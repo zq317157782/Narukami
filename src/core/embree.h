@@ -1,3 +1,4 @@
+
 /*
 MIT License
 
@@ -21,24 +22,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #pragma once
 
-/*
-narukami.h
-*/
+#include "rtcore.h"
 
-//marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
-
-//define DEBUG marco
-#ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
-#else
-    #define NARUKAMI_DEBUG
-#endif
-
-#include "embree.h"
-//create a global embree instance
-Embree embree;
+//a simple wrapper of embree API
+class Embree{
+private:
+    RTCDevice _device;
+public:
+    Embree(const char* config = nullptr){
+        _device=rtcNewDevice(config);
+    }
+    
+    ~Embree(){
+        rtcReleaseDevice(_device);
+    }
+};

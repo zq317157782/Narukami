@@ -7,6 +7,7 @@ enable_testing()
 include_directories(src)
 include_directories(src/core)
 include_directories(external)
+include_directories(external/embree/include/embree3)
 
 #add gtest
 set(gtest_force_shared_crt ON)
