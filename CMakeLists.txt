@@ -5,6 +5,7 @@ include(CTest)
 enable_testing()
 
 include_directories(src)
+include_directories(src/core)
 include_directories(external)
 
 add_executable(narukami src/main.cpp)
