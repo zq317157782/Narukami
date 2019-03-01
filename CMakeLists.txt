@@ -14,8 +14,13 @@ set(BUILD_GMOCK OFF)
 set(BUILD_GTEST ON)
 add_subdirectory(external/googletest)
 
+#add glog
+set(WITH_GFLAGS OFF)
+add_subdirectory(external/glog)
+
 #narukami
 add_executable(narukami src/main.cpp)
+target_link_libraries(narukami glog)
 
 #narukami_test
 add_executable(narukami_test test/main.cpp)
