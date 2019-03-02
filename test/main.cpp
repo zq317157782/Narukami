@@ -24,6 +24,12 @@ TEST(math,isinf){
     EXPECT_TRUE(isinf(x));
 }
 
+TEST(math,cast_i2f){
+    int x=1<<23;
+    float y=cast_i2f(x);
+    EXPECT_EQ(cast_f2i(y),x);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();

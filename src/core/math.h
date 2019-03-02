@@ -29,6 +29,25 @@ SOFTWARE.
 #include <cmath>
 NARUKAMI_BEGIN
 
+//IEEE float format
+//32 bits
+//[31][30-23][22-0]
+//[31] sign
+//[30-23] exp
+//[22-0] mag
+
+FINLINE float cast_i2f(const int x){
+    union {float f;int i;} v;
+    v.i=x;
+    return v.f;
+}
+
+FINLINE float cast_f2i(const float x){
+    union {float f;int i;} v;
+    v.f=x;
+    return v.i;
+}
+
 FINLINE float rcp(const float x){
     const __m128 a = _mm_set_ss(x);
     const __m128 r = _mm_rcp_ss(a);
@@ -50,6 +69,8 @@ FINLINE bool isinf(const float x){
 FINLINE float sqr(const float x){
     return x*x;
 }
+
+
 
 
 NARUKAMI_END
