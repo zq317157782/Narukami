@@ -38,7 +38,3 @@ narukami.h
 #else
     #define NARUKAMI_DEBUG
 #endif
-
-#include "embree.h"
-//create a global embree instance
-Embree embree;
