@@ -26,6 +26,7 @@ SOFTWARE.
 #include "sse.h"
 #include "platform.h"
 #include "narukami.h"
+#include <cmath>
 NARUKAMI_BEGIN
 
 FINLINE float rcp(const float x){
@@ -35,7 +36,16 @@ FINLINE float rcp(const float x){
 }
 
 FINLINE float sign(const float x){
-    return x>0?1.0f:(x<0?-1.0f:0.0f);
+    return x>=0.0f?1.0f:-1.0f;
 }
+
+FINLINE bool isnan(const float x){
+    return std::isnan(x);
+}
+
+FINLINE bool isinf(const float x){
+    return std::isinf(x);
+}
+
 
 NARUKAMI_END
