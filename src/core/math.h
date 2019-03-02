@@ -70,6 +70,17 @@ FINLINE float sqr(const float x){
     return x*x;
 }
 
+FINLINE float sqrt(const float x){
+    return std::sqrtf(x);
+}
+
+FINLINE float rsqrt( const float x )
+{
+    const __m128 a = _mm_set_ss(x);
+    const __m128 r = _mm_rsqrt_ss(a);
+    const __m128 c = _mm_add_ss(_mm_mul_ss(_mm_set_ss(1.5f), r),_mm_mul_ss(_mm_mul_ss(_mm_mul_ss(a, _mm_set_ss(-0.5f)), r), _mm_mul_ss(r, r)));
+    return _mm_cvtss_f32(c);
+}
 
 
 
