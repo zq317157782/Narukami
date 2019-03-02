@@ -25,9 +25,17 @@ SOFTWARE.
 #pragma once
 #include "sse.h"
 #include "platform.h"
+#include "narukami.h"
+NARUKAMI_BEGIN
 
 FINLINE float rcp(const float x){
     const __m128 a = _mm_set_ss(x);
     const __m128 r = _mm_rcp_ss(a);
     return _mm_cvtss_f32(_mm_mul_ss(r,_mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
 }
+
+FINLINE float sign(const float x){
+    return x>0?1.0f:(x<0?-1.0f:0.0f);
+}
+
+NARUKAMI_END

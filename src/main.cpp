@@ -1,6 +1,6 @@
 #include <iostream>
-#include "narukami.h"
-#include "log.h"
+#include "core/narukami.h"
+#include "core/log.h"
 int main(int, char**) {
 
     

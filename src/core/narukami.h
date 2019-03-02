@@ -27,8 +27,6 @@ SOFTWARE.
 narukami.h
 */
 
-#include "math.h"
-
 //marco for namespace
 #define NARUKAMI_BEGIN  namespace narukami{
 #define NARUKAMI_END    }
