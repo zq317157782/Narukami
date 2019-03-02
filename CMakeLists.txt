@@ -4,6 +4,9 @@ project(narukami VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
+set(CMAKE_BUILD_TYPE release)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 include_directories(src)
 include_directories(src/core)
 include_directories(external)
@@ -38,6 +41,10 @@ target_link_libraries(narukami glog)
 #narukami_test
 add_executable(narukami_test test/main.cpp)
 target_link_libraries(narukami_test gtest)
+
+#benchmark rcp
+add_executable(narukami_benchmark benchmark/main.cpp)
+target_link_libraries(narukami_benchmark benchmark)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
