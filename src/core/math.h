@@ -23,19 +23,11 @@ SOFTWARE.
 */
 
 #pragma once
-/*
-narukami.h
-*/
+#include "sse.h"
+#include "platform.h"
 
-#include "math.h"
-
-//marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
-
-//define DEBUG marco
-#ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
-#else
-    #define NARUKAMI_DEBUG
-#endif
+FINLINE float rcp(const float x){
+    const __m128 a = _mm_set_ss(x);
+    const __m128 r = _mm_rcp_ss(a);
+    return _mm_cvtss_f32(_mm_mul_ss(r,_mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
+}

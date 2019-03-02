@@ -21,21 +21,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #pragma once
-/*
-narukami.h
-*/
-
-#include "math.h"
-
-//marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
-
-//define DEBUG marco
-#ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
-#else
-    #define NARUKAMI_DEBUG
-#endif
+#include <xmmintrin.h>
