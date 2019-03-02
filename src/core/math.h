@@ -47,5 +47,9 @@ FINLINE bool isinf(const float x){
     return std::isinf(x);
 }
 
+FINLINE float sqr(const float x){
+    return x*x;
+}
+
 
 NARUKAMI_END
