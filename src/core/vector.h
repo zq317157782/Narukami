@@ -157,6 +157,11 @@ public:
         }
         return false;
     }
+
+    FINLINE friend std::ostream& operator<<(std::ostream& out,const Vector3f& v){
+        out<<'('<<v.x<<','<<v.y<<','<<v.z<<')';
+        return out;
+    }
 };
 
 NARUKAMI_END
