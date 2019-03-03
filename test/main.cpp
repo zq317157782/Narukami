@@ -101,6 +101,14 @@ TEST(vector3f,div){
     EXPECT_EQ(v2,Vector3f(0.5f,1.0f,1.5f));
 }
 
+TEST(vector3f,equal){
+    Vector3f v1(1);
+    Vector3f v2(2);
+    Vector3f v3(2);
+    EXPECT_TRUE(v1!=v3);
+    EXPECT_TRUE(v2==v3);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();

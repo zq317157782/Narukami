@@ -150,6 +150,13 @@ public:
         }
         return false;
     }
+
+    bool operator!=(const Vector3f& v1) const{
+        if((x!=v1.x)||(y!=v1.y)||(z!=v1.z)){
+            return true;
+        }
+        return false;
+    }
 };
 
 NARUKAMI_END
