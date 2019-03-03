@@ -39,3 +39,4 @@ narukami.h
 #endif
 
 #include <assert.h>
+#include <ostream>
