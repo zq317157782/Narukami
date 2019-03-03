@@ -95,12 +95,12 @@ FINLINE MAYBE_UNUSED int min(const int x,const int y){
 }
 
 template <typename T>
-FINLINE MAYBE_UNUSED T min(const T x,const T y,const T z){
+FINLINE MAYBE_UNUSED T min(const T& x,const T& y,const T& z){
     return min(min(x,y),z);
 }
 
 template <typename T>
-FINLINE MAYBE_UNUSED T min(const T x,const T y,const T z,const T w){
+FINLINE MAYBE_UNUSED T min(const T& x,const T& y,const T& z,const T& w){
     return min(min(x,y,z),w);
 }
 
@@ -113,13 +113,17 @@ FINLINE MAYBE_UNUSED int max(const int x,const int y){
 }
 
 template <typename T>
-FINLINE MAYBE_UNUSED T max(const T x,const T y,const T z){
+FINLINE MAYBE_UNUSED T max(const T& x,const T& y,const T& z){
     return max(max(x,y),z);
 }
 
 template <typename T>
-FINLINE MAYBE_UNUSED T max(const T x,const T y,const T z,const T w){
+FINLINE MAYBE_UNUSED T max(const T& x,const T& y,const T& z,const T& w){
     return max(max(x,y,z),w);
+}
+
+FINLINE MAYBE_UNUSED float abs(const float x){
+    return std::abs(x);
 }
 
 FINLINE MAYBE_UNUSED float sin(const float x){
@@ -150,6 +154,26 @@ FINLINE MAYBE_UNUSED float atan2(const float x,const float y){
     return std::atan2f(x,y);
 }
 
+FINLINE MAYBE_UNUSED float madd(float x,float y,float z){
+    return x*y+z;
+}
+
+FINLINE MAYBE_UNUSED float msub(float x,float y,float z){
+    return x*y-z;
+}
+
+FINLINE MAYBE_UNUSED float nmadd(float x,float y,float z){
+    return -x*y+z;
+}
+
+
+FINLINE MAYBE_UNUSED float nmsub(float x,float y,float z){
+    return -x*y-z;
+}
+
+
+FINLINE MAYBE_UNUSED float  deg2rad ( const float x )  { return x * 1.74532925199432957692e-2f; }
+FINLINE MAYBE_UNUSED float  rad2deg ( const float x )  { return x * 5.72957795130823208768e1f; }
 
 
 
