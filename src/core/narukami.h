@@ -37,3 +37,5 @@ narukami.h
 #else
     #define NARUKAMI_DEBUG
 #endif
+
+#include <assert.h>
