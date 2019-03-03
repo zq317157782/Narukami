@@ -32,21 +32,21 @@ class Vector3f{
 public:
     float x,y,z;
 public:
-    Vector3f():x(0),y(0),z(0){
+    FINLINE Vector3f():x(0),y(0),z(0){
     }
 
-    explicit Vector3f(const float a):x(a),y(a),z(a){
+    FINLINE explicit Vector3f(const float a):x(a),y(a),z(a){
         assert(!isnan(a));
     }
 
-    Vector3f(const float a,const float b,const float c):x(a),y(b),z(c){
+    FINLINE Vector3f(const float a,const float b,const float c):x(a),y(b),z(c){
         assert(!isnan(a));
         assert(!isnan(b));
         assert(!isnan(c));
     }
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    Vector3f(const Vector3f& v1){
+    FINLINE Vector3f(const Vector3f& v1){
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
@@ -55,7 +55,7 @@ public:
         z=v1.z;
     }
 
-    Vector3f& operator=(const Vector3f& v1){
+    FINLINE Vector3f& operator=(const Vector3f& v1){
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
@@ -66,7 +66,7 @@ public:
     }
 #endif
     
-    Vector3f operator+(const Vector3f& v1) const{
+    FINLINE Vector3f operator+(const Vector3f& v1) const{
         Vector3f v;
         v.x=x+v1.x;
         v.y=y+v1.y;
@@ -74,7 +74,7 @@ public:
         return v;
     }
 
-    Vector3f operator-(const Vector3f& v1) const{
+    FINLINE Vector3f operator-(const Vector3f& v1) const{
         Vector3f v;
         v.x=x-v1.x;
         v.y=y-v1.y;
@@ -83,7 +83,7 @@ public:
     }
 
     //compenont wise
-    Vector3f operator*(const Vector3f& v1) const{
+    FINLINE Vector3f operator*(const Vector3f& v1) const{
         Vector3f v;
         v.x=x*v1.x;
         v.y=y*v1.y;
@@ -91,7 +91,7 @@ public:
         return v;
     }
 
-    Vector3f operator*(const float f) const{
+    FINLINE Vector3f operator*(const float f) const{
         Vector3f v;
         v.x=x*f;
         v.y=y*f;
@@ -99,7 +99,7 @@ public:
         return v;
     }
     
-    Vector3f operator/(const float f) const{
+    FINLINE Vector3f operator/(const float f) const{
         assert(f!=0);
         Vector3f v;
         v.x=x/f;
@@ -108,35 +108,35 @@ public:
         return v;
     }
     
-    Vector3f& operator+=(const Vector3f& v1){
+    FINLINE Vector3f& operator+=(const Vector3f& v1){
         x+=v1.x;
         y+=v1.y;
         z+=v1.z;
         return (*this);
     }
 
-    Vector3f& operator-=(const Vector3f& v1){
+    FINLINE Vector3f& operator-=(const Vector3f& v1){
         x-=v1.x;
         y-=v1.y;
         z-=v1.z;
         return (*this);
     }
 
-    Vector3f& operator*=(const Vector3f& v1){
+    FINLINE Vector3f& operator*=(const Vector3f& v1){
         x*=v1.x;
         y*=v1.y;
         z*=v1.z;
         return (*this);
     }
 
-    Vector3f& operator*=(const float f){
+    FINLINE Vector3f& operator*=(const float f){
         x*=f;
         y*=f;
         z*=f;
         return (*this);
     }
 
-    Vector3f& operator/=(const float f){
+    FINLINE Vector3f& operator/=(const float f){
         assert(f!=0);
         x/=f;
         y/=f;
@@ -144,14 +144,14 @@ public:
         return (*this);
     }
 
-    bool operator==(const Vector3f& v1) const{
+    FINLINE bool operator==(const Vector3f& v1) const{
         if((x==v1.x)&&(y==v1.y)&&(z==v1.z)){
             return true;
         }
         return false;
     }
 
-    bool operator!=(const Vector3f& v1) const{
+    FINLINE bool operator!=(const Vector3f& v1) const{
         if((x!=v1.x)||(y!=v1.y)||(z!=v1.z)){
             return true;
         }
