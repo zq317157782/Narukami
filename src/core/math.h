@@ -36,49 +36,49 @@ NARUKAMI_BEGIN
 //[30-23] exp
 //[22-0] mag
 
-FINLINE float cast_i2f(const int x){
+FINLINE MAYBE_UNUSED float cast_i2f(const int x){
     union {float f;int i;} v;
     v.i=x;
     return v.f;
 }
 
-FINLINE float cast_f2i(const float x){
+FINLINE MAYBE_UNUSED float cast_f2i(const float x){
     union {float f;int i;} v;
     v.f=x;
     return v.i;
 }
 
-FINLINE float rcp(const float x){
+FINLINE MAYBE_UNUSED float rcp(const float x){
     const __m128 a = _mm_set_ss(x);
     const __m128 r = _mm_rcp_ss(a);
     return _mm_cvtss_f32(_mm_mul_ss(r,_mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
 }
 
-FINLINE float sign(const float x){
+FINLINE MAYBE_UNUSED float sign(const float x){
     return x>=0.0f?1.0f:-1.0f;
 }
 
-FINLINE int sign(const int x){
+FINLINE MAYBE_UNUSED int sign(const int x){
     return x>=0?1:-1;
 }
 
-FINLINE bool isnan(const float x){
+FINLINE MAYBE_UNUSED bool isnan(const float x){
     return std::isnan(x);
 }
 
-FINLINE bool isinf(const float x){
+FINLINE MAYBE_UNUSED bool isinf(const float x){
     return std::isinf(x);
 }
 
-FINLINE float sqr(const float x){
+FINLINE MAYBE_UNUSED float sqr(const float x){
     return x*x;
 }
 
-FINLINE float sqrt(const float x){
+FINLINE MAYBE_UNUSED float sqrt(const float x){
     return std::sqrtf(x);
 }
 
-FINLINE float rsqrt( const float x )
+FINLINE MAYBE_UNUSED float rsqrt( const float x )
 {
     const __m128 a = _mm_set_ss(x);
     const __m128 r = _mm_rsqrt_ss(a);
@@ -86,39 +86,39 @@ FINLINE float rsqrt( const float x )
     return _mm_cvtss_f32(c);
 }
 
-FINLINE float min(const float x,const float y){
+FINLINE MAYBE_UNUSED float min(const float x,const float y){
     return x<y?x:y;
 }
 
-FINLINE int min(const int x,const int y){
+FINLINE MAYBE_UNUSED int min(const int x,const int y){
     return x<y?x:y;
 }
 
 template <typename T>
-FINLINE T min(const T x,const T y,const T z){
+FINLINE MAYBE_UNUSED T min(const T x,const T y,const T z){
     return min(min(x,y),z);
 }
 
 template <typename T>
-FINLINE T min(const T x,const T y,const T z,const T w){
+FINLINE MAYBE_UNUSED T min(const T x,const T y,const T z,const T w){
     return min(min(x,y,z),w);
 }
 
-FINLINE float max(const float x,const float y){
+FINLINE MAYBE_UNUSED float max(const float x,const float y){
     return x>y?x:y;
 }
 
-FINLINE int max(const int x,const int y){
+FINLINE MAYBE_UNUSED int max(const int x,const int y){
     return x>y?x:y;
 }
 
 template <typename T>
-FINLINE T max(const T x,const T y,const T z){
+FINLINE MAYBE_UNUSED T max(const T x,const T y,const T z){
     return max(max(x,y),z);
 }
 
 template <typename T>
-FINLINE T max(const T x,const T y,const T z,const T w){
+FINLINE MAYBE_UNUSED T max(const T x,const T y,const T z,const T w){
     return max(max(x,y,z),w);
 }
 
