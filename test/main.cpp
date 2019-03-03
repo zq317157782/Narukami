@@ -52,6 +52,18 @@ TEST(math,max){
     EXPECT_FLOAT_EQ(max(x,y,z,w),30);
 }
 
+TEST(math,deg2rad){
+    float deg=180;
+    float rad=deg2rad(deg);
+    EXPECT_FLOAT_EQ(rad,3.1415927f);
+}
+
+TEST(math,rad2deg){
+    float rad=3.1415927f;
+    float deg=rad2deg(rad);
+    EXPECT_FLOAT_EQ(deg,180);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
