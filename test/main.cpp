@@ -64,6 +64,43 @@ TEST(math,rad2deg){
     EXPECT_FLOAT_EQ(deg,180);
 }
 
+#include "core/vector.h"
+TEST(vector3f,add){
+    Vector3f v1(1,2,3);
+    Vector3f v2(4,5,6);
+    auto v3=v1+v2;
+    EXPECT_EQ(v3,Vector3f(5,7,9));
+}
+
+TEST(vector3f,sub){
+    Vector3f v1(1,2,3);
+    Vector3f v2(4,5,6);
+    auto v3=v1-v2;
+    EXPECT_EQ(v3,Vector3f(-3,-3,-3));
+}
+
+
+TEST(vector3f,mul){
+    Vector3f v1(1,2,3);
+    Vector3f v2(4,5,6);
+    auto v3=v1*v2;
+    EXPECT_EQ(v3,Vector3f(4,10,18));
+}
+
+TEST(vector3f,mul2){
+    Vector3f v1(1,2,3);
+    float f=2; 
+    auto v2=v1*f;
+    EXPECT_EQ(v2,Vector3f(2,4,6));
+}
+
+TEST(vector3f,div){
+    Vector3f v1(1,2,3);
+    float f=2; 
+    auto v2=v1/f;
+    EXPECT_EQ(v2,Vector3f(0.5f,1.0f,1.5f));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
