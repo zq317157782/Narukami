@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 #define FINLINE                inline __attribute__((always_inline))
 #define NOINLINE               __attribute__((noinline))
 #define EXPECT_TAKEN(a)        __builtin_expect(!!(a), true)
