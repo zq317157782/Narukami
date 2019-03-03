@@ -58,6 +58,10 @@ FINLINE float sign(const float x){
     return x>=0.0f?1.0f:-1.0f;
 }
 
+FINLINE int sign(const int x){
+    return x>=0?1:-1;
+}
+
 FINLINE bool isnan(const float x){
     return std::isnan(x);
 }
@@ -117,6 +121,7 @@ template <typename T>
 FINLINE T max(const T x,const T y,const T z,const T w){
     return max(max(x,y,z),w);
 }
+
 
 
 
