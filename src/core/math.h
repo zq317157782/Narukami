@@ -122,6 +122,36 @@ FINLINE MAYBE_UNUSED T max(const T x,const T y,const T z,const T w){
     return max(max(x,y,z),w);
 }
 
+FINLINE MAYBE_UNUSED float sin(const float x){
+    return std::sinf(x);
+}
+
+FINLINE MAYBE_UNUSED float cos(const float x){
+    return std::cosf(x);
+}
+
+FINLINE MAYBE_UNUSED float tan(const float x){
+    return std::tanf(x);
+}
+
+FINLINE MAYBE_UNUSED float asin(const float x){
+    return std::asinf(x);
+}
+
+FINLINE MAYBE_UNUSED float acos(const float x){
+    return std::acosf(x);
+}
+
+FINLINE MAYBE_UNUSED float atan(const float x){
+    return std::atanf(x);
+}
+
+FINLINE MAYBE_UNUSED float atan2(const float x,const float y){
+    return std::atan2f(x,y);
+}
+
+
+
 
 
 
