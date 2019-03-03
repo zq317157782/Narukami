@@ -82,6 +82,44 @@ FINLINE float rsqrt( const float x )
     return _mm_cvtss_f32(c);
 }
 
+FINLINE float min(const float x,const float y){
+    return x<y?x:y;
+}
+
+FINLINE int min(const int x,const int y){
+    return x<y?x:y;
+}
+
+template <typename T>
+FINLINE T min(const T x,const T y,const T z){
+    return min(min(x,y),z);
+}
+
+template <typename T>
+FINLINE T min(const T x,const T y,const T z,const T w){
+    return min(min(x,y,z),w);
+}
+
+FINLINE float max(const float x,const float y){
+    return x>y?x:y;
+}
+
+FINLINE int max(const int x,const int y){
+    return x>y?x:y;
+}
+
+template <typename T>
+FINLINE T max(const T x,const T y,const T z){
+    return max(max(x,y),z);
+}
+
+template <typename T>
+FINLINE T max(const T x,const T y,const T z,const T w){
+    return max(max(x,y,z),w);
+}
+
+
+
 
 
 NARUKAMI_END

@@ -30,6 +30,28 @@ TEST(math,cast_i2f){
     EXPECT_EQ(cast_f2i(y),x);
 }
 
+TEST(math,min){
+    float x=10;
+    float y=20;
+    float z=30;
+    float w=5;
+
+    EXPECT_FLOAT_EQ(min(x,y),10);
+    EXPECT_FLOAT_EQ(min(x,y,z),10);
+    EXPECT_FLOAT_EQ(min(x,y,z,w),5);
+}
+
+TEST(math,max){
+    float x=10;
+    float y=20;
+    float z=30;
+    float w=5;
+
+    EXPECT_FLOAT_EQ(max(x,y),20);
+    EXPECT_FLOAT_EQ(max(x,y,z),30);
+    EXPECT_FLOAT_EQ(max(x,y,z,w),30);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
