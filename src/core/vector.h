@@ -224,5 +224,11 @@ FINLINE Vector3f rcp(const Vector3<T> &v1){
    return Vector3f(rcp(v1.x),rcp(v1.y),rcp(v1.z));
 }
 
+template <typename T> 
+FINLINE Vector3f sqrt(const Vector3<T> &v1){
+    return Vector3f(sqrt(v1.x),sqrt(v1.y),sqrt(v1.z));
+}
+
+
 
 NARUKAMI_END
