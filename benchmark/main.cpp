@@ -5,44 +5,60 @@
 static void BM_common_rcp(benchmark::State &state)
 {
     float ret = 0;
-    srand(0);
+    float x = 100.0f;
     for (auto _ : state)
-    {
-        benchmark::DoNotOptimize(ret += 1.0f / rand());
+    {   
+        x++;
+        benchmark::DoNotOptimize(ret += 1.0f /x);
     }
 }
 BENCHMARK(BM_common_rcp);
 
-static void BM_fast_rcp(benchmark::State &state)
+static void BM_SSE_rcp(benchmark::State &state)
 {
     float ret = 0;
-    srand(0);
+    float x = 100.0f;
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(ret += narukami::rcp(rand()));
+        x++;
+        benchmark::DoNotOptimize(ret += narukami::rcp(x));
     }
 }
 
-BENCHMARK(BM_fast_rcp);
+BENCHMARK(BM_SSE_rcp);
 
 static void BM_common_rsqrt(benchmark::State &state)
 {
     float ret = 0;
-    srand(0);
+    float x = 100.0f;
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(ret += 1.0f / std::sqrt(rand()));
+        x++;
+        benchmark::DoNotOptimize(ret += 1.0f / std::sqrt(x));
     }
 }
 BENCHMARK(BM_common_rsqrt);
 
+static void BM_SSE_rsqrt(benchmark::State &state)
+{
+    float ret = 0;
+    float x = 100.0f;
+    for (auto _ : state)
+    {
+        x++;
+        benchmark::DoNotOptimize(ret += narukami::rsqrt(x));
+    }
+}
+BENCHMARK(BM_SSE_rsqrt);
+
 static void BM_fast_rsqrt(benchmark::State &state)
 {
     float ret = 0;
-    srand(0);
+    float x = 100.0f;
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(ret += narukami::rsqrt(rand()));
+        x++;
+        benchmark::DoNotOptimize(ret += narukami::fast_rsqrt(x));
     }
 }
 BENCHMARK(BM_fast_rsqrt);
