@@ -27,26 +27,26 @@ SOFTWARE.
 #include "core/math.h"
 
 NARUKAMI_BEGIN
-
-class Vector3f{
+template <typename T>
+class Vector3{
 public:
-    float x,y,z;
+    T x,y,z;
 public:
-    FINLINE Vector3f():x(0),y(0),z(0){
+    FINLINE Vector3():x(0),y(0),z(0){
     }
 
-    FINLINE explicit Vector3f(const float a):x(a),y(a),z(a){
+    FINLINE explicit Vector3(const float a):x(a),y(a),z(a){
         assert(!isnan(a));
     }
 
-    FINLINE Vector3f(const float a,const float b,const float c):x(a),y(b),z(c){
+    FINLINE Vector3(const T& a,const T& b,const T& c):x(a),y(b),z(c){
         assert(!isnan(a));
         assert(!isnan(b));
         assert(!isnan(c));
     }
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Vector3f(const Vector3f& v1){
+    FINLINE Vector3(const Vector3& v1){
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
@@ -55,7 +55,7 @@ public:
         z=v1.z;
     }
 
-    FINLINE Vector3f& operator=(const Vector3f& v1){
+    FINLINE Vector3& operator=(const Vector3& v1){
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
@@ -66,16 +66,16 @@ public:
     }
 #endif
     
-    FINLINE Vector3f operator+(const Vector3f& v1) const{
-        Vector3f v;
+    FINLINE Vector3 operator+(const Vector3& v1) const{
+        Vector3 v;
         v.x=x+v1.x;
         v.y=y+v1.y;
         v.z=z+v1.z;
         return v;
     }
 
-    FINLINE Vector3f operator-(const Vector3f& v1) const{
-        Vector3f v;
+    FINLINE Vector3 operator-(const Vector3& v1) const{
+        Vector3 v;
         v.x=x-v1.x;
         v.y=y-v1.y;
         v.z=z-v1.z;
@@ -83,60 +83,60 @@ public:
     }
 
     //compenont wise
-    FINLINE Vector3f operator*(const Vector3f& v1) const{
-        Vector3f v;
+    FINLINE Vector3 operator*(const Vector3& v1) const{
+        Vector3 v;
         v.x=x*v1.x;
         v.y=y*v1.y;
         v.z=z*v1.z;
         return v;
     }
 
-    FINLINE Vector3f operator*(const float f) const{
-        Vector3f v;
+    FINLINE Vector3 operator*(const T& f) const{
+        Vector3 v;
         v.x=x*f;
         v.y=y*f;
         v.z=z*f;
         return v;
     }
     
-    FINLINE Vector3f operator/(const float f) const{
+    FINLINE Vector3 operator/(const T& f) const{
         assert(f!=0);
-        Vector3f v;
+        Vector3 v;
         v.x=x/f;
         v.y=y/f;
         v.z=z/f;
         return v;
     }
     
-    FINLINE Vector3f& operator+=(const Vector3f& v1){
+    FINLINE Vector3& operator+=(const Vector3& v1){
         x+=v1.x;
         y+=v1.y;
         z+=v1.z;
         return (*this);
     }
 
-    FINLINE Vector3f& operator-=(const Vector3f& v1){
+    FINLINE Vector3& operator-=(const Vector3& v1){
         x-=v1.x;
         y-=v1.y;
         z-=v1.z;
         return (*this);
     }
 
-    FINLINE Vector3f& operator*=(const Vector3f& v1){
+    FINLINE Vector3& operator*=(const Vector3& v1){
         x*=v1.x;
         y*=v1.y;
         z*=v1.z;
         return (*this);
     }
 
-    FINLINE Vector3f& operator*=(const float f){
+    FINLINE Vector3& operator*=(const T& f){
         x*=f;
         y*=f;
         z*=f;
         return (*this);
     }
 
-    FINLINE Vector3f& operator/=(const float f){
+    FINLINE Vector3& operator/=(const T& f){
         assert(f!=0);
         x/=f;
         y/=f;
@@ -144,24 +144,26 @@ public:
         return (*this);
     }
 
-    FINLINE bool operator==(const Vector3f& v1) const{
+    FINLINE bool operator==(const Vector3& v1) const{
         if((x==v1.x)&&(y==v1.y)&&(z==v1.z)){
             return true;
         }
         return false;
     }
 
-    FINLINE bool operator!=(const Vector3f& v1) const{
+    FINLINE bool operator!=(const Vector3& v1) const{
         if((x!=v1.x)||(y!=v1.y)||(z!=v1.z)){
             return true;
         }
         return false;
     }
 
-    FINLINE friend std::ostream& operator<<(std::ostream& out,const Vector3f& v){
+    FINLINE friend std::ostream& operator<<(std::ostream& out,const Vector3& v){
         out<<'('<<v.x<<','<<v.y<<','<<v.z<<')';
         return out;
     }
 };
+
+typedef Vector3<float> Vector3f;
 
 NARUKAMI_END
