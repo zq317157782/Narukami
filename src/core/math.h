@@ -66,6 +66,11 @@ FINLINE MAYBE_UNUSED bool isnan(const float x){
     return std::isnan(x);
 }
 
+FINLINE MAYBE_UNUSED bool isnan(const int x){
+    return false;
+}
+
+
 FINLINE MAYBE_UNUSED bool isinf(const float x){
     return std::isinf(x);
 }

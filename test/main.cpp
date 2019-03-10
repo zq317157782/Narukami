@@ -67,7 +67,7 @@ TEST(math,rad2deg){
 #include "core/vector.h"
 TEST(type,int_div_zero){
     int a= 1/0;
-    EXPECT_EQ(a,0);
+    EXPECT_EQ(isnan(a),false);
 }
 
 TEST(vector3f,add){

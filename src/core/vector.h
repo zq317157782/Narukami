@@ -28,142 +28,169 @@ SOFTWARE.
 
 NARUKAMI_BEGIN
 template <typename T>
-class Vector3{
-public:
-    T x,y,z;
-public:
-    FINLINE Vector3():x(0),y(0),z(0){
+class Vector3
+{
+  public:
+    T x, y, z;
+
+  public:
+    FINLINE Vector3() : x(0), y(0), z(0)
+    {
     }
 
-    FINLINE explicit Vector3(const float a):x(a),y(a),z(a){
+    FINLINE explicit Vector3(const float a) : x(a), y(a), z(a)
+    {
         assert(!isnan(a));
     }
 
-    FINLINE Vector3(const T& a,const T& b,const T& c):x(a),y(b),z(c){
+    FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c)
+    {
         assert(!isnan(a));
         assert(!isnan(b));
         assert(!isnan(c));
     }
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Vector3(const Vector3& v1){
+    FINLINE Vector3(const Vector3 &v1)
+    {
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
-        x=v1.x;
-        y=v1.y;
-        z=v1.z;
+        x = v1.x;
+        y = v1.y;
+        z = v1.z;
     }
 
-    FINLINE Vector3& operator=(const Vector3& v1){
+    FINLINE Vector3 &operator=(const Vector3 &v1)
+    {
         assert(!isnan(v1.x));
         assert(!isnan(v1.y));
         assert(!isnan(v1.z));
-        x=v1.x;
-        y=v1.y;
-        z=v1.z;
+        x = v1.x;
+        y = v1.y;
+        z = v1.z;
         return (*this);
     }
 #endif
-    
-    FINLINE Vector3 operator+(const Vector3& v1) const{
-        Vector3 v;
-        v.x=x+v1.x;
-        v.y=y+v1.y;
-        v.z=z+v1.z;
-        return v;
-    }
-
-    FINLINE Vector3 operator-(const Vector3& v1) const{
-        Vector3 v;
-        v.x=x-v1.x;
-        v.y=y-v1.y;
-        v.z=z-v1.z;
-        return v;
-    }
-
-    //compenont wise
-    FINLINE Vector3 operator*(const Vector3& v1) const{
-        Vector3 v;
-        v.x=x*v1.x;
-        v.y=y*v1.y;
-        v.z=z*v1.z;
-        return v;
-    }
-
-    FINLINE Vector3 operator*(const T& f) const{
-        Vector3 v;
-        v.x=x*f;
-        v.y=y*f;
-        v.z=z*f;
-        return v;
-    }
-    
-    FINLINE Vector3 operator/(const T& f) const{
-        assert(f!=0);
-        Vector3 v;
-        v.x=x/f;
-        v.y=y/f;
-        v.z=z/f;
-        return v;
-    }
-    
-    FINLINE Vector3& operator+=(const Vector3& v1){
-        x+=v1.x;
-        y+=v1.y;
-        z+=v1.z;
+    FINLINE Vector3 &operator+=(const Vector3 &v1)
+    {
+        x += v1.x;
+        y += v1.y;
+        z += v1.z;
         return (*this);
     }
 
-    FINLINE Vector3& operator-=(const Vector3& v1){
-        x-=v1.x;
-        y-=v1.y;
-        z-=v1.z;
+    FINLINE Vector3 &operator-=(const Vector3 &v1)
+    {
+        x -= v1.x;
+        y -= v1.y;
+        z -= v1.z;
         return (*this);
     }
 
-    FINLINE Vector3& operator*=(const Vector3& v1){
-        x*=v1.x;
-        y*=v1.y;
-        z*=v1.z;
+    FINLINE Vector3 &operator*=(const Vector3 &v1)
+    {
+        x *= v1.x;
+        y *= v1.y;
+        z *= v1.z;
         return (*this);
     }
 
-    FINLINE Vector3& operator*=(const T& f){
-        x*=f;
-        y*=f;
-        z*=f;
+    FINLINE Vector3 &operator*=(const T &f)
+    {
+        x *= f;
+        y *= f;
+        z *= f;
         return (*this);
     }
 
-    FINLINE Vector3& operator/=(const T& f){
-        assert(f!=0);
-        x/=f;
-        y/=f;
-        z/=f;
+    FINLINE Vector3 &operator/=(const T &f)
+    {
+        assert(f != 0);
+        x /= f;
+        y /= f;
+        z /= f;
         return (*this);
     }
-
-    FINLINE bool operator==(const Vector3& v1) const{
-        if((x==v1.x)&&(y==v1.y)&&(z==v1.z)){
-            return true;
-        }
-        return false;
-    }
-
-    FINLINE bool operator!=(const Vector3& v1) const{
-        if((x!=v1.x)||(y!=v1.y)||(z!=v1.z)){
-            return true;
-        }
-        return false;
-    }
-
-    FINLINE friend std::ostream& operator<<(std::ostream& out,const Vector3& v){
-        out<<'('<<v.x<<','<<v.y<<','<<v.z<<')';
+    FINLINE friend std::ostream &operator<<(std::ostream &out, const Vector3 &v)
+    {
+        out << '(' << v.x << ',' << v.y << ',' << v.z << ')';
         return out;
     }
 };
 
+template <typename T>
+FINLINE Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    Vector3<T> v;
+    v.x = v1.x + v2.x;
+    v.y = v1.y + v2.y;
+    v.z = v1.z + v2.z;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> operator-(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    Vector3<T> v;
+    v.x = v1.x - v2.x;
+    v.y = v1.y - v2.y;
+    v.z = v1.z - v2.z;
+    return v;
+}
+
+//compenont wise
+template <typename T>
+FINLINE Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    Vector3<T> v;
+    v.x = v1.x * v2.x;
+    v.y = v1.y * v2.y;
+    v.z = v1.z * v2.z;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> operator*(const Vector3<T> &v1, const T &f)
+{
+    Vector3<T> v;
+    v.x = v1.x * f;
+    v.y = v1.y * f;
+    v.z = v1.z * f;
+    return v;
+}
+template <typename T>
+FINLINE Vector3<T> operator/(const Vector3<T> &v1, const T &f)
+{
+    assert(f != 0);
+    Vector3<T> v;
+    v.x = v1.x / f;
+    v.y = v1.y / f;
+    v.z = v1.z / f;
+    return v;
+}
+
+template <typename T>
+FINLINE bool operator==(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z))
+    {
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+FINLINE bool operator!=(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    if ((v1.x != v2.x) || (v1.y != v2.y) || (v1.z != v2.z))
+    {
+        return true;
+    }
+    return false;
+}
+
 typedef Vector3<float> Vector3f;
+typedef Vector3<int> Vector3i;
 
 NARUKAMI_END
