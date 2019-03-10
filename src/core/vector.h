@@ -112,6 +112,17 @@ class Vector3
         z /= f;
         return (*this);
     }
+
+    FINLINE T operator[](const int idx) const{
+        assert(idx>=0&&idx<3);
+        return (&x)[idx];
+    }
+
+    FINLINE T& operator[](const int idx){
+        assert(idx>=0&&idx<3);
+        return (&x)[idx];
+    }
+
     FINLINE friend std::ostream &operator<<(std::ostream &out, const Vector3 &v)
     {
         out << '(' << v.x << ',' << v.y << ',' << v.z << ')';

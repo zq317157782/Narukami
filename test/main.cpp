@@ -136,6 +136,12 @@ TEST(vector3f,rcp){
     EXPECT_GE(v2.x,0.49999);
 }
 
+TEST(vector3f,subscript){
+    Vector3f v1(0);
+    v1[0]=1;
+    EXPECT_FLOAT_EQ(v1[0],1);
+}
+
 TEST(vector3i,dot){
     Vector3i v1(1,2,3);
     Vector3i v2(1,2,3);
