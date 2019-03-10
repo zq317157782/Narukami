@@ -128,6 +128,14 @@ TEST(vector3f,normalize){
     EXPECT_EQ(v2,Vector3f(1,0,0));
 }
 
+
+TEST(vector3f,rcp){
+    Vector3f v1(2,2,2);
+    auto v2=rcp(v1);
+    EXPECT_LE(v2.x,0.50001);
+    EXPECT_GE(v2.x,0.49999);
+}
+
 TEST(vector3i,dot){
     Vector3i v1(1,2,3);
     Vector3i v2(1,2,3);
