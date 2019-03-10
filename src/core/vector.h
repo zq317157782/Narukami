@@ -119,6 +119,9 @@ class Vector3
     }
 };
 
+typedef Vector3<float> Vector3f;
+typedef Vector3<int> Vector3i;
+
 template <typename T>
 FINLINE Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)
 {
@@ -190,7 +193,26 @@ FINLINE bool operator!=(const Vector3<T> &v1, const Vector3<T> &v2)
     return false;
 }
 
-typedef Vector3<float> Vector3f;
-typedef Vector3<int> Vector3i;
+template <typename T>
+FINLINE T dot(const Vector3<T> &v1, const Vector3<T> &v2){
+    return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;
+}
+
+template <typename T>
+FINLINE float length(const Vector3<T> &v){
+    return sqrt(float(dot(v,v)));
+}
+
+template <typename T>
+FINLINE Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2){
+    return Vector3<T>(v1.y*v2.z-v1.z*v2.y,v1.z*v2.x-v1.x*v2.z,v1.x*v2.y-v1.y*v2.x);
+}
+
+
+template <typename T>
+FINLINE Vector3f normalize(const Vector3<T> &v1){
+    float inv_l=rsqrt(dot(v1,v1));
+    return v1*inv_l;
+}
 
 NARUKAMI_END

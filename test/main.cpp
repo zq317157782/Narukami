@@ -65,10 +65,10 @@ TEST(math,rad2deg){
 }
 
 #include "core/vector.h"
-TEST(type,int_div_zero){
-    int a= 1/0;
-    EXPECT_EQ(isnan(a),false);
-}
+// TEST(type,int_div_zero){
+//     int a= 1/0;
+//     EXPECT_EQ(isnan(a),false);
+// }
 
 TEST(vector3f,add){
     Vector3f v1(1,2,3);
@@ -113,6 +113,37 @@ TEST(vector3f,equal){
     EXPECT_TRUE(v1!=v3);
     EXPECT_TRUE(v2==v3);
 }
+
+TEST(vector3f,cross){
+    Vector3f v1(1,0,0);
+    Vector3f v2(0,1,0);
+    auto v3=cross(v1,v2);
+    Vector3f v(0,0,1);
+    EXPECT_EQ(v3,v);
+}
+
+TEST(vector3f,normalize){
+    Vector3f v1(5,0,0);
+    auto v2=normalize(v1);
+    EXPECT_EQ(v2,Vector3f(1,0,0));
+}
+
+TEST(vector3i,dot){
+    Vector3i v1(1,2,3);
+    Vector3i v2(1,2,3);
+    int a=dot(v1,v2);
+    EXPECT_EQ(a,14);
+}
+
+TEST(vector3i,length){
+    Vector3i v1(1,2,3);
+    float a=length(v1);
+    EXPECT_FLOAT_EQ(a,3.7416575);
+}
+
+
+
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
