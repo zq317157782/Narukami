@@ -65,6 +65,11 @@ TEST(math,rad2deg){
 }
 
 #include "core/vector.h"
+TEST(type,int_div_zero){
+    int a= 1/0;
+    EXPECT_EQ(a,0);
+}
+
 TEST(vector3f,add){
     Vector3f v1(1,2,3);
     Vector3f v2(4,5,6);
