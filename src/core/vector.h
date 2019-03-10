@@ -33,6 +33,12 @@ class Vector3
   public:
     T x, y, z;
 
+    typedef T Scalar;
+    enum
+    {
+        N = 3
+    };
+
   public:
     FINLINE Vector3() : x(0), y(0), z(0)
     {
@@ -113,13 +119,15 @@ class Vector3
         return (*this);
     }
 
-    FINLINE T operator[](const int idx) const{
-        assert(idx>=0&&idx<3);
+    FINLINE T operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 
-    FINLINE T& operator[](const int idx){
-        assert(idx>=0&&idx<3);
+    FINLINE T &operator[](const int idx)
+    {
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 
@@ -205,41 +213,46 @@ FINLINE bool operator!=(const Vector3<T> &v1, const Vector3<T> &v2)
 }
 
 template <typename T>
-FINLINE T dot(const Vector3<T> &v1, const Vector3<T> &v2){
-    return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;
+FINLINE T dot(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 template <typename T>
-FINLINE float length(const Vector3<T> &v){
-    return sqrt(float(dot(v,v)));
+FINLINE float length(const Vector3<T> &v)
+{
+    return sqrt(float(dot(v, v)));
 }
 
 template <typename T>
-FINLINE float lensqr(const Vector3<T> &v){
-    return float(dot(v,v));
+FINLINE float lensqr(const Vector3<T> &v)
+{
+    return float(dot(v, v));
 }
 
 template <typename T>
-FINLINE Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2){
-    return Vector3<T>(v1.y*v2.z-v1.z*v2.y,v1.z*v2.x-v1.x*v2.z,v1.x*v2.y-v1.y*v2.x);
+FINLINE Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 }
 
 template <typename T>
-FINLINE Vector3f normalize(const Vector3<T> &v1){
-    float inv_l=rsqrt(dot(v1,v1));
-    return v1*inv_l;
+FINLINE Vector3f normalize(const Vector3<T> &v1)
+{
+    float inv_l = rsqrt(dot(v1, v1));
+    return v1 * inv_l;
 }
 
-template <typename T> 
-FINLINE Vector3f rcp(const Vector3<T> &v1){
-   return Vector3f(rcp(v1.x),rcp(v1.y),rcp(v1.z));
+template <typename T>
+FINLINE Vector3f rcp(const Vector3<T> &v1)
+{
+    return Vector3f(rcp(v1.x), rcp(v1.y), rcp(v1.z));
 }
 
-template <typename T> 
-FINLINE Vector3f sqrt(const Vector3<T> &v1){
-    return Vector3f(sqrt(v1.x),sqrt(v1.y),sqrt(v1.z));
+template <typename T>
+FINLINE Vector3f sqrt(const Vector3<T> &v1)
+{
+    return Vector3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z));
 }
-
-
 
 NARUKAMI_END
