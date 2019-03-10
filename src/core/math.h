@@ -171,23 +171,26 @@ FINLINE MAYBE_UNUSED float atan2(const float x,const float y){
     return std::atan2f(x,y);
 }
 
-FINLINE MAYBE_UNUSED float madd(float x,float y,float z){
+FINLINE MAYBE_UNUSED float madd(const float x,const float y,const float z){
     return x*y+z;
 }
 
-FINLINE MAYBE_UNUSED float msub(float x,float y,float z){
+FINLINE MAYBE_UNUSED float msub(const float x,const float y,const float z){
     return x*y-z;
 }
 
-FINLINE MAYBE_UNUSED float nmadd(float x,float y,float z){
+FINLINE MAYBE_UNUSED float nmadd(const float x,const float y,const float z){
     return -x*y+z;
 }
 
 
-FINLINE MAYBE_UNUSED float nmsub(float x,float y,float z){
+FINLINE MAYBE_UNUSED float nmsub(const float x,const float y,const float z){
     return -x*y-z;
 }
 
+FINLINE MAYBE_UNUSED float lerp(const float x0,const float x1,const float t){
+    return madd(1.0f-t,x0,t*x1);
+}
 
 FINLINE MAYBE_UNUSED float  deg2rad ( const float x )  { return x * 1.74532925199432957692e-2f; }
 FINLINE MAYBE_UNUSED float  rad2deg ( const float x )  { return x * 5.72957795130823208768e1f; }

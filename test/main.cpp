@@ -64,6 +64,11 @@ TEST(math,rad2deg){
     EXPECT_FLOAT_EQ(deg,180);
 }
 
+TEST(math,lerp){
+    float a=lerp(0,1,0.5f);
+    EXPECT_FLOAT_EQ(a,0.5f);
+}
+
 #include "core/vector.h"
 // TEST(type,int_div_zero){
 //     int a= 1/0;
