@@ -63,7 +63,7 @@ static void BM_fast_rsqrt(benchmark::State &state)
 }
 BENCHMARK(BM_fast_rsqrt);
 
-#include "core/vector.h"
+#include "core/vector3.h"
 template <typename T>
 FINLINE narukami::Vector3f normalize_v1(const narukami::Vector3<T> &v1)
 {
