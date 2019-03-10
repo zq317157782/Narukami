@@ -29,6 +29,8 @@ SOFTWARE.
 #include <cmath>
 NARUKAMI_BEGIN
 
+static MAYBE_UNUSED const float min_rcp_input = 1E-18f;
+
 //IEEE float format
 //32 bits
 //[31][30-23][22-0]
