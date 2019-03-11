@@ -9,18 +9,20 @@ TEST(math,rcp){
 }
 
 TEST(math,isnan){
-    float x=0.0f/0.0f;
+    float zero=0.0f;
+    float x=0.0f/zero;
     EXPECT_TRUE(isnan(x));
 
-    x=1.0f/0.0f;
+    x=1.0f/zero;
     EXPECT_FALSE(isnan(x));
 }
 
 TEST(math,isinf){
-    float x=0.0f/0.0f;
+    float zero=0.0f;
+    float x=0.0f/zero;
     EXPECT_FALSE(isinf(x));
 
-    x=1.0f/0.0f;
+    x=1.0f/zero;
     EXPECT_TRUE(isinf(x));
 }
 
