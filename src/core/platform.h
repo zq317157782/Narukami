@@ -6,7 +6,7 @@
 #define EXPECT_TAKEN(a)        __builtin_expect(!!(a), true)
 #define EXPECT_NOT_TAKEN(a)    __builtin_expect(!!(a), false)
 #define MAYBE_UNUSED           __attribute__((unused))
-#elif defined(__MSVC__)
+#elif defined(_MSC_VER)
 #define FINLINE                __forceinline
 #define NOINLINE               __declspec(noinline)
 #define MM_ALIGN16             __declspec(align(16))
