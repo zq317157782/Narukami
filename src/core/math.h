@@ -44,7 +44,7 @@ FINLINE MAYBE_UNUSED float cast_i2f(const int x){
     return v.f;
 }
 
-FINLINE MAYBE_UNUSED float cast_f2i(const float x){
+FINLINE MAYBE_UNUSED int cast_f2i(const float x){
     union {float f;int i;} v;
     v.f=x;
     return v.i;
