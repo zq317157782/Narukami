@@ -294,6 +294,35 @@ TEST(ssevector3f,sign){
      EXPECT_EQ(sign(v2),SSEVector3f(1.0f));
 }
 
+TEST(ssevector3f,add){
+     SSEVector3f v1(-5);
+     SSEVector3f v2(5);
+     auto v3=v1+v2;
+     EXPECT_EQ(v3,SSEVector3f(0.0F));
+}
+
+TEST(ssevector3f,sub){
+     SSEVector3f v1(-5);
+     SSEVector3f v2(5);
+     auto v3=v1*v2;
+     EXPECT_EQ(v3,SSEVector3f(-25.0F));
+}
+
+
+TEST(ssevector3f,mul){
+     SSEVector3f v1(-5);
+     SSEVector3f v2(5);
+     auto v3=v1-v2;
+     EXPECT_EQ(v3,SSEVector3f(-10.0F));
+}
+
+TEST(ssevector3f,div){
+     SSEVector3f v1(-5);
+     float div=5; 
+     auto v3=v1/div;
+     EXPECT_EQ(v3,SSEVector3f(-1.0F));
+}
+
 
 TEST(sse,_sse_blendv_ps){
     __m128 a =_mm_set1_ps(5.0f);

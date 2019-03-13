@@ -359,6 +359,28 @@ FINLINE SSEVector3f operator-(const SSEVector3f& v){
     return _mm_xor_ps(v.xyzw,mask);
 }
 
+FINLINE SSEVector3f operator+(const SSEVector3f& v1,const SSEVector3f& v2){
+    return _mm_add_ps(v1,v2);
+}
+
+FINLINE SSEVector3f operator-(const SSEVector3f& v1,const SSEVector3f& v2){
+    return _mm_sub_ps(v1,v2);
+}
+
+FINLINE SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){
+    return _mm_mul_ps(v1,v2);
+}
+
+FINLINE SSEVector3f operator*(const SSEVector3f& v1,const float a){
+    return _mm_mul_ps(v1,SSEVector3f(a));
+}
+
+FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){
+    assert(a!=0);
+    return _mm_div_ps(v1,SSEVector3f(a));
+}
+
+
 FINLINE SSEVector3f abs(const SSEVector3f& v){
     //0x7FFFFFFF and x(y,z)
     auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
