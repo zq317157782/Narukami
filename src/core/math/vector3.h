@@ -88,13 +88,15 @@ struct Vector3
         assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
-
-    FINLINE friend std::ostream &operator<<(std::ostream &out, const Vector3 &v)
-    {
-        out << '(' << v.x << ',' << v.y << ',' << v.z << ')';
-        return out;
-    }
 };
+
+
+template <typename T>
+FINLINE  std::ostream &operator<<(std::ostream &out, const Vector3<T> &v)
+{
+    out << '(' << v.x << ',' << v.y << ',' << v.z << ')';
+    return out;
+}
 
 typedef Vector3<float> Vector3f;
 typedef Vector3<int> Vector3i;
@@ -169,7 +171,7 @@ FINLINE Vector3<T> &operator-=(Vector3<T> &v, const Vector3<T> &v1)
 }
 
 template <typename T>
-FINLINE Vector3<T> &operator*=(Vector3<T> &v,const Vector3<T> &v1)
+FINLINE Vector3<T> &operator*=(Vector3<T> &v, const Vector3<T> &v1)
 {
     v.x *= v1.x;
     v.y *= v1.y;
@@ -178,7 +180,7 @@ FINLINE Vector3<T> &operator*=(Vector3<T> &v,const Vector3<T> &v1)
 }
 
 template <typename T>
-FINLINE Vector3<T> &operator*=(Vector3<T> &v,const T &f)
+FINLINE Vector3<T> &operator*=(Vector3<T> &v, const T &f)
 {
     v.x *= f;
     v.y *= f;
@@ -187,7 +189,7 @@ FINLINE Vector3<T> &operator*=(Vector3<T> &v,const T &f)
 }
 
 template <typename T>
-FINLINE Vector3<T> &operator/=(Vector3<T> &v,const T &f)
+FINLINE Vector3<T> &operator/=(Vector3<T> &v, const T &f)
 {
     assert(f != 0);
     v.x /= f;

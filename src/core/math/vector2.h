@@ -84,13 +84,14 @@ class Vector2
         assert(idx >= 0 && idx < 2);
         return (&x)[idx];
     }
+};
 
-    FINLINE friend std::ostream &operator<<(std::ostream &out, const Vector2 &v)
-    {
+template <typename T>
+FINLINE  std::ostream &operator<<(std::ostream &out, const Vector2<T> &v)
+{
         out << '(' << v.x << ',' << v.y  << ')';
         return out;
-    }
-};
+}
 
 typedef Vector2<float> Vector2f;
 typedef Vector2<int> Vector2i;
