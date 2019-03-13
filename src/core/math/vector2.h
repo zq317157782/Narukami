@@ -102,6 +102,19 @@ typedef Vector2<float> Vector2f;
 typedef Vector2<int> Vector2i;
 
 template <typename T>
+FINLINE Vector2<T> operator+(const Vector2<T>& v){
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> operator-(const Vector2<T>& v1){
+    Vector2<T> v;
+    v.x=-v1.x;
+    v.y=-v1.y;
+    return v;
+}
+
+template <typename T>
 FINLINE Vector2<T> operator+(const Vector2<T> &v1, const Vector2<T> &v2)
 {
     Vector2<T> v;
