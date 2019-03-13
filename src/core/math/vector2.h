@@ -73,42 +73,6 @@ class Vector2
         return (*this);
     }
 #endif
-    FINLINE Vector2 &operator+=(const Vector2 &v1)
-    {
-        x += v1.x;
-        y += v1.y;
-        return (*this);
-    }
-
-    FINLINE Vector2 &operator-=(const Vector2 &v1)
-    {
-        x -= v1.x;
-        y -= v1.y;
-        return (*this);
-    }
-
-    FINLINE Vector2 &operator*=(const Vector2 &v1)
-    {
-        x *= v1.x;
-        y *= v1.y;
-        return (*this);
-    }
-
-    FINLINE Vector2 &operator*=(const T &f)
-    {
-        x *= f;
-        y *= f;
-        return (*this);
-    }
-
-    FINLINE Vector2 &operator/=(const T &f)
-    {
-        assert(f != 0);
-        x /= f;
-        y /= f;
-        return (*this);
-    }
-
     FINLINE T operator[](const int idx) const
     {
         assert(idx >= 0 && idx < 2);
@@ -174,6 +138,47 @@ FINLINE Vector2<T> operator/(const Vector2<T> &v1, const T &f)
     Vector2<T> v;
     v.x = v1.x / f;
     v.y = v1.y / f;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> &operator+=(Vector2<T> &v, const Vector2<T> &v1)
+{
+    v.x += v1.x;
+    v.y += v1.y;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> &operator-=(Vector2<T> &v, const Vector2<T> &v1)
+{
+    v.x -= v1.x;
+    v.y -= v1.y;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> &operator*=(Vector2<T> &v,const Vector2<T> &v1)
+{
+    v.x *= v1.x;
+    v.y *= v1.y;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> &operator*=(Vector2<T> &v,const T &f)
+{
+    v.x *= f;
+    v.y *= f;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector2<T> &operator/=(Vector2<T> &v,const T &f)
+{
+    assert(f != 0);
+    v.x /= f;
+    v.y /= f;
     return v;
 }
 

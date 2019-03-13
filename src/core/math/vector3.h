@@ -28,11 +28,10 @@ SOFTWARE.
 
 NARUKAMI_BEGIN
 template <typename T>
-class Vector3
+struct Vector3
 {
   public:
     T x, y, z;
-
     typedef T Scalar;
     enum
     {
@@ -78,47 +77,6 @@ class Vector3
         return (*this);
     }
 #endif
-    FINLINE Vector3 &operator+=(const Vector3 &v1)
-    {
-        x += v1.x;
-        y += v1.y;
-        z += v1.z;
-        return (*this);
-    }
-
-    FINLINE Vector3 &operator-=(const Vector3 &v1)
-    {
-        x -= v1.x;
-        y -= v1.y;
-        z -= v1.z;
-        return (*this);
-    }
-
-    FINLINE Vector3 &operator*=(const Vector3 &v1)
-    {
-        x *= v1.x;
-        y *= v1.y;
-        z *= v1.z;
-        return (*this);
-    }
-
-    FINLINE Vector3 &operator*=(const T &f)
-    {
-        x *= f;
-        y *= f;
-        z *= f;
-        return (*this);
-    }
-
-    FINLINE Vector3 &operator/=(const T &f)
-    {
-        assert(f != 0);
-        x /= f;
-        y /= f;
-        z /= f;
-        return (*this);
-    }
-
     FINLINE T operator[](const int idx) const
     {
         assert(idx >= 0 && idx < 3);
@@ -189,6 +147,52 @@ FINLINE Vector3<T> operator/(const Vector3<T> &v1, const T &f)
     v.x = v1.x / f;
     v.y = v1.y / f;
     v.z = v1.z / f;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> &operator+=(Vector3<T> &v, const Vector3<T> &v1)
+{
+    v.x += v1.x;
+    v.y += v1.y;
+    v.z += v1.z;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> &operator-=(Vector3<T> &v, const Vector3<T> &v1)
+{
+    v.x -= v1.x;
+    v.y -= v1.y;
+    v.z -= v1.z;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> &operator*=(Vector3<T> &v,const Vector3<T> &v1)
+{
+    v.x *= v1.x;
+    v.y *= v1.y;
+    v.z *= v1.z;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> &operator*=(Vector3<T> &v,const T &f)
+{
+    v.x *= f;
+    v.y *= f;
+    v.z *= f;
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> &operator/=(Vector3<T> &v,const T &f)
+{
+    assert(f != 0);
+    v.x /= f;
+    v.y /= f;
+    v.z /= f;
     return v;
 }
 
