@@ -102,6 +102,19 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Vector3<T> &v)
 typedef Vector3<float> Vector3f;
 typedef Vector3<int> Vector3i;
 
+template <typename T>
+FINLINE Vector3<T> operator+(const Vector3<T>& v){
+    return v;
+}
+
+template <typename T>
+FINLINE Vector3<T> operator-(const Vector3<T>& v1){
+    Vector3<T> v;
+    v.x=-v1.x;
+    v.y=-v1.y;
+    v.z=-v1.z;
+    return v;
+}
 
 template <typename T>
 FINLINE Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)

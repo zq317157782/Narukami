@@ -85,12 +85,7 @@ TEST(vector3f,add){
     EXPECT_EQ(v3,Vector3f(5,7,9));
 }
 
-TEST(vector2f,add){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1+v2;
-    EXPECT_EQ(v3,Vector2f(5,7));
-}
+
 
 TEST(vector3f,sub){
     Vector3f v1(1,2,3);
@@ -99,12 +94,7 @@ TEST(vector3f,sub){
     EXPECT_EQ(v3,Vector3f(-3,-3,-3));
 }
 
-TEST(vector2f,sub){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1-v2;
-    EXPECT_EQ(v3,Vector2f(-3,-3));
-}
+
 
 
 TEST(vector3f,mul){
@@ -114,24 +104,13 @@ TEST(vector3f,mul){
     EXPECT_EQ(v3,Vector3f(4,10,18));
 }
 
-TEST(vector2f,mul){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1*v2;
-    EXPECT_EQ(v3,Vector2f(4,10));
-}
+
 
 TEST(vector3f,mul2){
     Vector3f v1(1,2,3);
     float f=2; 
     auto v2=v1*f;
     EXPECT_EQ(v2,Vector3f(2,4,6));
-}
-TEST(vector2f,mul2){
-    Vector2f v1(1,2);
-    float f=2; 
-    auto v2=v1*f;
-    EXPECT_EQ(v2,Vector2f(2,4));
 }
 
 
@@ -142,12 +121,7 @@ TEST(vector3f,div){
     EXPECT_EQ(v2,Vector3f(0.5f,1.0f,1.5f));
 }
 
-TEST(vector2f,div){
-    Vector2f v1(1,2);
-    float f=2; 
-    auto v2=v1/f;
-    EXPECT_EQ(v2,Vector2f(0.5f,1.0f));
-}
+
 
 TEST(vector3f,equal){
     Vector3f v1(1);
@@ -157,13 +131,6 @@ TEST(vector3f,equal){
     EXPECT_TRUE(v2==v3);
 }
 
-TEST(vector2f,equal){
-    Vector2f v1(1);
-    Vector2f v2(2);
-    Vector2f v3(2);
-    EXPECT_TRUE(v1!=v3);
-    EXPECT_TRUE(v2==v3);
-}
 
 TEST(vector3f,cross){
     Vector3f v1(1,0,0);
@@ -172,14 +139,69 @@ TEST(vector3f,cross){
     Vector3f v(0,0,1);
     EXPECT_EQ(v3,v);
 }
-
-
 TEST(vector3f,normalize){
     Vector3f v1(5,0,0);
     auto v2=normalize(v1);
     EXPECT_EQ(v2,Vector3f(1,0,0));
 }
+TEST(vector3f,rcp){
+    Vector3f v1(2,2,2);
+    auto v2=rcp(v1);
+    EXPECT_LE(v2.x,0.50001);
+    EXPECT_GE(v2.x,0.49999);
+}
+TEST(vector3f,subscript){
+    Vector3f v1(0);
+    v1[0]=1;
+    EXPECT_FLOAT_EQ(v1[0],1);
+}
 
+
+TEST(vector3f,positive_and_negative){
+    Vector3f v1(-1);
+    auto v2= -v1;
+    EXPECT_EQ(v2,Vector3f(1.0f));
+}
+
+
+TEST(vector2f,add){
+    Vector2f v1(1,2);
+    Vector2f v2(4,5);
+    auto v3=v1+v2;
+    EXPECT_EQ(v3,Vector2f(5,7));
+}
+TEST(vector2f,sub){
+    Vector2f v1(1,2);
+    Vector2f v2(4,5);
+    auto v3=v1-v2;
+    EXPECT_EQ(v3,Vector2f(-3,-3));
+}
+TEST(vector2f,mul){
+    Vector2f v1(1,2);
+    Vector2f v2(4,5);
+    auto v3=v1*v2;
+    EXPECT_EQ(v3,Vector2f(4,10));
+}
+TEST(vector2f,mul2){
+    Vector2f v1(1,2);
+    float f=2; 
+    auto v2=v1*f;
+    EXPECT_EQ(v2,Vector2f(2,4));
+}
+
+TEST(vector2f,div){
+    Vector2f v1(1,2);
+    float f=2; 
+    auto v2=v1/f;
+    EXPECT_EQ(v2,Vector2f(0.5f,1.0f));
+}
+TEST(vector2f,equal){
+    Vector2f v1(1);
+    Vector2f v2(2);
+    Vector2f v3(2);
+    EXPECT_TRUE(v1!=v3);
+    EXPECT_TRUE(v2==v3);
+}
 TEST(vector2f,normalize){
     Vector2f v1(5,0);
     auto v2=normalize(v1);
@@ -187,12 +209,6 @@ TEST(vector2f,normalize){
 }
 
 
-TEST(vector3f,rcp){
-    Vector3f v1(2,2,2);
-    auto v2=rcp(v1);
-    EXPECT_LE(v2.x,0.50001);
-    EXPECT_GE(v2.x,0.49999);
-}
 
 TEST(vector2f,rcp){
     Vector2f v1(2,2);
@@ -201,11 +217,6 @@ TEST(vector2f,rcp){
     EXPECT_GE(v2.x,0.49999);
 }
 
-TEST(vector3f,subscript){
-    Vector3f v1(0);
-    v1[0]=1;
-    EXPECT_FLOAT_EQ(v1[0],1);
-}
 
 TEST(vector2f,subscript){
     Vector2f v1(0);
@@ -224,6 +235,7 @@ TEST(vector2f,Vector3fToVector2f){
     Vector2f v2(v1);
     EXPECT_EQ(v2,Vector2f(1,2));
 }
+
 
 TEST(vector3i,dot){
     Vector3i v1(1,2,3);
