@@ -238,8 +238,59 @@ TEST(vector3i,length){
     EXPECT_FLOAT_EQ(a,3.7416575);
 }
 
+TEST(ssevector3f,size){
+    SSEVector3f v1;
+    auto len=sizeof(v1);
+    EXPECT_EQ(len,16);
+}
+
+TEST(ssevector3f,copy){
+    Vector3f v1(1,1,1);
+    SSEVector3f v2(v1);
+    EXPECT_EQ(v2.x,1);
+    EXPECT_EQ(v2.y,1);
+    EXPECT_EQ(v2.z,1);
+}
 
 
+TEST(ssevector3f,eq){
+    SSEVector3f v1(1);
+    SSEVector3f v2(1);
+    SSEVector3f v3(2);
+    EXPECT_TRUE(v1==v2);
+    EXPECT_TRUE(v1!=v3);
+}
+
+
+TEST(ssevector3f,negetive){
+     SSEVector3f v1(1);
+     SSEVector3f v2(-1);
+     EXPECT_EQ(-v1,v2);
+}
+
+TEST(ssevector3f,abs){
+     SSEVector3f v1(-1);
+     SSEVector3f v2(1);
+     EXPECT_EQ(abs(v1),v2);
+}
+
+
+TEST(ssevector3f,sign){
+     SSEVector3f v1(-5);
+     EXPECT_EQ(sign(v1),SSEVector3f(-1.0f));
+     SSEVector3f v2(5);
+     EXPECT_EQ(sign(v2),SSEVector3f(1.0f));
+}
+
+
+TEST(sse,_sse_blendv_ps){
+    __m128 a =_mm_set1_ps(5.0f);
+    __m128 b =_mm_set1_ps(6.0f);
+    __m128 mask = _mm_set1_ps(0xFFFFFFFF);
+    __m128 ret=_sse_blendv_ps(a,b,mask);
+
+    EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),5.0F);
+}
 
 
 int main(int argc, char* argv[]) {

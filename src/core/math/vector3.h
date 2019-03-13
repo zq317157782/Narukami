@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/math/math.h"
 
 NARUKAMI_BEGIN
+
 template <typename T>
 struct Vector3
 {
@@ -100,6 +101,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Vector3<T> &v)
 
 typedef Vector3<float> Vector3f;
 typedef Vector3<int> Vector3i;
+
 
 template <typename T>
 FINLINE Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)
@@ -259,6 +261,110 @@ template <typename T>
 FINLINE Vector3f sqrt(const Vector3<T> &v1)
 {
     return Vector3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z));
+}
+
+//--- [SSE] ---
+//16 bit
+struct SSE_ALIGNAS SSEVector3f{
+    typedef float Scalar;
+    enum
+    {
+        N = 3
+    };
+    
+    union{
+        __m128 xyzw;
+        struct{float x,y,z,_w;};
+    };
+
+    FINLINE SSEVector3f(){
+    }
+
+    FINLINE SSEVector3f(const __m128 _xyzw):xyzw(_xyzw){
+    }
+
+    FINLINE SSEVector3f(const float x,const float y,const float z):x(x),y(y),z(z){
+    }
+
+    FINLINE explicit SSEVector3f(const float a):xyzw(_mm_set1_ps(a)){
+
+    }
+    
+    FINLINE explicit SSEVector3f(const Vector3f& v):x(v.x),y(v.y),z(v.z){
+
+    }
+
+    FINLINE operator __m128&(){
+        return xyzw;
+    }
+    
+    FINLINE  operator const __m128&() const {
+        return xyzw;
+    }
+
+    FINLINE SSEVector3f& operator=(const Vector3f& v){
+        x=v.x;
+        y=v.y;
+        z=v.z;
+        return (*this);
+    } 
+
+
+    FINLINE SSEVector3f(const SSEVector3f& v):xyzw(v.xyzw){
+
+    }
+
+    FINLINE SSEVector3f& operator=(const SSEVector3f& v){
+        xyzw=v.xyzw;
+        return (*this);
+    } 
+
+    FINLINE const float& operator[](int idx) const{
+        assert(idx>=0&&idx<N);
+        return (&x)[idx];
+    }
+
+    FINLINE  float& operator[](int idx){
+        assert(idx>=0&&idx<N);
+        return (&x)[idx];
+    }
+};
+
+FINLINE  std::ostream &operator<<(std::ostream &out, const SSEVector3f &v)
+{
+    out << '(' << v.x << ',' << v.y << ',' << v.z << ')';
+    return out;
+}
+
+FINLINE SSEVector3f operator+(const SSEVector3f& v){
+    return v;
+}
+
+FINLINE SSEVector3f operator-(const SSEVector3f& v){
+    //0x80000000 xor x(y,z)
+    auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+    return _mm_xor_ps(v.xyzw,mask);
+}
+
+FINLINE SSEVector3f abs(const SSEVector3f& v){
+    //0x7FFFFFFF and x(y,z)
+    auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
+    return _mm_and_ps(v.xyzw,mask);
+}
+
+FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){
+    //only 3 bit used
+    return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7;
+}
+
+FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){
+    //only 3 bit used
+    return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0;
+}
+
+FINLINE SSEVector3f sign(const SSEVector3f& v){
+    auto mask = _mm_cmplt_ps(v,SSEVector3f(0.0f));
+    return _sse_blendv_ps(SSEVector3f(1.0f),SSEVector3f(-1.0f),mask);
 }
 
 NARUKAMI_END
