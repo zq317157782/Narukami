@@ -25,6 +25,7 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math/math.h"
+#include "core/math/vector3.h"
 
 NARUKAMI_BEGIN
 template <typename T>
@@ -53,6 +54,10 @@ class Vector2
     {
         assert(!isnan(a));
         assert(!isnan(b));
+    }
+
+    FINLINE explicit Vector2(const Vector3<T>& v):x(v.x),y(v.y){
+
     }
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG

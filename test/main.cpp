@@ -219,6 +219,12 @@ TEST(vector2f,sqrt){
     EXPECT_EQ(v2,Vector2f(3,3));
 }
 
+TEST(vector2f,Vector3fToVector2f){
+    Vector3f v1(1,2,3);
+    Vector2f v2(v1);
+    EXPECT_EQ(v2,Vector2f(1,2));
+}
+
 TEST(vector3i,dot){
     Vector3i v1(1,2,3);
     Vector3i v2(1,2,3);
