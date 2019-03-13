@@ -22,4 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include <xmmintrin.h>
+#include <xmmintrin.h>//sse
+#include <emmintrin.h>//sse2
