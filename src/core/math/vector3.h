@@ -380,6 +380,25 @@ FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){
     return _mm_div_ps(v1,SSEVector3f(a));
 }
 
+FINLINE SSEVector3f& operator+=(SSEVector3f& v1,const SSEVector3f& v2){
+    v1=v1+v2;
+    return v1;
+}
+
+FINLINE SSEVector3f& operator-=(SSEVector3f& v1,const SSEVector3f& v2){
+    v1=v1-v2;
+    return v1;
+}
+
+FINLINE SSEVector3f& operator*=(SSEVector3f& v1,const float a){
+    v1=v1*a;
+    return v1;
+}
+
+FINLINE SSEVector3f& operator/=(SSEVector3f& v1,const float f){
+    v1=v1/f;
+    return v1;
+}
 
 FINLINE SSEVector3f abs(const SSEVector3f& v){
     //0x7FFFFFFF and x(y,z)
