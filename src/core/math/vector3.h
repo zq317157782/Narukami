@@ -77,15 +77,15 @@ struct Vector3
         return (*this);
     }
 #endif
-    FINLINE T operator[](const int idx) const
+    FINLINE const T& operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < 3);
+        assert(idx >= 0 && idx < N);
         return (&x)[idx];
     }
 
     FINLINE T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < 3);
+        assert(idx >= 0 && idx < N);
         return (&x)[idx];
     }
 };
