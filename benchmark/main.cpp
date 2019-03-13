@@ -1,6 +1,6 @@
 #include "benchmark.h"
 #include <xmmintrin.h>
-#include "core/math.h"
+#include "core/math/math.h"
 
 static void BM_common_rcp(benchmark::State &state)
 {
@@ -63,7 +63,7 @@ static void BM_fast_rsqrt(benchmark::State &state)
 }
 BENCHMARK(BM_fast_rsqrt);
 
-#include "core/vector3.h"
+#include "core/math/vector3.h"
 template <typename T>
 FINLINE narukami::Vector3f normalize_v1(const narukami::Vector3<T> &v1)
 {

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "core/math.h"
+#include "core/math/math.h"
 using namespace narukami;
 TEST(math,rcp){
     EXPECT_FLOAT_EQ(rcp(2.0f),0.5f);
@@ -71,8 +71,8 @@ TEST(math,lerp){
     EXPECT_FLOAT_EQ(a,0.5f);
 }
 
-#include "core/vector2.h"
-#include "core/vector3.h"
+#include "core/math/vector2.h"
+#include "core/math/vector3.h"
 // TEST(type,int_div_zero){
 //     int a= 1/0;
 //     EXPECT_EQ(isnan(a),false);

@@ -23,9 +23,9 @@ SOFTWARE.
 */
 
 #pragma once
-#include "sse.h"
-#include "platform.h"
-#include "narukami.h"
+#include "core/sse/sse.h"
+#include "core/platform.h"
+#include "core/narukami.h"
 #include <cmath>
 NARUKAMI_BEGIN
 
