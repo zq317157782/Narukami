@@ -44,4 +44,6 @@ public:
     FINLINE float& operator[](const int idx){ assert(idx >= 0 && idx < N); return (&c0.x)[idx];}
 };
 
+FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){out << '(' << v.c0 << ',' << v.c1 << ',' << v.c2 << ',' << v.c3 << ')';return out;}
+
 NARUKAMI_END
