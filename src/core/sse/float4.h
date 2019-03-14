@@ -80,6 +80,8 @@ FINLINE float4& operator/=(float4& v1,const float f){assert(f!=0);v1=v1/f;return
 FINLINE bool operator==(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpeq_ps(a.xyzw, b.xyzw)) & 15) == 15;}
 FINLINE bool operator!=(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpneq_ps(a.xyzw, b.xyzw)) & 15) != 0;}
 
+FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
+
 FINLINE float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+c; }
 FINLINE float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }
 

@@ -406,6 +406,15 @@ TEST(float4 ,div){
 }
 
 
+TEST(float4 ,rcp){
+    float4 a(2);
+    auto b=rcp(a);
+    EXPECT_FLOAT_EQ(b[0],0.5f);
+    EXPECT_FLOAT_EQ(b[1],0.5f);
+    EXPECT_FLOAT_EQ(b[2],0.5f);
+    EXPECT_FLOAT_EQ(b[3],0.5f);
+}
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
