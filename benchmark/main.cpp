@@ -191,4 +191,38 @@ static void BM_add_ssevector3f(benchmark::State &state){
 }
 BENCHMARK(BM_add_ssevector3f);
 
+static void BM_cross_vector3f(benchmark::State &state){
+    
+     narukami::Vector3f v3;
+    for (auto _ : state)
+    {
+        narukami::Vector3f v1(1, 0, 0);
+        narukami::Vector3f v2(0, 1, 0);
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+    }
+}
+BENCHMARK(BM_cross_vector3f);
+
+static void BM_cross_ssevector3f(benchmark::State &state){
+    
+     narukami::SSEVector3f v3;
+    for (auto _ : state)
+    {
+        narukami::SSEVector3f v1(1, 0, 0);
+        narukami::SSEVector3f v2(0, 1, 0);
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+        benchmark::DoNotOptimize(v3=cross(v1,v2));
+    }
+}
+BENCHMARK(BM_cross_ssevector3f);
+
 BENCHMARK_MAIN();
