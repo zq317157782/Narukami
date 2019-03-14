@@ -119,7 +119,7 @@ struct SSE_ALIGNAS SSEVector3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEVector3f(){ }
+    FINLINE SSEVector3f():x(0),y(0),z(0),_w(0){ }
     FINLINE SSEVector3f(const __m128 _xyzw):xyzw(_xyzw){ }
     FINLINE SSEVector3f(const float x,const float y,const float z):x(x),y(y),z(z){ }
     FINLINE explicit SSEVector3f(const float a):xyzw(_mm_set1_ps(a)){ }
