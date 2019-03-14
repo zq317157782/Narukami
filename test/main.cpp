@@ -327,11 +327,63 @@ TEST(ssevector3f,div){
 TEST(sse,_sse_blendv_ps){
     __m128 a =_mm_set1_ps(5.0f);
     __m128 b =_mm_set1_ps(6.0f);
-    __m128 mask = _mm_set1_ps(0xFFFFFFFF);
+    __m128 mask = _mm_set1_ps(cast_i2f(0xFFFFFFFF));
     __m128 ret=_sse_blendv_ps(a,b,mask);
 
-    EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),5.0F);
+    EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),6.0F);
 }
+
+#include "core/sse/float4.h"
+TEST(float4,eq){
+    float4 a(1,1,1,1);
+    float4 b(1,1,1,1);
+    float4 c(1,1,1,2);
+    EXPECT_TRUE(a==b);
+    EXPECT_TRUE(a!=c);
+}
+
+
+TEST(float4,positive_and_negative){
+     float4 a(1,1,1,1);
+     EXPECT_EQ(-a,float4(-1,-1,-1,-1));
+}
+
+TEST(float4 ,add){
+    float4 a(1);
+    float4 b(1);
+    auto c = a+b;
+    EXPECT_EQ(c,float4(2));
+    c+=a;
+    EXPECT_EQ(c,float4(3));
+}
+
+TEST(float4 ,sub){
+    float4 a(1);
+    float4 b(1);
+    auto c = a-b;
+    EXPECT_EQ(c,float4(0));
+    c-=a;
+    EXPECT_EQ(c,float4(-1));
+}
+
+TEST(float4 ,mul){
+    float4 a(1);
+    float4 b(1);
+    auto c = a*b;
+    EXPECT_EQ(c,float4(1));
+    c*=a;
+    EXPECT_EQ(c,float4(1));
+}
+
+TEST(float4 ,div){
+    float4 a(1);
+    float4 b(1);
+    auto c = a/b;
+    EXPECT_EQ(c,float4(1));
+    c/=a;
+    EXPECT_EQ(c,float4(1));
+}
+
 
 
 int main(int argc, char* argv[]) {
