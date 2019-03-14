@@ -85,5 +85,6 @@ FINLINE float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b
 
 template<int i0, int i1, int i2, int i3>
 FINLINE float4 shuffle(const float4& v) { return _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(v), _MM_SHUFFLE(i3, i2, i1, i0))); }
-
+template<int i>
+FINLINE float4 shuffle(const float4& v){return shuffle<i,i,i,i>(v);}
 NARUKAMI_END

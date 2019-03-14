@@ -331,6 +331,20 @@ TEST(ssevector3f,cross){
     EXPECT_EQ(v3,v);
 }
 
+TEST(ssevector3f,reduce_add){
+    SSEVector3f v1(1,2,3);
+    float a=reduce_add(v1);
+    EXPECT_EQ(a,6);
+}
+
+
+TEST(ssevector3f,dot){
+    SSEVector3f v1(1,2,3);
+    SSEVector3f v2(1,2,3);
+    int a=dot(v1,v2);
+    EXPECT_EQ(a,14);
+}
+
 TEST(sse,_sse_blendv_ps){
     __m128 a =_mm_set1_ps(5.0f);
     __m128 b =_mm_set1_ps(6.0f);
