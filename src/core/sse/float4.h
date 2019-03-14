@@ -80,4 +80,7 @@ FINLINE float4& operator/=(float4& v1,const float f){assert(f!=0);v1=v1/f;return
 FINLINE bool operator==(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpeq_ps(a.xyzw, b.xyzw)) & 15) == 15;}
 FINLINE bool operator!=(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpneq_ps(a.xyzw, b.xyzw)) & 15) != 0;}
 
+template<int i0, int i1, int i2, int i3>
+FINLINE float4 shuffle(const float4& v) { return _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(v), _MM_SHUFFLE(i3, i2, i1, i0))); }
+
 NARUKAMI_END
