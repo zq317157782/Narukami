@@ -323,6 +323,13 @@ TEST(ssevector3f,div){
      EXPECT_EQ(v3,SSEVector3f(-1.0F));
 }
 
+TEST(ssevector3f,cross){
+    SSEVector3f v1(1,0,0);
+    SSEVector3f v2(0,1,0);
+    auto v3=cross(v1,v2);
+    SSEVector3f v(0,0,1);
+    EXPECT_EQ(v3,v);
+}
 
 TEST(sse,_sse_blendv_ps){
     __m128 a =_mm_set1_ps(5.0f);

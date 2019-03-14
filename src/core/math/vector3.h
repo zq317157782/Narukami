@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math/math.h"
-
+#include "core/sse/float4.h"
 NARUKAMI_BEGIN
 
 template <typename T>
@@ -157,6 +157,15 @@ FINLINE SSEVector3f& operator/=(SSEVector3f& v1,const float f){ v1=v1/f; return 
 FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
 FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0; }
 
+FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){
+    auto a0=float4(v1);
+    auto b0=shuffle<1,2,0,3>(float4(v2));
+
+    auto a1=shuffle<1,2,0,3>(float4(v1));
+    auto b1=float4(v1);
+
+    return shuffle<1,2,0,3>(msub(a0,b0,a1*b1));
+}
 //0x7FFFFFFF and x(y,z)
 FINLINE SSEVector3f abs(const SSEVector3f& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
 FINLINE SSEVector3f sign(const SSEVector3f& v){ auto mask = _mm_cmplt_ps(v,SSEVector3f(0.0f)); return _sse_blendv_ps(SSEVector3f(1.0f),SSEVector3f(-1.0f),mask); }
