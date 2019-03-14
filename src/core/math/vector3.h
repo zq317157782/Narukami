@@ -168,6 +168,6 @@ FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){
 }
 //0x7FFFFFFF and x(y,z)
 FINLINE SSEVector3f abs(const SSEVector3f& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
-FINLINE SSEVector3f sign(const SSEVector3f& v){ auto mask = _mm_cmplt_ps(v,SSEVector3f(0.0f)); return _sse_blendv_ps(SSEVector3f(1.0f),SSEVector3f(-1.0f),mask); }
+FINLINE SSEVector3f sign(const SSEVector3f& v){ auto mask = _mm_cmplt_ps(v,SSEVector3f(Zero)); return _sse_blendv_ps(SSEVector3f(One),-SSEVector3f(One),mask); }
 
 NARUKAMI_END

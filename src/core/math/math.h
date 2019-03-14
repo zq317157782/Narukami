@@ -29,7 +29,30 @@ SOFTWARE.
 #include <cmath>
 NARUKAMI_BEGIN
 
-static  MAYBE_UNUSED const float min_rcp_input = 1E-18f;
+static  MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
+
+struct TrueType {
+    FINLINE operator bool() const{return true;}
+} ;
+static MAYBE_UNUSED const TrueType True;
+
+struct FalseType {
+    FINLINE operator bool() const{return true;}
+} ;
+static MAYBE_UNUSED const FalseType False;
+
+struct ZeroType {
+    FINLINE operator float() const{return 0.0f;}
+    FINLINE operator int() const{return 0;}
+} ;
+static MAYBE_UNUSED const ZeroType Zero;
+
+
+struct OneType {
+    FINLINE operator float() const{return 1.0f;}
+    FINLINE operator int() const{return 1;}
+} ;
+static MAYBE_UNUSED const OneType One;
 
 //IEEE float format
 //32 bits
@@ -50,20 +73,6 @@ FINLINE  int cast_f2i(const float x){
     return v.i;
 }
 
-FINLINE  float rcp(const float x){
-    const __m128 a = _mm_set_ss(x);
-    const __m128 r = _mm_rcp_ss(a);
-    return _mm_cvtss_f32(_mm_mul_ss(r,_mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
-}
-
-FINLINE  float sign(const float x){
-    return x>=0.0f?1.0f:-1.0f;
-}
-
-FINLINE  int sign(const int x){
-    return x>=0?1:-1;
-}
-
 FINLINE  bool isnan(const float x){
     return std::isnan(x);
 }
@@ -77,12 +86,30 @@ FINLINE  bool isinf(const float x){
     return std::isinf(x);
 }
 
+
+
+FINLINE  float sign(const float x){
+    return x>=0.0f?1.0f:-1.0f;
+}
+
+FINLINE  int sign(const int x){
+    return x>=0?1:-1;
+}
+
+
+
 FINLINE  float sqr(const float x){
     return x*x;
 }
 
 FINLINE  float sqrt(const float x){
     return std::sqrtf(x);
+}
+
+FINLINE  float rcp(const float x){
+    const __m128 a = _mm_set_ss(x);
+    const __m128 r = _mm_rcp_ss(a);
+    return _mm_cvtss_f32(_mm_mul_ss(r,_mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
 }
 
 FINLINE  float rsqrt( const float x )
