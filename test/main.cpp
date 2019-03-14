@@ -423,6 +423,14 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
 
+#include "core/math/matrix4x4.h"
+TEST(matrix4x4,init){
+    Matrix4x4 mat;
+    EXPECT_FLOAT_EQ(mat[0],1);
+    EXPECT_FLOAT_EQ(mat[5],1);
+    EXPECT_FLOAT_EQ(mat[10],1);
+    EXPECT_FLOAT_EQ(mat[15],1);
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
