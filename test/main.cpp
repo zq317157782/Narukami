@@ -345,6 +345,14 @@ TEST(ssevector3f,dot){
     EXPECT_EQ(a,14);
 }
 
+TEST(ssevector3f,rcp){
+    SSEVector3f v1(2,2,2);
+    auto v2=rcp(v1);
+    EXPECT_FLOAT_EQ(v2[0],0.5f);
+    EXPECT_FLOAT_EQ(v2[1],0.5f);
+    EXPECT_FLOAT_EQ(v2[2],0.5f);
+}
+
 TEST(sse,_sse_blendv_ps){
     __m128 a =_mm_set1_ps(5.0f);
     __m128 b =_mm_set1_ps(6.0f);

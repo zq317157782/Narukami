@@ -157,6 +157,12 @@ FINLINE SSEVector3f& operator/=(SSEVector3f& v1,const float f){ v1=v1/f; return 
 FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
 FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0; }
 
+FINLINE SSEVector3f rcp(const SSEVector3f& v) {
+    float4 a(v);
+    auto b=rcp(a);
+    return SSEVector3f(b);
+}
+
 FINLINE float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=shuffle<1>(float4(v)); float4 c=shuffle<2>(float4(v)); return _mm_cvtss_f32(a+b+c); }
 
 FINLINE float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return reduce_add(v1*v2); }
