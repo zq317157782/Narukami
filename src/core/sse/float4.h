@@ -56,9 +56,9 @@ struct float4
     FINLINE float &operator[](const int idx){assert(idx >= 0 && idx < size);return (&x)[idx];}
 };
 
-FINLINE bool operator==(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpeq_ps(a.xyzw, b.xyzw)) & 15) == 15;}
-FINLINE bool operator!=(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpneq_ps(a.xyzw, b.xyzw)) & 15) != 0;}
+
 FINLINE std::ostream &operator<<(std::ostream &out, const float4 &v){out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';return out;}
+
 FINLINE float4 operator+(const float4 &v){return v;}
 //0x80000000 xor x(y,z)
 FINLINE float4 operator-(const float4 &v){auto mask = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));return _mm_xor_ps(v.xyzw, mask);}
@@ -76,5 +76,8 @@ FINLINE float4& operator*=(float4& v1,const float4& v2){v1=v1*v2;return v1;}
 FINLINE float4& operator*=(float4& v1,const float f){v1=v1*f;return v1;}
 FINLINE float4& operator/=(float4& v1,const float4& v2){v1=v1/v2;return v1;}
 FINLINE float4& operator/=(float4& v1,const float f){assert(f!=0);v1=v1/f;return v1;}
+
+FINLINE bool operator==(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpeq_ps(a.xyzw, b.xyzw)) & 15) == 15;}
+FINLINE bool operator!=(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpneq_ps(a.xyzw, b.xyzw)) & 15) != 0;}
 
 NARUKAMI_END
