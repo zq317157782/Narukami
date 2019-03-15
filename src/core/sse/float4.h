@@ -47,7 +47,7 @@ struct float4
 
   public:
     FINLINE float4() : x(0), y(0), z(0), w(0) {}
-    FINLINE float4(const __m128 &a) : xyzw(a) {}
+    FINLINE float4(const __m128 a) : xyzw(a) {}
     FINLINE explicit float4(const float a) : x(a), y(a), z(a), w(a) {}
     FINLINE float4(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
     FINLINE operator __m128&(){return xyzw;}
