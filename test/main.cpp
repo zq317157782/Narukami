@@ -439,6 +439,10 @@ TEST(matrix4x4,init){
     EXPECT_FLOAT_EQ(mat[15],1);
 }
 
+TEST(matrix4x4,size){
+    EXPECT_EQ(sizeof(Matrix4x4),64);
+}
+
 TEST(matrix4x4,identity){
     Matrix4x4 mat;
     Vector3f v1(1,0,0);
