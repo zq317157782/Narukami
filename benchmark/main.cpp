@@ -159,4 +159,32 @@ static void BM_normalize_v4(benchmark::State &state)
 }
 BENCHMARK(BM_normalize_v4);
 
+static void BM_cross_Vector3f(benchmark::State &state)
+{
+    narukami::Vector3f v1(1, 0, 0);
+    srand(0);
+    float x = rand();
+    float y = rand();
+    float z = rand();
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(v1=cross(narukami::Vector3f(x, y, z),v1));
+    }
+}
+BENCHMARK(BM_cross_Vector3f);
+
+static void BM_cross_SSEVector3f(benchmark::State &state)
+{
+    narukami::SSEVector3f v1(1, 0, 0);
+    srand(0);
+    float x = rand();
+    float y = rand();
+    float z = rand();
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(v1=cross(narukami::SSEVector3f(x, y, z),v1));
+    }
+}
+BENCHMARK(BM_cross_SSEVector3f);
+
 BENCHMARK_MAIN();
