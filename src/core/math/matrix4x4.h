@@ -25,11 +25,12 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math/math.h"
+#include "core/sse/sse.h"
 #include "core/sse/float4.h"
 
 NARUKAMI_BEGIN
 //column  major
-struct Matrix4x4{
+struct SSE_ALIGNAS Matrix4x4{
 public:
     union{
         float m[16];
