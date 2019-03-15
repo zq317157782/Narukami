@@ -29,7 +29,7 @@ SOFTWARE.
 #include "core/sse/float4.h"
 
 NARUKAMI_BEGIN
-//column  major
+//row major
 struct SSE_ALIGNAS Matrix4x4{
 public:
     union{
