@@ -55,5 +55,15 @@ FINLINE __m128 shuffle(const __m128 v1,const __m128 v2){
     return shuffle<i,i,i,i>(v1,v2);
 }
 
+FINLINE float sum(const __m128 a){
+    const __m128 b = swizzle<1>(a);
+    const __m128 c = swizzle<2>(a);
+    const __m128 d = swizzle<3>(a);
+    const __m128 e = _mm_add_ps(a,b);
+    const __m128 f = _mm_add_ps(e,c);
+    const __m128 g = _mm_add_ps(f,d);
+    return _mm_cvtss_f32(g);
+}
+
 
 NARUKAMI_END

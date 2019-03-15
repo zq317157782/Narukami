@@ -187,4 +187,32 @@ static void BM_cross_SSEVector3f(benchmark::State &state)
 }
 BENCHMARK(BM_cross_SSEVector3f);
 
+
+static void BM_sum_v1(benchmark::State &state)
+{
+    __m128 a = _mm_set_ps(1,2,3,4);
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(b=b+narukami::sum(a));
+    }
+}
+BENCHMARK(BM_sum_v1);
+
+FINLINE float sum_v2(const __m128 a){
+    float v[4];
+    _mm_store_ps(v,a);
+    return v[0]+v[1]+v[2]+v[3];
+}
+static void BM_sum_v2(benchmark::State &state)
+{
+    __m128 a = _mm_set_ps(1,2,3,4);
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(b=b+sum_v2(a));
+    }
+}
+BENCHMARK(BM_sum_v2);
+
 BENCHMARK_MAIN();

@@ -362,6 +362,11 @@ TEST(sse,_sse_blendv_ps){
     EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),6.0F);
 }
 
+TEST(sse,sum){
+    __m128 a =_mm_set_ps(1,2,3,4);
+    EXPECT_FLOAT_EQ(sum(a),10);
+}
+
 #include "core/sse/float4.h"
 TEST(float4,eq){
     float4 a(1,1,1,1);
@@ -422,6 +427,8 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[2],0.5f);
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
+
+
 
 #include "core/math/matrix4x4.h"
 TEST(matrix4x4,init){
