@@ -29,7 +29,7 @@ SOFTWARE.
 #include "core/sse/float4.h"
 
 NARUKAMI_BEGIN
-//row major
+//colmun major
 struct SSE_ALIGNAS Matrix4x4{
 public:
     union{
@@ -43,22 +43,22 @@ public:
     };
 public:
     Matrix4x4(){
-         //row 0
+         //col 0
         m[0]=One;
         m[1]=Zero;
         m[2]=Zero;
         m[3]=Zero;
-        //row 1
+        //col 1
         m[4]=Zero;
         m[5]=One;
         m[6]=Zero;
         m[7]=Zero;
-        //row 2
+        //col 2
         m[8]=Zero;
         m[9]=Zero;
         m[10]=One;
         m[11]=Zero;
-        //row 3
+        //col 3
         m[12]=Zero;
         m[13]=Zero;
         m[14]=Zero;
@@ -66,22 +66,22 @@ public:
     }
     Matrix4x4(const float m0,const float m1,const float m2,const float m3,const float m4,const float m5,const float m6,const float m7,const float m8,const float m9,const float m10,const float m11,const float m12,const float m13,const float m14,const float m15)
     {
-        //row 0
+        //col 0
         m[0]=m0;
         m[1]=m1;
         m[2]=m2;
         m[3]=m3;
-        //row 1
+        //col 1
         m[4]=m4;
         m[5]=m5;
         m[6]=m6;
         m[7]=m7;
-        //row 2
+        //col 2
         m[8]=m8;
         m[9]=m9;
         m[10]=m10;
         m[11]=m11;
-        //row 3
+        //col 3
         m[12]=m12;
         m[13]=m13;
         m[14]=m14;
@@ -89,22 +89,22 @@ public:
     }
 
     Matrix4x4(const float* v){
-        //row 0
+        //col 0
         m[0]=v[0];
         m[1]=v[1];
         m[2]=v[2];
         m[3]=v[3];
-        //row 1
+        //col 1
         m[4]=v[4];
         m[5]=v[5];
         m[6]=v[6];
         m[7]=v[7];
-        //row 2
+        //col 2
         m[8]=v[8];
         m[9]=v[9];
         m[10]=v[10];
         m[11]=v[11];
-        //row 3
+        //col 3
         m[12]=v[12];
         m[13]=v[13];
         m[14]=v[14];
@@ -123,22 +123,18 @@ FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
 }
 
 FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
-    // 16ns 
-    // __m128 xyzw = _mm_set_ps(Zero,v.z,v.y,v.x);
-    // float x=sum(_mm_mul_ps(M.mVec[0],xyzw));
-    // float y=sum(_mm_mul_ps(M.mVec[1],xyzw));
-    // float z=sum(_mm_mul_ps(M.mVec[2],xyzw));
-    // //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
-    // return Vector3f(x,y,z);
+    // 8ns   
+    // float4 r=float4(M.mVec[0])*float4(v.x);
+    // r+=float4(M.mVec[1])*float4(v.y);
+    // r+=float4(M.mVec[2])*float4(v.z);
+    // return Vector3f(r.x,r.y,r.z);
     
     // 7ns
-    float x =  M.m[0]*v.x+M.m[1]*v.y+M.m[2]*v.z;
-    float y =  M.m[4]*v.x+M.m[5]*v.y+M.m[6]*v.z;
-    float z =  M.m[8]*v.x+M.m[9]*v.y+M.m[10]*v.z;
+    float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
+    float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
+    float z =  M.m[3]*v.x+M.m[6]*v.y+M.m[10]*v.z;
 
     return narukami::Vector3f(x,y,z);
 }
-
-
 
 NARUKAMI_END

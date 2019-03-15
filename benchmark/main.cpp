@@ -220,17 +220,19 @@ BENCHMARK(BM_sum_v2);
 
 FINLINE narukami::Vector3f matMul_v1(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
      __m128 xyzw = _mm_set_ps(narukami::Zero,v.z,v.y,v.x);
-    float x=narukami::sum(_mm_mul_ps(M.mVec[0],xyzw));
-    float y=narukami::sum(_mm_mul_ps(M.mVec[1],xyzw));
-    float z=narukami::sum(_mm_mul_ps(M.mVec[2],xyzw));
+     
+     narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
+     r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
+     r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
+
     //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
-    return narukami::Vector3f(x,y,z);
+    return narukami::Vector3f(r.x,r.y,r.z);
 }
 
 FINLINE narukami::Vector3f matMul_v2(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
-    float x =  M.m[0]*v.x+M.m[1]*v.y+M.m[2]*v.z;
-    float y =  M.m[4]*v.x+M.m[5]*v.y+M.m[6]*v.z;
-    float z =  M.m[8]*v.x+M.m[9]*v.y+M.m[10]*v.z;
+    float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
+    float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
+    float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z;
 
     return narukami::Vector3f(x,y,z);
 }
