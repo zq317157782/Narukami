@@ -226,7 +226,9 @@ FINLINE narukami::Vector3f matMul_v1(const narukami::Matrix4x4& M,const narukami
      r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
 
     //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
-    return narukami::Vector3f(r.x,r.y,r.z);
+    float rr[4];
+    _mm_store_ps(rr,r.xyzw);
+    return narukami::Vector3f(rr[0],rr[1],rr[2]);
 }
 
 FINLINE narukami::Vector3f matMul_v2(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
@@ -260,5 +262,41 @@ static void BM_matrix_mul_v2(benchmark::State &state)
     }
 }
 BENCHMARK(BM_matrix_mul_v2);
+
+
+
+FINLINE narukami::Matrix4x4 matMul_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+    narukami::Matrix4x4 ret;
+    for(int r=0;r<4;++r){
+        for(int c=0;c<4;++c){
+            ret[c*4+r]=A.m[c*4+r]*B.m[c*4+r]+A.m[(c+1)*4+r]*B.m[c*4+(r+1)]+A.m[(c+2)*4+r]*B.m[c*4+(r+2)]+A.m[(c+3)*4+r]*B.m[c*4+(r+3)];
+        }
+    }   
+    return ret;
+}
+
+static void BM_matrix_mul_mm_v1(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(M=M*M2);
+    }
+}
+BENCHMARK(BM_matrix_mul_mm_v1);
+
+static void BM_matrix_mul_mm_v2(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(M=matMul_v2(M,M2));
+    }
+}
+BENCHMARK(BM_matrix_mul_mm_v2);
 
 BENCHMARK_MAIN();

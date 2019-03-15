@@ -137,4 +137,19 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     return narukami::Vector3f(x,y,z);
 }
 
+
+FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
+    
+    Matrix4x4 ret;
+
+    for(int i=0;i<4;++i){
+        float4 r=float4(A.mVec[0])*float4(B.m[i*4+0]);
+        r+=float4(A.mVec[1])*float4(B.m[i*4+1]);
+        r+=float4(A.mVec[2])*float4(B.m[i*4+2]);
+        r+=float4(A.mVec[3])*float4(B.m[i*4+3]);
+        ret.mVec[i]=r.xyzw;
+    }
+    return ret;
+}
+
 NARUKAMI_END

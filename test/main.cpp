@@ -450,6 +450,15 @@ TEST(matrix4x4,identity){
     EXPECT_EQ(v2,v1);
 }
 
+TEST(matrix4x4,mul){
+    Matrix4x4 mat;
+    Matrix4x4 mat2(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,0);
+    auto r=mat*mat2;
+    Vector3f v1(1,0,0);
+    auto v2=r*v1;
+    EXPECT_EQ(v2,Vector3f(2,0,0));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
