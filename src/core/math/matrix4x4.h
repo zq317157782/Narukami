@@ -117,7 +117,7 @@ public:
 FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
     for(int i=0;i<Matrix4x4::N;++i){
         out<<v.m[i];
-        out<<((i+1)==Matrix4x4::N)?')':',';
+        out<<(((i+1)==Matrix4x4::N)?')':',');
     }
     return out;
 }
