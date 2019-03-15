@@ -43,25 +43,25 @@ public:
 public:
     Matrix4x4(){
          //row 0
-        m[0]=1.0f;
-        m[1]=0.0f;
-        m[2]=0.0f;
-        m[3]=0.0f;
+        m[0]=One;
+        m[1]=Zero;
+        m[2]=Zero;
+        m[3]=Zero;
         //row 1
-        m[4]=0.0f;
-        m[5]=1.0f;
-        m[6]=0.0f;
-        m[7]=0.0f;
+        m[4]=Zero;
+        m[5]=One;
+        m[6]=Zero;
+        m[7]=Zero;
         //row 2
-        m[8]=0.0f;
-        m[9]=0.0f;
-        m[10]=1.0f;
-        m[11]=0.0f;
+        m[8]=Zero;
+        m[9]=Zero;
+        m[10]=One;
+        m[11]=Zero;
         //row 3
-        m[12]=0.0f;
-        m[13]=0.0f;
-        m[14]=0.0f;
-        m[15]=1.0f;
+        m[12]=Zero;
+        m[13]=Zero;
+        m[14]=Zero;
+        m[15]=One;
     }
     Matrix4x4(const float m0,const float m1,const float m2,const float m3,const float m4,const float m5,const float m6,const float m7,const float m8,const float m9,const float m10,const float m11,const float m12,const float m13,const float m14,const float m15)
     {

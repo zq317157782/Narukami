@@ -40,7 +40,7 @@ struct Vector3
     };
 
   public:
-    FINLINE Vector3() : x(0), y(0), z(0) { }
+    FINLINE Vector3() : x(Zero), y(Zero), z(Zero) { }
     FINLINE explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     //just for checking assert for debug
@@ -119,7 +119,7 @@ struct SSE_ALIGNAS SSEVector3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEVector3f():x(0),y(0),z(0),_w(0){ }
+    FINLINE SSEVector3f():x(Zero),y(Zero),z(Zero),_w(Zero){ }
     FINLINE SSEVector3f(const __m128 _xyzw):xyzw(_xyzw){ }
     FINLINE SSEVector3f(const float x,const float y,const float z):x(x),y(y),z(z){ }
     FINLINE explicit SSEVector3f(const float a):xyzw(_mm_set1_ps(a)){ }
