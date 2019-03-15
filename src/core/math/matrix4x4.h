@@ -121,4 +121,23 @@ FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
     return out;
 }
 
+FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
+    // 16ns 
+    // __m128 xyzw = _mm_set_ps(Zero,v.z,v.y,v.x);
+    // float x=sum(_mm_mul_ps(M.mVec[0],xyzw));
+    // float y=sum(_mm_mul_ps(M.mVec[1],xyzw));
+    // float z=sum(_mm_mul_ps(M.mVec[2],xyzw));
+    // //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
+    // return Vector3f(x,y,z);
+    
+    // 7ns
+    float x =  M.m[0]*v.x+M.m[1]*v.y+M.m[2]*v.z;
+    float y =  M.m[4]*v.x+M.m[5]*v.y+M.m[6]*v.z;
+    float z =  M.m[8]*v.x+M.m[9]*v.y+M.m[10]*v.z;
+
+    return narukami::Vector3f(x,y,z);
+}
+
+
+
 NARUKAMI_END

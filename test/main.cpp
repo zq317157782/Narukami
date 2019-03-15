@@ -439,6 +439,13 @@ TEST(matrix4x4,init){
     EXPECT_FLOAT_EQ(mat[15],1);
 }
 
+TEST(matrix4x4,identity){
+    Matrix4x4 mat;
+    Vector3f v1(1,0,0);
+    auto v2=mat*v1;
+    EXPECT_EQ(v2,v1);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
