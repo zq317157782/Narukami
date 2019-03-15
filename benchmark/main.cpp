@@ -217,7 +217,17 @@ BENCHMARK(BM_sum_v2);
 
 #include "core/math/matrix4x4.h"
 
-FINLINE narukami::Vector3f matMul(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+
+FINLINE narukami::Vector3f matMul_v1(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+     __m128 xyzw = _mm_set_ps(narukami::Zero,v.z,v.y,v.x);
+    float x=narukami::sum(_mm_mul_ps(M.mVec[0],xyzw));
+    float y=narukami::sum(_mm_mul_ps(M.mVec[1],xyzw));
+    float z=narukami::sum(_mm_mul_ps(M.mVec[2],xyzw));
+    //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
+    return narukami::Vector3f(x,y,z);
+}
+
+FINLINE narukami::Vector3f matMul_v2(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
     float x =  M.m[0]*v.x+M.m[1]*v.y+M.m[2]*v.z;
     float y =  M.m[4]*v.x+M.m[5]*v.y+M.m[6]*v.z;
     float z =  M.m[8]*v.x+M.m[9]*v.y+M.m[10]*v.z;
@@ -232,7 +242,7 @@ static void BM_matrix_mul_v1(benchmark::State &state)
     float b=0;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(v=M*v);
+         benchmark::DoNotOptimize(v=matMul_v1(M,v));
     }
 }
 BENCHMARK(BM_matrix_mul_v1);
@@ -244,7 +254,7 @@ static void BM_matrix_mul_v2(benchmark::State &state)
     float b=0;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(v=matMul(M,v));
+         benchmark::DoNotOptimize(v=matMul_v2(M,v));
     }
 }
 BENCHMARK(BM_matrix_mul_v2);
