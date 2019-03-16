@@ -299,4 +299,45 @@ static void BM_matrix_mul_mm_v2(benchmark::State &state)
 }
 BENCHMARK(BM_matrix_mul_mm_v2);
 
+
+FINLINE bool matEqual_v1(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+     __m128 mask0=_mm_and_ps(_mm_cmpeq_ps(A.mVec[0], B.mVec[0]),_mm_cmpeq_ps(A.mVec[1], B.mVec[1]));
+    __m128 mask1=_mm_and_ps(_mm_cmpeq_ps(A.mVec[2], B.mVec[2]),_mm_cmpeq_ps(A.mVec[3], B.mVec[3]));
+    return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)==15;
+}
+
+FINLINE bool matEqual_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+    if((A.m[0]==B.m[0])&&(A.m[1]==B.m[1])&&(A.m[2]==B.m[2])&&(A.m[3]==B.m[3])&&(A.m[4]==B.m[4])
+    &&(A.m[5]==B.m[5])&&(A.m[6]==B.m[6])&&(A.m[7]==B.m[7])&&(A.m[8]==B.m[8])&&(A.m[9]==B.m[9])
+    &&(A.m[10]==B.m[10])&&(A.m[11]==B.m[11])&&(A.m[12]==B.m[12])&&(A.m[13]==B.m[13])
+    &&(A.m[14]==B.m[14])&&(A.m[15]==B.m[15])){
+        return true;
+    }
+    return false;
+}
+
+static void BM_matrix_equal_v1(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(a+=matEqual_v1(M,M2));
+    }
+}
+BENCHMARK(BM_matrix_equal_v1);
+
+static void BM_matrix_equal_v2(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(a+=matEqual_v2(M,M2));
+    }
+}
+BENCHMARK(BM_matrix_equal_v2);
+
 BENCHMARK_MAIN();

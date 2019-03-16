@@ -456,7 +456,13 @@ TEST(matrix4x4,mul){
     auto r=mat*mat2;
     Vector3f v1(1,0,0);
     auto v2=r*v1;
-    EXPECT_EQ(v2,Vector3f(2,0,0));
+    EXPECT_EQ(v2,Vector3f(2,0,0));   
+}
+
+TEST(matrix4x4,eq){
+    Matrix4x4 mat;
+    Matrix4x4 mat2;
+    EXPECT_EQ(mat,mat2);
 }
 
 int main(int argc, char* argv[]) {
