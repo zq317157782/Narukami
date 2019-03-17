@@ -46,10 +46,10 @@ struct float4
     };
 
   public:
-    FINLINE float4() : x(0), y(0), z(0), w(0) {}
+    FINLINE float4() : xyzw(_mm_set_ps(Zero,Zero,Zero,Zero)) {}
     FINLINE float4(const __m128 a) : xyzw(a) {}
-    FINLINE explicit float4(const float a) : x(a), y(a), z(a), w(a) {}
-    FINLINE float4(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
+    FINLINE explicit float4(const float a) : xyzw(_mm_set_ps(a,a,a,a)) {}
+    FINLINE float4(const float x, const float y, const float z, const float w) : xyzw(_mm_set_ps(w,z,y,x)) {}
     FINLINE operator __m128&(){return xyzw;}
     FINLINE operator const __m128&() const{return xyzw;}
     FINLINE const float &operator[](const int idx) const{assert(idx >= 0 && idx < size);return (&x)[idx];}
