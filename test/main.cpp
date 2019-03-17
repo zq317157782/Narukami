@@ -448,6 +448,9 @@ TEST(matrix4x4,identity){
     Vector3f v1(1,0,0);
     auto v2=mat*v1;
     EXPECT_EQ(v2,v1);
+    SSEVector3f v3(1,0,0);
+    auto v4=mat*v3;
+    EXPECT_EQ(v3,v4);
 }
 
 TEST(matrix4x4,mul){

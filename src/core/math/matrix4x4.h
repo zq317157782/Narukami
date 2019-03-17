@@ -149,6 +149,17 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     return narukami::Vector3f(x,y,z);
 }
 
+FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
+    float4 vx=swizzle<0,0,0,0>(v.xyzw);
+    float4 vy=swizzle<1,1,1,1>(v.xyzw);
+    float4 vz=swizzle<2,2,2,2>(v.xyzw);
+    
+    float4 r=float4(M.mVec[0])*vx;
+    r+=float4(M.mVec[1])*vy;
+    r+=float4(M.mVec[2])*vz;
+    return SSEVector3f(r.xyzw);
+}
+
 
 FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     
