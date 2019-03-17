@@ -463,6 +463,9 @@ TEST(matrix4x4,eq){
     Matrix4x4 mat;
     Matrix4x4 mat2;
     EXPECT_EQ(mat,mat2);
+    Matrix4x4 mat3(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,2);
+    EXPECT_TRUE(mat!=mat3);
+    
 }
 
 int main(int argc, char* argv[]) {

@@ -128,6 +128,12 @@ FINLINE bool operator==(const Matrix4x4& A,const Matrix4x4& B){
     return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)==15;
 }
 
+FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
+    __m128 mask0=_mm_and_ps(_mm_cmpeq_ps(A.mVec[0], B.mVec[0]),_mm_cmpeq_ps(A.mVec[1], B.mVec[1]));
+    __m128 mask1=_mm_and_ps(_mm_cmpeq_ps(A.mVec[2], B.mVec[2]),_mm_cmpeq_ps(A.mVec[3], B.mVec[3]));
+    return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)!=15;
+}
+
 FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   
     // float4 r=float4(M.mVec[0])*float4(v.x);
