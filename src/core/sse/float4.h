@@ -46,9 +46,9 @@ struct float4
     };
 
   public:
-    FINLINE float4() : xyzw(_mm_set_ps(Zero,Zero,Zero,Zero)) {}
+    FINLINE float4() : xyzw(_mm_set1_ps(Zero)) {}
     FINLINE float4(const __m128 a) : xyzw(a) {}
-    FINLINE explicit float4(const float a) : xyzw(_mm_set_ps(a,a,a,a)) {}
+    FINLINE explicit float4(const float a) : xyzw(_mm_set1_ps(a)) {}
     FINLINE float4(const float x, const float y, const float z, const float w) : xyzw(_mm_set_ps(w,z,y,x)) {}
     FINLINE operator __m128&(){return xyzw;}
     FINLINE operator const __m128&() const{return xyzw;}
