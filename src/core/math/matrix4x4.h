@@ -194,7 +194,7 @@ FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
 }
 
 //https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html#_appendix_2
-FINLINE Matrix4x4 inverse_noscale(const Matrix4x4& mat){
+FINLINE Matrix4x4 transform_inverse_noscale(const Matrix4x4& mat){
     Matrix4x4 r;
     //transpose left-upper 3x3
     __m128 t0 = shuffle<0,1,0,1>(mat.mVec[0],mat.mVec[1]);// 00,10,01,11
@@ -203,6 +203,41 @@ FINLINE Matrix4x4 inverse_noscale(const Matrix4x4& mat){
     r.mVec[0] = shuffle<0,2,0,3>(t0,mat.mVec[2]);//00,01,02,32(=0)
     r.mVec[1] = shuffle<1,3,1,3>(t0,mat.mVec[2]);//10,11,12,32(=0)
     r.mVec[2] = shuffle<0,2,2,3>(t1,mat.mVec[2]);//20,21,22,32(=0)
+
+    //translate
+    r.mVec[3] =                      _mm_mul_ps(r.mVec[0],swizzle<0>(mat.mVec[3]));
+    r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[1],swizzle<1>(mat.mVec[3])));
+    r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[2],swizzle<2>(mat.mVec[3])));
+    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(One,Zero,Zero,Zero),r.mVec[3]);
+    
+    return r;
+}
+
+
+FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
+    Matrix4x4 r;
+    //transpose left-upper 3x3
+    __m128 t0 = shuffle<0,1,0,1>(mat.mVec[0],mat.mVec[1]);// 00,10,01,11
+    __m128 t1 = shuffle<2,3,2,3>(mat.mVec[0],mat.mVec[1]);// 20,30,21,31
+    // mat.mVec[2] : 02,12,22,32
+    r.mVec[0] = shuffle<0,2,0,3>(t0,mat.mVec[2]);//00,01,02,32(=0)
+    r.mVec[1] = shuffle<1,3,1,3>(t0,mat.mVec[2]);//10,11,12,32(=0)
+    r.mVec[2] = shuffle<0,2,2,3>(t1,mat.mVec[2]);//20,21,22,32(=0)
+
+    //calculate sqr size
+    __m128 sqrl = _mm_mul_ps(r.mVec[0],r.mVec[0]);
+    sqrl=_mm_add_ps(sqrl,_mm_mul_ps(r.mVec[1],r.mVec[1]));
+    sqrl=_mm_add_ps(sqrl,_mm_mul_ps(r.mVec[2],r.mVec[2]));
+
+    //here need avoid divide by zero?
+    //but I will remove it here,and add (0,0,0,1) to it
+     sqrl=_mm_add_ps(sqrl,_mm_set_ps(One,Zero,Zero,Zero));
+
+    __m128 rsqrl= _mm_div_ps(_mm_set1_ps(One),sqrl);
+
+    r.mVec[0] = _mm_mul_ps(r.mVec[0],rsqrl);
+    r.mVec[1] = _mm_mul_ps(r.mVec[1],rsqrl);
+    r.mVec[2] = _mm_mul_ps(r.mVec[2],rsqrl);
 
     //translate
     r.mVec[3] =                      _mm_mul_ps(r.mVec[0],swizzle<0>(mat.mVec[3]));
