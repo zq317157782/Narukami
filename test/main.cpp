@@ -331,9 +331,9 @@ TEST(ssevector3f,cross){
     EXPECT_EQ(v3,v);
 }
 
-TEST(ssevector3f,reduce_add){
+TEST(ssevector3f,sum){
     SSEVector3f v1(1,2,3);
-    float a=reduce_add(v1);
+    float a=sum(v1);
     EXPECT_EQ(a,6);
 }
 
@@ -351,6 +351,19 @@ TEST(ssevector3f,rcp){
     EXPECT_FLOAT_EQ(v2[0],0.5f);
     EXPECT_FLOAT_EQ(v2[1],0.5f);
     EXPECT_FLOAT_EQ(v2[2],0.5f);
+}
+
+
+TEST(ssevector3f,length){
+    SSEVector3f v1(1,0,0);
+    float l=length(v1);
+    EXPECT_FLOAT_EQ(l,1.0f);
+}
+
+TEST(ssevector3f,normalize){
+    SSEVector3f v1(5,0,0);
+    auto v2=normalize(v1);
+    EXPECT_EQ(v2,SSEVector3f(1,0,0));
 }
 
 TEST(sse,_sse_blendv_ps){
