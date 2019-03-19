@@ -34,6 +34,7 @@ struct SSE_ALIGNAS Matrix4x4{
 public:
     union{
         float m[16];
+        float mn[4][4];
         __m128 mVec[4];
     };
     typedef float Scalar;
@@ -165,14 +166,32 @@ FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     
     Matrix4x4 ret;
 
-    for(int i=0;i<4;++i){
-        float4 r=float4(A.mVec[0])*float4(B.m[i*4+0]);
-        r+=float4(A.mVec[1])*float4(B.m[i*4+1]);
-        r+=float4(A.mVec[2])*float4(B.m[i*4+2]);
-        r+=float4(A.mVec[3])*float4(B.m[i*4+3]);
-        ret.mVec[i]=r.xyzw;
-    }
+    float4 r=float4(A.mVec[0])*float4(B.m[0]);
+    r+=float4(A.mVec[1])*float4(B.m[1]);
+    r+=float4(A.mVec[2])*float4(B.m[2]);
+    r+=float4(A.mVec[3])*float4(B.m[3]);
+    ret.mVec[0]=r.xyzw;
+
+    r =float4(A.mVec[0])*float4(B.m[4]);
+    r+=float4(A.mVec[1])*float4(B.m[5]);
+    r+=float4(A.mVec[2])*float4(B.m[6]);
+    r+=float4(A.mVec[3])*float4(B.m[7]);
+    ret.mVec[1]=r.xyzw;
+
+    r =float4(A.mVec[0])*float4(B.m[8]);
+    r+=float4(A.mVec[1])*float4(B.m[9]);
+    r+=float4(A.mVec[2])*float4(B.m[10]);
+    r+=float4(A.mVec[3])*float4(B.m[11]);
+    ret.mVec[2]=r.xyzw;
+
+    r =float4(A.mVec[0])*float4(B.m[12]);
+    r+=float4(A.mVec[1])*float4(B.m[13]);
+    r+=float4(A.mVec[2])*float4(B.m[14]);
+    r+=float4(A.mVec[3])*float4(B.m[15]);
+    ret.mVec[3]=r.xyzw;
+    
     return ret;
 }
+
 
 NARUKAMI_END
