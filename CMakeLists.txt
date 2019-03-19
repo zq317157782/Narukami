@@ -6,7 +6,7 @@ enable_testing()
 
 set(CMAKE_BUILD_TYPE release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
 
 include_directories(src)
 include_directories(external)

@@ -366,19 +366,20 @@ TEST(ssevector3f,normalize){
     EXPECT_EQ(v2,SSEVector3f(1,0,0));
 }
 
-TEST(sse,_sse_blendv_ps){
-    __m128 a =_mm_set1_ps(5.0f);
-    __m128 b =_mm_set1_ps(6.0f);
-    __m128 mask = _mm_set1_ps(cast_i2f(0xFFFFFFFF));
-    __m128 ret=_sse_blendv_ps(a,b,mask);
+// TEST(sse,_sse_blendv_ps){
+//     __m128 a =_mm_set1_ps(5.0f);
+//     __m128 b =_mm_set1_ps(6.0f);
+//     __m128 mask = _mm_set1_ps(cast_i2f(0xFFFFFFFF));
+//     __m128 ret=_sse_blendv_ps(a,b,mask);
 
-    EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),6.0F);
-}
+//     EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),6.0F);
+// }
 
 TEST(sse,sum){
     __m128 a =_mm_set_ps(1,2,3,4);
     EXPECT_FLOAT_EQ(sum(a),10);
 }
+
 
 #include "core/sse/float4.h"
 TEST(float4,eq){

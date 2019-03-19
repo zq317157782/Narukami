@@ -26,14 +26,12 @@ SOFTWARE.
 #include "core/platform.h"
 #include <xmmintrin.h>//sse
 #include <emmintrin.h>//sse2
+#include <pmmintrin.h>//sse3
+#include <smmintrin.h>//sse4.1
 
 NARUKAMI_BEGIN
 #define SSE_ALIGNAS alignas(16)
 
-//SSE4.1's _mm_blendv_ps 
-FINLINE __m128 _sse_blendv_ps(__m128 a, __m128 b, __m128 mask){
-    return _mm_or_ps(_mm_and_ps(mask,b),_mm_andnot_ps(mask,a));
-}
 
 template<int i0,int i1,int i2,int i3>
 FINLINE __m128 swizzle(const __m128 v){
@@ -43,6 +41,27 @@ FINLINE __m128 swizzle(const __m128 v){
 template<int i>
 FINLINE __m128 swizzle(const __m128 v){
     return swizzle<i,i,i,i>(v);
+}
+ 
+template<> 
+FINLINE __m128 swizzle<0,1,0,1>(const __m128 v){
+    return _mm_movelh_ps(v,v);
+}
+
+template<> 
+FINLINE __m128 swizzle<2,3,2,3>(const __m128 v){
+   return _mm_movehl_ps(v,v);
+}
+
+
+template<> 
+FINLINE __m128 swizzle<0,0,2,2>(const __m128 v){
+    return _mm_moveldup_ps(v);
+}
+
+template<> 
+FINLINE __m128 swizzle<1,1,3,3>(const __m128 v){
+    return _mm_movehdup_ps(v);
 }
 
 template<int i0,int i1,int i2,int i3>
@@ -54,6 +73,18 @@ template<int i>
 FINLINE __m128 shuffle(const __m128 v1,const __m128 v2){
     return shuffle<i,i,i,i>(v1,v2);
 }
+
+
+template<>
+FINLINE __m128 shuffle<0,1,0,1>(const __m128 v1,const __m128 v2){
+    return _mm_movelh_ps(v1,v2);
+}
+
+template<>
+FINLINE __m128 shuffle<2,3,2,3>(const __m128 v1,const __m128 v2){
+    return _mm_movehl_ps(v1,v2);
+}
+
 
 FINLINE float sum(const __m128 a){
     const __m128 b = swizzle<1>(a);
