@@ -193,5 +193,24 @@ FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     return ret;
 }
 
+//https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html#_appendix_2
+FINLINE Matrix4x4 inverse_noscale(const Matrix4x4& mat){
+    Matrix4x4 r;
+    //transpose left-upper 3x3
+    __m128 t0 = shuffle<0,1,0,1>(mat.mVec[0],mat.mVec[1]);// 00,10,01,11
+    __m128 t1 = shuffle<2,3,2,3>(mat.mVec[0],mat.mVec[1]);// 20,30,21,31
+    // mat.mVec[2] : 02,12,22,32
+    r.mVec[0] = shuffle<0,2,0,3>(t0,mat.mVec[2]);//00,01,02,32(=0)
+    r.mVec[1] = shuffle<1,3,1,3>(t0,mat.mVec[2]);//10,11,12,32(=0)
+    r.mVec[2] = shuffle<0,2,2,3>(t1,mat.mVec[2]);//20,21,22,32(=0)
+
+    //translate
+    r.mVec[3] =                      _mm_mul_ps(r.mVec[0],swizzle<0>(mat.mVec[3]));
+    r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[1],swizzle<1>(mat.mVec[3])));
+    r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[2],swizzle<2>(mat.mVec[3])));
+    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(One,Zero,Zero,Zero),r.mVec[3]);
+    
+    return r;
+}
 
 NARUKAMI_END

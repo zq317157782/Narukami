@@ -485,6 +485,18 @@ TEST(matrix4x4,eq){
     
 }
 
+TEST(matrix4x4,inverse_noscale){
+    Matrix4x4 mat;
+    Matrix4x4 mat2 = inverse_noscale(mat);
+    EXPECT_TRUE(mat==mat2);
+
+    Matrix4x4 mat3(1,0,0,0,0,1,0,0,0,0,1,0,1,1,1,1);
+    Matrix4x4 mat4=inverse_noscale(mat3);
+    Matrix4x4 mat5(1,0,0,0,0,1,0,0,0,0,1,0,-1,-1,-1,1);
+    EXPECT_EQ(mat5,mat4);
+}
+
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
