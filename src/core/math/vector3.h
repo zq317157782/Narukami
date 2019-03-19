@@ -97,7 +97,7 @@ FINLINE Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2) { return Ve
 template <typename T>
 FINLINE float length(const Vector3<T> &v) { return sqrt(float(dot(v, v))); }
 template <typename T>
-FINLINE float lensqr(const Vector3<T> &v) { return float(dot(v, v)); }
+FINLINE float sqrlen(const Vector3<T> &v) { return float(dot(v, v)); }
 template <typename T>
 FINLINE Vector3f normalize(const Vector3<T> &v1) { float inv_l = rsqrt(dot(v1, v1)); return v1 * inv_l; }
 template <typename T>
