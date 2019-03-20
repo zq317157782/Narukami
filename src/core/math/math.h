@@ -54,6 +54,12 @@ struct OneType {
 } ;
 static MAYBE_UNUSED const OneType One;
 
+struct NegOneType {
+    FINLINE operator float() const{return -1.0f;}
+    FINLINE operator int() const{return -1;}
+} ;
+static MAYBE_UNUSED const NegOneType NegOne;
+
 //IEEE float format
 //32 bits
 //[31][30-23][22-0]
