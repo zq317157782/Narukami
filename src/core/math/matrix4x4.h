@@ -249,14 +249,13 @@ FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
 }
 
 
-static FINLINE __m128 adj2x2(const __m128 m){
-    return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(One,NegOne,NegOne,One));
-}
+static FINLINE __m128 adj2x2(const __m128 m){ return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(One,NegOne,NegOne,One)); }
+static FINLINE __m128 mul2x2(const __m128 m0,const __m128 m1){ return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1))); }
+static FINLINE __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swizzle<0,0,0,0>(m)/*a*/,swizzle<3,3,3,3>(m)/*d*/), _mm_mul_ps(swizzle<1,1,1,1>(m)/*c*/,swizzle<2,2,2,2>(m)/*b*/) ); }
 
-static FINLINE __m128 mul2x2(const __m128 m0,const __m128 m1){
-    return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1)));
-}
 
+//Blockwise inversion
+//https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion
 FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
     Matrix4x4 r;
     //extract 4 sub-matrix2x2
@@ -269,16 +268,16 @@ FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
 
     //2x2 det
     // h->  |D| |B| |C| |A| <-l
-    __m128 det=_mm_sub_ps(
-    _mm_mul_ps(shuffle<0,2,0,2>(mat.mVec[0],mat.mVec[2])/*a*/,shuffle<1,3,1,3>(mat.mVec[1],mat.mVec[3])/*d*/),
-    _mm_mul_ps(shuffle<1,3,1,3>(mat.mVec[0],mat.mVec[2])/*c*/,shuffle<0,2,0,2>(mat.mVec[1],mat.mVec[3])/*b*/)
-    );
+    // __m128 det=_mm_sub_ps(
+    // _mm_mul_ps(shuffle<0,2,0,2>(mat.mVec[0],mat.mVec[2])/*a*/,shuffle<1,3,1,3>(mat.mVec[1],mat.mVec[3])/*d*/),
+    // _mm_mul_ps(shuffle<1,3,1,3>(mat.mVec[0],mat.mVec[2])/*c*/,shuffle<0,2,0,2>(mat.mVec[1],mat.mVec[3])/*b*/)
+    // );
 
     //2x2 det
-    __m128 detA = swizzle<0>(det);
-    __m128 detB = swizzle<2>(det);
-    __m128 detC = swizzle<1>(det);
-    __m128 detD = swizzle<3>(det);
+    __m128 detA = det2x2(A);
+    // __m128 detB = swizzle<2>(det);
+    // __m128 detC = swizzle<1>(det);
+    // __m128 detD = swizzle<3>(det);
 
 
     __m128 invA= _mm_div_ps(adj2x2(A),detA);

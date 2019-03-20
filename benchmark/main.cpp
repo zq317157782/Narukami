@@ -300,13 +300,13 @@ static void BM_matrix_mul_mm_v2(benchmark::State &state)
 BENCHMARK(BM_matrix_mul_mm_v2);
 
 
-FINLINE bool matEqual_v1(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+FINLINE bool matEqual_sse(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
      __m128 mask0=_mm_and_ps(_mm_cmpeq_ps(A.mVec[0], B.mVec[0]),_mm_cmpeq_ps(A.mVec[1], B.mVec[1]));
     __m128 mask1=_mm_and_ps(_mm_cmpeq_ps(A.mVec[2], B.mVec[2]),_mm_cmpeq_ps(A.mVec[3], B.mVec[3]));
     return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)==15;
 }
 
-FINLINE bool matEqual_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+FINLINE bool matEqual_scaler(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
     if((A.m[0]==B.m[0])&&(A.m[1]==B.m[1])&&(A.m[2]==B.m[2])&&(A.m[3]==B.m[3])&&(A.m[4]==B.m[4])
     &&(A.m[5]==B.m[5])&&(A.m[6]==B.m[6])&&(A.m[7]==B.m[7])&&(A.m[8]==B.m[8])&&(A.m[9]==B.m[9])
     &&(A.m[10]==B.m[10])&&(A.m[11]==B.m[11])&&(A.m[12]==B.m[12])&&(A.m[13]==B.m[13])
@@ -316,28 +316,124 @@ FINLINE bool matEqual_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4&
     return false;
 }
 
-static void BM_matrix_equal_v1(benchmark::State &state)
+static void BM_matrix_equal_sse(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
     bool a;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(a+=matEqual_v1(M,M2));
+         benchmark::DoNotOptimize(a+=matEqual_sse(M,M2));
     }
 }
-BENCHMARK(BM_matrix_equal_v1);
+BENCHMARK(BM_matrix_equal_sse);
 
-static void BM_matrix_equal_v2(benchmark::State &state)
+static void BM_matrix_equal_scaler(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
     bool a;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(a+=matEqual_v2(M,M2));
+         benchmark::DoNotOptimize(a+=matEqual_scaler(M,M2));
     }
 }
-BENCHMARK(BM_matrix_equal_v2);
+BENCHMARK(BM_matrix_equal_scaler);
+
+
+static void BM_matrix_transform_inverse(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(M2=narukami::transform_inverse(M));
+    }
+}
+BENCHMARK(BM_matrix_transform_inverse);
+
+static void BM_matrix_inverse(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(M2=narukami::inverse(M));
+    }
+}
+BENCHMARK(BM_matrix_inverse);
+
+
+narukami::Matrix4x4 pbrt_inverse(const narukami::Matrix4x4 &m) {
+	int indxc[4], indxr[4];
+	int ipiv[4] = { 0, 0, 0, 0 };
+	float minv[4][4];
+	memcpy(minv, m.m, 4 * 4 * sizeof(float));
+	for (int i = 0; i < 4; i++) {
+		int irow = 0, icol = 0;
+		float big = 0.f;
+		// Choose pivot
+		for (int j = 0; j < 4; j++) {
+			if (ipiv[j] != 1) {
+				for (int k = 0; k < 4; k++) {
+					if (ipiv[k] == 0) {
+						if (std::abs(minv[j][k]) >= big) {
+							big = float(std::abs(minv[j][k]));
+							irow = j;
+							icol = k;
+						}
+					}
+				}
+			}
+		}
+		++ipiv[icol];
+		// Swap rows _irow_ and _icol_ for pivot
+		if (irow != icol) {
+			for (int k = 0; k < 4; ++k)
+				std::swap(minv[irow][k], minv[icol][k]);
+		}
+		indxr[i] = irow;
+		indxc[i] = icol;
+		
+
+		// Set $m[icol][icol]$ to one by scaling row _icol_ appropriately
+		float pivinv = 1. / minv[icol][icol];
+		minv[icol][icol] = 1.;
+		for (int j = 0; j < 4; j++)
+			minv[icol][j] *= pivinv;
+
+		// Subtract this row from others to zero out their columns
+		for (int j = 0; j < 4; j++) {
+			if (j != icol) {
+				float save = minv[j][icol];
+				minv[j][icol] = 0;
+				for (int k = 0; k < 4; k++)
+					minv[j][k] -= minv[icol][k] * save;
+			}
+		}
+	}
+	// Swap columns to reflect permutation
+	for (int j = 3; j >= 0; j--) {
+		if (indxr[j] != indxc[j]) {
+			for (int k = 0; k < 4; k++)
+				std::swap(minv[k][indxr[j]], minv[k][indxc[j]]);
+		}
+	}
+	return narukami::Matrix4x4((float*)minv);
+}
+
+static void BM_matrix_pbrt(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Matrix4x4 M2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(M2=pbrt_inverse(M));
+    }
+}
+BENCHMARK(BM_matrix_pbrt);
 
 BENCHMARK_MAIN();
