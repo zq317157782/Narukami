@@ -82,7 +82,7 @@ FINLINE __m128 shuffle<0,1,0,1>(const __m128 v1,const __m128 v2){
 
 template<>
 FINLINE __m128 shuffle<2,3,2,3>(const __m128 v1,const __m128 v2){
-    return _mm_movehl_ps(v1,v2);
+    return _mm_movehl_ps(v2,v1);
 }
 
 
