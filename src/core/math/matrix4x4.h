@@ -248,4 +248,59 @@ FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
     return r;
 }
 
+
+static FINLINE __m128 adj2x2(const __m128 m){
+    return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(One,NegOne,NegOne,One));
+}
+
+static FINLINE __m128 mul2x2(const __m128 m0,const __m128 m1){
+    return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1)));
+}
+
+FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+    Matrix4x4 r;
+    //extract 4 sub-matrix2x2
+    // | A B |
+    // | C D |
+    __m128 A = shuffle<0,1,0,1>(mat.mVec[0],mat.mVec[1]);
+    __m128 C = shuffle<2,3,2,3>(mat.mVec[0],mat.mVec[1]);
+    __m128 B = shuffle<0,1,0,1>(mat.mVec[2],mat.mVec[3]);
+    __m128 D = shuffle<2,3,2,3>(mat.mVec[2],mat.mVec[3]);
+
+    //2x2 det
+    // h->  |D| |B| |C| |A| <-l
+    __m128 det=_mm_sub_ps(
+    _mm_mul_ps(shuffle<0,2,0,2>(mat.mVec[0],mat.mVec[2])/*a*/,shuffle<1,3,1,3>(mat.mVec[1],mat.mVec[3])/*d*/),
+    _mm_mul_ps(shuffle<1,3,1,3>(mat.mVec[0],mat.mVec[2])/*c*/,shuffle<0,2,0,2>(mat.mVec[1],mat.mVec[3])/*b*/)
+    );
+
+    //2x2 det
+    __m128 detA = swizzle<0>(det);
+    __m128 detB = swizzle<2>(det);
+    __m128 detC = swizzle<1>(det);
+    __m128 detD = swizzle<3>(det);
+
+
+    __m128 invA= _mm_div_ps(adj2x2(A),detA);
+    __m128 D_CinvAB= _mm_sub_ps(D,mul2x2(mul2x2(C,invA),B));
+    __m128 det_D_CinvAB=_mm_sub_ps(
+    _mm_mul_ps(swizzle<0,0,0,0>(D_CinvAB)/*a*/,swizzle<3,3,3,3>(D_CinvAB)/*d*/),
+    _mm_mul_ps(swizzle<1,1,1,1>(D_CinvAB)/*c*/,swizzle<2,2,2,2>(D_CinvAB)/*b*/)
+    );
+
+    __m128 DD=_mm_div_ps(adj2x2(D_CinvAB),det_D_CinvAB);
+    __m128 CinvA = _mm_mul_ps(C,invA);
+    __m128 invAB = _mm_mul_ps(invA,B);
+    __m128 invABinv_D_CinvAB = _mm_mul_ps(invAB,DD);
+    __m128 BB =  _mm_sub_ps(_mm_set1_ps(Zero),invABinv_D_CinvAB);
+    __m128 AA =  _mm_add_ps(invA,_mm_mul_ps(invABinv_D_CinvAB,CinvA));
+    __m128 CC =  _mm_sub_ps(_mm_set1_ps(Zero),_mm_mul_ps(DD,CinvA));
+
+    r.mVec[0] = shuffle<0,1,0,1>(AA,CC);
+    r.mVec[1] = shuffle<2,3,2,3>(AA,CC);
+    r.mVec[2] = shuffle<0,1,0,1>(BB,DD);
+    r.mVec[3] = shuffle<2,3,2,3>(BB,DD);
+
+    return r;
+}
 NARUKAMI_END

@@ -485,7 +485,7 @@ TEST(matrix4x4,eq){
     
 }
 
-TEST(matrix4x4,inverse_noscale){
+TEST(matrix4x4,transform_inverse_noscale){
     Matrix4x4 mat;
     Matrix4x4 mat2 = transform_inverse_noscale(mat);
     EXPECT_TRUE(mat==mat2);
@@ -497,7 +497,7 @@ TEST(matrix4x4,inverse_noscale){
 }
 
 
-TEST(matrix4x4,inverse){
+TEST(matrix4x4,transform_inverse){
     Matrix4x4 mat;
     Matrix4x4 mat2 = transform_inverse(mat);
     EXPECT_TRUE(mat==mat2);
@@ -507,6 +507,32 @@ TEST(matrix4x4,inverse){
     Matrix4x4 mat5(0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f,0,0,0,0,1);
     EXPECT_EQ(mat5,mat4);
 }
+
+TEST(matrix4x4,inverse){
+    Matrix4x4 mat;
+    Matrix4x4 mat2 = inverse(mat);
+    EXPECT_TRUE(mat==mat2);
+
+    Matrix4x4 mat3(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2);
+    Matrix4x4 mat4=inverse(mat3);
+    Matrix4x4 mat5(0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f);
+    EXPECT_EQ(mat5,mat4);
+}
+
+TEST(matrix4x4,mul2x2){
+    auto m0=float4(1,0,0,1);
+    auto m1=float4(mul2x2(m0,m0));
+    EXPECT_EQ(m0,m1);
+}
+
+TEST(matrix4x4,adj2x2){
+    auto m0=float4(1,2,3,4);
+    auto m1=float4(adj2x2(m0));
+    auto m2=float4(4,-3,-2,1);
+    EXPECT_EQ(m2,m1);
+}
+
+
 
 
 int main(int argc, char* argv[]) {
