@@ -78,21 +78,21 @@ TEST(math,lerp){
 //     EXPECT_EQ(isnan(a),false);
 // }
 
-TEST(vector3f,add){
-    Vector3f v1(1,2,3);
-    Vector3f v2(4,5,6);
-    auto v3=v1+v2;
-    EXPECT_EQ(v3,Vector3f(5,7,9));
-}
+// TEST(vector3f,add){
+//     Vector3f v1(1,2,3);
+//     Vector3f v2(4,5,6);
+//     auto v3=v1+v2;
+//     EXPECT_EQ(v3,Vector3f(5,7,9));
+// }
 
 
 
-TEST(vector3f,sub){
-    Vector3f v1(1,2,3);
-    Vector3f v2(4,5,6);
-    auto v3=v1-v2;
-    EXPECT_EQ(v3,Vector3f(-3,-3,-3));
-}
+// TEST(vector3f,sub){
+//     Vector3f v1(1,2,3);
+//     Vector3f v2(4,5,6);
+//     auto v3=v1-v2;
+//     EXPECT_EQ(v3,Vector3f(-3,-3,-3));
+// }
 
 
 
@@ -302,12 +302,12 @@ TEST(ssevector3f,sign){
      EXPECT_EQ(sign(v2),SSEVector3f(1.0f));
 }
 
-TEST(ssevector3f,add){
-     SSEVector3f v1(-5);
-     SSEVector3f v2(5);
-     auto v3=v1+v2;
-     EXPECT_EQ(v3,SSEVector3f(0.0F));
-}
+// TEST(ssevector3f,add){
+//      SSEVector3f v1(-5);
+//      SSEVector3f v2(5);
+//      auto v3=v1+v2;
+//      EXPECT_EQ(v3,SSEVector3f(0.0F));
+// }
 
 TEST(ssevector3f,sub){
      SSEVector3f v1(-5);
@@ -317,12 +317,12 @@ TEST(ssevector3f,sub){
 }
 
 
-TEST(ssevector3f,mul){
-     SSEVector3f v1(-5);
-     SSEVector3f v2(5);
-     auto v3=v1-v2;
-     EXPECT_EQ(v3,SSEVector3f(-10.0F));
-}
+// TEST(ssevector3f,mul){
+//      SSEVector3f v1(-5);
+//      SSEVector3f v2(5);
+//      auto v3=v1-v2;
+//      EXPECT_EQ(v3,SSEVector3f(-10.0F));
+// }
 
 TEST(ssevector3f,div){
      SSEVector3f v1(-5);
