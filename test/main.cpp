@@ -581,7 +581,7 @@ TEST(SoAVector3f,eq){
     SoAVector3f v2(0);
     EXPECT_EQ(v1,v2);
 }
-
+#include "core/math/euclid.h"
 TEST(Euclid,point_add_vector){
     Point3f  p(0,0,0);
     Vector3f v(1,0,0);

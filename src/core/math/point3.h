@@ -62,10 +62,6 @@ template <typename T>
 FINLINE Point3<T> operator+(const Point3<T>& v){ return v; }
 template <typename T>
 FINLINE Point3<T> operator-(const Point3<T>& v1){ Point3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
-template <typename T>
-FINLINE Point3<T> operator+(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; v.z = v1.z + v2.z; return v; }
-template <typename T>
-FINLINE Point3<T> operator-(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x - v2.x; v.y = v1.y - v2.y; v.z = v1.z - v2.z; return v; }
 //compenont wise
 template <typename T>
 FINLINE Point3<T> operator*(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
@@ -73,10 +69,6 @@ template <typename T>
 FINLINE Point3<T> operator*(const Point3<T> &v1, const T &f) { Point3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
 template <typename T>
 FINLINE Point3<T> operator/(const Point3<T> &v1, const T &f) { assert(f != 0); Point3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
-template <typename T>
-FINLINE Point3<T> &operator+=(Point3<T> &v, const Point3<T> &v1) { v.x += v1.x; v.y += v1.y; v.z += v1.z; return v; }
-template <typename T>
-FINLINE Point3<T> &operator-=(Point3<T> &v, const Point3<T> &v1) { v.x -= v1.x; v.y -= v1.y; v.z -= v1.z; return v; }
 template <typename T>
 FINLINE Point3<T> &operator*=(Point3<T> &v, const Point3<T> &v1) { v.x *= v1.x; v.y *= v1.y; v.z *= v1.z; return v; }
 template <typename T>
@@ -137,14 +129,10 @@ FINLINE SSEPoint3f operator+(const SSEPoint3f& v){ return v; }
  //0x80000000 xor x(y,z)
 FINLINE SSEPoint3f operator-(const SSEPoint3f& v){ auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x80000000)); return _mm_xor_ps(v.xyzw,mask); }
 
-FINLINE SSEPoint3f operator+(const SSEPoint3f& v1,const SSEPoint3f& v2){ return _mm_add_ps(v1,v2); }
-FINLINE SSEPoint3f operator-(const SSEPoint3f& v1,const SSEPoint3f& v2){ return _mm_sub_ps(v1,v2); }
 FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const SSEPoint3f& v2){ return _mm_mul_ps(v1,v2); }
 FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const float a){ return _mm_mul_ps(v1,SSEPoint3f(a)); }
 FINLINE SSEPoint3f operator/(const SSEPoint3f& v1,const float a){ assert(a!=0); return _mm_div_ps(v1,SSEPoint3f(a)); }
 
-FINLINE SSEPoint3f& operator+=(SSEPoint3f& v1,const SSEPoint3f& v2){ v1=v1+v2; return v1; }
-FINLINE SSEPoint3f& operator-=(SSEPoint3f& v1,const SSEPoint3f& v2){ v1=v1-v2; return v1; }
 FINLINE SSEPoint3f& operator*=(SSEPoint3f& v1,const float a){ v1=v1*a; return v1; }
 FINLINE SSEPoint3f& operator/=(SSEPoint3f& v1,const float f){ v1=v1/f; return v1; }
 
