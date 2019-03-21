@@ -84,15 +84,17 @@ FINLINE bool operator!=(const Point3<T> &v1, const Point3<T> &v2) { if ((v1.x !=
 template <typename T>
 FINLINE Point3f rcp(const Point3<T> &v1) { return Point3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
 template <typename T>
-FINLINE Point3f abs(const Point3<T> &v1) { return Point3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
+FINLINE Point3<T> abs(const Point3<T> &v1) { return Point3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
 template <typename T>
-FINLINE Point3f sign(const Point3<T> &v1) { return Point3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
+FINLINE Point3<T> sign(const Point3<T> &v1) { return Point3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
 
 
 template <typename T>
 FINLINE Point3f sqrt(const Point3<T> &v1) { return Point3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
 template <typename T>
 FINLINE Point3f rsqrt(const Point3<T> &v1){ return Point3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
+
+
 
 //--- [SSE] ---
 //16 bit
