@@ -111,6 +111,8 @@ FINLINE Vector3f normalize(const Vector3<T> &v1) { float inv_l = rsqrt(dot(v1, v
 
 template <typename T>
 FINLINE Vector3f sqrt(const Vector3<T> &v1) { return Vector3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
+template <typename T>
+FINLINE Vector3f rsqrt(const Vector3<T> &v1){ return Vector3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
 
 //--- [SSE] ---
 //16 bit
@@ -176,6 +178,8 @@ FINLINE float length(const SSEVector3f& v){ return sqrt(dot(v,v));}
 FINLINE float sqrlen(const SSEVector3f& v){ return dot(v,v);}
 FINLINE SSEVector3f normalize(const SSEVector3f& v){ return v*rsqrt(dot(v,v)); }
 
+FINLINE SSEVector3f sqrt(const SSEVector3f& v){ return _mm_sqrt_ps(v.xyzw); }
+FINLINE SSEVector3f rsqrt(const SSEVector3f& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 
 
 NARUKAMI_END

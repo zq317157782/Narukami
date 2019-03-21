@@ -163,6 +163,14 @@ TEST(vector3f,positive_and_negative){
     EXPECT_EQ(v2,Vector3f(1.0f));
 }
 
+TEST(vector3f,rsqrt){
+    Vector3f v1(1,4,16);
+    auto v2=rsqrt(v1);
+    EXPECT_FLOAT_EQ(v2.x,1);
+    EXPECT_FLOAT_EQ(v2.y,0.5f);
+    EXPECT_FLOAT_EQ(v2.z,0.25f);
+}
+
 
 TEST(vector2f,add){
     Vector2f v1(1,2);
@@ -364,6 +372,14 @@ TEST(ssevector3f,normalize){
     SSEVector3f v1(5,0,0);
     auto v2=normalize(v1);
     EXPECT_EQ(v2,SSEVector3f(1,0,0));
+}
+
+TEST(ssevector3f,rsqrt){
+    SSEVector3f v1(1,4,16);
+    auto v2=rsqrt(v1);
+    EXPECT_FLOAT_EQ(v2.x,1);
+    EXPECT_FLOAT_EQ(v2.y,0.5f);
+    EXPECT_FLOAT_EQ(v2.z,0.25f);
 }
 
 // TEST(sse,_sse_blendv_ps){
