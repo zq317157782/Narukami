@@ -1,9 +1,6 @@
 #include "gtest/gtest.h"
 #include "core/math/euclid.h"
-#include "core/math/vector2.h"
-#include "core/math/vector3.h"
-#include "core/sse/float4.h"
-#include "core/math/matrix4x4.h"
+
 using namespace narukami;
 TEST(math,rcp){
     EXPECT_FLOAT_EQ(rcp(2.0f),0.5f);

@@ -24,7 +24,10 @@ SOFTWARE.
 
 #pragma once
 #include "core/narukami.h"
+#include "core/sse/sse.h"
+#include "core/sse/float4.h"
 #include "core/math/math.h"
+#include "core/math/vector2.h"
 #include "core/math/vector3.h"
 #include "core/math/point3.h"
 #include "core/math/matrix4x4.h"
