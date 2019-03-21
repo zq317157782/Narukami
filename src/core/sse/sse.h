@@ -45,7 +45,9 @@ FINLINE __m128 swizzle(const __m128 v){
  
 template<> 
 FINLINE __m128 swizzle<0,1,0,1>(const __m128 v){
-    return _mm_movelh_ps(v,v);
+    //return _mm_movelh_ps(v,v);
+    //from embree
+    return _mm_castpd_ps(_mm_movedup_pd(_mm_castps_pd(v)));
 }
 
 template<> 
