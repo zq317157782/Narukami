@@ -25,6 +25,7 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math/math.h"
+#include "core/math/point3.h"
 #include "core/sse/float4.h"
 NARUKAMI_BEGIN
 
@@ -65,7 +66,11 @@ FINLINE Vector3<T> operator-(const Vector3<T>& v1){ Vector3<T> v; v.x=-v1.x; v.y
 template <typename T>
 FINLINE Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2) { Vector3<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; v.z = v1.z + v2.z; return v; }
 template <typename T>
+FINLINE Point3<T> operator+(const Point3<T> &p, const Vector3<T> &v) { Point3<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; rp.z = p.z + v.z; return rp; }
+template <typename T>
 FINLINE Vector3<T> operator-(const Vector3<T> &v1, const Vector3<T> &v2) { Vector3<T> v; v.x = v1.x - v2.x; v.y = v1.y - v2.y; v.z = v1.z - v2.z; return v; }
+template <typename T>
+FINLINE Point3<T> operator-(const Point3<T> &p, const Vector3<T> &v) {return p+(-v);}
 //compenont wise
 template <typename T>
 FINLINE Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2) { Vector3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
@@ -150,7 +155,9 @@ FINLINE SSEVector3f operator+(const SSEVector3f& v){ return v; }
 FINLINE SSEVector3f operator-(const SSEVector3f& v){ auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x80000000)); return _mm_xor_ps(v.xyzw,mask); }
 
 FINLINE SSEVector3f operator+(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_add_ps(v1,v2); }
+FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_add_ps(p,v); }
 FINLINE SSEVector3f operator-(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_sub_ps(v1,v2); }
+FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_sub_ps(p,v); }
 FINLINE SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_mul_ps(v1,v2); }
 FINLINE SSEVector3f operator*(const SSEVector3f& v1,const float a){ return _mm_mul_ps(v1,SSEVector3f(a)); }
 FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){ assert(a!=0); return _mm_div_ps(v1,SSEVector3f(a)); }

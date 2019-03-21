@@ -582,6 +582,14 @@ TEST(SoAVector3f,eq){
     EXPECT_EQ(v1,v2);
 }
 
+TEST(Euclid,point_add_vector){
+    Point3f  p(0,0,0);
+    Vector3f v(1,0,0);
+
+    Point3f p2=p+v;
+    EXPECT_EQ(p2,Point3f(1,0,0));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
