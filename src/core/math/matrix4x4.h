@@ -135,6 +135,15 @@ FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
     return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)!=15;
 }
 
+FINLINE Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
+    Matrix4x4 r;
+    r.mVec[0] = float4(A.mVec[0])+float4(B.mVec[0]);
+    r.mVec[1] = float4(A.mVec[1])+float4(B.mVec[1]);
+    r.mVec[2] = float4(A.mVec[2])+float4(B.mVec[2]);
+    r.mVec[3] = float4(A.mVec[3])+float4(B.mVec[3]);
+    return r;
+}
+
 FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   
     // float4 r=float4(M.mVec[0])*float4(v.x);

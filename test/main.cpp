@@ -545,6 +545,14 @@ TEST(matrix4x4,transpose){
     EXPECT_EQ(mat2,mat3);
 }
 
+TEST(matrix4x4,add){
+    Matrix4x4 mat;
+    Matrix4x4 mat2;
+    auto mat3=mat+mat2;
+    Matrix4x4 mat4(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2);
+    EXPECT_EQ(mat4,mat3);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
