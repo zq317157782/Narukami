@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/math/math.h"
 #include "core/math/vector3.h"
 #include "core/math/point3.h"
+#include "core/math/matrix4x4.h"
 NARUKAMI_BEGIN
 template <typename T>
 FINLINE Point3<T> operator+(const Point3<T> &p, const Vector3<T> &v) { Point3<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; rp.z = p.z + v.z; return rp; }
@@ -39,5 +40,49 @@ FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3
 FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_add_ps(p,v); }
 FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_sub_ps(p,v); }
 FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return _mm_sub_ps(p1,p2); }
+
+
+FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
+    // 8ns   
+    // float4 r=float4(M.mVec[0])*float4(v.x);
+    // r+=float4(M.mVec[1])*float4(v.y);
+    // r+=float4(M.mVec[2])*float4(v.z);
+    // return Vector3f(r.x,r.y,r.z);
+    
+    // 7ns
+    float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
+    float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
+    float z =  M.m[3]*v.x+M.m[6]*v.y+M.m[10]*v.z;
+
+    return Vector3f(x,y,z);
+}
+
+FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
+    float4 vx=swizzle<0,0,0,0>(v.xyzw);
+    float4 vy=swizzle<1,1,1,1>(v.xyzw);
+    float4 vz=swizzle<2,2,2,2>(v.xyzw);
+    
+    float4 r=float4(M.mVec[0])*vx;
+    r+=float4(M.mVec[1])*vy;
+    r+=float4(M.mVec[2])*vz;
+    return SSEVector3f(r.xyzw);
+}
+
+
+FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
+    float4 r_xxxx=    swizzle<0,0,0,0>(M.mVec[0])/*m00*/*v.xxxx;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[1])/*m10*/*v.yyyy;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[2])/*m20*/*v.zzzz;
+
+    float4 r_yyyy=    swizzle<1,1,1,1>(M.mVec[0])/*m01*/*v.xxxx;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[1])/*m11*/*v.yyyy;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[2])/*m21*/*v.zzzz;
+
+    float4 r_zzzz=    swizzle<2,2,2,2>(M.mVec[0])/*m02*/*v.xxxx;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[1])/*m12*/*v.yyyy;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
+
+    return SoAVector3f(r_xxxx,r_yyyy,r_zzzz);
+}
 
 NARUKAMI_END

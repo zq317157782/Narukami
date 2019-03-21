@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
-#include "core/math/math.h"
+#include "core/math/euclid.h"
+#include "core/math/vector2.h"
+#include "core/math/vector3.h"
+#include "core/sse/float4.h"
+#include "core/math/matrix4x4.h"
 using namespace narukami;
 TEST(math,rcp){
     EXPECT_FLOAT_EQ(rcp(2.0f),0.5f);
@@ -71,8 +75,7 @@ TEST(math,lerp){
     EXPECT_FLOAT_EQ(a,0.5f);
 }
 
-#include "core/math/vector2.h"
-#include "core/math/vector3.h"
+
 // TEST(type,int_div_zero){
 //     int a= 1/0;
 //     EXPECT_EQ(isnan(a),false);
@@ -397,7 +400,7 @@ TEST(sse,sum){
 }
 
 
-#include "core/sse/float4.h"
+
 TEST(float4,eq){
     float4 a(1,1,1,1);
     float4 b(1,1,1,1);
@@ -460,7 +463,7 @@ TEST(float4 ,rcp){
 
 
 
-#include "core/math/matrix4x4.h"
+
 TEST(matrix4x4,init){
     Matrix4x4 mat;
     EXPECT_FLOAT_EQ(mat[0],1);
@@ -581,7 +584,7 @@ TEST(SoAVector3f,eq){
     SoAVector3f v2(0);
     EXPECT_EQ(v1,v2);
 }
-#include "core/math/euclid.h"
+
 TEST(Euclid,point_add_vector){
     Point3f  p(0,0,0);
     Vector3f v(1,0,0);
