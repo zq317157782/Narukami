@@ -216,7 +216,7 @@ struct SSE_ALIGNAS SoAVector3f{
     SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
     explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
     SoAVector3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(x0,x1,x2,x3),yyyy(y0,y1,y2,y3),zzzz(z0,z1,z2,z3){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
-
+    SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 

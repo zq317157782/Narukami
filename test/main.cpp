@@ -569,6 +569,13 @@ TEST(matrix4x4,add){
     EXPECT_EQ(mat4,mat3);
 }
 
+TEST(matrix4x4,soavector3){
+    Matrix4x4 mat(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,1);
+    SoAVector3f v(float4(1),float4(2),float4(3));
+    auto v2=mat*v;
+    EXPECT_EQ(v2,SoAVector3f(float4(2),float4(4),float4(6)));
+}
+
 TEST(SoAVector3f,eq){
     SoAVector3f v1;
     SoAVector3f v2(0);

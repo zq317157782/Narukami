@@ -171,6 +171,22 @@ FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
 }
 
 
+FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
+    float4 r_xxxx=    swizzle<0,0,0,0>(M.mVec[0])/*m00*/*v.xxxx;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[1])/*m10*/*v.yyyy;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[2])/*m20*/*v.zzzz;
+
+    float4 r_yyyy=    swizzle<1,1,1,1>(M.mVec[0])/*m01*/*v.xxxx;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[1])/*m11*/*v.yyyy;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[2])/*m21*/*v.zzzz;
+
+    float4 r_zzzz=    swizzle<2,2,2,2>(M.mVec[0])/*m02*/*v.xxxx;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[1])/*m12*/*v.yyyy;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
+
+    return SoAVector3f(r_xxxx,r_yyyy,r_zzzz);
+}
+
 FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     
     Matrix4x4 ret;

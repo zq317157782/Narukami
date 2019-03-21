@@ -424,7 +424,7 @@ narukami::Matrix4x4 pbrt_inverse(const narukami::Matrix4x4 &m) {
 	return narukami::Matrix4x4((float*)minv);
 }
 
-static void BM_matrix_pbrt(benchmark::State &state)
+static void BM_matrix_inverse_pbrt(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
@@ -434,6 +434,36 @@ static void BM_matrix_pbrt(benchmark::State &state)
          benchmark::DoNotOptimize(M2=pbrt_inverse(M));
     }
 }
-BENCHMARK(BM_matrix_pbrt);
+BENCHMARK(BM_matrix_inverse_pbrt);
+
+static void BM_matrix_mul_vector3(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Vector3f  v;
+    narukami::Vector3f  v2;
+    narukami::Vector3f  v3;
+    narukami::Vector3f  v4;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(v=M*v);
+         benchmark::DoNotOptimize(v2=M*v2);
+         benchmark::DoNotOptimize(v3=M*v3);
+         benchmark::DoNotOptimize(v4=M*v4);
+    }
+}
+BENCHMARK(BM_matrix_mul_vector3);
+
+static void BM_matrix_mul_soavector3(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::SoAVector3f  v;
+    narukami::SoAVector3f  v2;
+    bool a;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(v2=M*v);
+    }
+}
+BENCHMARK(BM_matrix_mul_soavector3);
 
 BENCHMARK_MAIN();
