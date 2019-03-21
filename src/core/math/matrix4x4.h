@@ -302,4 +302,10 @@ FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
 
     return r;
 }
+
+FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
+    Matrix4x4 r(mat);
+    _MM_TRANSPOSE4_PS(r.mVec[0],r.mVec[1],r.mVec[2],r.mVec[3]);
+    return r;
+}
 NARUKAMI_END

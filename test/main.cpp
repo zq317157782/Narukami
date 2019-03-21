@@ -534,6 +534,16 @@ TEST(matrix4x4,adj2x2){
 
 
 
+TEST(matrix4x4,transpose){
+    //|1  5   9  13| 
+    //|2  6  10  14|
+    //|3  7  11  15|
+    //|4  8  12  16|
+    Matrix4x4 mat(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
+    auto mat2=transpose(mat);
+    Matrix4x4 mat3(1,5,9,13,2,6,10,14,3,7,11,15,4,8,12,16);
+    EXPECT_EQ(mat2,mat3);
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
