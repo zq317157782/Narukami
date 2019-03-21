@@ -60,6 +60,14 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     return Vector3f(x,y,z);
 }
 
+FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
+    float4 r=float4(M.mVec[0])*float4(v.x);
+    r+=float4(M.mVec[1])*float4(v.y);
+    r+=float4(M.mVec[2])*float4(v.z);
+    r+=float4(M.mVec[3])*float4(One);
+    return Point3f(r.x,r.y,r.z);
+}
+
 FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     float4 vx=swizzle<0,0,0,0>(v.xyzw);
     float4 vy=swizzle<1,1,1,1>(v.xyzw);

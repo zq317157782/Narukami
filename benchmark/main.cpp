@@ -215,7 +215,7 @@ static void BM_sum_v2(benchmark::State &state)
 }
 BENCHMARK(BM_sum_v2);
 
-FINLINE narukami::Vector3f matMul_v1(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
      __m128 xyzw = _mm_set_ps(narukami::Zero,v.z,v.y,v.x);
      
      narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
@@ -228,7 +228,7 @@ FINLINE narukami::Vector3f matMul_v1(const narukami::Matrix4x4& M,const narukami
     return narukami::Vector3f(rr[0],rr[1],rr[2]);
 }
 
-FINLINE narukami::Vector3f matMul_v2(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+FINLINE narukami::Vector3f matMulVector(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
     float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
     float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
     float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z;
@@ -236,29 +236,29 @@ FINLINE narukami::Vector3f matMul_v2(const narukami::Matrix4x4& M,const narukami
     return narukami::Vector3f(x,y,z);
 }
 
-static void BM_matrix_mul_v1(benchmark::State &state)
+static void BM_matrix_mul_vector_sse(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Vector3f v;
     float b=0;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(v=matMul_v1(M,v));
+         benchmark::DoNotOptimize(v=matMulVector_SSE(M,v));
     }
 }
-BENCHMARK(BM_matrix_mul_v1);
+BENCHMARK(BM_matrix_mul_vector_sse);
 
-static void BM_matrix_mul_v2(benchmark::State &state)
+static void BM_matrix_mul_vector(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Vector3f v;
     float b=0;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(v=matMul_v2(M,v));
+         benchmark::DoNotOptimize(v=matMulVector(M,v));
     }
 }
-BENCHMARK(BM_matrix_mul_v2);
+BENCHMARK(BM_matrix_mul_vector);
 
 
 
@@ -462,5 +462,47 @@ static void BM_matrix_mul_soavector3(benchmark::State &state)
     }
 }
 BENCHMARK(BM_matrix_mul_soavector3);
+
+
+FINLINE narukami::Point3f mat_mul_point_SSE(const narukami::Matrix4x4& M,const narukami::Point3f& v){
+    narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
+    r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
+    r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
+    r+=narukami::float4(M.mVec[3])*narukami::float4(narukami::One);
+    return narukami::Point3f(r.x,r.y,r.z);
+}
+
+FINLINE narukami::Point3f mat_mul_point(const narukami::Matrix4x4& M,const narukami::Point3f& v){
+    float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z+M.m[12];
+    float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z+M.m[13];
+    float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z+M.m[14];
+
+    return narukami::Point3f(x,y,z);
+}
+
+static void BM_matrix_mul_point_sse(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Point3f v;
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(v=mat_mul_point_SSE(M,v));
+    }
+}
+BENCHMARK(BM_matrix_mul_point_sse);
+
+static void BM_matrix_mul_point(benchmark::State &state)
+{
+    narukami::Matrix4x4 M;
+    narukami::Point3f v;
+    float b=0;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(v=mat_mul_point(M,v));
+    }
+}
+BENCHMARK(BM_matrix_mul_point);
+
 
 BENCHMARK_MAIN();
