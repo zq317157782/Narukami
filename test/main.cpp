@@ -583,6 +583,20 @@ TEST(matrix4x4,mat_mul_point){
     EXPECT_EQ(p2,Point3f(1,2,3));
 }
 
+TEST(matrix4x4,mat_mul_ssepoint){
+    Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
+    SSEPoint3f p;
+    auto p2=mat*p;
+    EXPECT_EQ(p2,SSEPoint3f(1,2,3));
+}
+
+TEST(matrix4x4,mat_mul_soapoint){
+    Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
+    SoAPoint3f p;
+    auto p2=mat*p;
+    EXPECT_EQ(p2,SoAPoint3f(1,2,3,1,2,3,1,2,3,1,2,3));
+}
+
 TEST(SoAVector3f,eq){
     SoAVector3f v1;
     SoAVector3f v2(0);

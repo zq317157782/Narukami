@@ -68,6 +68,8 @@ FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
     return Point3f(r.x,r.y,r.z);
 }
 
+
+
 FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     float4 vx=swizzle<0,0,0,0>(v.xyzw);
     float4 vy=swizzle<1,1,1,1>(v.xyzw);
@@ -76,6 +78,18 @@ FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     float4 r=float4(M.mVec[0])*vx;
     r+=float4(M.mVec[1])*vy;
     r+=float4(M.mVec[2])*vz;
+    return SSEVector3f(r.xyzw);
+}
+
+FINLINE SSEPoint3f operator*(const Matrix4x4& M,const SSEPoint3f& v){
+    float4 vx=swizzle<0,0,0,0>(v.xyzw);
+    float4 vy=swizzle<1,1,1,1>(v.xyzw);
+    float4 vz=swizzle<2,2,2,2>(v.xyzw);
+    
+    float4 r=float4(M.mVec[0])*vx;
+    r+=float4(M.mVec[1])*vy;
+    r+=float4(M.mVec[2])*vz;
+    r+=float4(M.mVec[3]);
     return SSEVector3f(r.xyzw);
 }
 
@@ -94,6 +108,25 @@ FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
     r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
 
     return SoAVector3f(r_xxxx,r_yyyy,r_zzzz);
+}
+
+FINLINE SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
+    float4 r_xxxx=    swizzle<0,0,0,0>(M.mVec[0])/*m00*/*v.xxxx;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[1])/*m10*/*v.yyyy;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[2])/*m20*/*v.zzzz;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[3]);
+   
+    float4 r_yyyy=    swizzle<1,1,1,1>(M.mVec[0])/*m01*/*v.xxxx;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[1])/*m11*/*v.yyyy;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[2])/*m21*/*v.zzzz;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[3]);
+
+    float4 r_zzzz=    swizzle<2,2,2,2>(M.mVec[0])/*m02*/*v.xxxx;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[1])/*m12*/*v.yyyy;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[3]);
+
+    return SoAPoint3f(r_xxxx,r_yyyy,r_zzzz);
 }
 
 NARUKAMI_END
