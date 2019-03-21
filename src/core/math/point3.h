@@ -153,6 +153,7 @@ FINLINE SSEPoint3f sqrt(const SSEPoint3f& v){ return _mm_sqrt_ps(v.xyzw); }
 FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 
 
+//TODO : need to refactor 
 //SoA struct vector3f
 struct SSE_ALIGNAS SoAPoint3f{
     union{

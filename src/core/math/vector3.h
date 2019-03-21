@@ -177,7 +177,7 @@ FINLINE SSEVector3f rsqrt(const SSEVector3f& v){ const __m128 r = _mm_rsqrt_ps(v
 //SoA struct vector3f
 struct SSE_ALIGNAS SoAVector3f{
     union{
-        float4 xxxx;
+        __m128 xxxx;
         struct
         {
             float x0,x1,x2,x3;
@@ -185,7 +185,7 @@ struct SSE_ALIGNAS SoAVector3f{
     };
 
     union{
-        float4 yyyy;
+        __m128 yyyy;
         struct
         {
             float y0,y1,y2,y3;
@@ -193,7 +193,7 @@ struct SSE_ALIGNAS SoAVector3f{
     };
 
     union{
-        float4 zzzz;
+        __m128 zzzz;
         struct
         {
             float z0,z1,z2,z3;
@@ -203,12 +203,12 @@ struct SSE_ALIGNAS SoAVector3f{
     typedef float Scalar;
 
 
-    SoAVector3f():xxxx(Zero),yyyy(Zero),zzzz(Zero){}
-    explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
-    explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
-    SoAVector3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(x0,x1,x2,x3),yyyy(y0,y1,y2,y3),zzzz(z0,z1,z2,z3){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
-    SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    SoAVector3f():xxxx(_mm_set1_ps(Zero)),yyyy(_mm_set1_ps(Zero)),zzzz(_mm_set1_ps(Zero)){}
+    explicit SoAVector3f(const float a):xxxx(_mm_set1_ps(a)),yyyy(_mm_set1_ps(a)),zzzz(_mm_set1_ps(a)){assert(!isnan(a));}
+    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(_mm_set_ps(v3.x,v2.x,v1.x,v0.x)),yyyy(_mm_set_ps(v3.y,v2.y,v1.y,v0.y)),zzzz(_mm_set_ps(v3.z,v2.z,v1.z,v0.z)){ }
+    explicit SoAVector3f(const Vector3f& v):xxxx(_mm_set1_ps(v.x)),yyyy(_mm_set1_ps(v.y)),zzzz(_mm_set1_ps(v.z)){ }
+    SoAVector3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(_mm_set_ps(x3,x2,x1,x3)),yyyy(_mm_set_ps(y3,y2,y1,y0)),zzzz(_mm_set_ps(z3,z2,z1,z0)){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
+    SoAVector3f(const __m128 x,const __m128 y,const __m128 z):xxxx(x),yyyy(y),zzzz(z){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
@@ -219,6 +219,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) {
     return out;
 }
 
-FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ if( (v0.xxxx==v1.xxxx) && (v0.yyyy==v1.yyyy) && (v0.zzzz==v1.zzzz) ){ return true; } return false; }
-FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){ if( (v0.xxxx!=v1.xxxx) || (v0.yyyy!=v1.yyyy) || (v0.zzzz!=v1.zzzz) ){ return true; } return false; }
+//TODO : need to optimize 
+FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ if( (float4(v0.xxxx)==float4(v1.xxxx)) && (float4(v0.yyyy)==float4(v1.yyyy)) && (float4(v0.zzzz)==float4(v1.zzzz )) ){ return true; } return false; }
+FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){ if( (float4(v0.xxxx)!=float4(v1.xxxx)) || (float4(v0.yyyy)!=float4(v1.yyyy)) || (float4(v0.zzzz)!=float4(v1.zzzz)) ){ return true; } return false; }
 NARUKAMI_END 
