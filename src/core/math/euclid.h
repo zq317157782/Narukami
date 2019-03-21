@@ -37,13 +37,16 @@ FINLINE Point3<T> operator+(const Point3<T> &p, const Vector3<T> &v) { Point3<T>
 template <typename T>
 FINLINE Point3<T> operator-(const Point3<T> &p, const Vector3<T> &v) {return p+(-v);}
 template <typename T>
-FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> v; p.x = p1.x - p2.x; v.y = p1.y - p2.y; v.z = p1.z - p2.z; return v; }
+FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> p; p.x = p1.x - p2.x; p.y = p1.y - p2.y; p.z = p1.z - p2.z; return p; }
 
 
 FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_add_ps(p,v); }
 FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_sub_ps(p,v); }
 FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return _mm_sub_ps(p1,p2); }
 
+FINLINE float distance(const Point3f& p1,const Point3f& p2){ return length(p2-p1); }
+
+FINLINE float distance(const SSEPoint3f& p1,const SSEPoint3f& p2){ return length(p2-p1); }
 
 FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   

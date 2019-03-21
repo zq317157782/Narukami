@@ -611,6 +611,20 @@ TEST(Euclid,point_add_vector){
     EXPECT_EQ(p2,Point3f(1,0,0));
 }
 
+TEST(Euclid,distance){
+    Point3f p(0,0,0);
+    Point3f p2(1,0,0);
+    float d=distance(p,p2);
+    EXPECT_FLOAT_EQ(d,1);
+}
+
+TEST(Euclid,distance_sse){
+    SSEPoint3f p(0,0,0);
+    SSEPoint3f p2(1,0,0);
+    float d=distance(p,p2);
+    EXPECT_FLOAT_EQ(d,1);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
