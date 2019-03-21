@@ -569,6 +569,12 @@ TEST(matrix4x4,add){
     EXPECT_EQ(mat4,mat3);
 }
 
+TEST(SoAVector3f,eq){
+    SoAVector3f v1;
+    SoAVector3f v2(0);
+    EXPECT_EQ(v1,v2);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();

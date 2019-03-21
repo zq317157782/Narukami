@@ -182,4 +182,51 @@ FINLINE SSEVector3f sqrt(const SSEVector3f& v){ return _mm_sqrt_ps(v.xyzw); }
 FINLINE SSEVector3f rsqrt(const SSEVector3f& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 
 
-NARUKAMI_END
+//SoA struct vector3f
+struct SSE_ALIGNAS SoAVector3f{
+    union{
+        float4 xxxx;
+        struct
+        {
+            float x0,x1,x2,x3;
+        };   
+    };
+
+    union{
+        float4 yyyy;
+        struct
+        {
+            float y0,y1,y2,y3;
+        };   
+    };
+
+    union{
+        float4 zzzz;
+        struct
+        {
+            float z0,z1,z2,z3;
+        };   
+    };
+    
+    typedef float Scalar;
+
+
+    SoAVector3f():xxxx(Zero),yyyy(Zero),zzzz(Zero){}
+    explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
+    explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    SoAVector3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(x0,x1,x2,x3),yyyy(y0,y1,y2,y3),zzzz(z0,z1,z2,z3){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
+
+};
+
+FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
+    out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
+    out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
+    out << '(' << v.x2 << ',' << v.y2 << ',' << v.z2 << ')';
+    out << '(' << v.x3 << ',' << v.y3 << ',' << v.z3 << ')'; 
+    return out;
+}
+
+FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ if( (v0.xxxx==v1.xxxx) && (v0.yyyy==v1.yyyy) && (v0.zzzz==v1.zzzz) ){ return true; } return false; }
+FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){ if( (v0.xxxx!=v1.xxxx) || (v0.yyyy!=v1.yyyy) || (v0.zzzz!=v1.zzzz) ){ return true; } return false; }
+NARUKAMI_END 
