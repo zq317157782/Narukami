@@ -32,6 +32,7 @@ SOFTWARE.
 NARUKAMI_BEGIN
 #define SSE_ALIGNAS alignas(16)
 
+extern const __m128 sse_lookup_masks[16];
 
 template<int i0,int i1,int i2,int i3>
 FINLINE __m128 swizzle(const __m128 v){
