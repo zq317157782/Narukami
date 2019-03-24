@@ -161,9 +161,9 @@ FINLINE SSEVector3f rcp(const SSEVector3f& v) { const __m128 r = _mm_rcp_ps(v); 
 FINLINE SSEVector3f abs(const SSEVector3f& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
 FINLINE SSEVector3f sign(const SSEVector3f& v){ auto mask = _mm_cmplt_ps(v,SSEVector3f(Zero)); return _mm_blendv_ps(SSEVector3f(One),-SSEVector3f(One),mask); }
 
-FINLINE float sum(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
+FINLINE float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
 
-FINLINE float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return sum(v1*v2); }
+FINLINE float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return reduce_add(v1*v2); }
 FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){ float4 a0=float4(v1); float4 b0=swizzle<1,2,0,3>(v2); float4 a1=swizzle<1,2,0,3>(v1); float4 b1=float4(v2); return swizzle<1,2,0,3>(msub(a0,b0,a1*b1)); }
 
 FINLINE float length(const SSEVector3f& v){ return sqrt(dot(v,v));}

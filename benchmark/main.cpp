@@ -194,7 +194,7 @@ static void BM_sum_v1(benchmark::State &state)
     float b=0;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(b=b+narukami::sum(a));
+         benchmark::DoNotOptimize(b=b+narukami::reduce_add(a));
     }
 }
 BENCHMARK(BM_sum_v1);

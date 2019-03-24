@@ -89,7 +89,7 @@ FINLINE __m128 shuffle<2,3,2,3>(const __m128 v1,const __m128 v2){
 }
 
 
-FINLINE float sum(const __m128 a){
+FINLINE float reduce_add(const __m128 a){
     const __m128 b = swizzle<1>(a);
     const __m128 c = swizzle<2>(a);
     const __m128 d = swizzle<3>(a);

@@ -341,7 +341,7 @@ TEST(ssevector3f,cross){
 
 TEST(ssevector3f,sum){
     SSEVector3f v1(1,2,3);
-    float a=sum(v1);
+    float a=reduce_add(v1);
     EXPECT_EQ(a,6);
 }
 
@@ -391,9 +391,9 @@ TEST(ssevector3f,rsqrt){
 //     EXPECT_FLOAT_EQ(_mm_cvtss_f32(ret),6.0F);
 // }
 
-TEST(sse,sum){
+TEST(sse,reduce_add){
     __m128 a =_mm_set_ps(1,2,3,4);
-    EXPECT_FLOAT_EQ(sum(a),10);
+    EXPECT_FLOAT_EQ(reduce_add(a),10);
 }
 
 
