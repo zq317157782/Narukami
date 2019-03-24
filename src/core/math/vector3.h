@@ -219,7 +219,16 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) {
     return out;
 }
 
-//TODO : need to optimize 
-FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ if( (float4(v0.xxxx)==float4(v1.xxxx)) && (float4(v0.yyyy)==float4(v1.yyyy)) && (float4(v0.zzzz)==float4(v1.zzzz )) ){ return true; } return false; }
-FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){ if( (float4(v0.xxxx)!=float4(v1.xxxx)) || (float4(v0.yyyy)!=float4(v1.yyyy)) || (float4(v0.zzzz)!=float4(v1.zzzz)) ){ return true; } return false; }
+FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ 
+    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
+    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
+    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
+    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)==15;
+}
+FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
+    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
+    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
+    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
+    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)!=15;
+}
 NARUKAMI_END 
