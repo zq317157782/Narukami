@@ -2,6 +2,6 @@
 lightweight PBRT-style path tracer
 
 # Todo list
- -[ ] element math 
- -[ ] vector math
- -[ ] matrix math
+ - [x] element math 
+ - [x] vector math
+ - [x] matrix math
