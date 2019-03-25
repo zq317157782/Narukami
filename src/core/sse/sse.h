@@ -100,4 +100,5 @@ FINLINE float reduce_add(const __m128 a){
 }
 
 
+
 NARUKAMI_END

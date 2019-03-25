@@ -18,7 +18,7 @@ set(gtest_force_shared_crt ON)
 set(BUILD_GMOCK OFF)
 set(BUILD_GTEST ON)
 add_subdirectory(external/googletest)
-
+ 
 #add glog
 set(WITH_GFLAGS OFF)
 add_subdirectory(external/glog)
@@ -34,16 +34,16 @@ SET(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 add_subdirectory(external/benchmark)
 
 #narukami
-add_executable(narukami src/main.cpp)
+add_executable(narukami src/main.cpp src/core/math/math.cpp src/core/sse/sse.cpp)
 target_link_libraries(narukami glog)
 # target_link_libraries(narukami embree)
 
 #narukami_test
-add_executable(narukami_test test/main.cpp)
+add_executable(narukami_test test/main.cpp src/core/math/math.cpp src/core/sse/sse.cpp)
 target_link_libraries(narukami_test gtest)
 
 #benchmark rcp
-add_executable(narukami_benchmark benchmark/main.cpp)
+add_executable(narukami_benchmark benchmark/main.cpp src/core/math/math.cpp src/core/sse/sse.cpp)
 target_link_libraries(narukami_benchmark benchmark)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

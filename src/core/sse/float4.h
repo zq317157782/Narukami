@@ -24,6 +24,7 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math/math.h"
+#include "core/sse/bool4.h"
 #include "sse.h"
 
 NARUKAMI_BEGIN
@@ -31,19 +32,9 @@ NARUKAMI_BEGIN
 struct float4
 {
   public:
-    typedef float Scalar;
-    enum
-    {
-        size = 4
-    };
-
-    union {
-        __m128 xyzw;
-        struct
-        {
-            float x, y, z, w;
-        };
-    };
+    typedef float Scalar; 
+    enum { size = 4 };
+    union { __m128 xyzw; struct { float x, y, z, w; }; };
 
   public:
     FINLINE float4() : xyzw(_mm_set1_ps(Zero)) {}
@@ -77,8 +68,8 @@ FINLINE float4& operator*=(float4& v1,const float f){v1=v1*f;return v1;}
 FINLINE float4& operator/=(float4& v1,const float4& v2){v1=v1/v2;return v1;}
 FINLINE float4& operator/=(float4& v1,const float f){assert(f!=0);v1=v1/f;return v1;}
 
-FINLINE bool operator==(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpeq_ps(a.xyzw, b.xyzw)) & 15) == 15;}
-FINLINE bool operator!=(const float4 &a, const float4 &b){return (_mm_movemask_ps(_mm_cmpneq_ps(a.xyzw, b.xyzw)) & 15) != 0;}
+FINLINE bool4 operator==(const float4 &a, const float4 &b){return bool4(_mm_cmpeq_ps(a.xyzw, b.xyzw)); }
+FINLINE bool4 operator!=(const float4 &a, const float4 &b){return bool4(_mm_cmpneq_ps(a.xyzw, b.xyzw));}
 
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
 

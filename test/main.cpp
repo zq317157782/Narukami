@@ -396,56 +396,81 @@ TEST(sse,reduce_add){
     EXPECT_FLOAT_EQ(reduce_add(a),10);
 }
 
+TEST(bool4,index){
+    bool4 a(true);
+    EXPECT_TRUE(a[2]);
+}
 
+TEST(bool4,not){
+    bool4 a(true);
+    EXPECT_TRUE(none(!(a)));
+}
+
+TEST(bool4,or){
+    bool4 a(true);
+    bool4 b(false);
+
+    EXPECT_TRUE(all(a|b));
+}
+
+TEST(bool4,any){
+    bool4 a(true,false,false,false);
+    EXPECT_TRUE(any(a));
+}
+
+TEST(bool4,none){
+    bool4 a(false);
+    EXPECT_TRUE(none(a));
+}
 
 TEST(float4,eq){
     float4 a(1,1,1,1);
     float4 b(1,1,1,1);
     float4 c(1,1,1,2);
-    EXPECT_TRUE(a==b);
-    EXPECT_TRUE(a!=c);
+    EXPECT_TRUE(all(a==b));
+    EXPECT_TRUE(any(a!=c));
 }
 
 
 TEST(float4,positive_and_negative){
      float4 a(1,1,1,1);
-     EXPECT_EQ(-a,float4(-1,-1,-1,-1));
+     EXPECT_TRUE(all(-a==float4(-1,-1,-1,-1)));
 }
 
 TEST(float4 ,add){
     float4 a(1);
     float4 b(1);
     auto c = a+b;
-    EXPECT_EQ(c,float4(2));
+    EXPECT_TRUE(all(c==float4(2)));
     c+=a;
-    EXPECT_EQ(c,float4(3));
+    EXPECT_TRUE(all(c==float4(3)));
 }
 
 TEST(float4 ,sub){
     float4 a(1);
     float4 b(1);
     auto c = a-b;
-    EXPECT_EQ(c,float4(0));
+    EXPECT_TRUE(all(c==float4(0)));
     c-=a;
-    EXPECT_EQ(c,float4(-1));
+    EXPECT_TRUE(all(c==float4(-1)));
 }
 
 TEST(float4 ,mul){
     float4 a(1);
     float4 b(1);
     auto c = a*b;
-    EXPECT_EQ(c,float4(1));
+    EXPECT_TRUE(all(c==float4(1)));
     c*=a;
-    EXPECT_EQ(c,float4(1));
+    EXPECT_TRUE(all(c==float4(1)));
 }
 
 TEST(float4 ,div){
     float4 a(1);
     float4 b(1);
     auto c = a/b;
-    EXPECT_EQ(c,float4(1));
+    EXPECT_TRUE(all(c==float4(1)));
     c/=a;
-    EXPECT_EQ(c,float4(1));
+    EXPECT_TRUE(all(c==float4(1)));
 }
 
 
@@ -538,14 +563,14 @@ TEST(matrix4x4,inverse){
 TEST(matrix4x4,mul2x2){
     auto m0=float4(1,0,0,1);
     auto m1=float4(mul2x2(m0,m0));
-    EXPECT_EQ(m0,m1);
+    EXPECT_TRUE(all(m0==m1));
 }
 
 TEST(matrix4x4,adj2x2){
     auto m0=float4(1,2,3,4);
     auto m1=float4(adj2x2(m0));
     auto m2=float4(4,-3,-2,1);
-    EXPECT_EQ(m2,m1);
+    EXPECT_TRUE(all(m2==m1));
 }
 
 
