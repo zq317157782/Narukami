@@ -58,6 +58,8 @@ FINLINE bool4 operator|(const bool4 &a,const bool4 &b){ return _mm_or_ps (a.xyzw
 FINLINE bool all(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)==0xF;}
 FINLINE bool any(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)!=0x0;}
 FINLINE bool none(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)==0x0;}
+//#TODO 这个的命名可能不太对
+FINLINE bool not_all(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)!=0xF;}
 
 
 NARUKAMI_END

@@ -124,15 +124,23 @@ FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
 }
 
 FINLINE bool operator==(const Matrix4x4& A,const Matrix4x4& B){
-    __m128 mask0=_mm_and_ps(_mm_cmpeq_ps(A.mVec[0], B.mVec[0]),_mm_cmpeq_ps(A.mVec[1], B.mVec[1]));
-    __m128 mask1=_mm_and_ps(_mm_cmpeq_ps(A.mVec[2], B.mVec[2]),_mm_cmpeq_ps(A.mVec[3], B.mVec[3]));
-    return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)==15;
+
+    auto bool_i0 = float4(A.mVec[0])==float4(B.mVec[0]);
+    auto bool_i1 = float4(A.mVec[1])==float4(B.mVec[1]);
+    auto bool_i2 = float4(A.mVec[2])==float4(B.mVec[2]);
+    auto bool_i3 = float4(A.mVec[3])==float4(B.mVec[3]);
+
+    return all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
 FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
-    __m128 mask0=_mm_and_ps(_mm_cmpeq_ps(A.mVec[0], B.mVec[0]),_mm_cmpeq_ps(A.mVec[1], B.mVec[1]));
-    __m128 mask1=_mm_and_ps(_mm_cmpeq_ps(A.mVec[2], B.mVec[2]),_mm_cmpeq_ps(A.mVec[3], B.mVec[3]));
-    return (_mm_movemask_ps(_mm_and_ps(mask0,mask1))&15)!=15;
+
+    auto bool_i0 = float4(A.mVec[0])==float4(B.mVec[0]);
+    auto bool_i1 = float4(A.mVec[1])==float4(B.mVec[1]);
+    auto bool_i2 = float4(A.mVec[2])==float4(B.mVec[2]);
+    auto bool_i3 = float4(A.mVec[3])==float4(B.mVec[3]);
+
+   return not_all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
 FINLINE Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
