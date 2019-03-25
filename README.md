@@ -5,3 +5,5 @@ lightweight PBRT-style path tracer
  - [x] element math 
  - [x] vector math
  - [x] matrix math
+ - [ ] basic ray structure
+ - [ ] SoA triangle
