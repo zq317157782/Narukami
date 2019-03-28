@@ -339,11 +339,11 @@ TEST(ssevector3f,cross){
     EXPECT_EQ(v3,v);
 }
 
-TEST(ssevector3f,sum){
-    SSEVector3f v1(1,2,3);
-    float a=reduce_add(v1);
-    EXPECT_EQ(a,6);
-}
+// TEST(ssevector3f,sum){
+//     SSEVector3f v1(1,2,3);
+//     float a=reduce_add(v1);
+//     EXPECT_EQ(a,6);
+// }
 
 
 TEST(ssevector3f,dot){
