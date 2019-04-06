@@ -22,10 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include "core/narukami.h"
-#include "core/math/euclid.h"
+#include "core/euclid.h"
+#include "core/simd.h"
 
 NARUKAMI_BEGIN
+
+struct Ray{
+   Point3f o;
+   Point3f d;
+};
+
 
 struct SSE_ALIGNAS SoATriangle{
     SoAVector3f v0;
