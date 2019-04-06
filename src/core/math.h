@@ -23,42 +23,11 @@ SOFTWARE.
 */
 
 #pragma once
-#include "core/sse/sse.h"
+#include "core/sse.h"
 #include "core/platform.h"
 #include "core/narukami.h"
 #include <cmath>
 NARUKAMI_BEGIN
-
-static  MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
-
-struct TrueType {
-    FINLINE operator bool() const{return true;}
-} ;
-extern MAYBE_UNUSED const TrueType True;
-
-struct FalseType {
-    FINLINE operator bool() const{return true;}
-} ;
-extern MAYBE_UNUSED const FalseType False;
-
-struct ZeroType {
-    FINLINE operator float() const{return 0.0f;}
-    FINLINE operator int() const{return 0;}
-} ;
-extern MAYBE_UNUSED const ZeroType Zero;
-
-
-struct OneType {
-    FINLINE operator float() const{return 1.0f;}
-    FINLINE operator int() const{return 1;}
-} ;
-extern MAYBE_UNUSED const OneType One;
-
-struct NegOneType {
-    FINLINE operator float() const{return -1.0f;}
-    FINLINE operator int() const{return -1;}
-} ;
-extern MAYBE_UNUSED const NegOneType NegOne;
 
 //IEEE float format
 //32 bits

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "core/math/euclid.h"
+#include "core/euclid.h"
 
 using namespace narukami;
 TEST(math,rcp){
@@ -170,80 +170,6 @@ TEST(vector3f,rsqrt){
     EXPECT_FLOAT_EQ(v2.y,0.5f);
     EXPECT_FLOAT_EQ(v2.z,0.25f);
 }
-
-
-TEST(vector2f,add){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1+v2;
-    EXPECT_EQ(v3,Vector2f(5,7));
-}
-TEST(vector2f,sub){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1-v2;
-    EXPECT_EQ(v3,Vector2f(-3,-3));
-}
-TEST(vector2f,mul){
-    Vector2f v1(1,2);
-    Vector2f v2(4,5);
-    auto v3=v1*v2;
-    EXPECT_EQ(v3,Vector2f(4,10));
-}
-TEST(vector2f,mul2){
-    Vector2f v1(1,2);
-    float f=2; 
-    auto v2=v1*f;
-    EXPECT_EQ(v2,Vector2f(2,4));
-}
-
-TEST(vector2f,div){
-    Vector2f v1(1,2);
-    float f=2; 
-    auto v2=v1/f;
-    EXPECT_EQ(v2,Vector2f(0.5f,1.0f));
-}
-TEST(vector2f,equal){
-    Vector2f v1(1);
-    Vector2f v2(2);
-    Vector2f v3(2);
-    EXPECT_TRUE(v1!=v3);
-    EXPECT_TRUE(v2==v3);
-}
-TEST(vector2f,normalize){
-    Vector2f v1(5,0);
-    auto v2=normalize(v1);
-    EXPECT_EQ(v2,Vector2f(1,0));
-}
-
-
-
-TEST(vector2f,rcp){
-    Vector2f v1(2,2);
-    auto v2=rcp(v1);
-    EXPECT_LE(v2.x,0.50001);
-    EXPECT_GE(v2.x,0.49999);
-}
-
-
-TEST(vector2f,subscript){
-    Vector2f v1(0);
-    v1[0]=1;
-    EXPECT_FLOAT_EQ(v1[0],1);
-}
-
-TEST(vector2f,sqrt){
-    Vector2f v1(9);
-    auto v2=sqrt(v1);
-    EXPECT_EQ(v2,Vector2f(3,3));
-}
-
-TEST(vector2f,Vector3fToVector2f){
-    Vector3f v1(1,2,3);
-    Vector2f v2(v1);
-    EXPECT_EQ(v2,Vector2f(1,2));
-}
-
 
 TEST(vector3i,dot){
     Vector3i v1(1,2,3);

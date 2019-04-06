@@ -1,6 +1,6 @@
 #include "benchmark.h"
 #include <xmmintrin.h>
-#include "core/math/euclid.h"
+#include "core/euclid.h"
 
 static void BM_common_rcp(benchmark::State &state)
 {
