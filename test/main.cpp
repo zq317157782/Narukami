@@ -576,6 +576,15 @@ TEST(Euclid,distance_sse){
     EXPECT_FLOAT_EQ(d,1);
 }
 
+
+TEST(Euclid,point_minus_point){
+    SoAPoint3f p(2);
+    SoAPoint3f p2(1);
+    SoAVector3f v=p-p2;
+
+    EXPECT_EQ(v,SoAVector3f(1));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
