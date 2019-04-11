@@ -56,4 +56,9 @@ struct NegOneType {
     FINLINE operator int() const{return -1;}
 } ;
 extern MAYBE_UNUSED const NegOneType NegOne;
+
+struct InfiniteType{
+    FINLINE operator float() const{return std::numeric_limits<float>::infinity();}
+};
+extern MAYBE_UNUSED const InfiniteType Infinite;
 NARUKAMI_END

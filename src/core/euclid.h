@@ -406,10 +406,11 @@ struct SSE_ALIGNAS SoAPoint3f{
 
     SoAPoint3f():xxxx(_mm_set1_ps(Zero)),yyyy(_mm_set1_ps(Zero)),zzzz(_mm_set1_ps(Zero)){}
     explicit SoAPoint3f(const float a):xxxx(_mm_set1_ps(a)),yyyy(_mm_set1_ps(a)),zzzz(_mm_set1_ps(a)){assert(!isnan(a));}
-    SoAPoint3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(_mm_set_ps(v3.x,v2.x,v1.x,v0.x)),yyyy(_mm_set_ps(v3.y,v2.y,v1.y,v0.y)),zzzz(_mm_set_ps(v3.z,v2.z,v1.z,v0.z)){ }
-    explicit SoAPoint3f(const Vector3f& v):xxxx(_mm_set1_ps(v.x)),yyyy(_mm_set1_ps(v.y)),zzzz(_mm_set1_ps(v.z)){ }
+    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(_mm_set_ps(v3.x,v2.x,v1.x,v0.x)),yyyy(_mm_set_ps(v3.y,v2.y,v1.y,v0.y)),zzzz(_mm_set_ps(v3.z,v2.z,v1.z,v0.z)){ }
+    explicit SoAPoint3f(const Point3f& v):xxxx(_mm_set1_ps(v.x)),yyyy(_mm_set1_ps(v.y)),zzzz(_mm_set1_ps(v.z)){ }
     SoAPoint3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(_mm_set_ps(x3,x2,x1,x3)),yyyy(_mm_set_ps(y3,y2,y1,y0)),zzzz(_mm_set_ps(z3,z2,z1,z0)){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
     SoAPoint3f(const __m128 x,const __m128 y,const __m128 z):xxxx(x),yyyy(y),zzzz(z){}
+    SoAPoint3f(const float x,const float y,const float z):xxxx(_mm_set1_ps(x)),yyyy(_mm_set1_ps(y)),zzzz(_mm_set1_ps(z)){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 

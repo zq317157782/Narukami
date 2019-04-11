@@ -30,5 +30,6 @@ NARUKAMI_BEGIN
  const ZeroType Zero;
  const OneType One;
  const NegOneType NegOne;
+ const InfiniteType Infinite;
 
 NARUKAMI_END

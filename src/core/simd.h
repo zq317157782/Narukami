@@ -52,7 +52,7 @@ struct bool4
 
 FINLINE std::ostream &operator<<(std::ostream &out, const bool4 &b){out << '(' << ((b.x!=0)?"true":"false")<< ',' << ((b.y!=0)?"true":"false") << ',' << ((b.z!=0)?"true":"false") << ',' << ((b.w!=0)?"true":"false") << ')';return out;}
 
-FINLINE bool4 operator!(const bool4 &a){ return _mm_xor_ps(a,bool4(True)); }
+FINLINE bool4 operator!(const bool4 &a){ return _mm_xor_ps(a,bool4(True));}
 FINLINE bool4 operator&(const bool4 &a,const bool4 &b){ return _mm_and_ps(a.xyzw,b.xyzw);}
 FINLINE bool4 operator|(const bool4 &a,const bool4 &b){ return _mm_or_ps (a.xyzw,b.xyzw);}
 
@@ -62,6 +62,7 @@ FINLINE bool none(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)==0x0;}
 //#TODO 这个的命名可能不太对
 FINLINE bool not_all(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)!=0xF;}
 
+FINLINE int movemask(const bool4& b){ return _mm_movemask_ps(b); }
 
 struct float4
 {
@@ -104,6 +105,11 @@ FINLINE float4& operator/=(float4& v1,const float f){assert(f!=0);v1=v1/f;return
 
 FINLINE bool4 operator==(const float4 &a, const float4 &b){return bool4(_mm_cmpeq_ps(a.xyzw, b.xyzw)); }
 FINLINE bool4 operator!=(const float4 &a, const float4 &b){return bool4(_mm_cmpneq_ps(a.xyzw, b.xyzw));}
+
+FINLINE bool4 operator>(const float4 &a, const float4 &b){ return  bool4(_mm_cmpgt_ps(a.xyzw, b.xyzw)); }
+FINLINE bool4 operator<(const float4 &a, const float4 &b){ return  bool4(_mm_cmplt_ps(a.xyzw, b.xyzw)); }
+FINLINE bool4 operator>=(const float4 &a, const float4 &b){ return  bool4(_mm_cmpge_ps(a.xyzw, b.xyzw)); }
+FINLINE bool4 operator<=(const float4 &a, const float4 &b){ return  bool4(_mm_cmple_ps(a.xyzw, b.xyzw)); }
 
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
 
