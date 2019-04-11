@@ -554,6 +554,14 @@ TEST(SoAVector3f,eq){
     EXPECT_EQ(v1,v2);
 }
 
+TEST(SoAVector3f,dot){
+    SoAVector3f v1(1,2,0);
+    SoAVector3f v2(1,2,0);
+    auto value =dot(v1,v2);
+    EXPECT_TRUE(all(float4(value)==float4(5)));
+}
+
+
 TEST(SoAVector3f,cross){
     SoAVector3f v1(1,0,0);
     SoAVector3f v2(0,1,0);
@@ -590,6 +598,53 @@ TEST(Euclid,point_minus_point){
     SoAVector3f v=p-p2;
 
     EXPECT_EQ(v,SoAVector3f(1));
+}
+#include "core/geometry.h"
+TEST(geometry,ray_intersect_triangle){
+    Triangle triangle;
+    triangle.v0 = Point3f(0,0,1);
+    triangle.e1 = Vector3f(1,0,0);
+    triangle.e2 = Vector3f(0,1,0);
+
+    Ray r(Point3f(0,0,0),Vector3f(0,0,1));
+    bool a=intersect(r,triangle);
+    EXPECT_EQ(a,true);
+
+    Ray r2(Point3f(1,0,0),Vector3f(0,0,1));
+    bool a2=intersect(r2,triangle);
+    EXPECT_EQ(a2,true);
+
+    Ray r3(Point3f(1.1,0,0),Vector3f(0,0,1));
+    bool a3=intersect(r3,triangle);
+    EXPECT_EQ(a3,false);
+
+    Ray r4(Point3f(0,1.1,0),Vector3f(0,0,1));
+    bool a4=intersect(r4,triangle);
+    EXPECT_EQ(a4,false);
+}
+TEST(geometry,ray_intersect_soatriangle){
+    
+    SoATriangle triangle;
+    triangle.v0 = SoAPoint3f(0,0,1);
+    triangle.e1 = SoAVector3f(1,0,0);
+    triangle.e2 = SoAVector3f(0,1,0);
+
+
+    SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
+    int a=intersect(r,triangle);
+    EXPECT_EQ(a,15);
+
+    SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
+    int a2=intersect(r2,triangle);
+    EXPECT_EQ(a2,15);
+
+    SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
+    int a3=intersect(r3,triangle);
+    EXPECT_EQ(a3,0);
+
+    SoARay r4(Point3f(0,1.1,0),Vector3f(0,0,1));
+    int a4=intersect(r4,triangle);
+    EXPECT_EQ(a4,0);
 }
 
 int main(int argc, char* argv[]) {

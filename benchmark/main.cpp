@@ -1,6 +1,7 @@
 #include "benchmark.h"
 #include <xmmintrin.h>
 #include "core/euclid.h"
+#include "core/geometry.h"
 
 static void BM_common_rcp(benchmark::State &state)
 {
@@ -186,6 +187,20 @@ static void BM_cross_SSEVector3f(benchmark::State &state)
     }
 }
 BENCHMARK(BM_cross_SSEVector3f);
+
+static void BM_cross_SoAVector3f(benchmark::State &state)
+{
+    narukami::SoAVector3f v1(1, 0, 0);
+    srand(0);
+    float x = rand();
+    float y = rand();
+    float z = rand();
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(v1=cross(narukami::SoAVector3f(x, y, z),v1));
+    }
+}
+BENCHMARK(BM_cross_SoAVector3f);
 
 
 static void BM_sum_v1(benchmark::State &state)
@@ -504,5 +519,55 @@ static void BM_matrix_mul_point(benchmark::State &state)
 }
 BENCHMARK(BM_matrix_mul_point);
 
+
+static void BM_ray_triangle_intersect(benchmark::State &state)
+{
+    narukami::Triangle triangle;
+    triangle.v0 = narukami::Point3f(0,0,1);
+    triangle.e1 = narukami::Vector3f(1,0,0);
+    triangle.e2 = narukami::Vector3f(0,1,0);
+
+    narukami::Triangle triangle2;
+    triangle2.v0 = narukami::Point3f(0,0,1);
+    triangle2.e1 = narukami::Vector3f(1,0,0);
+    triangle2.e2 = narukami::Vector3f(0,1,0);
+
+    narukami::Triangle triangle3;
+    triangle3.v0 = narukami::Point3f(0,0,1);
+    triangle3.e1 = narukami::Vector3f(1,0,0);
+    triangle3.e2 = narukami::Vector3f(0,1,0);
+
+    narukami::Triangle triangle4;
+    triangle4.v0 = narukami::Point3f(0,0,1);
+    triangle4.e1 = narukami::Vector3f(1,0,0);
+    triangle4.e2 = narukami::Vector3f(0,1,0);
+
+    narukami::Ray r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
+    int b=0;
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(b=+intersect(r,triangle));
+        benchmark::DoNotOptimize(b=+intersect(r,triangle2));
+        benchmark::DoNotOptimize(b=+intersect(r,triangle3));
+        benchmark::DoNotOptimize(b=+intersect(r,triangle4));
+    }
+}
+BENCHMARK(BM_ray_triangle_intersect);
+
+static void BM_ray_soatriangle_intersect(benchmark::State &state)
+{
+    narukami::SoATriangle triangle;
+    triangle.v0 = narukami::SoAPoint3f(0,0,1);
+    triangle.e1 = narukami::SoAVector3f(1,0,0);
+    triangle.e2 = narukami::SoAVector3f(0,1,0);
+
+    narukami::SoARay r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
+    int b=0;
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(b=+intersect(r,triangle));
+    }
+}
+BENCHMARK(BM_ray_soatriangle_intersect);
 
 BENCHMARK_MAIN();

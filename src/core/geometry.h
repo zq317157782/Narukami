@@ -32,11 +32,28 @@ struct Ray{
    Vector3f d;
    float tMax;
 
-   Ray(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(o),d(d),tMax(tMax){
+   FINLINE Ray(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(o),d(d),tMax(tMax){
 
    }
 };
 
+
+struct SSE_ALIGNAS SoARay
+{
+    SoAPoint3f o;
+    SoAVector3f d;
+    __m128  tMax;
+     
+    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(SoAPoint3f(o)),d(SoAVector3f(d)),tMax(_mm_set1_ps(tMax)){}
+    FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),tMax(_mm_set1_ps(ray.tMax)){}
+};
+
+
+struct Triangle{
+    Point3f v0;
+    Vector3f e1;
+    Vector3f e2;
+};
 
 struct SSE_ALIGNAS SoATriangle{
     SoAPoint3f v0;
@@ -44,10 +61,40 @@ struct SSE_ALIGNAS SoATriangle{
     SoAVector3f e2;
 };
 
+//Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
+    auto O = ray.o;
+    auto D = ray.d;
 
-FINLINE int intersect(const Ray& ray,const SoATriangle& triangle){
-    SoAPoint3f O(ray.o);
-    SoAVector3f D(ray.d);
+    auto V0 = triangle.v0;
+    auto E1 = triangle.e1;
+    auto E2 = triangle.e2;
+
+    auto T = O - V0;
+    auto P = cross(D,E2);
+    auto Q = cross(T,E1);
+
+    auto P_dot_E1 = dot(P,E1);
+    auto P_dot_T = dot(P,T);
+    auto Q_dot_D = dot(Q,D);
+
+    auto u = P_dot_T/P_dot_E1;
+    auto v = Q_dot_D/P_dot_E1;
+
+    if(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f)){
+        return false;
+    }
+    float t = dot(Q,E2)/P_dot_E1;
+    if(t<=ray.tMax){
+        return true;
+    }
+    return false;
+}
+
+//Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+FINLINE int intersect(const SoARay& ray,const SoATriangle& triangle){
+    auto O=ray.o;
+    auto D =ray.d;
     auto V0 = triangle.v0;
     auto E1 = triangle.e1;
     auto E2 = triangle.e2;
@@ -65,16 +112,15 @@ FINLINE int intersect(const Ray& ray,const SoATriangle& triangle){
     float4 v = float4(Q_dot_D)/float4(P_dot_E1);
 
     bool4 mask0=u>=float4(Zero);
-    bool4 mask1=v>=float4(Zero);
-    bool4 mask2=(u+v)<=float4(One);
-    bool4 mask3=(mask0&mask1)&mask2;
-    if(none(mask3)){
-        return 0;
+    mask0=mask0&(v>=float4(Zero));
+    mask0=mask0&((u+v)<=float4(One));
+    if(none(mask0)){
+        return Zero;
     }
   
     float4 t = dot(Q,E2)/float4(P_dot_E1);
-    bool4 mask4 = (t <= float4(ray.tMax))&mask3;
-    return movemask(mask4);
+    mask0 = (t <= float4(ray.tMax))&mask0;
+    return movemask(mask0);
 }
 
 NARUKAMI_END
