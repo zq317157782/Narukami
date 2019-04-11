@@ -554,6 +554,13 @@ TEST(SoAVector3f,eq){
     EXPECT_EQ(v1,v2);
 }
 
+TEST(SoAVector3f,cross){
+    SoAVector3f v1(1,0,0);
+    SoAVector3f v2(0,1,0);
+    SoAVector3f v3 =cross(v1,v2);
+    EXPECT_EQ(v3,SoAVector3f(0,0,1));
+}
+
 TEST(Euclid,point_add_vector){
     Point3f  p(0,0,0);
     Vector3f v(1,0,0);

@@ -212,6 +212,7 @@ struct SSE_ALIGNAS SoAVector3f{
     explicit SoAVector3f(const Vector3f& v):xxxx(_mm_set1_ps(v.x)),yyyy(_mm_set1_ps(v.y)),zzzz(_mm_set1_ps(v.z)){ }
     SoAVector3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(_mm_set_ps(x3,x2,x1,x3)),yyyy(_mm_set_ps(y3,y2,y1,y0)),zzzz(_mm_set_ps(z3,z2,z1,z0)){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
     SoAVector3f(const __m128 x,const __m128 y,const __m128 z):xxxx(x),yyyy(y),zzzz(z){}
+    SoAVector3f(const float x,const float y,const float z):xxxx(_mm_set1_ps(x)),yyyy(_mm_set1_ps(y)),zzzz(_mm_set1_ps(z)){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
@@ -233,6 +234,13 @@ FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
     __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
     __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
     return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)!=15;
+}
+
+FINLINE SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){
+    float4 xxxx=float4(v0.yyyy)*float4(v1.zzzz)-float4(v0.zzzz)*float4(v1.yyyy);
+    float4 yyyy=float4(v0.zzzz)*float4(v1.xxxx)-float4(v0.xxxx)*float4(v1.zzzz);
+    float4 zzzz=float4(v0.xxxx)*float4(v1.yyyy)-float4(v0.yyyy)*float4(v1.xxxx);
+    return SoAVector3f(xxxx,yyyy,zzzz);
 }
 
 //---VECTOR3 END---
