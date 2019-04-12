@@ -62,14 +62,8 @@ struct SSE_ALIGNAS SoATriangle{
     SoAVector3f e2;
 };
 
-struct TriangleIntersection{
-    float t;
-    float u;
-    float v;
-};
-
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Ray& ray,const Triangle& triangle,TriangleIntersection * hit = nullptr){
+FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     auto O = ray.o;
     auto D = ray.d;
 
@@ -93,20 +87,19 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle,TriangleIntersect
         return false;
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
-    if(t<=ray.tMax){
-        if(hit!=nullptr){
-            hit->t=t;
-            hit->u=u;
-            hit->v=v;
-        }
-
+    if(t>=0&&t<=ray.tMax){
+        // if(hit!=nullptr){
+        //     hit->t=t;
+        //     hit->u=u;
+        //     hit->v=v;
+        // }
         return true;
     }
     return false;
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,TriangleIntersection * hit = nullptr){
+FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
@@ -134,47 +127,18 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,TriangleInt
     bool4 mask0=(u>=zero);
     mask0=mask0&(v>=zero);
     mask0=mask0&((u+v)<=one);
-    if(none(mask0)){
-       return false;
-    }
+    // if(none(mask0)){
+    //    return false;
+    // }
     auto Q_dot_E2 = dot(Q,E2);
     float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
-    mask0 = (t <= float4(ray.tMax))&mask0;
+    mask0 = mask0&(t <= float4(ray.tMax));
+    mask0 = mask0&(t >= zero);
+
 
     if(none(mask0)){
        return false;
     }
-
-    
-    if (hit!=nullptr){
-        int mask=movemask(mask0);
-    
-        float stored_t[4];
-        float stored_u[4];
-        float stored_v[4];
-    
-        store(t,stored_t);
-        store(u,stored_u);
-        store(v,stored_v);
-
-        float min_t=Infinite;
-        float u,v;
-        for(int i = 0; i < 4; i++)
-        {
-            if( (mask&(1<<i))!=0 ){
-                if(stored_t[i]<min_t){
-                    min_t=stored_t[i];
-                    u=stored_u[i];
-                    v=stored_v[i];
-                }
-            }
-        }
-
-        hit->t=min_t;
-        hit->u=u;
-        hit->v=v;
-    }
-
     return true;
 }
 

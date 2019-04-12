@@ -526,14 +526,14 @@ static void BM_ray_triangle_intersect(benchmark::State &state)
     triangle.v0 = narukami::Point3f(0,0,1);
     triangle.e1 = narukami::Vector3f(1,0,0);
     triangle.e2 = narukami::Vector3f(0,1,0);
-    narukami::TriangleIntersection ref;
+
     narukami::Ray r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
     for (auto _ : state)
     {
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(intersect(r,triangle,&ref));
+            benchmark::DoNotOptimize(intersect(r,triangle));
         }
         
     }
@@ -542,21 +542,32 @@ BENCHMARK(BM_ray_triangle_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 static void BM_ray_soatriangle_intersect(benchmark::State &state)
 {
-    narukami::SoATriangle triangle;
-    triangle.v0 = narukami::SoAPoint3f(0,0,1);
-    triangle.e1 = narukami::SoAVector3f(1,0,0);
-    triangle.e2 = narukami::SoAVector3f(0,1,0);
-
     narukami::SoARay r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
-    narukami::TriangleIntersection ref;
-    int b=0;
+    float t;
+
+    auto triangles = new narukami::SoATriangle[state.range(0)];
+    for(size_t i = 0; i < state.range(0); i++)
+    {
+       triangles[i].v0=narukami::SoAPoint3f(0,0,1);
+       triangles[i].e1 = narukami::SoAVector3f(1,0,0);
+       triangles[i].e2 = narukami::SoAVector3f(0,1,0);
+    }
+    
+
+    // narukami::SoATriangle triangle;
+    // triangle.v0 = narukami::SoAPoint3f(0,0,1);
+    // triangle.e1 = narukami::SoAVector3f(1,0,0);
+    // triangle.e2 = narukami::SoAVector3f(0,1,0);
+
     for (auto _ : state)
     {
         for(size_t i = 0; i < state.range(0); i++)
         {
-             benchmark::DoNotOptimize(intersect(r,triangle,&ref));
+             benchmark::DoNotOptimize(intersect(r,triangles[i]));
         }
     }
+
+    delete[] triangles;
 }
 BENCHMARK(BM_ray_soatriangle_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
