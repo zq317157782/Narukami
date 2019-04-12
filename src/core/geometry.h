@@ -78,13 +78,14 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     auto P_dot_T = dot(P,T);
     auto Q_dot_D = dot(Q,D);
 
-    auto u = P_dot_T/P_dot_E1;
-    auto v = Q_dot_D/P_dot_E1;
+    auto inv_P_dot_E1 = 1.0f/P_dot_E1;
+    auto u = P_dot_T*inv_P_dot_E1;
+    auto v = Q_dot_D*inv_P_dot_E1;
 
     if(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f)){
         return false;
     }
-    float t = dot(Q,E2)/P_dot_E1;
+    float t = dot(Q,E2)*inv_P_dot_E1;
     if(t<=ray.tMax){
         return true;
     }
@@ -93,7 +94,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE int intersect(const SoARay& ray,const SoATriangle& triangle){
-    auto O=ray.o;
+    auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
     auto E1 = triangle.e1;
@@ -107,18 +108,24 @@ FINLINE int intersect(const SoARay& ray,const SoATriangle& triangle){
     auto P_dot_E1 = dot(P,E1);
     auto P_dot_T = dot(P,T);
     auto Q_dot_D = dot(Q,D);
+    
+    
+    float4 zero = _mm_setzero_ps();
+    float4 one = float4(One);
+    
+    float4 inv_P_dot_E1 = one/float4(P_dot_E1);
 
-    float4 u = float4(P_dot_T)/float4(P_dot_E1);
-    float4 v = float4(Q_dot_D)/float4(P_dot_E1);
-
-    bool4 mask0=u>=float4(Zero);
-    mask0=mask0&(v>=float4(Zero));
-    mask0=mask0&((u+v)<=float4(One));
+    float4 u = P_dot_T*inv_P_dot_E1;
+    float4 v = Q_dot_D*inv_P_dot_E1;
+    
+    bool4 mask0=(u>=zero);
+    mask0=mask0&(v>=zero);
+    mask0=mask0&((u+v)<=one);
     if(none(mask0)){
-        return Zero;
+       return Zero;
     }
-  
-    float4 t = dot(Q,E2)/float4(P_dot_E1);
+    auto Q_dot_E2 = dot(Q,E2);
+    float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
     mask0 = (t <= float4(ray.tMax))&mask0;
     return movemask(mask0);
 }
