@@ -526,14 +526,14 @@ static void BM_ray_triangle_intersect(benchmark::State &state)
     triangle.v0 = narukami::Point3f(0,0,1);
     triangle.e1 = narukami::Vector3f(1,0,0);
     triangle.e2 = narukami::Vector3f(0,1,0);
-
+    narukami::TriangleIntersection ref;
     narukami::Ray r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
     for (auto _ : state)
     {
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(intersect(r,triangle));
+            benchmark::DoNotOptimize(intersect(r,triangle,&ref));
         }
         
     }
