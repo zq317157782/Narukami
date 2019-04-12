@@ -538,7 +538,7 @@ static void BM_ray_triangle_intersect(benchmark::State &state)
         
     }
 }
-BENCHMARK(BM_ray_triangle_intersect)->Arg(1)->Arg(5)->Arg(10);
+BENCHMARK(BM_ray_triangle_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 static void BM_ray_soatriangle_intersect(benchmark::State &state)
 {
@@ -548,15 +548,16 @@ static void BM_ray_soatriangle_intersect(benchmark::State &state)
     triangle.e2 = narukami::SoAVector3f(0,1,0);
 
     narukami::SoARay r(narukami::Point3f(0,0,0),narukami::Vector3f(0,0,1));
+    narukami::TriangleIntersection ref;
     int b=0;
     for (auto _ : state)
     {
         for(size_t i = 0; i < state.range(0); i++)
         {
-             benchmark::DoNotOptimize(intersect(r,triangle));
+             benchmark::DoNotOptimize(intersect(r,triangle,&ref));
         }
     }
 }
-BENCHMARK(BM_ray_soatriangle_intersect)->Arg(1)->Arg(5)->Arg(10);
+BENCHMARK(BM_ray_soatriangle_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 BENCHMARK_MAIN();

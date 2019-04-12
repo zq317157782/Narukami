@@ -635,6 +635,8 @@ TEST(geometry,ray_intersect_triangle){
 }
 TEST(geometry,ray_intersect_soatriangle){
     
+    TriangleIntersection ref;
+
     SoATriangle triangle;
     triangle.v0 = SoAPoint3f(0,0,1);
     triangle.e1 = SoAVector3f(1,0,0);
@@ -642,20 +644,28 @@ TEST(geometry,ray_intersect_soatriangle){
 
 
     SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
-    int a=intersect(r,triangle);
-    EXPECT_EQ(a,15);
+    bool a=intersect(r,triangle,&ref);
+    EXPECT_EQ(a,true);
+    EXPECT_EQ(ref.t,1);
+    EXPECT_EQ(ref.u,0);
+    EXPECT_EQ(ref.v,0);
 
     SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
-    int a2=intersect(r2,triangle);
-    EXPECT_EQ(a2,15);
+    bool a2=intersect(r2,triangle,&ref);
+    EXPECT_EQ(a2,true);
+    EXPECT_EQ(ref.t,1);
+    EXPECT_EQ(ref.u,1);
+    EXPECT_EQ(ref.v,0);
 
     SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
-    int a3=intersect(r3,triangle);
-    EXPECT_EQ(a3,0);
+    bool a3=intersect(r3,triangle,&ref);
+    EXPECT_EQ(a3,false);
+
 
     SoARay r4(Point3f(0,1.1,0),Vector3f(0,0,1));
-    int a4=intersect(r4,triangle);
-    EXPECT_EQ(a4,0);
+    bool a4=intersect(r4,triangle,&ref);
+    EXPECT_EQ(a4,false);
+   
 }
 
 int main(int argc, char* argv[]) {

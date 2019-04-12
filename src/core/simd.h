@@ -124,4 +124,6 @@ FINLINE  float4 vreduce_max(const float4& x){ auto a = max(swizzle<1,0,3,2>(x),x
 FINLINE float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+c; }
 FINLINE float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }
 
+FINLINE void store(const float4 &x,float* data){ _mm_store_ps(data,x.xyzw);}
+
 NARUKAMI_END
