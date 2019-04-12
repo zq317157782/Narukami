@@ -409,7 +409,18 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
 
+TEST(float4 ,vreduce_min){
+    float4 a(1,2,3,4);
+    a = vreduce_min(a);
+    EXPECT_TRUE(all(a==float4(1,1,1,1)));
+}
 
+
+TEST(float4 ,vreduce_max){
+    float4 a(1,2,3,4);
+    a = vreduce_max(a);
+    EXPECT_TRUE(all(a==float4(4,4,4,4)));
+}
 
 
 TEST(matrix4x4,init){

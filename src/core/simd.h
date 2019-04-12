@@ -113,6 +113,14 @@ FINLINE bool4 operator<=(const float4 &a, const float4 &b){ return  bool4(_mm_cm
 
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
 
+FINLINE  float4 min(const float4& x,const float4& y){ return _mm_min_ps(x.xyzw,y.xyzw); }
+FINLINE  float4 max(const float4& x,const float4& y){ return _mm_max_ps(x.xyzw,y.xyzw); }
+
+FINLINE  float4 vreduce_min(const float4& x){ auto a = min(swizzle<1,0,3,2>(x),x); auto b = min(swizzle<2,3,0,1>(a),a); return b; }
+
+FINLINE  float4 vreduce_max(const float4& x){ auto a = max(swizzle<1,0,3,2>(x),x); auto b = max(swizzle<2,3,0,1>(a),a); return b; }
+
+
 FINLINE float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+c; }
 FINLINE float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }
 
