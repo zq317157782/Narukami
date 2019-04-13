@@ -160,72 +160,71 @@ static void BM_normalize_v4(benchmark::State &state)
 }
 BENCHMARK(BM_normalize_v4);
 
-static void BM_vector3f_cross(benchmark::State &state)
+static void BM_vector3_cross(benchmark::State &state)
 {
-    narukami::Vector3f v1(1, 0, 0);
-    srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+    auto data = new float[6*state.range(0)];
+    for(int i=0;i<6*state.range(0);++i){
+        data[i]=rand();
+    }
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(v1=cross(narukami::Vector3f(x, y, z),v1));
+        for(int i=0;i<state.range(0);++i){
+            benchmark::DoNotOptimize(cross(narukami::Vector3f(data[6*i],data[6*i+1], data[6*i+2]),narukami::Vector3f(data[6*i+3], data[6*i+4], data[6*i+5])));
+        }
     }
+    delete [] data;
 }
-BENCHMARK(BM_vector3f_cross);
+BENCHMARK(BM_vector3_cross)->Arg(1)->Arg(5)->Arg(10);
 
-static void BM_ssevector3f_cross(benchmark::State &state)
+static void BM_ssevector3_cross(benchmark::State &state)
 {
-    narukami::SSEVector3f v1(1, 0, 0);
-    srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+   auto data = new float[6*state.range(0)];
+    for(int i=0;i<6*state.range(0);++i){
+        data[i]=rand();
+    }
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(v1=cross(narukami::SSEVector3f(x, y, z),v1));
+        for(int i=0;i<state.range(0);++i){
+            benchmark::DoNotOptimize(cross(narukami::SSEVector3f(data[6*i],data[6*i+1], data[6*i+2]),narukami::SSEVector3f(data[6*i+3], data[6*i+4], data[6*i+5])));
+        }
     }
+    delete [] data;
 }
-BENCHMARK(BM_ssevector3f_cross);
+BENCHMARK(BM_ssevector3_cross)->Arg(1)->Arg(5)->Arg(10);;
 
-static void BM_soavector3f_cross(benchmark::State &state)
+static void BM_soavector3_cross(benchmark::State &state)
 {
    
-    float x1 = rand();
-    float y1 = rand();
-    float z1 = rand();
-
-    float x2 = rand();
-    float y2 = rand();
-    float z2 = rand();
+    auto data = new float[6*state.range(0)];
+    for(int i=0;i<6*state.range(0);++i){
+        data[i]=rand();
+    }
 
     for (auto _ : state)
     {
         for(int i=0;i<state.range(0);++i){
-            benchmark::DoNotOptimize(cross(narukami::SoAVector3f(x1, y1, z1),narukami::SoAVector3f(x2, y2, z2)));
+            benchmark::DoNotOptimize(cross(narukami::SoAVector3f(data[6*i],data[6*i+1], data[6*i+2]),narukami::SoAVector3f(data[6*i+3], data[6*i+4], data[6*i+5])));
         }
     }
+    delete [] data;
 }
-BENCHMARK(BM_soavector3f_cross)->Arg(1)->Arg(5)->Arg(10);
+BENCHMARK(BM_soavector3_cross)->Arg(1)->Arg(5)->Arg(10);
 
 
 static void BM_soavector3f_dot(benchmark::State &state)
 {
    
-    float x1 = rand();
-    float y1 = rand();
-    float z1 = rand();
-
-    float x2 = rand();
-    float y2 = rand();
-    float z2 = rand();
-
+    auto data = new float[6*state.range(0)];
+    for(int i=0;i<6*state.range(0);++i){
+        data[i]=rand();
+    }
     for (auto _ : state)
     {
         for(int i=0;i<state.range(0);++i){
-            benchmark::DoNotOptimize(dot(narukami::SoAVector3f(x1, y1, z1),narukami::SoAVector3f(x2, y2, z2)));
+            benchmark::DoNotOptimize(dot(narukami::SoAVector3f(data[6*i],data[6*i+1], data[6*i+2]),narukami::SoAVector3f(data[6*i+3], data[6*i+4], data[6*i+5])));
         }
     }
+    delete [] data;
 }
 BENCHMARK(BM_soavector3f_dot)->Arg(1)->Arg(5)->Arg(10);
 
