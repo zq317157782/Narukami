@@ -62,6 +62,8 @@ struct SSE_ALIGNAS SoATriangle{
     SoAVector3f e2;
 };
 
+
+
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     auto O = ray.o;
@@ -76,6 +78,11 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     auto Q = cross(T,E1);
 
     auto P_dot_E1 = dot(P,E1);
+
+    if(P_dot_E1<=EPSION&&P_dot_E1>=-EPSION){
+        return false;
+    }
+    
     auto P_dot_T = dot(P,T);
     auto Q_dot_D = dot(Q,D);
 
@@ -100,13 +107,14 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
     auto V0 = triangle.v0;
     auto E1 = triangle.e1;
     auto E2 = triangle.e2;
-
+ 
     auto T = O - V0;
     
     auto P = cross(D,E2);
     auto Q = cross(T,E1);
 
     auto P_dot_E1 = dot(P,E1);
+
     auto P_dot_T = dot(P,T);
     auto Q_dot_D = dot(Q,D);
     
@@ -119,17 +127,21 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
     float4 u = float4(P_dot_T)*float4(inv_P_dot_E1);
     float4 v = float4(Q_dot_D)*float4(inv_P_dot_E1);
     
-    bool4 mask0=(u>=zero);
+    //check det
+    bool4 mask0 = (float4(P_dot_E1)>=float4(EPSION));
+    mask0 = mask0 | (float4(P_dot_E1)<=float4(-EPSION));
+    //check u/v
+    mask0=mask0&(u>=zero);
     mask0=mask0&(v>=zero);
     mask0=mask0&((u+v)<=one);
-    // if(none(mask0)){
-    //    return false;
-    // }
+    if(none(mask0)){
+       return false;
+    }
     auto Q_dot_E2 = dot(Q,E2);
     float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
+    //check t
     mask0 = mask0&(t <= float4(ray.tMax));
     mask0 = mask0&(t >= zero);
-
 
     if(none(mask0)){
        return false;

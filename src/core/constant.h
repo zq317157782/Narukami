@@ -26,8 +26,8 @@ SOFTWARE.
 #include "core/platform.h"
 #include "core/narukami.h"
 NARUKAMI_BEGIN
-static  MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
-
+static   MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
+static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon()/(2.0f);
 struct TrueType {
     FINLINE operator bool() const{return true;}
 } ;
