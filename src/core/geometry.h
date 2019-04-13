@@ -88,11 +88,6 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
     if(t>=0&&t<=ray.tMax){
-        // if(hit!=nullptr){
-        //     hit->t=t;
-        //     hit->u=u;
-        //     hit->v=v;
-        // }
         return true;
     }
     return false;
@@ -121,8 +116,8 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
     
     float4 inv_P_dot_E1 = one/float4(P_dot_E1);
 
-    float4 u = P_dot_T*inv_P_dot_E1;
-    float4 v = Q_dot_D*inv_P_dot_E1;
+    float4 u = float4(P_dot_T)*float4(inv_P_dot_E1);
+    float4 v = float4(Q_dot_D)*float4(inv_P_dot_E1);
     
     bool4 mask0=(u>=zero);
     mask0=mask0&(v>=zero);
