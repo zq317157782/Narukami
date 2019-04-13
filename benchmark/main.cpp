@@ -190,17 +190,44 @@ BENCHMARK(BM_ssevector3f_cross);
 
 static void BM_soavector3f_cross(benchmark::State &state)
 {
-    narukami::SoAVector3f v1(1, 0, 0);
-    srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+   
+    float x1 = rand();
+    float y1 = rand();
+    float z1 = rand();
+
+    float x2 = rand();
+    float y2 = rand();
+    float z2 = rand();
+
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(v1=cross(narukami::SoAVector3f(x, y, z),v1));
+        for(int i=0;i<state.range(0);++i){
+            benchmark::DoNotOptimize(cross(narukami::SoAVector3f(x1, y1, z1),narukami::SoAVector3f(x2, y2, z2)));
+        }
     }
 }
-BENCHMARK(BM_soavector3f_cross);
+BENCHMARK(BM_soavector3f_cross)->Arg(1)->Arg(5)->Arg(10);
+
+
+static void BM_soavector3f_dot(benchmark::State &state)
+{
+   
+    float x1 = rand();
+    float y1 = rand();
+    float z1 = rand();
+
+    float x2 = rand();
+    float y2 = rand();
+    float z2 = rand();
+
+    for (auto _ : state)
+    {
+        for(int i=0;i<state.range(0);++i){
+            benchmark::DoNotOptimize(dot(narukami::SoAVector3f(x1, y1, z1),narukami::SoAVector3f(x2, y2, z2)));
+        }
+    }
+}
+BENCHMARK(BM_soavector3f_dot)->Arg(1)->Arg(5)->Arg(10);
 
 FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
      __m128 xyzw = _mm_set_ps(narukami::Zero,v.z,v.y,v.x);
