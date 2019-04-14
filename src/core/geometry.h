@@ -31,37 +31,46 @@ NARUKAMI_BEGIN
 struct Ray{
    Point3f o;
    Vector3f d;
-   float tMax;
+   mutable float tMax;
 
    FINLINE Ray(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(o),d(d),tMax(tMax){
 
    }
 };
-
+FINLINE  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
+    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.tMax<<"]";
+} 
 
 struct SSE_ALIGNAS SoARay
 {
     SoAPoint3f o;
     SoAVector3f d;
-    __m128  tMax;
+    mutable __m128  tMax;
      
     FINLINE SoARay(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(SoAPoint3f(o)),d(SoAVector3f(d)),tMax(_mm_set1_ps(tMax)){}
     FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),tMax(_mm_set1_ps(ray.tMax)){}
 };
-
+FINLINE  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
+    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<float4(ray.tMax)<<"]";
+} 
 
 struct Triangle{
     Point3f v0;
     Vector3f e1;
     Vector3f e2;
 };
+FINLINE  std::ostream &operator<<(std::ostream &out, const Triangle &triangle) {
+    out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
+} 
 
 struct SSE_ALIGNAS SoATriangle{
     SoAPoint3f v0;
     SoAVector3f e1;
     SoAVector3f e2;
 };
-
+FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
+    out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
+} 
 
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
@@ -82,7 +91,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     if(P_dot_E1<=EPSION&&P_dot_E1>=-EPSION){
         return false;
     }
-    
+
     auto P_dot_T = dot(P,T);
     auto Q_dot_D = dot(Q,D);
 
@@ -95,13 +104,14 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
     if(t>=0&&t<=ray.tMax){
+        ray.tMax=t;
         return true;
     }
     return false;
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
+FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
@@ -128,25 +138,30 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle){
     float4 v = float4(Q_dot_D)*float4(inv_P_dot_E1);
     
     //check det
-    bool4 mask0 = (float4(P_dot_E1)>=float4(EPSION));
-    mask0 = mask0 | (float4(P_dot_E1)<=float4(-EPSION));
+    bool4 mask_det = (float4(P_dot_E1)>=float4(EPSION));
+    mask_det = mask_det | (float4(P_dot_E1)<=float4(-EPSION));
+
+    mask=mask&mask_det;
+
     //check u/v
-    mask0=mask0&(u>=zero);
-    mask0=mask0&(v>=zero);
-    mask0=mask0&((u+v)<=one);
-    if(none(mask0)){
-       return false;
+    mask=mask&(u>=zero);
+    mask=mask&(v>=zero);
+    mask=mask&((u+v)<=one);
+    if(none(mask)){
+        return mask;
     }
     auto Q_dot_E2 = dot(Q,E2);
     float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
     //check t
-    mask0 = mask0&(t <= float4(ray.tMax));
-    mask0 = mask0&(t >= zero);
+    mask = mask&(t <= float4(ray.tMax));
+    mask = mask&(t >= zero);
 
-    if(none(mask0)){
-       return false;
+    if(none(mask)){
+        return mask;
     }
-    return true;
+
+    ray.tMax =_mm_blendv_ps(ray.tMax,t,mask);
+    return mask;
 }
 
 NARUKAMI_END

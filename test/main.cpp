@@ -635,7 +635,6 @@ TEST(geometry,ray_intersect_triangle){
 }
 TEST(geometry,ray_intersect_soatriangle){
     
-   
 
     SoATriangle triangle;
     triangle.v0 = SoAPoint3f(0,0,2);
@@ -644,23 +643,23 @@ TEST(geometry,ray_intersect_soatriangle){
 
 
     SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
-    bool a=intersect(r,triangle);
-    EXPECT_EQ(a,true);
+    auto a=intersect(r,triangle);
+    EXPECT_EQ(all(a),true);
 
 
     SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
-    bool a2=intersect(r2,triangle);
-    EXPECT_EQ(a2,true);
+    auto a2=intersect(r2,triangle,SSE_MASK(false,false,false,false));
+    EXPECT_EQ(all(a2),false);
 
 
     SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
-    bool a3=intersect(r3,triangle);
-    EXPECT_EQ(a3,false);
+    auto a3=intersect(r3,triangle);
+    EXPECT_EQ(all(a3),false);
 
 
     SoARay r4(Point3f(0,1.1,0),Vector3f(0,0,1));
-    bool a4=intersect(r4,triangle);
-    EXPECT_EQ(a4,false);
+    auto a4=intersect(r4,triangle);
+    EXPECT_EQ(all(a4),false);
    
 }
 

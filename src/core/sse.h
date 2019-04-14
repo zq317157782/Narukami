@@ -34,6 +34,11 @@ NARUKAMI_BEGIN
 
 extern const __m128 sse_lookup_masks[16];
 
+#define SSE_MASK_FALSE sse_lookup_masks[0]
+#define SSE_MASK_TRUE  sse_lookup_masks[15]
+#define SSE_BOOL_TO_LUT_IDX(a0,a1,a2,a3) size_t(a0)|(size_t(a1)<<1)|(size_t(a2)<<2)|(size_t(a3)<<3)
+#define SSE_MASK(a0,a1,a2,a3) sse_lookup_masks[SSE_BOOL_TO_LUT_IDX(a0,a1,a2,a3)]
+
 template<int i0,int i1,int i2,int i3>
 FINLINE __m128 swizzle(const __m128 v){
     return _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(v), _MM_SHUFFLE(i3, i2, i1, i0)));

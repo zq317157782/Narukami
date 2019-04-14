@@ -29,8 +29,6 @@ SOFTWARE.
 
 NARUKAMI_BEGIN
 
-#define BOOL_TO_LUT_IDX(a0,a1,a2,a3) size_t(a0)|(size_t(a1)<<1)|(size_t(a2)<<2)|(size_t(a3)<<3)
-
 struct bool4
 {
     typedef bool Scalar; 
@@ -39,8 +37,8 @@ struct bool4
     
 
     FINLINE bool4(const __m128 v):xyzw(v){}
-    FINLINE explicit bool4(const bool a):xyzw(sse_lookup_masks[BOOL_TO_LUT_IDX(a,a,a,a)]){}
-    FINLINE explicit bool4(const bool a0,const bool a1,const bool a2,const bool a3):xyzw(sse_lookup_masks[BOOL_TO_LUT_IDX(a0,a1,a2,a3)]){}
+    FINLINE explicit bool4(const bool a):xyzw(SSE_MASK(a,a,a,a)){}
+    FINLINE explicit bool4(const bool a0,const bool a1,const bool a2,const bool a3):xyzw(SSE_MASK(a0,a1,a2,a3)){}
 
     FINLINE operator __m128&(){return xyzw;}
     FINLINE operator const __m128&() const{return xyzw;}
