@@ -409,6 +409,15 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
 
+TEST(float4 ,safe_rcp){
+    float4 a(0);
+    auto b=safe_rcp(a);
+    EXPECT_FLOAT_EQ(b[0],0.5f);
+    EXPECT_FLOAT_EQ(b[1],0.5f);
+    EXPECT_FLOAT_EQ(b[2],0.5f);
+    EXPECT_FLOAT_EQ(b[3],0.5f);
+}
+
 TEST(float4 ,vreduce_min){
     float4 a(1,2,3,4);
     a = vreduce_min(a);
@@ -661,6 +670,23 @@ TEST(geometry,ray_intersect_soatriangle){
     auto a4=intersect(r4,triangle);
     EXPECT_EQ(all(a4),false);
    
+}
+
+TEST(soabox,intersect){
+    SoARay ray(Point3f(0.5,0.5,0),Vector3f(0,0,1));
+    SoABox box;
+    box.min_point = SoAPoint3f(0,0,0);
+    box.max_point = SoAPoint3f(1,1,1);
+    int sign[3]={1,1,0};
+    auto a=intersect(ray.o,safe_rcp(ray.d),float4(0),float4(Infinite),sign,box);
+    EXPECT_TRUE(all(a));
+}
+
+
+#include "core/qbvh.h"
+
+TEST(qbvh,qbvhnode_size){
+    EXPECT_EQ(sizeof(QBVHNode),128);
 }
 
 int main(int argc, char* argv[]) {

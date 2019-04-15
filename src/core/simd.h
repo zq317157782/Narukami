@@ -109,7 +109,10 @@ FINLINE bool4 operator<(const float4 &a, const float4 &b){ return  bool4(_mm_cmp
 FINLINE bool4 operator>=(const float4 &a, const float4 &b){ return  bool4(_mm_cmpge_ps(a.xyzw, b.xyzw)); }
 FINLINE bool4 operator<=(const float4 &a, const float4 &b){ return  bool4(_mm_cmple_ps(a.xyzw, b.xyzw)); }
 
+
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
+FINLINE  float4 zero_fix(const float4& x){ auto min_rcp_input = _mm_set1_ps(MIN_RCP_INPUT); return _mm_blendv_ps(x.xyzw,min_rcp_input,_mm_cmplt_ps(x.xyzw,min_rcp_input)); }
+FINLINE  float4 safe_rcp(const float4& x){ return rcp(zero_fix(x)); }
 
 FINLINE  float4 min(const float4& x,const float4& y){ return _mm_min_ps(x.xyzw,y.xyzw); }
 FINLINE  float4 max(const float4& x,const float4& y){ return _mm_max_ps(x.xyzw,y.xyzw); }
