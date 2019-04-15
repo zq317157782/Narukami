@@ -646,12 +646,13 @@ TEST(geometry,ray_intersect_soatriangle){
     auto a=intersect(r,triangle);
     EXPECT_EQ(all(a),true);
 
-
+    triangle.mask=SSE_MASK(false,false,false,false);
     SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
-    auto a2=intersect(r2,triangle,SSE_MASK(false,false,false,false));
+    auto a2=intersect(r2,triangle);
     EXPECT_EQ(all(a2),false);
 
 
+    triangle.mask=SSE_MASK(true,true,true,true);
     SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
     auto a3=intersect(r3,triangle);
     EXPECT_EQ(all(a3),false);
