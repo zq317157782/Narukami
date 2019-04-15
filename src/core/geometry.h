@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
+#include "core/narukami.h"
 #include "core/euclid.h"
 #include "core/simd.h"
 
@@ -71,6 +72,18 @@ struct SSE_ALIGNAS SoATriangle{
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
 } 
+
+
+struct SSE_ALIGNAS SoABox
+{
+    SoAPoint3f min_point;
+    SoAPoint3f max_point;
+
+    const SoAPoint3f& operator[](const int idx) const{
+        assert(idx>=0&&idx<2);
+        return (&min_point)[idx];
+    }
+};
 
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
@@ -162,6 +175,24 @@ FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 ma
 
     ray.tMax =_mm_blendv_ps(ray.tMax,t,mask);
     return mask;
+}
+
+//https://www.slideshare.net/ssuser2848d3/qbv
+FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int sign[3],const SoABox& box){
+    // x
+    t_min = max(t_min,(float4(box[sign[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
+    t_max = min(t_max,(float4(box[1-sign[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
+    
+    //y
+    t_min = max(t_min,(float4(box[sign[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
+    t_max = min(t_max,(float4(box[1-sign[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
+    
+    //z
+    t_min = max(t_min,(float4(box[sign[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+    t_max = min(t_max,(float4(box[1-sign[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+
+    //check
+    return float4(t_min)<=float4(t_max);
 }
 
 NARUKAMI_END

@@ -684,7 +684,7 @@ TEST(soabox,intersect){
     SoABox box;
     box.min_point = SoAPoint3f(0,0,0);
     box.max_point = SoAPoint3f(1,1,1);
-    int sign[3]={1,1,0};
+    int sign[3]={0,0,0};
     auto a=intersect(ray.o,safe_rcp(ray.d),float4(0),float4(Infinite),sign,box);
     EXPECT_TRUE(all(a));
 }
