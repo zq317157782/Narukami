@@ -589,6 +589,13 @@ TEST(SoAVector3f,cross){
     EXPECT_EQ(v3,SoAVector3f(0,0,1));
 }
 
+
+TEST(SoAVector3f,safe_rcp){
+    SoAVector3f v1(1,0,0);
+    auto v2 = safe_rcp(v1);
+    EXPECT_EQ(v2,SoAVector3f(0,0,1));
+}
+
 TEST(Euclid,point_add_vector){
     Point3f  p(0,0,0);
     Vector3f v(1,0,0);
