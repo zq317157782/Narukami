@@ -67,9 +67,6 @@ struct SSE_ALIGNAS SoATriangle{
     SoAPoint3f v0;
     SoAVector3f e1;
     SoAVector3f e2;
-    __m128 mask;
-
-    SoATriangle():mask(SSE_MASK_TRUE){}
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
@@ -114,13 +111,13 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle){
+FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
     auto E1 = triangle.e1;
     auto E2 = triangle.e2;
-    auto mask = triangle.mask;
+ 
     auto T = O - V0;
     
     auto P = cross(D,E2);
