@@ -12,6 +12,7 @@ include_directories(src)
 include_directories(external)
 #include_directories(external/embree/include/embree3)
 include_directories(external/benchmark/include/benchmark)
+include_directories(external/lodepng/lodepng.h)
 
 #add gtest
 set(gtest_force_shared_crt ON)
@@ -45,6 +46,9 @@ target_link_libraries(narukami_test gtest)
 #benchmark rcp
 add_executable(narukami_benchmark benchmark/main.cpp src/core/constant.cpp src/core/sse.cpp)
 target_link_libraries(narukami_benchmark benchmark)
+
+#demos
+add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp external/lodepng/lodepng.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
