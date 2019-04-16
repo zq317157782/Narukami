@@ -358,6 +358,14 @@ TEST(float4,eq){
 }
 
 
+TEST(float4,select){
+    float4 a(1,1,1,1);
+    float4 b(0,0,0,0);
+    float4 c=select(bool4(true,false,true,false),a,b);
+    EXPECT_TRUE(all(c==float4(1,0,1,0)));
+}
+
+
 TEST(float4,positive_and_negative){
      float4 a(1,1,1,1);
      EXPECT_TRUE(all(-a==float4(-1,-1,-1,-1)));
@@ -409,14 +417,14 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
 
-TEST(float4 ,safe_rcp){
-    float4 a(0);
-    auto b=safe_rcp(a);
-    EXPECT_FLOAT_EQ(b[0],0.5f);
-    EXPECT_FLOAT_EQ(b[1],0.5f);
-    EXPECT_FLOAT_EQ(b[2],0.5f);
-    EXPECT_FLOAT_EQ(b[3],0.5f);
-}
+// TEST(float4 ,safe_rcp){
+//     float4 a(0);
+//     auto b=safe_rcp(a);
+//     EXPECT_FLOAT_EQ(b[0],0.5f);
+//     EXPECT_FLOAT_EQ(b[1],0.5f);
+//     EXPECT_FLOAT_EQ(b[2],0.5f);
+//     EXPECT_FLOAT_EQ(b[3],0.5f);
+// }
 
 TEST(float4 ,vreduce_min){
     float4 a(1,2,3,4);
@@ -590,11 +598,11 @@ TEST(SoAVector3f,cross){
 }
 
 
-TEST(SoAVector3f,safe_rcp){
-    SoAVector3f v1(1,0,0);
-    auto v2 = safe_rcp(v1);
-    EXPECT_EQ(v2,SoAVector3f(0,0,1));
-}
+// TEST(SoAVector3f,safe_rcp){
+//     SoAVector3f v1(1,0,0);
+//     auto v2 = safe_rcp(v1);
+//     EXPECT_EQ(v2,SoAVector3f(0,0,1));
+// }
 
 TEST(Euclid,point_add_vector){
     Point3f  p(0,0,0);
@@ -680,13 +688,19 @@ TEST(geometry,ray_intersect_soatriangle){
 }
 
 TEST(soabox,intersect){
-    SoARay ray(Point3f(0.5,0.5,0),Vector3f(0,0,1));
+    
     SoABox box;
     box.min_point = SoAPoint3f(0,0,0);
     box.max_point = SoAPoint3f(1,1,1);
     int sign[3]={0,0,0};
+
+    SoARay ray(Point3f(0.5,0.5,0),Vector3f(0,0,1));
     auto a=intersect(ray.o,safe_rcp(ray.d),float4(0),float4(Infinite),sign,box);
     EXPECT_TRUE(all(a));
+
+    SoARay ray2(Point3f(1.001,0.5,0),Vector3f(0,0,1));
+    auto b=intersect(ray2.o,safe_rcp(ray2.d),float4(0),float4(Infinite),sign,box);
+    EXPECT_FALSE(all(b));
 }
 
 
