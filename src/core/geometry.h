@@ -178,18 +178,37 @@ FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 ma
 }
 
 //https://www.slideshare.net/ssuser2848d3/qbv
-FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int sign[3],const SoABox& box){
+FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int isPositive[3],const SoABox& box){
     // x
-    t_min = max(t_min,(float4(box[sign[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
-    t_max = min(t_max,(float4(box[1-sign[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
+    t_min = max(t_min,(float4(box[1-isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
+    t_max = min(t_max,(float4(box[isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
     
     //y
-    t_min = max(t_min,(float4(box[sign[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
-    t_max = min(t_max,(float4(box[1-sign[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
+    t_min = max(t_min,(float4(box[1-isPositive[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
+    t_max = min(t_max,(float4(box[isPositive[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
     
     //z
-    t_min = max(t_min,(float4(box[sign[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
-    t_max = min(t_max,(float4(box[1-sign[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+    t_min = max(t_min,(float4(box[1-isPositive[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+    t_max = min(t_max,(float4(box[isPositive[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+
+    //check
+    return float4(t_min)<=float4(t_max);
+}
+
+
+FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const __m128 isPositive[3],const SoABox& box){
+    // x
+    
+    t_min = max(t_min,(float4(select(isPositive[0],box[0].xxxx,box[1].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
+    t_max = min(t_max,(float4(select(isPositive[0],box[1].xxxx,box[0].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
+    
+    //y
+    t_min = max(t_min,(float4(select(isPositive[1],box[0].yyyy,box[1].yyyy))-float4(o.yyyy))*float4(inv_d.yyyy));
+    t_max = min(t_max,(float4(select(isPositive[1],box[1].yyyy,box[0].yyyy))-float4(o.yyyy))*float4(inv_d.yyyy));
+    
+    //z
+    t_min = max(t_min,(float4(select(isPositive[2],box[0].zzzz,box[1].zzzz))-float4(o.yyyy))*float4(inv_d.zzzz));
+    t_max = min(t_max,(float4(select(isPositive[2],box[1].zzzz,box[0].zzzz))-float4(o.yyyy))*float4(inv_d.zzzz));
 
     //check
     return float4(t_min)<=float4(t_max);
