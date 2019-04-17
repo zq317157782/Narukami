@@ -416,6 +416,18 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[2],0.5f);
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
+TEST(float4 ,min_index_mask){
+    float4 a(5,6,3,4);
+    int mask=min_index_mask(a);
+    EXPECT_EQ(mask,4);
+}
+
+TEST(float4 ,max_index_mask){
+    float4 a(5,6,3,4);
+    int mask=max_index_mask(a);
+    EXPECT_EQ(mask,2);
+}
+
 
 // TEST(float4 ,safe_rcp){
 //     float4 a(0);
