@@ -21,30 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #pragma once
+#include "narukami.h"
+#include "platform.h"
+#include "sse.h"
 
-#if defined(__APPLE__)
-	#define NARUKAMI_IS_OSX 
-#elif defined(__linux__)
-	#define NARUKAMI_IS_LINUX
+NARUKAMI_BEGIN
+template <int LINE_SIZE>
+void *alloc_aligned(size_t size){
+#ifdef NARUKAMI_IS_OSX
+	void* ptr;
+	if(posix_memalign(&ptr,LINE_SIZE,size)!=0){
+		ptr=nullptr;
+	}
+	return ptr;
+#elif defined(NARUKAMI_IS_WIN) && defined(_MSC_VER)
+	return _aligned_malloc(size, LINE_SIZE);
 #else
-	#define NARUKAMI_IS_WIN 
+	void* ptr;
+	if(posix_memalign(&ptr,LINE_SIZE,size)!=0){
+		ptr=nullptr;
+	}
+	return ptr;
 #endif
+}
 
-
-#if defined(__GNUC__) || defined(__clang__)
-#define FINLINE                inline __attribute__((always_inline))
-#define NOINLINE               __attribute__((noinline))
-#define EXPECT_TAKEN(a)        __builtin_expect(!!(a), true)
-#define EXPECT_NOT_TAKEN(a)    __builtin_expect(!!(a), false)
-#define MAYBE_UNUSED           __attribute__((unused))
-#elif defined(_MSC_VER)
-#define FINLINE                __forceinline
-#define NOINLINE               __declspec(noinline)
-#define MM_ALIGN16             __declspec(align(16))
-#define EXPECT_TAKEN(a)        (a)
-#define EXPECT_NOT_TAKEN(a)    (a)
-#define MAYBE_UNUSED           
-#else
-#error Unsupported compiler!
-#endif
+NARUKAMI_END

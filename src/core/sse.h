@@ -30,6 +30,7 @@ SOFTWARE.
 #include <smmintrin.h>//sse4.1
 
 NARUKAMI_BEGIN
+#define SSE_LINE_SIZE 128
 #define SSE_ALIGNAS alignas(16)
 
 extern const __m128 sse_lookup_masks[16];

@@ -726,6 +726,15 @@ TEST(qbvh,qbvhnode_size){
     EXPECT_EQ(sizeof(QBVHNode),128);
 }
 
+
+#include "core/memory.h"
+
+TEST(memory,alloc_aligned){
+    auto alloced_area=alloc_aligned<128>(1000);
+    EXPECT_EQ(((int)(alloced_area))%128,0);
+}
+
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
