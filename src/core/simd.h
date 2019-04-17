@@ -120,8 +120,8 @@ FINLINE  float4 max(const float4& x,const float4& y){ return _mm_max_ps(x.xyzw,y
 FINLINE  float4 vreduce_min(const float4& x){ auto a = min(swizzle<1,0,3,2>(x),x); auto b = min(swizzle<2,3,0,1>(a),a); return b; }
 FINLINE  float4 vreduce_max(const float4& x){ auto a = max(swizzle<1,0,3,2>(x),x); auto b = max(swizzle<2,3,0,1>(a),a); return b; }
 
-FINLINE  int min_index_mask(const float4& x){ auto y=vreduce_min(x); auto z=_mm_cmpeq_epi32(_mm_castps_si128(x),_mm_castps_si128(y)); return _mm_movemask_ps(_mm_castsi128_ps(z)); }
-FINLINE  int max_index_mask(const float4& x){ auto y=vreduce_max(x); auto z=_mm_cmpeq_epi32(_mm_castps_si128(x),_mm_castps_si128(y)); return _mm_movemask_ps(_mm_castsi128_ps(z)); }
+FINLINE  int reduce_min_mask(const float4& x,float* min_value){ auto y=vreduce_min(x); auto z=_mm_cmpeq_epi32(_mm_castps_si128(x),_mm_castps_si128(y)); _mm_store_ss(min_value,y); return _mm_movemask_ps(_mm_castsi128_ps(z)); }
+FINLINE  int reduce_max_mask(const float4& x,float* max_value){ auto y=vreduce_max(x); auto z=_mm_cmpeq_epi32(_mm_castps_si128(x),_mm_castps_si128(y)); _mm_store_ss(max_value,y); return _mm_movemask_ps(_mm_castsi128_ps(z)); }
 
 FINLINE float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+c; }
 FINLINE float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }

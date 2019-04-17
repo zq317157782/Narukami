@@ -416,15 +416,19 @@ TEST(float4 ,rcp){
     EXPECT_FLOAT_EQ(b[2],0.5f);
     EXPECT_FLOAT_EQ(b[3],0.5f);
 }
-TEST(float4 ,min_index_mask){
+TEST(float4 ,reduce_min_mask){
     float4 a(5,6,3,4);
-    int mask=min_index_mask(a);
+    float b;
+    int mask=reduce_min_mask(a,&b);
+    EXPECT_EQ(b,3);
     EXPECT_EQ(mask,4);
 }
 
-TEST(float4 ,max_index_mask){
+TEST(float4 ,reduce_max_mask){
     float4 a(5,6,3,4);
-    int mask=max_index_mask(a);
+    float b;
+    int mask=reduce_max_mask(a,&b);
+    EXPECT_EQ(b,6);
     EXPECT_EQ(mask,2);
 }
 
@@ -676,26 +680,26 @@ TEST(geometry,ray_intersect_soatriangle){
     triangle.v0 = SoAPoint3f(0,0,2);
     triangle.e1 = SoAVector3f(1,0,0);
     triangle.e2 = SoAVector3f(0,1,0);
-
+    HitInfo hit;
 
     SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
     auto a=intersect(r,triangle);
-    EXPECT_EQ(all(a),true);
+    EXPECT_EQ((a),true);
 
     SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
-    auto a2=intersect(r2,triangle,SSE_MASK(false,false,false,false));
-    EXPECT_EQ(all(a2),false);
+    auto a2=intersect(r2,triangle,&hit,SSE_MASK(false,false,false,false));
+    EXPECT_EQ((a2),false);
 
 
 
     SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
     auto a3=intersect(r3,triangle);
-    EXPECT_EQ(all(a3),false);
+    EXPECT_EQ((a3),false);
 
 
     SoARay r4(Point3f(0,1.1,0),Vector3f(0,0,1));
     auto a4=intersect(r4,triangle);
-    EXPECT_EQ(all(a4),false);
+    EXPECT_EQ((a4),false);
    
 }
 
