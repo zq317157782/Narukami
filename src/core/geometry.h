@@ -85,9 +85,17 @@ struct SSE_ALIGNAS SoABox
     }
 };
 
+struct HitInfo
+{
+    float t;
+    float u;
+    float v;
+    int   index;
+};
+
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
+FINLINE bool intersect(const Ray& ray,const Triangle& triangle,HitInfo* hit=nullptr){
     auto O = ray.o;
     auto D = ray.d;
 
@@ -117,14 +125,18 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle){
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
     if(t>=0&&t<=ray.tMax){
-        ray.tMax=t;
+        if(hit){
+            hit->t= t;
+            hit->u= u;
+            hit->v= v;
+        }
         return true;
     }
     return false;
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 mask=SSE_MASK_TRUE){
+FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,HitInfo* hit=nullptr,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
@@ -161,7 +173,7 @@ FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 ma
     mask=mask&(v>=zero);
     mask=mask&((u+v)<=one);
     if(none(mask)){
-        return mask;
+        return false;
     }
     auto Q_dot_E2 = dot(Q,E2);
     float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
@@ -170,12 +182,33 @@ FINLINE __m128 intersect(const SoARay& ray,const SoATriangle& triangle,__m128 ma
     mask = mask&(t >= zero);
 
     if(none(mask)){
-        return mask;
+        return false;
     }
 
-    ray.tMax =_mm_blendv_ps(ray.tMax,t,mask);
-    return mask;
+    if(hit){
+        int min_mask=reduce_min_mask(t,&hit->t);
+        int idx=0;
+        if(min_mask&0x1){
+            idx=0;
+        }
+        else if(min_mask&0x2){
+            idx=1;
+        }
+        else if(min_mask&0x4){
+            idx=2;
+        }
+        else if(min_mask&0x8){
+            idx=3;
+        }
+        
+        hit->u=u[idx];
+        hit->v=v[idx];
+        hit->index = idx;
+    }
+    return true;
 }
+
+
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int isPositive[3],const SoABox& box){

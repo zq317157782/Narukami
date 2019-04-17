@@ -12,19 +12,19 @@ int main(){
 
     std::vector<uint8_t> image;
 	for (int i = 0; i<128*128; ++i) {
-
+		narukami::HitInfo hit;
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
-        narukami::bool4 b=intersect(ray,triangle);
-
+        bool b=intersect(ray,triangle,&hit);
+		
 		float rgb[3];
-		if (any(b)){
-            rgb[0] = 1;
-		    rgb[1] = 0;
+		if (b){
+            rgb[0] = hit.u;
+		    rgb[1] = hit.v;
 		    rgb[2] = 0;
         }
         else{
             rgb[0] = 0;
-		    rgb[1] = 1;
+		    rgb[1] = 0;
 		    rgb[2] = 0;
         }
         
