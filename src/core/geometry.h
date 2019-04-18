@@ -73,6 +73,18 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
 } 
 
+struct Box
+{
+    Point3f min_point;
+    Point3f max_point;
+    const Point3f& operator[](const int idx) const{
+        assert(idx>=0&&idx<2);
+        return (&min_point)[idx];
+    }
+};
+FINLINE  std::ostream &operator<<(std::ostream &out, const Box &box) {
+    out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
+} 
 
 struct SSE_ALIGNAS SoABox
 {
@@ -84,6 +96,9 @@ struct SSE_ALIGNAS SoABox
         return (&min_point)[idx];
     }
 };
+FINLINE  std::ostream &operator<<(std::ostream &out, const SoABox &box) {
+    out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
+} 
 
 struct HitInfo
 {
@@ -211,39 +226,54 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,HitInfo* hi
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
-FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int isPositive[3],const SoABox& box){
-    // x
-    t_min = max(t_min,(float4(box[1-isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
-    t_max = min(t_max,(float4(box[isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
-    
+FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Box& box){
+    //x
+    t_min = max(t_min,(box[1-isPositive[0]].x-o.x)*inv_d.x);
+    t_max = min(t_max,(box[isPositive[0]].x-o.x)*inv_d.x);
     //y
-    t_min = max(t_min,(float4(box[1-isPositive[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
-    t_max = min(t_max,(float4(box[isPositive[1]].yyyy)-float4(o.yyyy))*float4(inv_d.yyyy));
-    
+    t_min = max(t_min,(box[1-isPositive[1]].y-o.y)*inv_d.y);
+    t_max = min(t_max,(box[isPositive[1]].y-o.y)*inv_d.y);
     //z
-    t_min = max(t_min,(float4(box[1-isPositive[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
-    t_max = min(t_max,(float4(box[isPositive[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
+    t_min = max(t_min,(box[1-isPositive[2]].z-o.z)*inv_d.z);
+    t_max = min(t_max,(box[isPositive[2]].z-o.z)*inv_d.z);
 
-    //check
-    return movemask(float4(t_min)<=float4(t_max));
+    return t_min<=t_max;
 }
 
 
-FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const __m128 isPositive[3],const SoABox& box){
+FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABox& box){
     // x
-    t_min = max(t_min,(float4(select(isPositive[0],box[0].xxxx,box[1].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
-    t_max = min(t_max,(float4(select(isPositive[0],box[1].xxxx,box[0].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
+    t_min = max(t_min,(box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
+    t_max = min(t_max,(box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
     
     //y
-    t_min = max(t_min,(float4(select(isPositive[1],box[0].yyyy,box[1].yyyy))-float4(o.yyyy))*float4(inv_d.yyyy));
-    t_max = min(t_max,(float4(select(isPositive[1],box[1].yyyy,box[0].yyyy))-float4(o.yyyy))*float4(inv_d.yyyy));
+    t_min = max(t_min,(box[1-isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy);
+    t_max = min(t_max,(box[isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy);
     
     //z
-    t_min = max(t_min,(float4(select(isPositive[2],box[0].zzzz,box[1].zzzz))-float4(o.yyyy))*float4(inv_d.zzzz));
-    t_max = min(t_max,(float4(select(isPositive[2],box[1].zzzz,box[0].zzzz))-float4(o.yyyy))*float4(inv_d.zzzz));
+    t_min = max(t_min,(box[1-isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz);
+    t_max = min(t_max,(box[isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz);
 
     //check
-    return movemask(float4(t_min)<=float4(t_max));
+    return movemask(t_min<=t_max);
 }
+
+
+// FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const float4 isPositive[3],const SoABox& box){
+//     // x
+//     t_min = max(t_min,(select(isPositive[0],box[0].xxxx,box[1].xxxx)-o.xxxx)*inv_d.xxxx);
+//     t_max = min(t_max,(select(isPositive[0],box[1].xxxx,box[0].xxxx)-o.xxxx)*inv_d.xxxx);
+    
+//     //y
+//     t_min = max(t_min,(select(isPositive[1],box[0].yyyy,box[1].yyyy)-o.yyyy)*inv_d.yyyy);
+//     t_max = min(t_max,(select(isPositive[1],box[1].yyyy,box[0].yyyy)-o.yyyy)*inv_d.yyyy);
+    
+//     //z
+//     t_min = max(t_min,(select(isPositive[2],box[0].zzzz,box[1].zzzz)-o.yyyy)*inv_d.zzzz);
+//     t_max = min(t_max,(select(isPositive[2],box[1].zzzz,box[0].zzzz)-o.yyyy)*inv_d.zzzz);
+
+//     //check
+//     return movemask(t_min<=t_max);
+// }
 
 NARUKAMI_END
