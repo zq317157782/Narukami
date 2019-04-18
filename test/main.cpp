@@ -748,12 +748,20 @@ TEST(spectrum,index){
     EXPECT_EQ(a.b,2);
 }
 
-TEST(vertexbuffer,construct){
+TEST(databuffer,construct){
     int data[3]={2,3,4};
     DataBuffer<int> buf(10,data);
     EXPECT_EQ(buf[2],4);
     load(buf,data,3,3);
     EXPECT_EQ(buf[3],2);
+}
+
+TEST(databuffer,assign){
+    int data[3]={2,3,4};
+    DataBuffer<int> buf(3,data);
+    DataBuffer<int> buf2 = buf;
+    EXPECT_EQ(buf2[2],4);
+
 }
 
 int main(int argc, char* argv[]) {

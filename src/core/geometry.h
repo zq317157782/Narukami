@@ -32,12 +32,12 @@ template <typename T>
 struct DataBuffer
 {
     int size;
-    std::unique_ptr<T[]> buffer;
+    std::shared_ptr<T[]> buffer;
     DataBuffer(const int size):size(size){
         assert(size>0);
-        buffer = std::unique_ptr<T[]>(new T[size]);
+        buffer = std::shared_ptr<T[]>(new T[size]);
     }
-
+    
     DataBuffer(const int size,void* data):DataBuffer(size){
         memcpy(buffer.get(),data,sizeof(T)*size);
     }
