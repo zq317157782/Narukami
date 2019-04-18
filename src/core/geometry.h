@@ -32,27 +32,27 @@ NARUKAMI_BEGIN
 struct Ray{
    Point3f o;
    Vector3f d;
-   mutable float tMax;
+   mutable float t_max;
 
-   FINLINE Ray(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(o),d(d),tMax(tMax){
+   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = Infinite):o(o),d(d),t_max(t_max){
 
    }
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
-    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.tMax<<"]";
+    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.t_max<<"]";
 } 
 
 struct SSE_ALIGNAS SoARay
 {
     SoAPoint3f o;
     SoAVector3f d;
-    mutable __m128  tMax;
+    mutable float4 t_max;
      
-    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float tMax = Infinite):o(SoAPoint3f(o)),d(SoAVector3f(d)),tMax(_mm_set1_ps(tMax)){}
-    FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),tMax(_mm_set1_ps(ray.tMax)){}
+    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float t_max = Infinite):o(SoAPoint3f(o)),d(SoAVector3f(d)),t_max(t_max){}
+    FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),t_max(ray.t_max){}
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
-    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<float4(ray.tMax)<<"]";
+    out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<float4(ray.t_max)<<"]";
 } 
 
 struct Triangle{
@@ -123,7 +123,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle,HitInfo* hit=null
         return false;
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
-    if(t>=0&&t<=ray.tMax){
+    if(t>=0&&t<=ray.t_max){
         if(hit){
             hit->t= t;
             hit->u= u;
@@ -177,7 +177,7 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,HitInfo* hi
     auto Q_dot_E2 = dot(Q,E2);
     float4 t = float4(Q_dot_E2)*inv_P_dot_E1;
     //check t
-    mask = mask&(t <= float4(ray.tMax));
+    mask = mask&(t <= float4(ray.t_max));
     mask = mask&(t >= zero);
 
     if(none(mask)){
