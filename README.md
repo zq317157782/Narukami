@@ -5,6 +5,7 @@ lightweight PBRT-style path tracer
  - [x] element math 
  - [x] vector math
  - [x] matrix math
+ - [ ] transform structure
  - [ ] vertex/index buffer structure
  - [x] basic/SoA ray structure
  - [x] basic/SoA triangle structure (one vertex with two edge vector)
