@@ -10,3 +10,4 @@ lightweight PBRT-style path tracer
  - [x] intersect func for ray and SoA triangle(single ray with four triangle)
  - [ ] partial differential dpdu/dpdv for triangle
  - [x] basic/SoA AABB structure(for QBVH) and intersect scheme
+ - [x] basic spectrum structure
