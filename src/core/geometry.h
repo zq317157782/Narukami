@@ -93,7 +93,6 @@ struct HitInfo
     int   index;
 };
 
-
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE bool intersect(const Ray& ray,const Triangle& triangle,HitInfo* hit=nullptr){
     auto O = ray.o;
@@ -211,7 +210,8 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,HitInfo* hi
 
 
 //https://www.slideshare.net/ssuser2848d3/qbv
-FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int isPositive[3],const SoABox& box){
+//single ray with four box
+FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const int isPositive[3],const SoABox& box){
     // x
     t_min = max(t_min,(float4(box[1-isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
     t_max = min(t_max,(float4(box[isPositive[0]].xxxx)-float4(o.xxxx))*float4(inv_d.xxxx));
@@ -225,13 +225,12 @@ FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_m
     t_max = min(t_max,(float4(box[isPositive[2]].zzzz)-float4(o.zzzz))*float4(inv_d.zzzz));
 
     //check
-    return float4(t_min)<=float4(t_max);
+    return movemask(float4(t_min)<=float4(t_max));
 }
 
 
-FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const __m128 isPositive[3],const SoABox& box){
+FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_min,__m128 t_max,const __m128 isPositive[3],const SoABox& box){
     // x
-    
     t_min = max(t_min,(float4(select(isPositive[0],box[0].xxxx,box[1].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
     t_max = min(t_max,(float4(select(isPositive[0],box[1].xxxx,box[0].xxxx))-float4(o.xxxx))*float4(inv_d.xxxx));
     
@@ -244,7 +243,7 @@ FINLINE __m128 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,__m128 t_m
     t_max = min(t_max,(float4(select(isPositive[2],box[1].zzzz,box[0].zzzz))-float4(o.yyyy))*float4(inv_d.zzzz));
 
     //check
-    return float4(t_min)<=float4(t_max);
+    return movemask(float4(t_min)<=float4(t_max));
 }
 
 NARUKAMI_END
