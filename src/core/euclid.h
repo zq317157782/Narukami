@@ -237,12 +237,12 @@ FINLINE int operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
     return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
-FINLINE __m128 dot(const SoAVector3f& v0,const SoAVector3f& v1){ return float4(v0.xxxx)*float4(v1.xxxx)+float4(v0.yyyy)*float4(v1.yyyy)+float4(v0.zzzz)*float4(v1.zzzz); }
+FINLINE float4 dot(const SoAVector3f& v0,const SoAVector3f& v1){ return v0.xxxx*v1.xxxx+v0.yyyy*v1.yyyy+v0.zzzz*v1.zzzz; }
 
-FINLINE SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 xxxx=float4(v0.yyyy)*float4(v1.zzzz)-float4(v0.zzzz)*float4(v1.yyyy); float4 yyyy=float4(v0.zzzz)*float4(v1.xxxx)-float4(v0.xxxx)*float4(v1.zzzz); float4 zzzz=float4(v0.xxxx)*float4(v1.yyyy)-float4(v0.yyyy)*float4(v1.xxxx); return SoAVector3f(xxxx,yyyy,zzzz); }
+FINLINE SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 xxxx=v0.yyyy*v1.zzzz-v0.zzzz*v1.yyyy; float4 yyyy=v0.zzzz*v1.xxxx-v0.xxxx*v1.zzzz; float4 zzzz=v0.xxxx*v1.yyyy-v0.yyyy*v1.xxxx; return SoAVector3f(xxxx,yyyy,zzzz); }
 
-FINLINE SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(float4(v.xxxx)); vv.yyyy = rcp(float4(v.yyyy)); vv.zzzz = rcp(float4(v.zzzz)); return vv; }
-FINLINE SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(float4(v.xxxx)); vv.yyyy = safe_rcp(float4(v.yyyy)); vv.zzzz = safe_rcp(float4(v.zzzz)); return vv; }
+FINLINE SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(v.xxxx); vv.yyyy = rcp(v.yyyy); vv.zzzz = rcp(v.zzzz); return vv; }
+FINLINE SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(v.xxxx); vv.yyyy = safe_rcp(v.yyyy); vv.zzzz = safe_rcp(v.zzzz); return vv; }
 //---VECTOR3 END---
 
 //---POINT3 BEGIN---
