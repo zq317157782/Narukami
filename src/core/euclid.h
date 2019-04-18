@@ -435,6 +435,34 @@ FINLINE int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
 
 //---POINT3 END---
 
+//---NORMAL3 BEGIN---
+template <typename T>
+struct Normal3
+{
+  public:
+    T x, y, z;
+    typedef T Scalar;
+    enum
+    {
+        N = 3
+    };
+
+  public:
+    FINLINE Normal3() : x(Zero), y(Zero), z(Zero) { }
+    FINLINE explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
+    FINLINE Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    //just for checking assert for debug
+#ifdef NARUKAMI_DEBUG
+    FINLINE Normal3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
+    FINLINE Normal3 &operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+#endif
+    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+};
+typedef Normal3<float> Normal3f;
+typedef Normal3<int> Normal3i;
+//---NORMAL3 END---
+
 //---POINT2 BEGIN---
 template <typename T>
 struct Point2
