@@ -374,7 +374,7 @@ FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){ const __m128 r = _mm_rsqrt_ps(v.x
 //TODO : need to refactor 
 struct SSE_ALIGNAS SoAPoint3f{
     union{
-        __m128 xxxx;
+        float4 xxxx;
         struct
         {
             float x0,x1,x2,x3;
@@ -382,7 +382,7 @@ struct SSE_ALIGNAS SoAPoint3f{
     };
 
     union{
-        __m128 yyyy;
+        float4 yyyy;
         struct
         {
             float y0,y1,y2,y3;
@@ -390,7 +390,7 @@ struct SSE_ALIGNAS SoAPoint3f{
     };
 
     union{
-        __m128 zzzz;
+        float4 zzzz;
         struct
         {
             float z0,z1,z2,z3;
@@ -400,13 +400,12 @@ struct SSE_ALIGNAS SoAPoint3f{
     typedef float Scalar;
 
 
-    SoAPoint3f():xxxx(_mm_set1_ps(Zero)),yyyy(_mm_set1_ps(Zero)),zzzz(_mm_set1_ps(Zero)){}
-    explicit SoAPoint3f(const float a):xxxx(_mm_set1_ps(a)),yyyy(_mm_set1_ps(a)),zzzz(_mm_set1_ps(a)){assert(!isnan(a));}
-    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(_mm_set_ps(v3.x,v2.x,v1.x,v0.x)),yyyy(_mm_set_ps(v3.y,v2.y,v1.y,v0.y)),zzzz(_mm_set_ps(v3.z,v2.z,v1.z,v0.z)){ }
-    explicit SoAPoint3f(const Point3f& v):xxxx(_mm_set1_ps(v.x)),yyyy(_mm_set1_ps(v.y)),zzzz(_mm_set1_ps(v.z)){ }
-    SoAPoint3f(const float x0,const float y0,const float z0,const float x1,const float y1,const float z1,const float x2,const float y2,const float z2,const float x3,const float y3,const float z3):xxxx(_mm_set_ps(x3,x2,x1,x3)),yyyy(_mm_set_ps(y3,y2,y1,y0)),zzzz(_mm_set_ps(z3,z2,z1,z0)){ assert(!isnan(x0));assert(!isnan(y0));assert(!isnan(z0)); assert(!isnan(x1));assert(!isnan(y1));assert(!isnan(z1)); assert(!isnan(x2));assert(!isnan(y2));assert(!isnan(z2)); assert(!isnan(x3));assert(!isnan(y3));assert(!isnan(z3)); }
-    SoAPoint3f(const __m128 x,const __m128 y,const __m128 z):xxxx(x),yyyy(y),zzzz(z){}
-    SoAPoint3f(const float x,const float y,const float z):xxxx(_mm_set1_ps(x)),yyyy(_mm_set1_ps(y)),zzzz(_mm_set1_ps(z)){}
+    SoAPoint3f():xxxx(Zero),yyyy(Zero),zzzz(Zero){}
+    explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v3.x,v2.x,v1.x,v0.x),yyyy(v3.y,v2.y,v1.y,v0.y),zzzz(v3.z,v2.z,v1.z,v0.z){ }
+    explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
@@ -417,18 +416,22 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) {
     return out;
 }
 
-FINLINE bool operator==(const SoAPoint3f& v0,const SoAPoint3f& v1){ 
-    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
-    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
-    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
-    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)==15;
+
+FINLINE int operator==(const SoAPoint3f& v0,const SoAPoint3f& v1){
+
+    bool4  mask_xxxx =(v0.xxxx==v1.xxxx);
+    bool4  mask_yyyy =(v0.yyyy==v1.yyyy);
+    bool4  mask_zzzz =(v0.zzzz==v1.zzzz);
+
+    return movemask((mask_xxxx&mask_yyyy)&mask_zzzz);
 }
-FINLINE bool operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
-    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
-    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
-    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
-    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)!=15;
+FINLINE int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
+    bool4  mask_xxxx =(v0.xxxx!=v1.xxxx);
+    bool4  mask_yyyy =(v0.yyyy!=v1.yyyy);
+    bool4  mask_zzzz =(v0.zzzz!=v1.zzzz);
+    return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
+
 
 //---POINT3 END---
 
