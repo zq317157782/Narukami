@@ -748,6 +748,13 @@ TEST(spectrum,index){
     EXPECT_EQ(a.b,2);
 }
 
+TEST(vertexbuffer,construct){
+    int data[3]={2,3,4};
+    VertexBuffer<int> buf(10,data);
+    EXPECT_EQ(buf[2],4);
+    load(buf,data,3,3);
+    EXPECT_EQ(buf[3],2);
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);

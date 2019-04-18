@@ -25,8 +25,31 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/euclid.h"
 #include "core/simd.h"
-
+#include <vector>
 NARUKAMI_BEGIN
+
+template <typename T>
+struct VertexBuffer
+{
+    int size;
+    std::unique_ptr<T[]> buffer;
+    VertexBuffer(const int size):size(size){
+        assert(size>0);
+        buffer = std::unique_ptr<T[]>(new T[size]);
+    }
+
+    VertexBuffer(const int size,void* data):VertexBuffer(size){
+        memcpy(buffer.get(),data,sizeof(T)*size);
+    }
+    
+    FINLINE T& operator[](const int idx){ assert(idx>=0&&idx<size); return buffer[idx]; }
+    FINLINE T& operator[](const int idx) const{ assert(idx>=0&&idx<size); return buffer[idx]; }
+};
+
+template <typename T>
+void load(VertexBuffer<T>& vb,void* data,const  int size,const int offset=0){
+    memcpy(vb.buffer.get()+offset,data,sizeof(T)*size);
+}
 
 
 struct Ray{
