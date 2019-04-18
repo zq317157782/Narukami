@@ -222,17 +222,19 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) {
     return out;
 }
 
-FINLINE bool operator==(const SoAVector3f& v0,const SoAVector3f& v1){ 
-    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
-    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
-    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
-    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)==15;
+FINLINE int operator==(const SoAVector3f& v0,const SoAVector3f& v1){
+
+    bool4  mask_xxxx =(v0.xxxx==v1.xxxx);
+    bool4  mask_yyyy =(v0.yyyy==v1.yyyy);
+    bool4  mask_zzzz =(v0.zzzz==v1.zzzz);
+
+    return movemask((mask_xxxx&mask_yyyy)&mask_zzzz);
 }
-FINLINE bool operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
-    __m128 mask_xxxx=_mm_cmpeq_ps(v0.xxxx,v1.xxxx);
-    __m128 mask_yyyy=_mm_cmpeq_ps(v0.yyyy,v1.yyyy);
-    __m128 mask_zzzz=_mm_cmpeq_ps(v0.zzzz,v1.zzzz);
-    return (_mm_movemask_ps(_mm_and_ps(_mm_and_ps(mask_xxxx,mask_yyyy),mask_zzzz))&15)!=15;
+FINLINE int operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
+    bool4  mask_xxxx =(v0.xxxx!=v1.xxxx);
+    bool4  mask_yyyy =(v0.yyyy!=v1.yyyy);
+    bool4  mask_zzzz =(v0.zzzz!=v1.zzzz);
+    return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
 FINLINE __m128 dot(const SoAVector3f& v0,const SoAVector3f& v1){ return float4(v0.xxxx)*float4(v1.xxxx)+float4(v0.yyyy)*float4(v1.yyyy)+float4(v0.zzzz)*float4(v1.zzzz); }

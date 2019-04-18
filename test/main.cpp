@@ -595,7 +595,13 @@ TEST(matrix4x4,mat_mul_soapoint){
 TEST(SoAVector3f,eq){
     SoAVector3f v1;
     SoAVector3f v2(0);
-    EXPECT_EQ(v1,v2);
+    EXPECT_EQ(v1==v2,15);
+}
+
+TEST(SoAVector3f,not_eq){
+    SoAVector3f v1;
+    SoAVector3f v2(1);
+    EXPECT_EQ(v1!=v2,15);
 }
 
 TEST(SoAVector3f,dot){
