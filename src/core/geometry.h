@@ -100,7 +100,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoABox &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
 } 
 
-struct HitInfo
+struct GeometryInteraction
 {
     float t;
     float u;
@@ -109,7 +109,7 @@ struct HitInfo
 };
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Ray& ray,const Triangle& triangle,HitInfo* hit=nullptr){
+FINLINE bool intersect(const Ray& ray,const Triangle& triangle,GeometryInteraction* hit=nullptr){
     auto O = ray.o;
     auto D = ray.d;
 
@@ -150,7 +150,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle,HitInfo* hit=null
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,HitInfo* hit=nullptr,__m128 mask=SSE_MASK_TRUE){
+FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,GeometryInteraction* hit=nullptr,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;

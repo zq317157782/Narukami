@@ -485,7 +485,7 @@ BENCHMARK(BM_matrix4x4_mul_point3_sse);
 
 
 static void BM_intersect_triangle(benchmark::State &state)
-{   narukami::HitInfo hit;
+{   narukami::GeometryInteraction hit;
      narukami::Ray r(narukami::Point3f(rand(),rand(),rand()),narukami::Vector3f(rand(),rand(),rand()));
     auto triangles = new narukami::Triangle[state.range(0)];
     
@@ -510,7 +510,7 @@ BENCHMARK(BM_intersect_triangle)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 static void BM_intersect_soatriangle(benchmark::State &state)
 {
-    narukami::HitInfo hit;
+    narukami::GeometryInteraction hit;
     narukami::SoARay r(narukami::Point3f(rand(),rand(),rand()),narukami::Vector3f(rand(),rand(),rand()));
     auto triangles = new narukami::SoATriangle[state.range(0)]();
     for(size_t i = 0; i < state.range(0); i++)

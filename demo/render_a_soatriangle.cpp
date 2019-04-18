@@ -12,7 +12,7 @@ int main(){
 
     std::vector<uint8_t> image;
 	for (int i = 0; i<128*128; ++i) {
-		narukami::HitInfo hit;
+		narukami::GeometryInteraction hit;
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
         bool b=intersect(ray,triangle,&hit);
 		
