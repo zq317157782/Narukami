@@ -750,7 +750,7 @@ TEST(spectrum,index){
 
 TEST(vertexbuffer,construct){
     int data[3]={2,3,4};
-    VertexBuffer<int> buf(10,data);
+    DataBuffer<int> buf(10,data);
     EXPECT_EQ(buf[2],4);
     load(buf,data,3,3);
     EXPECT_EQ(buf[3],2);

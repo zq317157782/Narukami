@@ -29,16 +29,16 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 template <typename T>
-struct VertexBuffer
+struct DataBuffer
 {
     int size;
     std::unique_ptr<T[]> buffer;
-    VertexBuffer(const int size):size(size){
+    DataBuffer(const int size):size(size){
         assert(size>0);
         buffer = std::unique_ptr<T[]>(new T[size]);
     }
 
-    VertexBuffer(const int size,void* data):VertexBuffer(size){
+    DataBuffer(const int size,void* data):DataBuffer(size){
         memcpy(buffer.get(),data,sizeof(T)*size);
     }
     
@@ -47,9 +47,10 @@ struct VertexBuffer
 };
 
 template <typename T>
-void load(VertexBuffer<T>& vb,void* data,const  int size,const int offset=0){
+void load(DataBuffer<T>& vb,void* data,const  int size,const int offset=0){
     memcpy(vb.buffer.get()+offset,data,sizeof(T)*size);
 }
+
 
 
 struct Ray{
