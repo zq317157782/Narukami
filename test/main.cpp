@@ -739,7 +739,13 @@ TEST(memory,alloc_aligned){
     auto alloced_area=alloc_aligned<128>(1000);
     EXPECT_EQ(((int)(alloced_area))%128,0);
     free_aligned(alloced_area);
-    EXPECT_EQ(alloced_area,0);
+    //EXPECT_EQ(alloced_area,nullptr);
+}
+#include "core/spectrum.h"
+TEST(spectrum,index){
+    Spectrum a(1,1,1);
+    a[2]=2;
+    EXPECT_EQ(a.b,2);
 }
 
 

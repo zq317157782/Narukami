@@ -23,22 +23,23 @@ SOFTWARE.
 */
 
 #pragma once
-/*
-narukami.h
-*/
 
-//marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
+#include "core/narukami.h"
+#include "core/constant.h"
+#include "core/math.h"
+NARUKAMI_BEGIN
+    struct Spectrum
+    {
+        union { struct { float x,y,z; }; struct { float r,g,b; }; };
+        typedef float Scalar;
+        enum { N = 3 };
+        FINLINE Spectrum():r(Zero),g(Zero),b(Zero){}
+        FINLINE Spectrum(const float r,const float g,const float b):r(r),g(g),b(b){ }
+        FINLINE float operator[](const int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
+        FINLINE float& operator[](const int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    };
 
-//define DEBUG marco
-#ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
-#else
-    #define NARUKAMI_DEBUG
-#endif
-
-#include <assert.h>
-#include <ostream>
-#include <iostream>
-#include "core/platform.h"
+    FINLINE bool operator==(const Spectrum& a,const Spectrum& b){ if((a.r==b.r)&&(a.g==b.g)&&(a.b==b.b)){ return true; } return false; }
+    FINLINE bool operator!=(const Spectrum& a,const Spectrum& b){ if((a.r!=b.r)||(a.g!=b.g)||(a.b!=b.b)){ return true; } return false; }
+    
+NARUKAMI_END

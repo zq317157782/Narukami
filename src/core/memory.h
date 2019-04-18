@@ -58,7 +58,6 @@ void free_aligned(void * ptr){
 #else
 	free(ptr);
 #endif
-	ptr = nullptr;
 }
 
 NARUKAMI_END
