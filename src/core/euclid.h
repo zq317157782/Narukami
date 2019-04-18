@@ -836,9 +836,9 @@ FINLINE SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
 }
 
 FINLINE SoAVector3f operator-(const SoAPoint3f& p0, const SoAPoint3f& p1){
-    auto xxxx=float4(p0.xxxx) - float4(p1.xxxx);
-    auto yyyy=float4(p0.yyyy) - float4(p1.yyyy);
-    auto zzzz=float4(p0.zzzz) - float4(p1.zzzz);
+    auto xxxx=p0.xxxx - p1.xxxx;
+    auto yyyy=p0.yyyy - p1.yyyy;
+    auto zzzz=p0.zzzz - p1.zzzz;
     return SoAVector3f(xxxx,yyyy,zzzz);
 }
 
