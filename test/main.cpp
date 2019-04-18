@@ -738,6 +738,8 @@ TEST(qbvh,qbvhnode_size){
 TEST(memory,alloc_aligned){
     auto alloced_area=alloc_aligned<128>(1000);
     EXPECT_EQ(((int)(alloced_area))%128,0);
+    free_aligned(alloced_area);
+    EXPECT_EQ(alloced_area,0);
 }
 
 

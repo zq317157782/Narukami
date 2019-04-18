@@ -47,4 +47,18 @@ void *alloc_aligned(size_t size){
 #endif
 }
 
+void free_aligned(void * ptr){
+	if(!ptr){
+		return;
+	}
+#ifdef NARUKAMI_IS_OSX
+	free(ptr);
+#elif defined(NARUKAMI_IS_WIN) && defined(_MSC_VER)
+	_aligned_free(ptr);
+#else
+	free(ptr);
+#endif
+	ptr = nullptr;
+}
+
 NARUKAMI_END
