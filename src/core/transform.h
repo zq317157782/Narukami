@@ -67,7 +67,7 @@ FINLINE Transform rotate_x(const float theta){
     Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,cos_theta,-sin_theta, Zero,Zero,sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
     return Transform(mat,inv_mat);
 }
-
+//clockwise
 FINLINE Transform rotate_y(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
@@ -76,7 +76,7 @@ FINLINE Transform rotate_y(const float theta){
     Matrix4x4 inv_mat(/*col0*/cos_theta,Zero,-sin_theta,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/sin_theta,Zero, cos_theta,Zero,/*col3*/Zero, Zero,Zero,One);
     return Transform(mat,inv_mat);
 }
-
+//clockwise
 FINLINE Transform rotate_z(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
@@ -87,12 +87,13 @@ FINLINE Transform rotate_z(const float theta){
 }
 
 //http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf
-FINLINE Transform rotate(const float theta,const Vector3f& normalized_axis){
+//clockwise
+FINLINE Transform rotate(const float theta,const Vector3f& axis){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
 
-    auto a =normalized_axis;
+    auto a =normalize(axis);
     auto t = (1.0f-cos_theta);
 
     Matrix4x4 mat;
@@ -115,6 +116,35 @@ FINLINE Transform rotate(const float theta,const Vector3f& normalized_axis){
     
 
     return Transform(mat,transpose(mat));
+}
+
+FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f& up){
+    auto forward=normalize(target-o);
+    auto right=cross(normalize(up),forward);
+    auto newUp=cross(forward,right);
+
+    Matrix4x4 cam2wrold;
+    //right
+    cam2wrold.m[0] = right.x;
+    cam2wrold.m[1] = right.y;
+    cam2wrold.m[2] = right.z;
+    cam2wrold.m[3] = Zero;
+    //newUp
+    cam2wrold.m[4] = newUp.x;
+    cam2wrold.m[5] = newUp.y;
+    cam2wrold.m[6] = newUp.z;
+    cam2wrold.m[7] = Zero;
+    //forward
+    cam2wrold.m[8]  = forward.x;
+    cam2wrold.m[9]  = forward.y;
+    cam2wrold.m[10] = forward.z;
+    cam2wrold.m[11] = Zero;
+    //pos
+    cam2wrold.m[12]  = o.x;
+    cam2wrold.m[13]  = o.y;
+    cam2wrold.m[14]  = o.z;
+    cam2wrold.m[15]  = One;
+    return Transform(transform_inverse(cam2wrold),cam2wrold);
 }
 
 NARUKAMI_END

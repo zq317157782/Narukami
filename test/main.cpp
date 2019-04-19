@@ -813,6 +813,21 @@ TEST(transform,rotate){
     //EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
+TEST(transform,look_at){
+    auto transform=look_at(Point3f(0,0,0),Point3f(5,0,0),Vector3f(0,1,0));
+    // std::cout<<transform.mat;
+    // std::cout<<transform.inv_mat;
+    auto v0=transform.mat * Vector3f(0,0,1);
+    EXPECT_FLOAT_EQ(v0.x,-1.0f);
+    EXPECT_FLOAT_EQ(v0.y, 0.0f);
+    EXPECT_FLOAT_EQ(v0.z, 0.0f);
+
+    auto v1=transform.mat * Vector3f(1,0,0);
+    EXPECT_FLOAT_EQ(v1.x, 0.0f);
+    EXPECT_FLOAT_EQ(v1.y, 0.0f);
+    EXPECT_FLOAT_EQ(v1.z, 1.0f);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
