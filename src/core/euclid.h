@@ -708,7 +708,7 @@ static FINLINE __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swiz
 
 //Blockwise inversion
 //https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion
-FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+FINLINE Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
     Matrix4x4 r;
     //extract 4 sub-matrix2x2
     // | A B |
@@ -755,6 +755,10 @@ FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
     return r;
 }
 
+FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+    return mat;
+}
+
 FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
     Matrix4x4 r(mat);
     _MM_TRANSPOSE4_PS(r.mVec[0],r.mVec[1],r.mVec[2],r.mVec[3]);
@@ -786,7 +790,7 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // r+=float4(M.mVec[2])*float4(v.z);
     // return Vector3f(r.x,r.y,r.z);
     
-    
+
     // 7ns
     float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
     float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;

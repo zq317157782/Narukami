@@ -528,13 +528,13 @@ TEST(matrix4x4,transform_inverse){
     EXPECT_EQ(mat5,mat4);
 }
 
-TEST(matrix4x4,inverse){
+TEST(matrix4x4,blockwise_inverse){
     Matrix4x4 mat;
-    Matrix4x4 mat2 = inverse(mat);
+    Matrix4x4 mat2 = blockwise_inverse(mat);
     EXPECT_TRUE(mat==mat2);
 
     Matrix4x4 mat3(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2);
-    Matrix4x4 mat4=inverse(mat3);
+    Matrix4x4 mat4=blockwise_inverse(mat3);
     Matrix4x4 mat5(0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f);
     EXPECT_EQ(mat5,mat4);
 }
