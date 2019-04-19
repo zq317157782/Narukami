@@ -786,11 +786,11 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // r+=float4(M.mVec[2])*float4(v.z);
     // return Vector3f(r.x,r.y,r.z);
     
+    
     // 7ns
     float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
     float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
-    float z =  M.m[3]*v.x+M.m[6]*v.y+M.m[10]*v.z;
-
+    float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z;
     return Vector3f(x,y,z);
 }
 
