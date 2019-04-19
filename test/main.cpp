@@ -33,6 +33,15 @@ TEST(math,cast_i2f){
     EXPECT_EQ(cast_f2i(y),x);
 }
 
+TEST(math,sin){
+    EXPECT_FLOAT_EQ(narukami::sin(deg2rad(90.0f)),1);
+}
+
+TEST(math,cos){
+    EXPECT_LT(narukami::cos(deg2rad(90.0f)),0.0000001);
+    EXPECT_GT(narukami::cos(deg2rad(90.0f)),-0.0000001);
+}
+
 TEST(math,min){
     float x=10;
     float y=20;
@@ -762,6 +771,46 @@ TEST(databuffer,assign){
     DataBuffer<int> buf2 = buf;
     EXPECT_EQ(buf2[2],4);
 
+}
+#include "core/transform.h"
+TEST(transform,translate){
+    auto transform = translate(Vector3f(1,0,0));
+    auto p0=transform.mat * Point3f(0,0,0);
+    EXPECT_EQ(p0,Point3f(1,0,0));
+    auto p1=transform.inv_mat * Point3f(0,0,0);
+    EXPECT_EQ(p1,Point3f(-1,0,0));
+}
+
+TEST(transform,scale){
+    auto transform = scale(0.5f,0.5f,0.5f);
+    auto p0=transform.mat * Point3f(1,0,0);
+    EXPECT_EQ(p0,Point3f(0.5f,0,0));
+    auto p1=transform.inv_mat * Point3f(1,0,0);
+    EXPECT_FLOAT_EQ(p1.x,2);
+}
+
+TEST(transform,rotate_x){
+    auto transform = rotate_x(90);
+    auto v0=transform.mat * Vector3f(0,0,1);
+    EXPECT_FLOAT_EQ(v0.x,0.0f);
+    EXPECT_FLOAT_EQ(v0.y,-1.0f);
+   // EXPECT_FLOAT_EQ(v0.z,0.0f);
+    auto v1=transform.inv_mat * Vector3f(0,0,1);
+    EXPECT_FLOAT_EQ(v1.x,0.0f);
+    EXPECT_FLOAT_EQ(v1.y,1.0f);
+   // EXPECT_FLOAT_EQ(v1.z,0.0f);
+}
+
+TEST(transform,rotate){
+    auto transform = rotate(90,Vector3f(1,0,0));
+    auto v0=transform.mat * Vector3f(0,0,1);
+    EXPECT_FLOAT_EQ(v0.x,0.0f);
+    EXPECT_FLOAT_EQ(v0.y,-1.0f);
+    //EXPECT_FLOAT_EQ(v0.z,0.0f);
+    auto v1=transform.inv_mat * Vector3f(0,0,1);
+    EXPECT_FLOAT_EQ(v1.x,0.0f);
+    EXPECT_FLOAT_EQ(v1.y,1.0f);
+    //EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
 int main(int argc, char* argv[]) {
