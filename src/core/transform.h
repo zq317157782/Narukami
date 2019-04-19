@@ -64,26 +64,25 @@ FINLINE Transform rotate_x(const float theta){
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
     Matrix4x4 mat(One,Zero,Zero,Zero, Zero,cos_theta,sin_theta, Zero,Zero,-sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
-    Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,cos_theta,-sin_theta, Zero,Zero,sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
-    return Transform(mat,inv_mat);
+    //Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,cos_theta,-sin_theta, Zero,Zero,sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
+    return Transform(mat,transpose(mat));
 }
 //clockwise
 FINLINE Transform rotate_y(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
-    Matrix4x4 mat(/*col0*/One,Zero,Zero,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/Zero,Zero, One,Zero,/*col3*/Zero, Zero,Zero,One);
-    Matrix4x4 inv_mat(/*col0*/cos_theta,Zero,-sin_theta,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/sin_theta,Zero, cos_theta,Zero,/*col3*/Zero, Zero,Zero,One);
-    return Transform(mat,inv_mat);
+    Matrix4x4 mat(/*col0*/cos_theta,Zero,-sin_theta,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/sin_theta,Zero, cos_theta,Zero,/*col3*/Zero, Zero,Zero,One);
+
+    return Transform(mat,transpose(mat));
 }
 //clockwise
 FINLINE Transform rotate_z(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
-    Matrix4x4 mat(/*col0*/One,Zero,Zero,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/Zero,Zero, One,Zero,/*col3*/Zero, Zero,Zero,One);
-    Matrix4x4 inv_mat(/*col0*/cos_theta,sin_theta,Zero,Zero, /*col1*/-sin_theta,cos_theta,Zero,Zero,/*col2*/Zero,Zero, One,Zero,/*col3*/Zero, Zero,Zero,One);
-    return Transform(mat,inv_mat);
+    Matrix4x4 mat(/*col0*/cos_theta,sin_theta,Zero,Zero, /*col1*/-sin_theta,cos_theta,Zero,Zero,/*col2*/Zero,Zero, One,Zero,/*col3*/Zero, Zero,Zero,One);
+    return Transform(mat,transpose(mat));
 }
 
 //http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf
