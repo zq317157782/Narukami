@@ -767,6 +767,7 @@ FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
     return r;
 }
 
+//TODO need optimal
 FINLINE Matrix4x4 minor(const Matrix4x4& mat){
     __m128 m0 = swizzle<1,0,0,0>(mat.mVec[1])
                *swizzle<2,2,1,1>(mat.mVec[2])
