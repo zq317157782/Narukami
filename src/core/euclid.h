@@ -573,6 +573,12 @@ public:
         m[14]=v[14];
         m[15]=v[15];
     }
+    Matrix4x4(const __m128 col0,const __m128 col1,const __m128 col2,const __m128 col3){
+        mVec[0]=col0;
+        mVec[1]=col1;
+        mVec[2]=col2;
+        mVec[3]=col3;
+    }
     FINLINE const float& operator[](const int idx) const { assert(idx >= 0 && idx < N); return m[idx];}
     FINLINE float& operator[](const int idx){ assert(idx >= 0 && idx < N); return m[idx];}
 };
@@ -755,15 +761,96 @@ FINLINE Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
     return r;
 }
 
-FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
-    return mat;
-}
-
 FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
     Matrix4x4 r(mat);
     _MM_TRANSPOSE4_PS(r.mVec[0],r.mVec[1],r.mVec[2],r.mVec[3]);
     return r;
 }
+
+FINLINE Matrix4x4 minor(const Matrix4x4& mat){
+    __m128 m0 = swizzle<1,0,0,0>(mat.mVec[1])
+               *swizzle<2,2,1,1>(mat.mVec[2])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m0 = m0 + swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m0 = m0 + swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m0 = m0 - swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m0 = m0 - swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m0 = m0 - swizzle<1,2,1,1>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
+    
+    __m128 m1 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[2])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m1 = m1 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m1 = m1 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m1 = m1 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m1 = m1 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m1 = m1 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
+     
+   __m128 m2 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[1])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m2 = m2 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m2 = m2 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m2 = m2 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m2 = m2 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m2 = m2 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
+
+    __m128 m3 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[1])
+               *swizzle<3,3,3,2>(mat.mVec[2]);
+    m3 = m3 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2]);
+    m3 = m3 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[2]);
+    m3 = m3 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2]);
+    m3 = m3 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2]);
+    m3 = m3 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,0,0,0>(mat.mVec[2]);
+    
+    return Matrix4x4(m0,m1,m2,m3);
+}
+
+FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+    return mat;
+}
+
 //---MATRIX4X4 END---
 
 //---GENERAL BEGIN---

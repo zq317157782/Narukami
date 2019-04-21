@@ -552,6 +552,12 @@ TEST(matrix4x4,adj2x2){
     EXPECT_TRUE(all(m2==m1));
 }
 
+TEST(matrix4x4,minor){
+   Matrix4x4 mat;
+   auto mat2=minor(mat);
+   EXPECT_EQ(mat,mat2);
+}
+
 
 
 TEST(matrix4x4,transpose){
@@ -735,21 +741,21 @@ TEST(geometry,ray_intersect_soatriangle){
 // }
 
 
-#include "core/qbvh.h"
+// #include "core/qbvh.h"
 
-TEST(qbvh,qbvhnode_size){
-    EXPECT_EQ(sizeof(QBVHNode),128);
-}
+// TEST(qbvh,qbvhnode_size){
+//     EXPECT_EQ(sizeof(QBVHNode),128);
+// }
 
 
 #include "core/memory.h"
 
-TEST(memory,alloc_aligned){
-    auto alloced_area=alloc_aligned<128>(1000);
-    EXPECT_EQ(((int)(alloced_area))%128,0);
-    free_aligned(alloced_area);
-    //EXPECT_EQ(alloced_area,nullptr);
-}
+// TEST(memory,alloc_aligned){
+//     auto alloced_area=alloc_aligned<128>(1000);
+//     EXPECT_EQ(((int)(alloced_area))%128,0);
+//     free_aligned(alloced_area);
+//     //EXPECT_EQ(alloced_area,nullptr);
+// }
 #include "core/spectrum.h"
 TEST(spectrum,index){
     Spectrum a(1,1,1);
@@ -757,21 +763,21 @@ TEST(spectrum,index){
     EXPECT_EQ(a.b,2);
 }
 
-TEST(databuffer,construct){
-    int data[3]={2,3,4};
-    DataBuffer<int> buf(10,data);
-    EXPECT_EQ(buf[2],4);
-    load(buf,data,3,3);
-    EXPECT_EQ(buf[3],2);
-}
+// TEST(databuffer,construct){
+//     int data[3]={2,3,4};
+//     DataBuffer<int> buf(10,data);
+//     EXPECT_EQ(buf[2],4);
+//     load(buf,data,3,3);
+//     EXPECT_EQ(buf[3],2);
+// }
 
-TEST(databuffer,assign){
-    int data[3]={2,3,4};
-    DataBuffer<int> buf(3,data);
-    DataBuffer<int> buf2 = buf;
-    EXPECT_EQ(buf2[2],4);
+// TEST(databuffer,assign){
+//     int data[3]={2,3,4};
+//     DataBuffer<int> buf(3,data);
+//     DataBuffer<int> buf2 = buf;
+//     EXPECT_EQ(buf2[2],4);
 
-}
+// }
 #include "core/transform.h"
 TEST(transform,translate){
     auto transform = translate(Vector3f(1,0,0));
