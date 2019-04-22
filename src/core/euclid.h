@@ -123,18 +123,18 @@ struct SSE_ALIGNAS SSEVector3f{
     };
     
     union{
-        __m128 xyzw;
+        float4 xyzw;
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEVector3f():xyzw(_mm_set1_ps(Zero)){ }
-    FINLINE SSEVector3f(const __m128 _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEVector3f(const float x,const float y,const float z):xyzw(_mm_set_ps(z,z,y,x)){ }
-    FINLINE explicit SSEVector3f(const float a):xyzw(_mm_set1_ps(a)){ }
-    FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(_mm_set_ps(v.z,v.z,v.y,v.x)){ }
+    FINLINE SSEVector3f():xyzw(float4(Zero)){ }
+    FINLINE SSEVector3f(const float4& _xyzw):xyzw(_xyzw){ }
+    FINLINE SSEVector3f(const float x,const float y,const float z):xyzw(float4(x,y,z,Zero)){ }
+    FINLINE explicit SSEVector3f(const float a):xyzw(float4(a)){ }
+    FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,Zero)){ }
 
-    FINLINE operator __m128&(){ return xyzw; }
-    FINLINE  operator const __m128&() const { return xyzw; }
+    FINLINE operator float4&(){ return xyzw; }
+    FINLINE  operator const float4&() const { return xyzw; }
 
     FINLINE SSEVector3f& operator=(const Vector3f& v){ x=v.x; y=v.y; z=v.z; return (*this); } 
 
@@ -146,35 +146,35 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SSEVector3f &v) { out
 
 FINLINE SSEVector3f operator+(const SSEVector3f& v){ return v; }
  //0x80000000 xor x(y,z)
-FINLINE SSEVector3f operator-(const SSEVector3f& v){ auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x80000000)); return _mm_xor_ps(v.xyzw,mask); }
+FINLINE SSEVector3f operator-(const SSEVector3f& v){ return - v.xyzw;}
 
-FINLINE SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_mul_ps(v1,v2); }
-FINLINE SSEVector3f operator*(const SSEVector3f& v1,const float a){ return _mm_mul_ps(v1,SSEVector3f(a)); }
-FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){ assert(a!=0); return _mm_div_ps(v1,SSEVector3f(a)); }
+FINLINE SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){ return  v1.xyzw*v2.xyzw; }
+FINLINE SSEVector3f operator*(const SSEVector3f& v1,const float a){ return v1.xyzw*float4(a); }
+FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
 
 FINLINE SSEVector3f& operator*=(SSEVector3f& v1,const float a){ v1=v1*a; return v1; }
 FINLINE SSEVector3f& operator/=(SSEVector3f& v1,const float f){ v1=v1/f; return v1; }
 
 //only 3 bit used
-FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&0x7)==0x7; }
+FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
 FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&0x7)!=0x0; }
 
-FINLINE SSEVector3f rcp(const SSEVector3f& v) { const __m128 r = _mm_rcp_ps(v); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, v))); }
+FINLINE SSEVector3f rcp(const SSEVector3f& v) { return rcp(v.xyzw);}
 //0x7FFFFFFF and x(y,z)
-FINLINE SSEVector3f abs(const SSEVector3f& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
-FINLINE SSEVector3f sign(const SSEVector3f& v){ auto mask = _mm_cmplt_ps(v,SSEVector3f(Zero)); return _mm_blendv_ps(SSEVector3f(One),-SSEVector3f(One),mask); }
+FINLINE SSEVector3f abs(const SSEVector3f& v){ return abs(v.xyzw); }
+FINLINE SSEVector3f sign(const SSEVector3f& v){ return sign(v.xyzw); }
 
 //FINLINE float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
 //Use SSE 4.0's _mm_dp_ps
 FINLINE float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_cvtss_f32(_mm_dp_ps(v1.xyzw,v2.xyzw,0x7F)); }
-FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){ float4 a0=float4(v1); float4 b0=swizzle<1,2,0,3>(v2); float4 a1=swizzle<1,2,0,3>(v1); float4 b1=float4(v2); return swizzle<1,2,0,3>(msub(a0,b0,a1*b1)); }
+FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){ float4 a0=v1.xyzw; float4 b0=swizzle<1,2,0,3>(v2.xyzw); float4 a1=swizzle<1,2,0,3>(v1.xyzw); float4 b1=v2.xyzw; return swizzle<1,2,0,3>(msub(a0,b0,a1*b1)); }
 
 FINLINE float length(const SSEVector3f& v){ return sqrt(dot(v,v));}
 FINLINE float sqrlen(const SSEVector3f& v){ return dot(v,v);}
 FINLINE SSEVector3f normalize(const SSEVector3f& v){ return v*rsqrt(dot(v,v)); }
 
-FINLINE SSEVector3f sqrt(const SSEVector3f& v){ return _mm_sqrt_ps(v.xyzw); }
-FINLINE SSEVector3f rsqrt(const SSEVector3f& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
+FINLINE SSEVector3f sqrt(const SSEVector3f& v){ return sqrt(v.xyzw); }
+FINLINE SSEVector3f rsqrt(const SSEVector3f& v){return rsqrt(v.xyzw);}
 
 
 //SoA struct vector3f
@@ -324,18 +324,18 @@ struct SSE_ALIGNAS SSEPoint3f{
     };
     
     union{
-        __m128 xyzw;
+        float4 xyzw;
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEPoint3f():xyzw(_mm_set1_ps(Zero)){ }
-    FINLINE SSEPoint3f(const __m128 _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEPoint3f(const float x,const float y,const float z):xyzw(_mm_set_ps(z,z,y,x)){ }
-    FINLINE explicit SSEPoint3f(const float a):xyzw(_mm_set1_ps(a)){ }
-    FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(_mm_set_ps(v.z,v.z,v.y,v.x)){ }
+    FINLINE SSEPoint3f():xyzw(float4(Zero)){ }
+    FINLINE SSEPoint3f(const float4& _xyzw):xyzw(_xyzw){ }
+    FINLINE SSEPoint3f(const float x,const float y,const float z):xyzw(float4(x,y,z,One)){ }
+    FINLINE explicit SSEPoint3f(const float a):xyzw(float4(a)){ }
+    FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,One)){ }
 
-    FINLINE operator __m128&(){ return xyzw; }
-    FINLINE  operator const __m128&() const { return xyzw; }
+    FINLINE operator float4&(){ return xyzw; }
+    FINLINE  operator const float4&() const { return xyzw; }
 
     FINLINE SSEPoint3f& operator=(const Point3f& v){ x=v.x; y=v.y; z=v.z; return (*this); } 
 
@@ -347,11 +347,11 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SSEPoint3f &v) { out 
 
 FINLINE SSEPoint3f operator+(const SSEPoint3f& v){ return v; }
  //0x80000000 xor x(y,z)
-FINLINE SSEPoint3f operator-(const SSEPoint3f& v){ auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x80000000)); return _mm_xor_ps(v.xyzw,mask); }
+FINLINE SSEPoint3f operator-(const SSEPoint3f& v){ return -v.xyzw;}
 
-FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const SSEPoint3f& v2){ return _mm_mul_ps(v1,v2); }
-FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const float a){ return _mm_mul_ps(v1,SSEPoint3f(a)); }
-FINLINE SSEPoint3f operator/(const SSEPoint3f& v1,const float a){ assert(a!=0); return _mm_div_ps(v1,SSEPoint3f(a)); }
+FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const SSEPoint3f& v2){ return v1.xyzw*v2.xyzw; }
+FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const float a){ return v1.xyzw*float4(a); }
+FINLINE SSEPoint3f operator/(const SSEPoint3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
 
 FINLINE SSEPoint3f& operator*=(SSEPoint3f& v1,const float a){ v1=v1*a; return v1; }
 FINLINE SSEPoint3f& operator/=(SSEPoint3f& v1,const float f){ v1=v1/f; return v1; }
@@ -360,15 +360,15 @@ FINLINE SSEPoint3f& operator/=(SSEPoint3f& v1,const float f){ v1=v1/f; return v1
 FINLINE bool operator==(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
 FINLINE bool operator!=(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0; }
 
-FINLINE SSEPoint3f rcp(const SSEPoint3f& v) { const __m128 r = _mm_rcp_ps(v); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, v))); }
+FINLINE SSEPoint3f rcp(const SSEPoint3f& v) {return rcp(v.xyzw);}
 //0x7FFFFFFF and x(y,z)
-FINLINE SSEPoint3f abs(const SSEPoint3f& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
-FINLINE SSEPoint3f sign(const SSEPoint3f& v){ auto mask = _mm_cmplt_ps(v,SSEPoint3f(Zero)); return _mm_blendv_ps(SSEPoint3f(One),-SSEPoint3f(One),mask); }
+FINLINE SSEPoint3f abs(const SSEPoint3f& v){return abs(v.xyzw);}
+FINLINE SSEPoint3f sign(const SSEPoint3f& v){return sign(v.xyzw);}
 
-FINLINE float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
+FINLINE float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v.xyzw); float4 c=swizzle<2>(v.xyzw); return _mm_cvtss_f32(a+b+c);}
 
-FINLINE SSEPoint3f sqrt(const SSEPoint3f& v){ return _mm_sqrt_ps(v.xyzw); }
-FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
+FINLINE SSEPoint3f sqrt(const SSEPoint3f& v){ return sqrt(v.xyzw); }
+FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){return rsqrt(v.xyzw);}
 
 
 //TODO : need to refactor 
@@ -932,6 +932,9 @@ FINLINE float  determinant(const Matrix4x4& mat){
 }
 
 FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+    // auto tran_mat = transpose(mat);
+    // auto cofactor_mat = cofactor(tran_mat);
+    //  float4(mat.mVec[0])*float4(cofactor_mat.mVec[0])
     return mat;
 }
 
@@ -946,9 +949,9 @@ template <typename T>
 FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> p; p.x = p1.x - p2.x; p.y = p1.y - p2.y; p.z = p1.z - p2.z; return p; }
 
 
-FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_add_ps(p,v); }
-FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return _mm_sub_ps(p,v); }
-FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return _mm_sub_ps(p1,p2); }
+FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw+v.xyzw; }
+FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw-v.xyzw; }
+FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return p1.xyzw-p2.xyzw; }
 
 FINLINE float distance(const Point3f& p1,const Point3f& p2){ return length(p2-p1); }
 
