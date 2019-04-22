@@ -441,7 +441,11 @@ TEST(float4 ,reduce_max_mask){
     EXPECT_EQ(mask,2);
 }
 
-
+TEST(float4,vreduce_add){
+    float4 a(1,2,3,4);
+    auto b =vreduce_add(a);
+    EXPECT_TRUE(all(b==float4(10)));
+}
 // TEST(float4 ,safe_rcp){
 //     float4 a(0);
 //     auto b=safe_rcp(a);

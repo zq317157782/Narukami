@@ -141,6 +141,7 @@ FINLINE  float4 safe_rcp(const float4& x){ return rcp(zero_fix(x)); }
 FINLINE  float4 min(const float4& x,const float4& y){ return _mm_min_ps(x.xyzw,y.xyzw); }
 FINLINE  float4 max(const float4& x,const float4& y){ return _mm_max_ps(x.xyzw,y.xyzw); }
 
+FINLINE  float4 vreduce_add(const float4& x){auto a  = x+swizzle<1,0,3,2>(x); auto b = a + swizzle<2,3,0,1>(a); return b; }
 FINLINE  float4 vreduce_min(const float4& x){ auto a = min(swizzle<1,0,3,2>(x),x); auto b = min(swizzle<2,3,0,1>(a),a); return b; }
 FINLINE  float4 vreduce_max(const float4& x){ auto a = max(swizzle<1,0,3,2>(x),x); auto b = max(swizzle<2,3,0,1>(a),a); return b; }
 
