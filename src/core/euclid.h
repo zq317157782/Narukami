@@ -497,7 +497,7 @@ public:
     union{
         float m[16];
         float mn[4][4];
-        __m128 mVec[4];
+        float4 mVec[4];
     };
     typedef float Scalar;
     enum
@@ -573,7 +573,7 @@ public:
         m[14]=v[14];
         m[15]=v[15];
     }
-    Matrix4x4(const __m128 col0,const __m128 col1,const __m128 col2,const __m128 col3){
+    Matrix4x4(const float4& col0,const float4& col1,const float4& col2,const float4& col3){
         mVec[0]=col0;
         mVec[1]=col1;
         mVec[2]=col2;
@@ -593,30 +593,30 @@ FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
 
 FINLINE bool operator==(const Matrix4x4& A,const Matrix4x4& B){
 
-    auto bool_i0 = float4(A.mVec[0])==float4(B.mVec[0]);
-    auto bool_i1 = float4(A.mVec[1])==float4(B.mVec[1]);
-    auto bool_i2 = float4(A.mVec[2])==float4(B.mVec[2]);
-    auto bool_i3 = float4(A.mVec[3])==float4(B.mVec[3]);
+    auto bool_i0 = A.mVec[0]==B.mVec[0];
+    auto bool_i1 = A.mVec[1]==B.mVec[1];
+    auto bool_i2 = A.mVec[2]==B.mVec[2];
+    auto bool_i3 = A.mVec[3]==B.mVec[3];
 
     return all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
 FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
 
-    auto bool_i0 = float4(A.mVec[0])==float4(B.mVec[0]);
-    auto bool_i1 = float4(A.mVec[1])==float4(B.mVec[1]);
-    auto bool_i2 = float4(A.mVec[2])==float4(B.mVec[2]);
-    auto bool_i3 = float4(A.mVec[3])==float4(B.mVec[3]);
+    auto bool_i0 = A.mVec[0]==B.mVec[0];
+    auto bool_i1 = A.mVec[1]==B.mVec[1];
+    auto bool_i2 = A.mVec[2]==B.mVec[2];
+    auto bool_i3 = A.mVec[3]==B.mVec[3];
 
    return not_all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
 FINLINE Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
     Matrix4x4 r;
-    r.mVec[0] = float4(A.mVec[0])+float4(B.mVec[0]);
-    r.mVec[1] = float4(A.mVec[1])+float4(B.mVec[1]);
-    r.mVec[2] = float4(A.mVec[2])+float4(B.mVec[2]);
-    r.mVec[3] = float4(A.mVec[3])+float4(B.mVec[3]);
+    r.mVec[0] = A.mVec[0]+B.mVec[0];
+    r.mVec[1] = A.mVec[1]+B.mVec[1];
+    r.mVec[2] = A.mVec[2]+B.mVec[2];
+    r.mVec[3] = A.mVec[3]+B.mVec[3];
     return r;
 }
 
@@ -624,28 +624,28 @@ FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     
     Matrix4x4 ret;
 
-    float4 r=float4(A.mVec[0])*float4(B.m[0]);
-    r+=float4(A.mVec[1])*float4(B.m[1]);
-    r+=float4(A.mVec[2])*float4(B.m[2]);
-    r+=float4(A.mVec[3])*float4(B.m[3]);
+    float4 r=A.mVec[0]*B.m[0];
+    r+=A.mVec[1]*B.m[1];
+    r+=A.mVec[2]*B.m[2];
+    r+=A.mVec[3]*B.m[3];
     ret.mVec[0]=r.xyzw;
 
-    r =float4(A.mVec[0])*float4(B.m[4]);
-    r+=float4(A.mVec[1])*float4(B.m[5]);
-    r+=float4(A.mVec[2])*float4(B.m[6]);
-    r+=float4(A.mVec[3])*float4(B.m[7]);
+    r =A.mVec[0]*B.m[4];
+    r+=A.mVec[1]*B.m[5];
+    r+=A.mVec[2]*B.m[6];
+    r+=A.mVec[3]*B.m[7];
     ret.mVec[1]=r.xyzw;
 
-    r =float4(A.mVec[0])*float4(B.m[8]);
-    r+=float4(A.mVec[1])*float4(B.m[9]);
-    r+=float4(A.mVec[2])*float4(B.m[10]);
-    r+=float4(A.mVec[3])*float4(B.m[11]);
+    r =A.mVec[0]*B.m[8];
+    r+=A.mVec[1]*B.m[9];
+    r+=A.mVec[2]*B.m[10];
+    r+=A.mVec[3]*B.m[11];
     ret.mVec[2]=r.xyzw;
 
-    r =float4(A.mVec[0])*float4(B.m[12]);
-    r+=float4(A.mVec[1])*float4(B.m[13]);
-    r+=float4(A.mVec[2])*float4(B.m[14]);
-    r+=float4(A.mVec[3])*float4(B.m[15]);
+    r =A.mVec[0]*B.m[12];
+    r+=A.mVec[1]*B.m[13];
+    r+=A.mVec[2]*B.m[14];
+    r+=A.mVec[3]*B.m[15];
     ret.mVec[3]=r.xyzw;
     
     return ret;
@@ -769,160 +769,160 @@ FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
 
 //TODO need optimal
 FINLINE Matrix4x4 minor(const Matrix4x4& mat){
-    __m128 m0 = float4(swizzle<1,0,0,0>(mat.mVec[1]))
-               *float4(swizzle<2,2,1,1>(mat.mVec[2]))
-               *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m0 = m0 + float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[2]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m0 = m0 + float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[2]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<1,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[2]))
-             *float4(swizzle<2,0,0,0>(mat.mVec[3]));
+    __m128 m0 = swizzle<1,0,0,0>(mat.mVec[1])
+               *swizzle<2,2,1,1>(mat.mVec[2])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m0 = m0 + swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m0 = m0 + swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m0 = m0 - swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m0 = m0 - swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m0 = m0 - swizzle<1,2,1,1>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
     
-    __m128 m1 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<2,2,1,1>(mat.mVec[2]))
-               *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m1 = m1 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[2]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m1 = m1 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[2]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<1,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[2]))
-             *float4(swizzle<2,0,0,0>(mat.mVec[3]));
+    __m128 m1 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[2])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m1 = m1 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m1 = m1 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m1 = m1 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[2])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m1 = m1 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[2])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m1 = m1 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[2])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
      
-   __m128 m2 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<2,2,1,1>(mat.mVec[1]))
-               *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m2 = m2 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m2 = m2 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[1]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[1]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<1,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<2,0,0,0>(mat.mVec[3]));
+   __m128 m2 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[1])
+               *swizzle<3,3,3,2>(mat.mVec[3]);
+    m2 = m2 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m2 = m2 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[3]);
+    m2 = m2 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[3]);
+    m2 = m2 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[3]);
+    m2 = m2 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,0,0,0>(mat.mVec[3]);
 
-    __m128 m3 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<2,2,1,1>(mat.mVec[1]))
-               *float4(swizzle<3,3,3,2>(mat.mVec[2]));
-    m3 = m3 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]));
-    m3 = m3 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[1]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,0,0,0>(mat.mVec[1]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<1,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<2,0,0,0>(mat.mVec[2]));
+    __m128 m3 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,2,1,1>(mat.mVec[1])
+               *swizzle<3,3,3,2>(mat.mVec[2]);
+    m3 = m3 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2]);
+    m3 = m3 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<2,2,1,1>(mat.mVec[2]);
+    m3 = m3 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,0,0,0>(mat.mVec[2]);
+    m3 = m3 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,0,0,0>(mat.mVec[1])
+             *swizzle<3,3,3,2>(mat.mVec[2]);
+    m3 = m3 - swizzle<1,2,1,1>(mat.mVec[0])
+             *swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,0,0,0>(mat.mVec[2]);
     return Matrix4x4(m0,m1,m2,m3);
 }
 
 FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
-    __m128 m0 = float4(swizzle<1,0,0,0>(mat.mVec[1]))
-               *float4(swizzle<2,3,1,2>(mat.mVec[2]))
-               *float4(swizzle<3,2,3,1>(mat.mVec[3]));
-    m0 = m0 + float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[2]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[3]));
-    m0 = m0 + float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[2]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<3,3,3,2>(mat.mVec[1]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[2]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<2,2,1,1>(mat.mVec[1]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[2]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[3]));
-    m0 = m0 - float4(swizzle<1,0,1,0>(mat.mVec[1]))
-             *float4(swizzle<3,2,3,1>(mat.mVec[2]))
-             *float4(swizzle<2,3,0,2>(mat.mVec[3]));
+    __m128 m0 = swizzle<1,0,0,0>(mat.mVec[1])
+               *swizzle<2,3,1,2>(mat.mVec[2])
+               *swizzle<3,2,3,1>(mat.mVec[3]);
+    m0 = m0 + swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<3,0,3,0>(mat.mVec[2])
+             *swizzle<1,3,0,2>(mat.mVec[3]);
+    m0 = m0 + swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<1,2,0,1>(mat.mVec[2])
+             *swizzle<2,0,1,0>(mat.mVec[3]);
+    m0 = m0 - swizzle<3,3,3,2>(mat.mVec[1])
+             *swizzle<2,0,1,0>(mat.mVec[2])
+             *swizzle<1,2,0,1>(mat.mVec[3]);
+    m0 = m0 - swizzle<2,2,1,1>(mat.mVec[1])
+             *swizzle<1,3,0,2>(mat.mVec[2])
+             *swizzle<3,0,3,0>(mat.mVec[3]);
+    m0 = m0 - swizzle<1,0,1,0>(mat.mVec[1])
+             *swizzle<3,2,3,1>(mat.mVec[2])
+             *swizzle<2,3,0,2>(mat.mVec[3]);
 
-    __m128 m1 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<3,2,3,1>(mat.mVec[2]))
-               *float4(swizzle<2,3,1,2>(mat.mVec[3]));
-    m1 = m1 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[2]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[3]));
-    m1 = m1 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[2]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<1,0,0,0>(mat.mVec[0]))
-             *float4(swizzle<2,3,1,2>(mat.mVec[2]))
-             *float4(swizzle<3,2,3,1>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[2]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[3]));
-    m1 = m1 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[2]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[3]));
+    __m128 m1 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<3,2,3,1>(mat.mVec[2])
+               *swizzle<2,3,1,2>(mat.mVec[3]);
+    m1 = m1 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,3,0,2>(mat.mVec[2])
+             *swizzle<3,0,3,0>(mat.mVec[3]);
+    m1 = m1 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,0,1,0>(mat.mVec[2])
+             *swizzle<1,2,0,1>(mat.mVec[3]);
+    m1 = m1 - swizzle<1,0,0,0>(mat.mVec[0])
+             *swizzle<2,3,1,2>(mat.mVec[2])
+             *swizzle<3,2,3,1>(mat.mVec[3]);
+    m1 = m1 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,0,3,0>(mat.mVec[2])
+             *swizzle<1,3,0,2>(mat.mVec[3]);
+    m1 = m1 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,2,0,1>(mat.mVec[2])
+             *swizzle<2,0,1,0>(mat.mVec[3]);
 
-    __m128 m2 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<2,3,1,2>(mat.mVec[1]))
-               *float4(swizzle<3,2,3,1>(mat.mVec[3]));
-    m2 = m2 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[1]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[3]));
-    m2 = m2 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[1]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[1]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[1]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[3]));
-    m2 = m2 - float4(swizzle<1,0,1,0>(mat.mVec[0]))
-             *float4(swizzle<3,2,3,1>(mat.mVec[1]))
-             *float4(swizzle<2,3,0,2>(mat.mVec[3]));
+    __m128 m2 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<2,3,1,2>(mat.mVec[1])
+               *swizzle<3,2,3,1>(mat.mVec[3]);
+    m2 = m2 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,0,3,0>(mat.mVec[1])
+             *swizzle<1,3,0,2>(mat.mVec[3]);
+    m2 = m2 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,2,0,1>(mat.mVec[1])
+             *swizzle<2,0,1,0>(mat.mVec[3]);
+    m2 = m2 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,0,1,0>(mat.mVec[1])
+             *swizzle<1,2,0,1>(mat.mVec[3]);
+    m2 = m2 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,3,0,2>(mat.mVec[1])
+             *swizzle<3,0,3,0>(mat.mVec[3]);
+    m2 = m2 - swizzle<1,0,1,0>(mat.mVec[0])
+             *swizzle<3,2,3,1>(mat.mVec[1])
+             *swizzle<2,3,0,2>(mat.mVec[3]);
 
-    __m128 m3 = float4(swizzle<1,0,0,0>(mat.mVec[0]))
-               *float4(swizzle<3,2,3,1>(mat.mVec[1]))
-               *float4(swizzle<2,3,1,2>(mat.mVec[2]));
-    m3 = m3 + float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[1]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[2]));
-    m3 = m3 + float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[1]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<1,0,0,0>(mat.mVec[0]))
-             *float4(swizzle<2,3,1,2>(mat.mVec[1]))
-             *float4(swizzle<3,2,3,1>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<2,2,1,1>(mat.mVec[0]))
-             *float4(swizzle<3,0,3,0>(mat.mVec[1]))
-             *float4(swizzle<1,3,0,2>(mat.mVec[2]));
-    m3 = m3 - float4(swizzle<3,3,3,2>(mat.mVec[0]))
-             *float4(swizzle<1,2,0,1>(mat.mVec[1]))
-             *float4(swizzle<2,0,1,0>(mat.mVec[2]));
+    __m128 m3 = swizzle<1,0,0,0>(mat.mVec[0])
+               *swizzle<3,2,3,1>(mat.mVec[1])
+               *swizzle<2,3,1,2>(mat.mVec[2]);
+    m3 = m3 + swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<1,3,0,2>(mat.mVec[1])
+             *swizzle<3,0,3,0>(mat.mVec[2]);
+    m3 = m3 + swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<2,0,1,0>(mat.mVec[1])
+             *swizzle<1,2,0,1>(mat.mVec[2]);
+    m3 = m3 - swizzle<1,0,0,0>(mat.mVec[0])
+             *swizzle<2,3,1,2>(mat.mVec[1])
+             *swizzle<3,2,3,1>(mat.mVec[2]);
+    m3 = m3 - swizzle<2,2,1,1>(mat.mVec[0])
+             *swizzle<3,0,3,0>(mat.mVec[1])
+             *swizzle<1,3,0,2>(mat.mVec[2]);
+    m3 = m3 - swizzle<3,3,3,2>(mat.mVec[0])
+             *swizzle<1,2,0,1>(mat.mVec[1])
+             *swizzle<2,0,1,0>(mat.mVec[2]);
     return Matrix4x4(m0,m1,m2,m3);
 }
 
@@ -973,10 +973,10 @@ FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
 }
 
 FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
-    float4 r=float4(M.mVec[0])*float4(v.x);
-    r+=float4(M.mVec[1])*float4(v.y);
-    r+=float4(M.mVec[2])*float4(v.z);
-    r+=float4(M.mVec[3])*float4(One);
+    float4 r=M.mVec[0]*v.x;
+    r+=M.mVec[1]*v.y;
+    r+=M.mVec[2]*v.z;
+    r+=M.mVec[3]*One;
     return Point3f(r.x,r.y,r.z);
 }
 
@@ -1007,36 +1007,36 @@ FINLINE SSEPoint3f operator*(const Matrix4x4& M,const SSEPoint3f& v){
 
 
 FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
-    float4 r_xxxx=    float4(swizzle<0,0,0,0>(M.mVec[0]))/*m00*/*float4(v.xxxx);
-    r_xxxx = r_xxxx + float4(swizzle<0,0,0,0>(M.mVec[1]))/*m10*/*float4(v.yyyy);
-    r_xxxx = r_xxxx + float4(swizzle<0,0,0,0>(M.mVec[2]))/*m20*/*float4(v.zzzz);
+    float4 r_xxxx=    swizzle<0,0,0,0>(M.mVec[0])/*m00*/*v.xxxx;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[1])/*m10*/*v.yyyy;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[2])/*m20*/*v.zzzz;
 
-    float4 r_yyyy=    float4(swizzle<1,1,1,1>(M.mVec[0]))/*m01*/*float4(v.xxxx);
-    r_yyyy = r_yyyy + float4(swizzle<1,1,1,1>(M.mVec[1]))/*m11*/*float4(v.yyyy);
-    r_yyyy = r_yyyy + float4(swizzle<1,1,1,1>(M.mVec[2]))/*m21*/*float4(v.zzzz);
+    float4 r_yyyy=    swizzle<1,1,1,1>(M.mVec[0])/*m01*/*v.xxxx;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[1])/*m11*/*v.yyyy;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[2])/*m21*/*v.zzzz;
 
-    float4 r_zzzz=    float4(swizzle<2,2,2,2>(M.mVec[0]))/*m02*/*float4(v.xxxx);
-    r_zzzz = r_zzzz + float4(swizzle<2,2,2,2>(M.mVec[1]))/*m12*/*float4(v.yyyy);
-    r_zzzz = r_zzzz + float4(swizzle<2,2,2,2>(M.mVec[2]))/*m22*/*float4(v.zzzz);
+    float4 r_zzzz=    swizzle<2,2,2,2>(M.mVec[0])/*m02*/*v.xxxx;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[1])/*m12*/*v.yyyy;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
 
     return SoAVector3f(r_xxxx,r_yyyy,r_zzzz);
 }
 
 FINLINE SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
-    float4 r_xxxx=    float4(swizzle<0,0,0,0>(M.mVec[0]))/*m00*/*float4(v.xxxx);
-    r_xxxx = r_xxxx + float4(swizzle<0,0,0,0>(M.mVec[1]))/*m10*/*float4(v.yyyy);
-    r_xxxx = r_xxxx + float4(swizzle<0,0,0,0>(M.mVec[2]))/*m20*/*float4(v.zzzz);
-    r_xxxx = r_xxxx + float4(swizzle<0,0,0,0>(M.mVec[3]));
+    float4 r_xxxx=    swizzle<0,0,0,0>(M.mVec[0])/*m00*/*v.xxxx;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[1])/*m10*/*v.yyyy;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[2])/*m20*/*v.zzzz;
+    r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.mVec[3]);
    
-    float4 r_yyyy=    float4(swizzle<1,1,1,1>(M.mVec[0]))/*m01*/*float4(v.xxxx);
-    r_yyyy = r_yyyy + float4(swizzle<1,1,1,1>(M.mVec[1]))/*m11*/*float4(v.yyyy);
-    r_yyyy = r_yyyy + float4(swizzle<1,1,1,1>(M.mVec[2]))/*m21*/*float4(v.zzzz);
-    r_yyyy = r_yyyy + float4(swizzle<1,1,1,1>(M.mVec[3]));
+    float4 r_yyyy=    swizzle<1,1,1,1>(M.mVec[0])/*m01*/*v.xxxx;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[1])/*m11*/*v.yyyy;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[2])/*m21*/*v.zzzz;
+    r_yyyy = r_yyyy + swizzle<1,1,1,1>(M.mVec[3]);
 
-    float4 r_zzzz=    float4(swizzle<2,2,2,2>(M.mVec[0]))/*m02*/*float4(v.xxxx);
-    r_zzzz = r_zzzz + float4(swizzle<2,2,2,2>(M.mVec[1]))/*m12*/*float4(v.yyyy);
-    r_zzzz = r_zzzz + float4(swizzle<2,2,2,2>(M.mVec[2]))/*m22*/*float4(v.zzzz);
-    r_zzzz = r_zzzz + float4(swizzle<2,2,2,2>(M.mVec[3]));
+    float4 r_zzzz=    swizzle<2,2,2,2>(M.mVec[0])/*m02*/*v.xxxx;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[1])/*m12*/*v.yyyy;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[2])/*m22*/*v.zzzz;
+    r_zzzz = r_zzzz + swizzle<2,2,2,2>(M.mVec[3]);
 
     return SoAPoint3f(r_xxxx,r_yyyy,r_zzzz);
 }
