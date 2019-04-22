@@ -932,6 +932,7 @@ FINLINE float  determinant(const Matrix4x4& mat){
     return reduce_add(float4(mat.mVec[0])*float4(cofactor_mat.mVec[0]));
 }
 
+//Cramer's rule
 FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
     auto tran_mat = transpose(mat);
     auto cofactor_mat = cofactor(tran_mat);
