@@ -109,7 +109,10 @@ FINLINE bool4 operator<(const float4 &a, const float4 &b){ return  bool4(_mm_cmp
 FINLINE bool4 operator>=(const float4 &a, const float4 &b){ return  bool4(_mm_cmpge_ps(a.xyzw, b.xyzw)); }
 FINLINE bool4 operator<=(const float4 &a, const float4 &b){ return  bool4(_mm_cmple_ps(a.xyzw, b.xyzw)); }
 
-
+FINLINE float4 abs(const float4& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
+FINLINE  float4 sign(const float4& v){ auto mask = _mm_cmplt_ps(v,float4(Zero)); return _mm_blendv_ps(float4(One),-float4(One),mask); }
+FINLINE float4 sqrt(const float4& v){ return _mm_sqrt_ps(v.xyzw); }
+FINLINE float4 rsqrt(const float4& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
 FINLINE  float4 zero_fix(const float4& x){ auto min_rcp_input = _mm_set1_ps(MIN_RCP_INPUT); return _mm_blendv_ps(x.xyzw,min_rcp_input,_mm_cmplt_ps(x.xyzw,min_rcp_input)); }
 FINLINE  float4 safe_rcp(const float4& x){ return rcp(zero_fix(x)); }
