@@ -926,6 +926,11 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
     return Matrix4x4(m0,m1,m2,m3);
 }
 
+FINLINE float  determinant(const Matrix4x4& mat){
+    auto cofactor_mat = cofactor(mat);
+    return reduce_add(float4(mat.mVec[0])*float4(cofactor_mat.mVec[0]));
+}
+
 FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
     return mat;
 }

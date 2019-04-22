@@ -564,6 +564,12 @@ TEST(matrix4x4,cofactor){
    EXPECT_EQ(mat,mat2);
 }
 
+TEST(matrix4x4,determinant){
+   Matrix4x4 mat;
+   auto det=determinant(mat);
+   EXPECT_EQ(det,1);
+}
+
 
 
 TEST(matrix4x4,transpose){
