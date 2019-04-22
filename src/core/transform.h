@@ -143,7 +143,7 @@ FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f&
     cam2wrold.m[13]  = o.y;
     cam2wrold.m[14]  = o.z;
     cam2wrold.m[15]  = One;
-    return Transform(transform_inverse(cam2wrold),cam2wrold);
+    return Transform(transform_inverse_noscale(cam2wrold),cam2wrold);
 }
 
 NARUKAMI_END
