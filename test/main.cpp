@@ -558,6 +558,12 @@ TEST(matrix4x4,minor){
    EXPECT_EQ(mat,mat2);
 }
 
+TEST(matrix4x4,cofactor){
+   Matrix4x4 mat;
+   auto mat2=cofactor(mat);
+   EXPECT_EQ(mat,mat2);
+}
+
 
 
 TEST(matrix4x4,transpose){
