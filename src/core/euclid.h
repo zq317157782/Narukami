@@ -584,6 +584,7 @@ public:
 };
 
 FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
+    out<<'(';
     for(int i=0;i<Matrix4x4::N;++i){
         out<<v.m[i];
         out<<(((i+1)==Matrix4x4::N)?')':',');
@@ -932,10 +933,15 @@ FINLINE float  determinant(const Matrix4x4& mat){
 }
 
 FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
-    // auto tran_mat = transpose(mat);
-    // auto cofactor_mat = cofactor(tran_mat);
-    //  float4(mat.mVec[0])*float4(cofactor_mat.mVec[0])
-    return mat;
+    auto tran_mat = transpose(mat);
+    auto cofactor_mat = cofactor(tran_mat);
+    auto det=vreduce_add(float4(tran_mat.mVec[0])*float4(cofactor_mat.mVec[0]));
+    auto inv_det= rcp(det);
+    cofactor_mat.mVec[0] = cofactor_mat.mVec[0]*inv_det;
+    cofactor_mat.mVec[1] = cofactor_mat.mVec[1]*inv_det;
+    cofactor_mat.mVec[2] = cofactor_mat.mVec[2]*inv_det;
+    cofactor_mat.mVec[3] = cofactor_mat.mVec[3]*inv_det;
+    return cofactor_mat;
 }
 
 //---MATRIX4X4 END---

@@ -543,6 +543,18 @@ TEST(matrix4x4,blockwise_inverse){
     EXPECT_EQ(mat5,mat4);
 }
 
+TEST(matrix4x4,inverse){
+    Matrix4x4 mat;
+    Matrix4x4 mat2 = inverse(mat);
+    EXPECT_TRUE(mat==mat2);
+
+    Matrix4x4 mat3(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2);
+    Matrix4x4 mat4=inverse(mat3);
+    Matrix4x4 mat5(0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f);
+    EXPECT_EQ(mat5,mat4);
+}
+
+
 TEST(matrix4x4,mul2x2){
     auto m0=float4(1,0,0,1);
     auto m1=float4(mul2x2(m0,m0));
@@ -848,6 +860,8 @@ TEST(transform,look_at){
     EXPECT_FLOAT_EQ(v1.x, 0.0f);
     EXPECT_FLOAT_EQ(v1.y, 0.0f);
     EXPECT_FLOAT_EQ(v1.z, 1.0f);
+    // std::cout<<transform.mat;
+    // std::cout<<transform.inv_mat;
 }
 
 int main(int argc, char* argv[]) {
