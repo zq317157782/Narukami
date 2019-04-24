@@ -1,6 +1,6 @@
 #include "benchmark.h"
 #include <xmmintrin.h>
-#include "core/euclid.h"
+#include "core/affine.h"
 #include "core/geometry.h"
 
 static void BM_common_rcp(benchmark::State &state)

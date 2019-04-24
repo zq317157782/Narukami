@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #pragma once
 #include "core/narukami.h"
-#include "core/euclid.h"
+#include "core/affine.h"
 #include "core/simd.h"
 #include <vector>
 NARUKAMI_BEGIN

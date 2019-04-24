@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "core/euclid.h"
+#include "core/affine.h"
 
 using namespace narukami;
 TEST(math,rcp){
