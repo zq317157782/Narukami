@@ -31,7 +31,7 @@ SOFTWARE.
 	#define NARUKAMI_IS_WIN 
 #endif
 
-
+//from mitsuba
 #if defined(__GNUC__) || defined(__clang__)
 #define FINLINE                inline __attribute__((always_inline))
 #define NOINLINE               __attribute__((noinline))
