@@ -231,11 +231,11 @@ BENCHMARK(BM_soavector3f_dot)->Arg(1)->Arg(5)->Arg(10);
 FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
      __m128 xyzw = _mm_set_ps(0.0f,v.z,v.y,v.x);
      
-     narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
-     r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
-     r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
+     narukami::float4 r=narukami::float4(M.col[0])*narukami::float4(v.x);
+     r+=narukami::float4(M.col[1])*narukami::float4(v.y);
+     r+=narukami::float4(M.col[2])*narukami::float4(v.z);
 
-    //float w=sum(_mm_add_ps(M.mVec[3],xyzw));
+    //float w=sum(_mm_add_ps(M.col[3],xyzw));
     float rr[4];
     _mm_store_ps(rr,r.xyzw);
     return narukami::Vector3f(rr[0],rr[1],rr[2]);
@@ -459,10 +459,10 @@ BENCHMARK(BM_matrix4x4_mul_point3);
 
 
 FINLINE narukami::Point3f mat_mul_point3_sse(const narukami::Matrix4x4& M,const narukami::Point3f& v){
-    narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
-    r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
-    r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
-    r+=narukami::float4(M.mVec[3])*narukami::float4(1.0f);
+    narukami::float4 r=narukami::float4(M.col[0])*narukami::float4(v.x);
+    r+=narukami::float4(M.col[1])*narukami::float4(v.y);
+    r+=narukami::float4(M.col[2])*narukami::float4(v.z);
+    r+=narukami::float4(M.col[3])*narukami::float4(1.0f);
     return narukami::Point3f(r.x,r.y,r.z);
 }
 
