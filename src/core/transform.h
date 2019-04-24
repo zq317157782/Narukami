@@ -40,6 +40,7 @@ struct SSE_ALIGNAS Transform{
     FINLINE Point3f operator()(const Point3f& p) const{ return mat*p; }
     FINLINE Vector3f operator()(const Vector3f& v) const{ return mat*v;}
     FINLINE Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
+    FINLINE Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat); }
 };
 
 FINLINE Transform inverse(const Transform& transform){
@@ -51,8 +52,8 @@ FINLINE Transform transpose(const Transform& transform){
 }
 
 FINLINE Transform translate(const Vector3f& delta){
-    Matrix4x4 mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,delta.x, delta.y,delta.z,Zero);
-    Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,-delta.x, -delta.y,-delta.z,Zero);
+    Matrix4x4 mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,delta.x, delta.y,delta.z,One);
+    Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,-delta.x, -delta.y,-delta.z,One);
     return Transform(mat,inv_mat);
 }
 

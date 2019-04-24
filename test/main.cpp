@@ -893,6 +893,15 @@ TEST(transform,normal3f){
     EXPECT_FLOAT_EQ(v.z, 0.0f);
 }
 
+TEST(transform,transform){
+    auto transform = translate(Vector3f(1,0,0));
+    //auto transform1 = rotate(90,Vector3f(0,1,0));
+    auto transform2 = scale(2,2,2);
+    auto transform3 = transform2((transform));
+
+    EXPECT_EQ(transform3.mat,Matrix4x4(2,0,0,0,0,2,0,0,0,0,2,0,2,0,0,1));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
