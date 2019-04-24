@@ -636,6 +636,12 @@ TEST(matrix4x4,mat_mul_soapoint){
     EXPECT_EQ(p2,SoAPoint3f(1,2,3));
 }
 
+TEST(matrix4x4,sub_matrix3x3_determinant){
+    Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
+    float det=sub_matrix3x3_determinant(mat);
+    EXPECT_EQ(det,1);
+}
+
 TEST(SoAVector3f,eq){
     SoAVector3f v1;
     SoAVector3f v2(0);
@@ -901,6 +907,8 @@ TEST(transform,transform){
 
     EXPECT_EQ(transform3.mat,Matrix4x4(2,0,0,0,0,2,0,0,0,0,2,0,2,0,0,1));
 }
+
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);

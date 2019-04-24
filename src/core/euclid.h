@@ -371,7 +371,7 @@ FINLINE SSEPoint3f rcp(const SSEPoint3f& v) {return rcp(v.xyzw);}
 FINLINE SSEPoint3f abs(const SSEPoint3f& v){return abs(v.xyzw);}
 FINLINE SSEPoint3f sign(const SSEPoint3f& v){return sign(v.xyzw);}
 
-FINLINE float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v.xyzw); float4 c=swizzle<2>(v.xyzw); return _mm_cvtss_f32(a+b+c);}
+//FINLINE float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v.xyzw); float4 c=swizzle<2>(v.xyzw); return _mm_cvtss_f32(a+b+c);}
 
 FINLINE SSEPoint3f sqrt(const SSEPoint3f& v){ return sqrt(v.xyzw); }
 FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){return rsqrt(v.xyzw);}
@@ -937,6 +937,12 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
 FINLINE float  determinant(const Matrix4x4& mat){
     auto cofactor_mat = cofactor(mat);
     return reduce_add(float4(mat.mVec[0])*float4(cofactor_mat.mVec[0]));
+}
+
+FINLINE float sub_matrix3x3_determinant(const Matrix4x4& mat){
+    auto temp = mat.mVec[0]*swizzle<1,2,0,3>(mat.mVec[1])*swizzle<2,0,1,3>(mat.mVec[2])-swizzle<2,1,0,3>(mat.mVec[0])*swizzle<1,0,2,3>(mat.mVec[1])*swizzle<0,2,1,3>(mat.mVec[1]);
+    float4 a=temp; float4 b=swizzle<1>(temp); float4 c=swizzle<2>(temp);
+    return _mm_cvtss_f32(a+b+c);
 }
 
 //Cramer's rule

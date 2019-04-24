@@ -532,4 +532,40 @@ static void BM_intersect_soatriangle(benchmark::State &state)
 }
 BENCHMARK(BM_intersect_soatriangle)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
+
+static void BM_sub_matrix3x3_determinant_sse(benchmark::State &state)
+{   narukami::Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(sub_matrix3x3_determinant(mat));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_sub_matrix3x3_determinant_sse)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+
+float sub_matrix3x3_determinant_common(const narukami::Matrix4x4& mat){
+    return mat.m[0]*mat.m[5]*mat.m[10]+mat.m[1]*mat.m[6]*mat.m[8]+mat.m[2]*mat.m[4]*mat.m[9]-mat.m[2]*mat.m[5]*mat.m[8]+mat.m[1]*mat.m[4]*mat.m[10]+mat.m[0]*mat.m[6]*mat.m[9];
+}
+
+static void BM_sub_matrix3x3_determinant_common(benchmark::State &state)
+{   narukami::Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(sub_matrix3x3_determinant_common(mat));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_sub_matrix3x3_determinant_common)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
 BENCHMARK_MAIN();
