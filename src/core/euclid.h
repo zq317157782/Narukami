@@ -30,6 +30,11 @@ SOFTWARE.
 #include "core/constant.h"
 NARUKAMI_BEGIN
 
+template <typename T>
+struct Vector3;
+template <typename T>
+struct Normal3;
+
 //---VECTOR3 BEGIN---
 template <typename T>
 struct Vector3
@@ -46,6 +51,7 @@ struct Vector3
     FINLINE Vector3() : x(Zero), y(Zero), z(Zero) { }
     FINLINE explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    FINLINE Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Vector3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
@@ -451,6 +457,7 @@ struct Normal3
     FINLINE Normal3() : x(Zero), y(Zero), z(Zero) { }
     FINLINE explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    FINLINE Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Normal3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }

@@ -36,6 +36,10 @@ struct SSE_ALIGNAS Transform{
     Transform(const float* mat):mat(mat),inv_mat(inverse(this->mat)){}
     Transform(const Matrix4x4& mat,const Matrix4x4& inv_mat):mat(mat),inv_mat(inv_mat){}
     Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
+
+    FINLINE Point3f operator()(const Point3f& p) const{ return mat*p; }
+    FINLINE Vector3f operator()(const Vector3f& v) const{ return mat*v;}
+    FINLINE Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
 };
 
 FINLINE Transform inverse(const Transform& transform){
