@@ -33,7 +33,7 @@ NARUKAMI_BEGIN
         union { struct { float x,y,z; }; struct { float r,g,b; }; };
         typedef float Scalar;
         enum { N = 3 };
-        FINLINE Spectrum():r(Zero),g(Zero),b(Zero){}
+        FINLINE Spectrum():r(0.0f),g(0.0f),b(0.0f){}
         FINLINE Spectrum(const float r,const float g,const float b):r(r),g(g),b(b){ }
         FINLINE float operator[](const int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
         FINLINE float& operator[](const int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }

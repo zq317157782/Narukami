@@ -28,37 +28,7 @@ SOFTWARE.
 NARUKAMI_BEGIN
 static   MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
 static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon();
-struct TrueType {
-    FINLINE operator bool() const{return true;}
-} ;
-extern MAYBE_UNUSED const TrueType True;
 
-struct FalseType {
-    FINLINE operator bool() const{return true;}
-} ;
-extern MAYBE_UNUSED const FalseType False;
+static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
 
-struct ZeroType {
-    FINLINE operator float() const{return 0.0f;}
-    FINLINE operator int() const{return 0;}
-} ;
-extern MAYBE_UNUSED const ZeroType Zero;
-
-
-struct OneType {
-    FINLINE operator float() const{return 1.0f;}
-    FINLINE operator int() const{return 1;}
-} ;
-extern MAYBE_UNUSED const OneType One;
-
-struct NegOneType {
-    FINLINE operator float() const{return -1.0f;}
-    FINLINE operator int() const{return -1;}
-} ;
-extern MAYBE_UNUSED const NegOneType NegOne;
-
-struct InfiniteType{
-    FINLINE operator float() const{return std::numeric_limits<float>::infinity();}
-};
-extern MAYBE_UNUSED const InfiniteType Infinite;
 NARUKAMI_END

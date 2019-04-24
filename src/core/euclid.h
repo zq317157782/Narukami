@@ -48,7 +48,7 @@ struct Vector3
     };
 
   public:
-    FINLINE Vector3() : x(Zero), y(Zero), z(Zero) { }
+    FINLINE Vector3() : x(0.0f), y(0.0f), z(0.0f) { }
     FINLINE explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     FINLINE Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
@@ -133,11 +133,11 @@ struct SSE_ALIGNAS SSEVector3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEVector3f():xyzw(float4(Zero)){ }
+    FINLINE SSEVector3f():xyzw(float4()){ }
     FINLINE SSEVector3f(const float4& _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEVector3f(const float x,const float y,const float z):xyzw(float4(x,y,z,Zero)){ }
+    FINLINE SSEVector3f(const float x,const float y,const float z):xyzw(float4(x,y,z,0.0f)){ }
     FINLINE explicit SSEVector3f(const float a):xyzw(float4(a)){ }
-    FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,Zero)){ }
+    FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,0.0f)){ }
 
     FINLINE operator float4&(){ return xyzw; }
     FINLINE  operator const float4&() const { return xyzw; }
@@ -212,7 +212,7 @@ struct SSE_ALIGNAS SoAVector3f{
     typedef float Scalar;
 
 
-    SoAVector3f():xxxx(Zero),yyyy(Zero),zzzz(Zero){}
+    SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
     explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
     SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v3.x,v2.x,v1.x,v0.x),yyyy(v3.y,v2.y,v1.y,v0.y),zzzz(v3.z,v2.z,v1.z,v0.z){ }
     explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
@@ -264,7 +264,7 @@ struct Point3
     };
 
   public:
-    FINLINE Point3() : x(Zero), y(Zero), z(Zero) { }
+    FINLINE Point3() : x(0.0f), y(0.0f), z(0.0f) { }
     FINLINE explicit Point3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Point3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     //just for checking assert for debug
@@ -334,11 +334,11 @@ struct SSE_ALIGNAS SSEPoint3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEPoint3f():xyzw(float4(Zero)){ }
+    FINLINE SSEPoint3f():xyzw(float4()){ }
     FINLINE SSEPoint3f(const float4& _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEPoint3f(const float x,const float y,const float z):xyzw(float4(x,y,z,One)){ }
+    FINLINE SSEPoint3f(const float x,const float y,const float z):xyzw(float4(x,y,z,1.0f)){ }
     FINLINE explicit SSEPoint3f(const float a):xyzw(float4(a)){ }
-    FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,One)){ }
+    FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,1.0f)){ }
 
     FINLINE operator float4&(){ return xyzw; }
     FINLINE  operator const float4&() const { return xyzw; }
@@ -406,7 +406,7 @@ struct SSE_ALIGNAS SoAPoint3f{
     typedef float Scalar;
 
 
-    SoAPoint3f():xxxx(Zero),yyyy(Zero),zzzz(Zero){}
+    SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
     explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
     SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v3.x,v2.x,v1.x,v0.x),yyyy(v3.y,v2.y,v1.y,v0.y),zzzz(v3.z,v2.z,v1.z,v0.z){ }
     explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
@@ -454,7 +454,7 @@ struct Normal3
     };
 
   public:
-    FINLINE Normal3() : x(Zero), y(Zero), z(Zero) { }
+    FINLINE Normal3() : x(0.0f), y(0.0f), z(0.0f) { }
     FINLINE explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     FINLINE Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
@@ -483,7 +483,7 @@ struct Point2
     };
 
   public:
-    FINLINE Point2() : x(Zero), y(Zero) { }
+    FINLINE Point2() : x(0.0f), y(0.0f) { }
     FINLINE explicit Point2(const float a) : x(a), y(a){ assert(!isnan(a)); }
     FINLINE Point2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); }
     //just for checking assert for debug
@@ -514,25 +514,25 @@ public:
 public:
     Matrix4x4(){
          //col 0
-        m[0]=One;
-        m[1]=Zero;
-        m[2]=Zero;
-        m[3]=Zero;
+        m[0]=1.0f;
+        m[1]=0.0f;
+        m[2]=0.0f;
+        m[3]=0.0f;
         //col 1
-        m[4]=Zero;
-        m[5]=One;
-        m[6]=Zero;
-        m[7]=Zero;
+        m[4]=0.0f;
+        m[5]=1.0f;
+        m[6]=0.0f;
+        m[7]=0.0f;
         //col 2
-        m[8]=Zero;
-        m[9]=Zero;
-        m[10]=One;
-        m[11]=Zero;
+        m[8]=0.0f;
+        m[9]=0.0f;
+        m[10]=1.0f;
+        m[11]=0.0f;
         //col 3
-        m[12]=Zero;
-        m[13]=Zero;
-        m[14]=Zero;
-        m[15]=One;
+        m[12]=0.0f;
+        m[13]=0.0f;
+        m[14]=0.0f;
+        m[15]=1.0f;
     }
     Matrix4x4(const float m0,const float m1,const float m2,const float m3,const float m4,const float m5,const float m6,const float m7,const float m8,const float m9,const float m10,const float m11,const float m12,const float m13,const float m14,const float m15)
     {
@@ -674,7 +674,7 @@ FINLINE Matrix4x4 transform_inverse_noscale(const Matrix4x4& mat){
     r.mVec[3] =                      _mm_mul_ps(r.mVec[0],swizzle<0>(mat.mVec[3]));
     r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[1],swizzle<1>(mat.mVec[3])));
     r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[2],swizzle<2>(mat.mVec[3])));
-    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(One,Zero,Zero,Zero),r.mVec[3]);
+    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(1.0f,0.0f,0.0f,0.0f),r.mVec[3]);
     
     return r;
 }
@@ -697,9 +697,9 @@ FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
 
     //here need avoid divide by zero?
     //but I will remove it here,and add (0,0,0,1) to it
-     sqrl=_mm_add_ps(sqrl,_mm_set_ps(One,Zero,Zero,Zero));
+     sqrl=_mm_add_ps(sqrl,_mm_set_ps(1.0f,0.0f,0.0f,0.0f));
 
-    __m128 rsqrl= _mm_div_ps(_mm_set1_ps(One),sqrl);
+    __m128 rsqrl= _mm_div_ps(_mm_set1_ps(1.0f),sqrl);
 
     r.mVec[0] = _mm_mul_ps(r.mVec[0],rsqrl);
     r.mVec[1] = _mm_mul_ps(r.mVec[1],rsqrl);
@@ -709,13 +709,13 @@ FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
     r.mVec[3] =                      _mm_mul_ps(r.mVec[0],swizzle<0>(mat.mVec[3]));
     r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[1],swizzle<1>(mat.mVec[3])));
     r.mVec[3] = _mm_add_ps(r.mVec[3],_mm_mul_ps(r.mVec[2],swizzle<2>(mat.mVec[3])));
-    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(One,Zero,Zero,Zero),r.mVec[3]);
+    r.mVec[3] =  _mm_sub_ps(_mm_set_ps(1.0f,0.0f,0.0f,0.0f),r.mVec[3]);
     
     return r;
 }
 
 
-static FINLINE __m128 adj2x2(const __m128 m){ return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(One,NegOne,NegOne,One)); }
+static FINLINE __m128 adj2x2(const __m128 m){ return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(1.0f,-1.0f,-1.0f,1.0f)); }
 static FINLINE __m128 mul2x2(const __m128 m0,const __m128 m1){ return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1))); }
 static FINLINE __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swizzle<0,0,0,0>(m)/*a*/,swizzle<3,3,3,3>(m)/*d*/), _mm_mul_ps(swizzle<1,1,1,1>(m)/*c*/,swizzle<2,2,2,2>(m)/*b*/) ); }
 
@@ -757,9 +757,9 @@ FINLINE Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
     __m128 CinvA = _mm_mul_ps(C,invA);
     __m128 invAB = _mm_mul_ps(invA,B);
     __m128 invABinv_D_CinvAB = _mm_mul_ps(invAB,DD);
-    __m128 BB =  _mm_sub_ps(_mm_set1_ps(Zero),invABinv_D_CinvAB);
+    __m128 BB =  _mm_sub_ps(_mm_set1_ps(0.0f),invABinv_D_CinvAB);
     __m128 AA =  _mm_add_ps(invA,_mm_mul_ps(invABinv_D_CinvAB,CinvA));
-    __m128 CC =  _mm_sub_ps(_mm_set1_ps(Zero),_mm_mul_ps(DD,CinvA));
+    __m128 CC =  _mm_sub_ps(_mm_set1_ps(0.0f),_mm_mul_ps(DD,CinvA));
 
     r.mVec[0] = shuffle<0,1,0,1>(AA,CC);
     r.mVec[1] = shuffle<2,3,2,3>(AA,CC);
@@ -996,7 +996,7 @@ FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
     float4 r=M.mVec[0]*v.x;
     r+=M.mVec[1]*v.y;
     r+=M.mVec[2]*v.z;
-    r+=M.mVec[3]*One;
+    r+=M.mVec[3]*1.0f;
     return Point3f(r.x,r.y,r.z);
 }
 

@@ -52,14 +52,14 @@ FINLINE Transform transpose(const Transform& transform){
 }
 
 FINLINE Transform translate(const Vector3f& delta){
-    Matrix4x4 mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,delta.x, delta.y,delta.z,One);
-    Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,One,Zero, Zero,Zero,Zero, One,Zero,-delta.x, -delta.y,-delta.z,One);
+    Matrix4x4 mat(1.0f,0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,delta.x, delta.y,delta.z,1.0f);
+    Matrix4x4 inv_mat(1.0f,0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,-delta.x, -delta.y,-delta.z,1.0f);
     return Transform(mat,inv_mat);
 }
 
 FINLINE Transform scale(const float x,const float y,const float z){
-    Matrix4x4 mat(x,Zero,Zero,Zero, Zero,y,Zero, Zero,Zero,Zero, z,Zero,Zero, Zero,Zero,One);
-    Matrix4x4 inv_mat(rcp(x),Zero,Zero,Zero, Zero,rcp(y),Zero, Zero,Zero,Zero, rcp(z),Zero,Zero, Zero,Zero,One);
+    Matrix4x4 mat(x,0.0f,0.0f,0.0f, 0.0f,y,0.0f, 0.0f,0.0f,0.0f, z,0.0f,0.0f, 0.0f,0.0f,1.0f);
+    Matrix4x4 inv_mat(rcp(x),0.0f,0.0f,0.0f, 0.0f,rcp(y),0.0f, 0.0f,0.0f,0.0f, rcp(z),0.0f,0.0f, 0.0f,0.0f,1.0f);
     return Transform(mat,inv_mat);
 }
 
@@ -68,8 +68,8 @@ FINLINE Transform rotate_x(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
-    Matrix4x4 mat(One,Zero,Zero,Zero, Zero,cos_theta,sin_theta, Zero,Zero,-sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
-    //Matrix4x4 inv_mat(One,Zero,Zero,Zero, Zero,cos_theta,-sin_theta, Zero,Zero,sin_theta, cos_theta,Zero,Zero, Zero,Zero,One);
+    Matrix4x4 mat(1.0f,0.0f,0.0f,0.0f, 0.0f,cos_theta,sin_theta, 0.0f,0.0f,-sin_theta, cos_theta,0.0f,0.0f, 0.0f,0.0f,1.0f);
+    //Matrix4x4 inv_mat(1.0f,0.0f,0.0f,0.0f, 0.0f,cos_theta,-sin_theta, 0.0f,0.0f,sin_theta, cos_theta,0.0f,0.0f, 0.0f,0.0f,1.0f);
     return Transform(mat,transpose(mat));
 }
 //clockwise
@@ -77,7 +77,7 @@ FINLINE Transform rotate_y(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
-    Matrix4x4 mat(/*col0*/cos_theta,Zero,-sin_theta,Zero, /*col1*/Zero,One,Zero,Zero,/*col2*/sin_theta,Zero, cos_theta,Zero,/*col3*/Zero, Zero,Zero,One);
+    Matrix4x4 mat(/*col0*/cos_theta,0.0f,-sin_theta,0.0f, /*col1*/0.0f,1.0f,0.0f,0.0f,/*col2*/sin_theta,0.0f, cos_theta,0.0f,/*col3*/0.0f, 0.0f,0.0f,1.0f);
 
     return Transform(mat,transpose(mat));
 }
@@ -86,7 +86,7 @@ FINLINE Transform rotate_z(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
-    Matrix4x4 mat(/*col0*/cos_theta,sin_theta,Zero,Zero, /*col1*/-sin_theta,cos_theta,Zero,Zero,/*col2*/Zero,Zero, One,Zero,/*col3*/Zero, Zero,Zero,One);
+    Matrix4x4 mat(/*col0*/cos_theta,sin_theta,0.0f,0.0f, /*col1*/-sin_theta,cos_theta,0.0f,0.0f,/*col2*/0.0f,0.0f, 1.0f,0.0f,/*col3*/0.0f, 0.0f,0.0f,1.0f);
     return Transform(mat,transpose(mat));
 }
 
@@ -132,27 +132,27 @@ FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f&
     cam2wrold.m[0] = right.x;
     cam2wrold.m[1] = right.y;
     cam2wrold.m[2] = right.z;
-    cam2wrold.m[3] = Zero;
+    cam2wrold.m[3] = 0.0f;
     //newUp
     cam2wrold.m[4] = newUp.x;
     cam2wrold.m[5] = newUp.y;
     cam2wrold.m[6] = newUp.z;
-    cam2wrold.m[7] = Zero;
+    cam2wrold.m[7] = 0.0f;
     //forward
     cam2wrold.m[8]  = forward.x;
     cam2wrold.m[9]  = forward.y;
     cam2wrold.m[10] = forward.z;
-    cam2wrold.m[11] = Zero;
+    cam2wrold.m[11] = 0.0f;
     //pos
     cam2wrold.m[12]  = o.x;
     cam2wrold.m[13]  = o.y;
     cam2wrold.m[14]  = o.z;
-    cam2wrold.m[15]  = One;
+    cam2wrold.m[15]  = 1.0f;
     return Transform(transform_inverse_noscale(cam2wrold),cam2wrold);
 }
 
 FINLINE bool swap_handedness(const Transform& t){
-    return (sub_matrix3x3_determinant(t.mat)<0);
+    return (sub_matrix3x3_determinant(t.mat)<0.0f);
 }
 
 NARUKAMI_END

@@ -58,7 +58,7 @@ struct Ray{
    Vector3f d;
    mutable float t_max;
 
-   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = Infinite):o(o),d(d),t_max(t_max){
+   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(o),d(d),t_max(t_max){
 
    }
 };
@@ -72,7 +72,7 @@ struct SSE_ALIGNAS SoARay
     SoAVector3f d;
     mutable float4 t_max;
      
-    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float t_max = Infinite):o(SoAPoint3f(o)),d(SoAVector3f(d)),t_max(t_max){}
+    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(SoAPoint3f(o)),d(SoAVector3f(d)),t_max(t_max){}
     FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),t_max(ray.t_max){}
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
@@ -193,7 +193,7 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,GeometryInt
     
     
     float4 zero = _mm_setzero_ps();
-    float4 one = float4(One);
+    float4 one = float4(1.0f);
     
     float4 inv_P_dot_E1 = one/float4(P_dot_E1);
 

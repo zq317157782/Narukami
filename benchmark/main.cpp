@@ -229,7 +229,7 @@ static void BM_soavector3f_dot(benchmark::State &state)
 BENCHMARK(BM_soavector3f_dot)->Arg(1)->Arg(5)->Arg(10);
 
 FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
-     __m128 xyzw = _mm_set_ps(narukami::Zero,v.z,v.y,v.x);
+     __m128 xyzw = _mm_set_ps(0.0f,v.z,v.y,v.x);
      
      narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
      r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
@@ -462,7 +462,7 @@ FINLINE narukami::Point3f mat_mul_point3_sse(const narukami::Matrix4x4& M,const 
     narukami::float4 r=narukami::float4(M.mVec[0])*narukami::float4(v.x);
     r+=narukami::float4(M.mVec[1])*narukami::float4(v.y);
     r+=narukami::float4(M.mVec[2])*narukami::float4(v.z);
-    r+=narukami::float4(M.mVec[3])*narukami::float4(narukami::One);
+    r+=narukami::float4(M.mVec[3])*narukami::float4(1.0f);
     return narukami::Point3f(r.x,r.y,r.z);
 }
 

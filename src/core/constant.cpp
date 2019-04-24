@@ -24,12 +24,6 @@ SOFTWARE.
 
 #include "constant.h"
 NARUKAMI_BEGIN
- 
- const TrueType True;
- const FalseType False;
- const ZeroType Zero;
- const OneType One;
- const NegOneType NegOne;
- const InfiniteType Infinite;
+
 
 NARUKAMI_END

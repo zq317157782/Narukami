@@ -50,7 +50,7 @@ struct bool4
 
 FINLINE std::ostream &operator<<(std::ostream &out, const bool4 &b){out << '(' << ((b.x!=0)?"true":"false")<< ',' << ((b.y!=0)?"true":"false") << ',' << ((b.z!=0)?"true":"false") << ',' << ((b.w!=0)?"true":"false") << ')';return out;}
 
-FINLINE bool4 operator!(const bool4 &a){ return _mm_xor_ps(a,bool4(True));}
+FINLINE bool4 operator!(const bool4 &a){ return _mm_xor_ps(a,bool4(true));}
 FINLINE bool4 operator&(const bool4 &a,const bool4 &b){ return _mm_and_ps(a.xyzw,b.xyzw);}
 FINLINE bool4 operator|(const bool4 &a,const bool4 &b){ return _mm_or_ps (a.xyzw,b.xyzw);}
 
@@ -70,7 +70,7 @@ struct float4
     union { __m128 xyzw; struct { float x, y, z, w; }; };
 
   public:
-    FINLINE float4() : xyzw(_mm_set1_ps(Zero)) {}
+    FINLINE float4() : xyzw(_mm_setzero_ps()) {}
     FINLINE float4(const __m128 a) : xyzw(a) {}
     FINLINE explicit float4(const float a) : xyzw(_mm_set1_ps(a)) {}
     FINLINE float4(const float x, const float y, const float z, const float w) : xyzw(_mm_set_ps(w,z,y,x)) {}
@@ -131,7 +131,7 @@ template<>
 FINLINE float4 shuffle<2,3,2,3>(const float4& v1,const float4& v2){ return _mm_movehl_ps(v2,v1); }
 
 FINLINE float4 abs(const float4& v){  auto mask=_mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)); return _mm_and_ps(v.xyzw,mask); }
-FINLINE  float4 sign(const float4& v){ auto mask = _mm_cmplt_ps(v,float4(Zero)); return _mm_blendv_ps(float4(One),-float4(One),mask); }
+FINLINE  float4 sign(const float4& v){ auto mask = _mm_cmplt_ps(v,_mm_setzero_ps()); return _mm_blendv_ps(float4(1.0f),-float4(1.0f),mask); }
 FINLINE float4 sqrt(const float4& v){ return _mm_sqrt_ps(v.xyzw); }
 FINLINE float4 rsqrt(const float4& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 FINLINE  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
