@@ -908,6 +908,11 @@ TEST(transform,transform){
     EXPECT_EQ(transform3.mat,Matrix4x4(2,0,0,0,0,2,0,0,0,0,2,0,2,0,0,1));
 }
 
+TEST(transform,swap_handedness){
+    auto transform = scale(-2,2,2);
+    EXPECT_TRUE(swap_handedness(transform));
+}
+
 
 
 int main(int argc, char* argv[]) {

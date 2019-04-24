@@ -151,4 +151,8 @@ FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f&
     return Transform(transform_inverse_noscale(cam2wrold),cam2wrold);
 }
 
+FINLINE bool swap_handedness(const Transform& t){
+    return (sub_matrix3x3_determinant(t.mat)<0);
+}
+
 NARUKAMI_END
