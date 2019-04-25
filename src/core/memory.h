@@ -28,8 +28,11 @@ SOFTWARE.
 #include "sse.h"
 
 NARUKAMI_BEGIN
+
+#define NARUKAMI_CACHE_LINE 64
+
 template <int LINE_SIZE>
-void *alloc_aligned(size_t size){
+FINLINE void *alloc_aligned(size_t size){
 #ifdef NARUKAMI_IS_OSX
 	void* ptr;
 	if(posix_memalign(&ptr,LINE_SIZE,size)!=0){
@@ -47,7 +50,7 @@ void *alloc_aligned(size_t size){
 #endif
 }
 
-void free_aligned(void * ptr){
+FINLINE void free_aligned(void * ptr){
 	if(!ptr){
 		return;
 	}
@@ -58,6 +61,11 @@ void free_aligned(void * ptr){
 #else
 	free(ptr);
 #endif
+}
+
+
+FINLINE void * memcpy(void* const dst,const void* const src,size_t size){
+	return std::memcpy(dst,src,size);
 }
 
 NARUKAMI_END

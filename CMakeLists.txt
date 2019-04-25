@@ -33,14 +33,14 @@ add_subdirectory(external/glog)
 #add benchmark
 SET(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 add_subdirectory(external/benchmark)
-
+ 
 #narukami
-add_executable(narukami src/main.cpp src/core/constant.cpp src/core/sse.cpp)
+add_executable(narukami src/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
 target_link_libraries(narukami glog)
 # target_link_libraries(narukami embree)
 
 #narukami_test
-add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cpp)
+add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
 target_link_libraries(narukami_test gtest)
 
 #benchmark rcp

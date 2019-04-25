@@ -914,6 +914,26 @@ TEST(transform,swap_handedness){
 }
 
 
+#include "core/mesh.h"
+TEST(mesh,meshdata){
+    auto transform = translate(Vector3f(1,0,0));
+    Point3f vertices[4];
+    uint32_t indices[6]={0,1,2,1,2,3};
+    MeshData data(transform,2,indices,4,vertices);
+    EXPECT_EQ(data.indices[5],3); 
+}
+
+TEST(mesh,CreateMeshTriangles){
+     Point3f vertices[4]={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
+     uint32_t indices[6]={0,1,2,1,2,3};
+     auto transform = translate(Vector3f(1,0,0));
+     auto transform2 = translate(Vector3f(-1,0,0));
+     auto triangles=CreateMeshTriangles(&transform,&transform2,2,indices,4,vertices);
+     EXPECT_EQ(triangles.size(),2);
+     auto triange = triangles[0];
+     auto p = (*triange)[1];
+     EXPECT_EQ(p,Point3f(1,0,0));
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
