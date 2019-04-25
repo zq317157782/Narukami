@@ -38,7 +38,9 @@ struct SSE_ALIGNAS Transform{
     Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
 
     FINLINE Point3f operator()(const Point3f& p) const{ return mat*p; }
+    FINLINE SoAPoint3f operator()(const SoAPoint3f& p) const{ return mat*p; }
     FINLINE Vector3f operator()(const Vector3f& v) const{ return mat*v;}
+    FINLINE SoAVector3f operator()(const SoAVector3f& v) const{ return mat*v;}
     FINLINE Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
     FINLINE Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat); }
 };
