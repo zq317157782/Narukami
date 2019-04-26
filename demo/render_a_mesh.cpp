@@ -10,13 +10,14 @@ int main(){
 
    
      Point3f vertices[4]={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
+     Point2f uvs[4] = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
      uint32_t indices[6]={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=CreateMeshTriangles(&transform,&transform2,2,indices,4,vertices);
+     auto triangles=CreateMeshTriangles(&transform,&transform2,2,indices,4,vertices,nullptr,uvs);
     
      auto soa_triangles=cast2SoA(triangles,0,2);
-      std::cout<<soa_triangles[0];
+    std::cout<<soa_triangles[0];
 
     std::vector<uint8_t> image;
 	for (int i = 0; i<128*128; ++i) {
@@ -25,14 +26,14 @@ int main(){
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
         uint32_t index;
         bool b =intersect(ray,soa_triangles[0],&t,&uv,&index);
-        //std::cout<<index;
+       // std::cout<<index;
         // for(int j=0;j<soa_triangles.size();++j){
         //     b=(b||intersect(ray,soa_triangles[j],&t,&uv,&index));
         //     if(b){
         //         break;
         //     }
         // }
-
+        uv=triangles[index]->sample_uv(uv);
 
 		float rgb[3];
 		if (b){

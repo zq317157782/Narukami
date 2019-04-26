@@ -287,6 +287,11 @@ template <typename T>
 FINLINE Point3<T> operator+(const Point3<T>& v){ return v; }
 template <typename T>
 FINLINE Point3<T> operator-(const Point3<T>& v1){ Point3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
+
+
+//operator+  =>  just for affine interpolation
+template <typename T>
+FINLINE Point3<T> operator+(const Point3<T> &v1, const Point3<T> &v2){ Point3<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; v.z = v1.z + v2.z; return v; }
 //compenont wise
 template <typename T>
 FINLINE Point3<T> operator*(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
@@ -497,6 +502,15 @@ struct Point2
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
+
+//operator+  =>  just for affine interpolation
+template <typename T>
+FINLINE Point2<T> operator+(const Point2<T> &v1, const Point2<T> &v2){ Point2<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; return v; }
+template <typename T>
+FINLINE Point2<T> operator*(const Point2<T> &v1, const Point2<T> &v2) { Point2<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; return v; }
+template <typename T>
+FINLINE Point2<T> operator*(const Point2<T> &v1, const T &f) { Point2<T> v; v.x = v1.x * f; v.y = v1.y * f; return v; }
+
 typedef Point2<float> Point2f;
 typedef Point2<int> Point2i;
 //---POINT2 END---

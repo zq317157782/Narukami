@@ -26,26 +26,30 @@ SOFTWARE.
 #include "core/affine.h"
 #include "core/transform.h"
 NARUKAMI_BEGIN
-    struct MeshData{
-        std::unique_ptr<Point3f[]> vertices;
-        std::unique_ptr<Normal3f[]> normals;
-        std::unique_ptr<Point2f[]> uvs;
-        std::unique_ptr<uint32_t[]> indices;
+    class MeshData{
+        public:
+            std::unique_ptr<Point3f[]> vertices;
+            std::unique_ptr<Normal3f[]> normals;
+            std::unique_ptr<Point2f[]> uvs;
+            std::unique_ptr<uint32_t[]> indices;
         
         MeshData(const Transform& object2wrold,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
     };
 
-    struct MeshTriangle{
-        const Transform * object2world,*world2object;
-        std::shared_ptr<MeshData> mesh;
-        uint32_t index[3];
-
-        MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):object2world(object2world),world2object(world2object),mesh(mesh){
-            memcpy(index,idx,sizeof(uint32_t)*3);
+    class MeshTriangle{
+        private:
+            const Transform * _object2world,*_world2object;
+            std::shared_ptr<MeshData> _mesh;
+            uint32_t _index[3];
+        public:
+        MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):_object2world(object2world),_world2object(world2object),_mesh(mesh){
+            memcpy(_index,idx,sizeof(uint32_t)*3);
         }
 
-        Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh->vertices[index[i]]; }
-        const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return mesh->vertices[index[i]];}
+        //FINLINE Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
+        FINLINE const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
+        FINLINE const Point2f& get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
+        FINLINE const Point2f& sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
     };
 
     FINLINE bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
