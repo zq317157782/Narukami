@@ -124,13 +124,6 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoABox &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
 } 
 
-struct GeometryInteraction
-{
-    float t;
-    float u;
-    float v;
-    int   index;
-};
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt= nullptr,Point2f* uv= nullptr){
@@ -158,7 +151,7 @@ FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ra
     auto u = P_dot_T*inv_P_dot_E1;
     auto v = Q_dot_D*inv_P_dot_E1;
 
-    if(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f)){
+    if(EXPECT_TAKEN(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f))){
         return false;
     }
     float t = dot(Q,E2)*inv_P_dot_E1;
@@ -181,7 +174,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle,float* t= nullptr
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,GeometryInteraction* hit=nullptr,__m128 mask=SSE_MASK_TRUE){
+FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= nullptr,Point2f* uv= nullptr,uint32_t*index= nullptr,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
@@ -217,7 +210,7 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,GeometryInt
     mask=mask&(u>=zero);
     mask=mask&(v>=zero);
     mask=mask&((u+v)<=one);
-    if(none(mask)){
+    if(EXPECT_TAKEN(none(mask))){
         return false;
     }
     auto Q_dot_E2 = dot(Q,E2);
@@ -226,29 +219,35 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,GeometryInt
     mask = mask&(t <= float4(ray.t_max));
     mask = mask&(t >= zero);
 
-    if(none(mask)){
+    if(EXPECT_TAKEN(none(mask))){
         return false;
     }
 
-    if(hit){
-        int min_mask=reduce_min_mask(t,&hit->t);
+    if(tt){
+        int min_mask=reduce_min_mask(t,tt);
         int idx=0;
-        if(min_mask&0x1){
-            idx=0;
+        if(index||uv){
+            if(min_mask&0x1){
+                idx=0;
+            }
+            else if(min_mask&0x2){
+                idx=1;
+            }
+            else if(min_mask&0x4){
+                idx=2;
+            }
+            else if(min_mask&0x8){
+                idx=3;
+            }
+            if(index){
+                 (*index) = idx;
+            }
+            if(uv){
+                 uv->x=u[idx];
+                 uv->y=v[idx];
+            }
         }
-        else if(min_mask&0x2){
-            idx=1;
-        }
-        else if(min_mask&0x4){
-            idx=2;
-        }
-        else if(min_mask&0x8){
-            idx=3;
-        }
-        
-        hit->u=u[idx];
-        hit->v=v[idx];
-        hit->index = idx;
+
     }
     return true;
 }

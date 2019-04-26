@@ -12,14 +12,15 @@ int main(){
 
     std::vector<uint8_t> image;
 	for (int i = 0; i<128*128; ++i) {
-		narukami::GeometryInteraction hit;
+		narukami::Point2f uv;
+		float t;
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
-        bool b=intersect(ray,triangle,&hit);
+        bool b=intersect(ray,triangle,&t,&uv);
 		
 		float rgb[3];
 		if (b){
-            rgb[0] = hit.u;
-		    rgb[1] = hit.v;
+            rgb[0] = uv.x;
+		    rgb[1] = uv.y;
 		    rgb[2] = 0;
         }
         else{

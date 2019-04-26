@@ -736,14 +736,15 @@ TEST(geometry,ray_intersect_soatriangle){
     triangle.v0 = SoAPoint3f(0,0,2);
     triangle.e1 = SoAVector3f(1,0,0);
     triangle.e2 = SoAVector3f(0,1,0);
-    GeometryInteraction hit;
+    float t;
+    Point2f uv;
 
     SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
     auto a=intersect(r,triangle);
     EXPECT_EQ((a),true);
 
     SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
-    auto a2=intersect(r2,triangle,&hit,SSE_MASK(false,false,false,false));
+    auto a2=intersect(r2,triangle,&t,&uv,nullptr,SSE_MASK(false,false,false,false));
     EXPECT_EQ((a2),false);
 
 
