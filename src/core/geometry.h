@@ -133,6 +133,49 @@ struct GeometryInteraction
 };
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt,Point2f* uv){
+    auto O = ray_o;
+    auto D = ray_d;
+
+    auto V0 = v0;
+    auto E1 = e1;
+    auto E2 = e2;
+
+    auto T = O - V0;
+    auto P = cross(D,E2);
+    auto Q = cross(T,E1);
+
+    auto P_dot_E1 = dot(P,E1);
+
+    if(P_dot_E1<=EPSION&&P_dot_E1>=-EPSION){
+        return false;
+    }
+
+    auto P_dot_T = dot(P,T);
+    auto Q_dot_D = dot(Q,D);
+
+    auto inv_P_dot_E1 = 1.0f/P_dot_E1;
+    auto u = P_dot_T*inv_P_dot_E1;
+    auto v = Q_dot_D*inv_P_dot_E1;
+
+    if(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f)){
+        return false;
+    }
+    float t = dot(Q,E2)*inv_P_dot_E1;
+    if(t>=0&&t<=ray_t_max){
+        if(tt){
+            (*tt)= t;
+        }
+        if(uv){
+            uv->x= u;
+            uv->y= v;
+        }
+        return true;
+    }
+    return false;
+}
+
+//Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE bool intersect(const Ray& ray,const Triangle& triangle,GeometryInteraction* hit=nullptr){
     auto O = ray.o;
     auto D = ray.d;

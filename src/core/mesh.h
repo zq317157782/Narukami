@@ -48,7 +48,12 @@ NARUKAMI_BEGIN
         const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return mesh->vertices[index[i]];}
     };
 
-    
+    FINLINE bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
+        auto v0 = triangle[0];
+        auto e1 = triangle[1]-v0;
+        auto e2 = triangle[2]-v0;
+        return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
+    }
 
     std::vector<std::shared_ptr<MeshTriangle>> CreateMeshTriangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
 
