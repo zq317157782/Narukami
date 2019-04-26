@@ -31,6 +31,7 @@ SOFTWARE.
 
 NARUKAMI_BEGIN
 #define SSE_LINE_SIZE 128
+#define SSE_FLOAT_COUNT 4
 #define SSE_ALIGNAS alignas(16)
 
 extern const __m128 sse_lookup_masks[16];

@@ -64,6 +64,7 @@ struct Ray{
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
     out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.t_max<<"]";
+    return out;
 } 
 
 struct SSE_ALIGNAS SoARay
@@ -77,6 +78,7 @@ struct SSE_ALIGNAS SoARay
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
     out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<float4(ray.t_max)<<"]";
+    return out;
 } 
 
 struct Triangle{
@@ -86,6 +88,7 @@ struct Triangle{
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const Triangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
+    return out;
 } 
 
 struct SSE_ALIGNAS SoATriangle{
@@ -95,6 +98,7 @@ struct SSE_ALIGNAS SoATriangle{
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
+    return out;
 } 
 
 struct Box
@@ -108,6 +112,7 @@ struct Box
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const Box &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
+    return out;
 } 
 
 struct SSE_ALIGNAS SoABox
@@ -120,6 +125,7 @@ struct SSE_ALIGNAS SoABox
         return (&min_point)[idx];
     }
 };
+
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoABox &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
 } 

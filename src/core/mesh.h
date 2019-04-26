@@ -55,6 +55,8 @@ NARUKAMI_BEGIN
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
 
+    std::vector<SoATriangle> cast2SoA(const std::vector<std::shared_ptr<MeshTriangle>>& triangles,uint32_t start,uint32_t count);
+
     std::vector<std::shared_ptr<MeshTriangle>> CreateMeshTriangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
 
 NARUKAMI_END

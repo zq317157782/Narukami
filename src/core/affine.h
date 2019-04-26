@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -214,7 +214,7 @@ struct SSE_ALIGNAS SoAVector3f{
 
     SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
     explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v3.x,v2.x,v1.x,v0.x),yyyy(v3.y,v2.y,v1.y,v0.y),zzzz(v3.z,v2.z,v1.z,v0.z){ }
+    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
     explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
     SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
     SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
@@ -249,6 +249,7 @@ FINLINE SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 x
 
 FINLINE SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(v.xxxx); vv.yyyy = rcp(v.yyyy); vv.zzzz = rcp(v.zzzz); return vv; }
 FINLINE SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(v.xxxx); vv.yyyy = safe_rcp(v.yyyy); vv.zzzz = safe_rcp(v.zzzz); return vv; }
+FINLINE SoAVector3f load(const Vector3f* vector_array){ return SoAVector3f(vector_array[0],vector_array[1],vector_array[2],vector_array[3]); }
 //---VECTOR3 END---
 
 //---POINT3 BEGIN---
@@ -408,7 +409,7 @@ struct SSE_ALIGNAS SoAPoint3f{
 
     SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
     explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v3.x,v2.x,v1.x,v0.x),yyyy(v3.y,v2.y,v1.y,v0.y),zzzz(v3.z,v2.z,v1.z,v0.z){ }
+    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
     explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
     SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
     SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
@@ -438,7 +439,9 @@ FINLINE int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
     return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
-
+FINLINE SoAPoint3f load(const Point3f* point_array){ 
+    return SoAPoint3f(point_array[0],point_array[1],point_array[2],point_array[3]); 
+}
 //---POINT3 END---
 
 //---NORMAL3 BEGIN---
