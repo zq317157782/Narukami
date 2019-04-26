@@ -133,7 +133,7 @@ struct GeometryInteraction
 };
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt,Point2f* uv){
+FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt= nullptr,Point2f* uv= nullptr){
     auto O = ray_o;
     auto D = ray_d;
 
@@ -176,44 +176,8 @@ FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ra
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Ray& ray,const Triangle& triangle,GeometryInteraction* hit=nullptr){
-    auto O = ray.o;
-    auto D = ray.d;
-
-    auto V0 = triangle.v0;
-    auto E1 = triangle.e1;
-    auto E2 = triangle.e2;
-
-    auto T = O - V0;
-    auto P = cross(D,E2);
-    auto Q = cross(T,E1);
-
-    auto P_dot_E1 = dot(P,E1);
-
-    if(P_dot_E1<=EPSION&&P_dot_E1>=-EPSION){
-        return false;
-    }
-
-    auto P_dot_T = dot(P,T);
-    auto Q_dot_D = dot(Q,D);
-
-    auto inv_P_dot_E1 = 1.0f/P_dot_E1;
-    auto u = P_dot_T*inv_P_dot_E1;
-    auto v = Q_dot_D*inv_P_dot_E1;
-
-    if(!(u>=0.0f&&v>=0.0f&&(u+v)<=1.0f)){
-        return false;
-    }
-    float t = dot(Q,E2)*inv_P_dot_E1;
-    if(t>=0&&t<=ray.t_max){
-        if(hit){
-            hit->t= t;
-            hit->u= u;
-            hit->v= v;
-        }
-        return true;
-    }
-    return false;
+FINLINE bool intersect(const Ray& ray,const Triangle& triangle,float* t= nullptr,Point2f* uv = nullptr){
+    return intersect(ray.o,ray.d,ray.t_max,triangle.v0,triangle.e1,triangle.e2,t,uv);
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf

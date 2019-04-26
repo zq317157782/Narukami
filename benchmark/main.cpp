@@ -485,7 +485,8 @@ BENCHMARK(BM_matrix4x4_mul_point3_sse);
 
 
 static void BM_intersect_triangle(benchmark::State &state)
-{   narukami::GeometryInteraction hit;
+{    float t;
+    narukami::Point2f uv;
      narukami::Ray r(narukami::Point3f(rand(),rand(),rand()),narukami::Vector3f(rand(),rand(),rand()));
     auto triangles = new narukami::Triangle[state.range(0)];
     
@@ -500,7 +501,7 @@ static void BM_intersect_triangle(benchmark::State &state)
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(intersect(r,triangles[i],&hit));
+            benchmark::DoNotOptimize(intersect(r,triangles[i],&t,&uv));
         }
         
     }
