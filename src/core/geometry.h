@@ -230,7 +230,9 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= 
     }
 
     if(tt){
-        int min_mask=reduce_min_mask(t,tt);
+        bool4 min_bool4=reduce_min_mask(t,tt);
+        min_bool4=min_bool4&bool4(mask);
+        auto min_mask=movemask(min_bool4);
         int idx=0;
         if(index||uv){
             if(min_mask&0x1){

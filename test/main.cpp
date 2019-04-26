@@ -428,17 +428,17 @@ TEST(float4 ,rcp){
 TEST(float4 ,reduce_min_mask){
     float4 a(5,6,3,4);
     float b;
-    int mask=reduce_min_mask(a,&b);
+    auto mask=reduce_min_mask(a,&b);
     EXPECT_EQ(b,3);
-    EXPECT_EQ(mask,4);
+    EXPECT_EQ(movemask(mask),4);
 }
 
 TEST(float4 ,reduce_max_mask){
     float4 a(5,6,3,4);
     float b;
-    int mask=reduce_max_mask(a,&b);
+    auto mask=reduce_max_mask(a,&b);
     EXPECT_EQ(b,6);
-    EXPECT_EQ(mask,2);
+    EXPECT_EQ(movemask(mask),2);
 }
 
 TEST(float4,vreduce_add){
