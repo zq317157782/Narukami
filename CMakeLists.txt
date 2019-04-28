@@ -58,7 +58,8 @@ target_link_libraries(narukami_benchmark benchmark)
 
 #demos
 add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp)
-add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp)
+add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
+               src/core/imageio.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

@@ -4,6 +4,7 @@
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/mesh.h"
+#include "core/imageio.h"
 using namespace narukami;
 int main(){
     
@@ -20,6 +21,7 @@ int main(){
     std::cout<<soa_triangles[0];
 
     std::vector<uint8_t> image;
+    float data[128*128*3];
 	for (int i = 0; i<128*128; ++i) {
 		narukami::Point2f uv;
 		float t;
@@ -34,23 +36,11 @@ int main(){
         //     }
         // }
         uv=triangles[index]->sample_uv(uv);
-
-		float rgb[3];
-		if (b){
-            rgb[0] = uv.x;
-		    rgb[1] = uv.y;
-		    rgb[2] = 0;
-        }
-        else{
-            rgb[0] = 0;
-		    rgb[1] = 0;
-		    rgb[2] = 0;
-        }
-        
-		image.push_back(rgb[0] * 255);//R
-		image.push_back(rgb[1] * 255);//G
-		image.push_back(rgb[2] * 255);//B
-		image.push_back(255);		//A
+        data[i*3] = uv[0];
+        data[i*3+1] = uv[1];
+        data[i*3+2] = 0; 
 	}
-	unsigned error = lodepng::encode("mesh.png", image, 128, 128);
+
+    narukami::write_image_to_file("mesh.png",data,128,128);
+	//unsigned error = lodepng::encode(, image, 128, 128);
 }
