@@ -14,6 +14,7 @@ include_directories(external)
 include_directories(external/benchmark/include/benchmark)
 include_directories(external/lodepng)
 include_directories(external/lua/src)
+include_directories(external/tinyobjloader)
 
 #add gtest
 set(gtest_force_shared_crt ON)
@@ -28,6 +29,10 @@ add_subdirectory(external/glog)
 #add lua
 add_subdirectory(external/lua)
 
+
+#add tinyobjloader
+add_subdirectory(external/tinyobjloader)
+
 #add embree3
 # set(EMBREE_ISPC_SUPPORT OFF)
 # set(EMBREE_TUTORIALS OFF)
@@ -40,7 +45,7 @@ add_subdirectory(external/benchmark)
  
 #narukami
 add_executable(narukami src/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
-target_link_libraries(narukami glog)
+target_link_libraries(narukami glog tinyobjloader)
 # target_link_libraries(narukami embree)
 
 #narukami_test
