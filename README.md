@@ -16,4 +16,5 @@ lightweight PBRT-style path tracer
  - [x] basic triangle mesh structure 
    - [ ] read obj model 
  - [ ] basic path tracing framework
+ - [x] basic image i/o 
  
