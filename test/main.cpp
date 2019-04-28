@@ -760,6 +760,10 @@ TEST(geometry,ray_intersect_soatriangle){
    
 }
 
+TEST(geometry,size_of_soatriangle){
+    EXPECT_EQ(sizeof(SoATriangle),144);
+}
+
 // TEST(soabox,collide){
     
 //     SoABox box;
