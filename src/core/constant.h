@@ -32,12 +32,12 @@ static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsil
 static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
 
 
-static MAYBE_UNUSED constexpr float PI = 3.14159265358979323846;
-static MAYBE_UNUSED constexpr float INV_PI = 0.31830988618379067154;
-static MAYBE_UNUSED constexpr float INV_TWO_PI = 0.15915494309189533577;
-static MAYBE_UNUSED constexpr float INV_FOUR_PI = 0.07957747154594766788;
-static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923;
-static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961;
+static MAYBE_UNUSED constexpr float PI = 3.14159265358979323846f;
+static MAYBE_UNUSED constexpr float INV_PI = 0.31830988618379067154f;
+static MAYBE_UNUSED constexpr float INV_TWO_PI = 0.15915494309189533577f;
+static MAYBE_UNUSED constexpr float INV_FOUR_PI = 0.07957747154594766788f;
+static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
+static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
 
 
 NARUKAMI_END
