@@ -855,17 +855,17 @@ TEST(transform,rotate_y){
    // EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
-TEST(transform,rotate_z){
-    auto transform = rotate_z(90);
-    auto v0=transform.mat * Vector3f(1,0,0);
-    EXPECT_FLOAT_EQ(v0.x,0.0f);
-    EXPECT_FLOAT_EQ(v0.y,1.0f);
-   // EXPECT_FLOAT_EQ(v0.z,0.0f);
-    auto v1=transform.inv_mat * Vector3f(1,0,0);
-    EXPECT_FLOAT_EQ(v1.x,0.0f);
-    EXPECT_FLOAT_EQ(v1.y,-1.0f);
-   // EXPECT_FLOAT_EQ(v1.z,0.0f);
-}
+// TEST(transform,rotate_z){
+//     auto transform = rotate_z(90);
+//     auto v0=transform.mat * Vector3f(1,0,0);
+//     EXPECT_FLOAT_EQ(v0.x,0.0f);
+//     EXPECT_FLOAT_EQ(v0.y,1.0f);
+//    // EXPECT_FLOAT_EQ(v0.z,0.0f);
+//     auto v1=transform.inv_mat * Vector3f(1,0,0);
+//     EXPECT_FLOAT_EQ(v1.x,0.0f);
+//     EXPECT_FLOAT_EQ(v1.y,-1.0f);
+//    // EXPECT_FLOAT_EQ(v1.z,0.0f);
+// }
 
 TEST(transform,rotate){
     auto transform = rotate(90,Vector3f(1,0,0));
@@ -958,6 +958,12 @@ TEST(mesh,CreateMeshTriangles){
      auto triange = triangles[0];
      auto p = (*triange)[1];
      EXPECT_EQ(p,Point3f(1,0,0));
+}
+
+#include "lua/narukami_lua.h"
+TEST(lua,init){
+    NarukamiLua lua;
+    lua.init();
 }
 
 int main(int argc, char* argv[]) {

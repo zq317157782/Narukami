@@ -13,6 +13,7 @@ include_directories(external)
 #include_directories(external/embree/include/embree3)
 include_directories(external/benchmark/include/benchmark)
 include_directories(external/lodepng)
+include_directories(external/lua/src)
 
 #add gtest
 set(gtest_force_shared_crt ON)
@@ -23,6 +24,9 @@ add_subdirectory(external/googletest)
 #add glog
 set(WITH_GFLAGS OFF)
 add_subdirectory(external/glog)
+
+#add lua
+add_subdirectory(external/lua)
 
 #add embree3
 # set(EMBREE_ISPC_SUPPORT OFF)
@@ -41,7 +45,7 @@ target_link_libraries(narukami glog)
 
 #narukami_test
 add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
-target_link_libraries(narukami_test gtest)
+target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp
 add_executable(narukami_benchmark benchmark/main.cpp src/core/constant.cpp src/core/sse.cpp)
