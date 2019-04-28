@@ -24,7 +24,7 @@ int main(){
 		narukami::Point2f uv;
 		float t;
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
-        uint32_t index;
+        int index;
         bool b =intersect(ray,soa_triangles[0],&t,&uv,&index);
        // std::cout<<index;
         // for(int j=0;j<soa_triangles.size();++j){

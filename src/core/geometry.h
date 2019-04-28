@@ -91,6 +91,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Triangle &triangle) {
     return out;
 } 
 
+//v0(128*3)+e1(128*3)+e2(128*3)
 struct SSE_ALIGNAS SoATriangle{
     SoAPoint3f v0;
     SoAVector3f e1;
@@ -180,7 +181,7 @@ FINLINE bool intersect(const Ray& ray,const Triangle& triangle,float* t= nullptr
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= nullptr,Point2f* uv= nullptr,uint32_t*index= nullptr,__m128 mask=SSE_MASK_TRUE){
+FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= nullptr,Point2f* uv= nullptr,int*index= nullptr,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
