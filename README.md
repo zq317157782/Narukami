@@ -5,7 +5,7 @@ lightweight PBRT-style path tracer
  - [x] element math 
  - [x] vector math
  - [x] matrix math
-   - [ ] SSE general inverse
+   - [x] SSE general inverse
  - [x] transform structure
  - [x] basic/SoA ray structure
  - [x] basic/SoA triangle structure (one vertex with two edge vector)
@@ -13,3 +13,5 @@ lightweight PBRT-style path tracer
  - [ ] partial differential dpdu/dpdv for triangle
  - [x] basic/SoA AABB structure(for QBVH) and intersect scheme
  - [x] basic spectrum structure
+ - [x] basic triangle mesh structure 
+ - [ ] basic path tracing framework
