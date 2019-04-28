@@ -14,7 +14,7 @@ int main(){
      uint32_t indices[6]={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=CreateMeshTriangles(&transform,&transform2,2,indices,4,vertices,nullptr,uvs);
+     auto triangles=create_mesh_triangles(&transform,&transform2,2,indices,4,vertices,nullptr,uvs);
     
      auto soa_triangles=cast2SoA(triangles,0,2);
     std::cout<<soa_triangles[0];

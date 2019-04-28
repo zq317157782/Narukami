@@ -71,7 +71,7 @@ NARUKAMI_BEGIN
       
     }
 
-std::vector<std::shared_ptr<MeshTriangle>> CreateMeshTriangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals,const Point2f *uvs){
+std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals,const Point2f *uvs){
      std::shared_ptr<MeshData> mesh_data=std::make_shared<MeshData>(*object2wrold,triangle_num,indices,vertex_num,vertices,normals,uvs);
      std::vector<std::shared_ptr<MeshTriangle>> triangles;
      for(int i=0;i<triangle_num;++i){
