@@ -1,6 +1,4 @@
 #include "core/narukami.h"
-#include <vector>
-#include "lodepng.h"
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/mesh.h"

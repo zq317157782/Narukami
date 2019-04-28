@@ -32,18 +32,22 @@ void write_image_to_file(const char* file_name,const float* data,const int width
     assert(file_name);
     auto suf=suffix(file_name);
     if((std::strcmp(suf,"png")==0)||(std::strcmp(suf,"PNG")==0)){
+        //TODO opmtize by thread
         std::vector<uint8_t> image;
-		for (int i = 0; i<width*height; ++i) {
-			float rgb[3];
-			rgb[0] = data[i * 3];
-			rgb[1] = data[i * 3 + 1];
-			rgb[2] = data[i * 3 + 2];
 
-			image.push_back(rgb[0] * 255);//R
-			image.push_back(rgb[1] * 255);//G
-			image.push_back(rgb[2] * 255);//B
-			image.push_back(255);		//A
-		}
+        for(int y=height-1;y>=0;--y){
+            for(int x = 0;x<width;++x){
+                float rgb[3];
+			    rgb[0] = data[(y*height+x)*3];
+			    rgb[1] = data[(y*height+x)*3+1];
+			    rgb[2] = data[(y*height+x)*3+2];
+
+                image.push_back(rgb[0] * 255);//R
+			    image.push_back(rgb[1] * 255);//G
+			    image.push_back(rgb[2] * 255);//B
+			    image.push_back(255);		//A
+            }
+        }
 
 		unsigned error = lodepng::encode(file_name, image, width, height);
 		if (error) {
