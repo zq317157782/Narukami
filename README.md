@@ -14,4 +14,6 @@ lightweight PBRT-style path tracer
  - [x] basic/SoA AABB structure(for QBVH) and intersect scheme
  - [x] basic spectrum structure
  - [x] basic triangle mesh structure 
+   - [ ] read obj model 
  - [ ] basic path tracing framework
+ 
