@@ -63,7 +63,6 @@ NARUKAMI_BEGIN
 
     std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
 
-    //std::vector<std::shared_ptr<MeshTriangle>> 
 
 
 NARUKAMI_END

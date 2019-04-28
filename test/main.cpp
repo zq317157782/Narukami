@@ -948,12 +948,12 @@ TEST(mesh,meshdata){
     EXPECT_EQ(data.indices[5],3); 
 }
 
-TEST(mesh,CreateMeshTriangles){
+TEST(mesh,create_mesh_triangles){
      Point3f vertices[4]={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
      uint32_t indices[6]={0,1,2,1,2,3};
      auto transform = translate(Vector3f(1,0,0));
      auto transform2 = translate(Vector3f(-1,0,0));
-     auto triangles=CreateMeshTriangles(&transform,&transform2,2,indices,4,vertices);
+     auto triangles=create_mesh_triangles(&transform,&transform2,2,indices,4,vertices);
      EXPECT_EQ(triangles.size(),2);
      auto triange = triangles[0];
      auto p = (*triange)[1];
