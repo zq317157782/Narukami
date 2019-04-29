@@ -18,3 +18,10 @@ lightweight PBRT-style path tracer
  - [ ] basic path tracing framework
  - [x] basic image i/o 
  
+# Reference
+[Physically Based Rendering](https://www.pbrt.org/)
+
+[Embree](https://embree.github.io/)
+
+[Mitsuba renderer](https://www.mitsuba-renderer.org/)
+ 
