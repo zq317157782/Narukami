@@ -523,6 +523,9 @@ struct Point2
 
 
 template <typename T>
+FINLINE  std::ostream &operator<<(std::ostream &out, const Point2<T> &v) { out << '(' << v.x << ',' << v.y <<  ')'; return out; }
+
+template <typename T>
 FINLINE bool operator==(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y)) { return true; } return false; }
 template <typename T>
 FINLINE bool operator!=(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) ) { return true; } return false; }
