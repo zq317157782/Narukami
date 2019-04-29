@@ -1025,6 +1025,11 @@ TEST(Bounds3f,collide){
     EXPECT_TRUE(isHit);
 }
 
+#include "core/film.h"
+TEST(film,construct){
+    Film film(Point2i(128,128));
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
