@@ -31,6 +31,7 @@ NARUKAMI_BEGIN
 
   }
 
+  //TODO SSE alignas
   std::vector<SoATriangle> cast2SoA(const std::vector<std::shared_ptr<MeshTriangle>>& triangles,uint32_t start,uint32_t count){
         assert(count>0);
         assert((start+count)<=triangles.size());
