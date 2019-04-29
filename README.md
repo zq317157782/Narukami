@@ -11,12 +11,16 @@ lightweight PBRT-style path tracer
  - [x] basic/SoA triangle structure (one vertex with two edge vector)
  - [x] intersect func for ray and SoA triangle(single ray with four triangle)
  - [ ] partial differential dpdu/dpdv for triangle
+ - [x] basic rect structure 
  - [x] basic/SoA AABB structure(for QBVH) and intersect scheme
  - [x] basic spectrum structure
  - [x] basic triangle mesh structure 
    - [ ] read obj model 
  - [ ] basic path tracing framework
- - [x] basic image i/o 
+ - [ ] basic image i/o 
+   - [x] write PNG
+   - [ ] read PNG
+ - [ ] basic film structure
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
