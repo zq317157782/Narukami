@@ -324,6 +324,11 @@ FINLINE Point3f sqrt(const Point3<T> &v1) { return Point3f(sqrt(v1.x), sqrt(v1.y
 template <typename T>
 FINLINE Point3f rsqrt(const Point3<T> &v1){ return Point3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
 
+template <typename T>
+FINLINE Point3<T> min(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(min(p0.x,p1.x),min(p0.y,p1.y),min(p0.z,p1.z)); }
+template <typename T>
+FINLINE Point3<T> max(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(max(p0.x,p1.x),max(p0.y,p1.y),max(p0.z,p1.z)); }
+
 
 
 //--- [SSE] ---

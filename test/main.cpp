@@ -317,6 +317,22 @@ TEST(ssevector3f,rsqrt){
     EXPECT_FLOAT_EQ(v2.z,0.25f);
 }
 
+
+TEST(point3f,min){
+    Point3f p0(1,10,2);
+    Point3f p1(10,3,7);
+    auto min_point=min(p0,p1);
+    EXPECT_EQ(min_point,Point3f(1,3,2));
+}
+
+
+TEST(point3f,max){
+    Point3f p0(1,10,2);
+    Point3f p1(10,3,7);
+    auto max_point=max(p0,p1);
+    EXPECT_EQ(max_point,Point3f(10,10,7));
+}
+
 // TEST(sse,_sse_blendv_ps){
 //     __m128 a =_mm_set1_ps(5.0f);
 //     __m128 b =_mm_set1_ps(6.0f);
