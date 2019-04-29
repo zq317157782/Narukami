@@ -61,6 +61,7 @@ add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp 
 add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
                src/core/imageio.cpp)
 add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
+add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
