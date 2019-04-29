@@ -449,6 +449,14 @@ FINLINE int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
     return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
+FINLINE SoAPoint3f min(const SoAPoint3f& p0,const SoAPoint3f& p1){
+    return SoAPoint3f(min(p0.xxxx,p1.xxxx),min(p0.yyyy,p1.yyyy),min(p0.zzzz,p1.zzzz));
+}
+
+FINLINE SoAPoint3f max(const SoAPoint3f& p0,const SoAPoint3f& p1){
+    return SoAPoint3f(max(p0.xxxx,p1.xxxx),max(p0.yyyy,p1.yyyy),max(p0.zzzz,p1.zzzz));
+}
+
 FINLINE SoAPoint3f load(const Point3f* point_array){ 
     return SoAPoint3f(point_array[0],point_array[1],point_array[2],point_array[3]); 
 }
