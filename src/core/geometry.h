@@ -102,24 +102,106 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle
     return out;
 } 
 
+
+template<typename T>
+struct Bounds2
+{
+    Point2<T> min_point;
+    Point2<T> max_point;
+    FINLINE const Point2<T>& operator[](const int idx) const{
+        assert(idx>=0&&idx<2);
+        return (&min_point)[idx];
+    }
+
+    FINLINE Bounds2(){
+        T min_value=std::numeric_limits<T>::lowest();
+        T max_value=std::numeric_limits<T>::max();
+        min_point=Point2<T>(max_value,max_value,max_value);
+        max_point=Point2<T>(min_value,min_value,min_value);
+    }
+
+    FINLINE Bounds2(const Point2<T>& p0,const Point2<T>& p1){
+        min_point=min(p0,p1);
+        max_point=max(p0,p1);
+    }
+};
+template<typename T>
+FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
+    out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
+    return out;
+} 
+
+typedef Bounds2<float> Bounds2f;
+typedef Bounds2<int> Bounds2i;
+
+// from PBRT
+class Bounds2iIterator: public std::forward_iterator_tag {
+public:
+	inline Bounds2iIterator(const Bounds2i &b, const Point2i &pt) :
+			_p(pt), _bounds(&b) {
+	}
+	inline Bounds2iIterator operator++() {
+		advance();
+		return *this;
+	}
+	inline Bounds2iIterator operator++(int) {
+		Bounds2iIterator old = *this;
+		advance();
+		return old;
+	}
+	inline bool operator==(const Bounds2iIterator &bi) const {
+		return _p == bi._p && _bounds == bi._bounds;
+	}
+	inline bool operator!=(const Bounds2iIterator &bi) const {
+		return _p != bi._p || _bounds != bi._bounds;
+	}
+
+	inline Point2i operator*() const {
+		return _p;
+	}
+
+private:
+	inline void advance() {
+		++_p.x;
+		if (_p.x == _bounds->max_point.x) {
+			_p.x = _bounds->min_point.x;
+			++_p.y;
+		}
+	}
+	Point2i _p;
+	const Bounds2i *_bounds;
+};
+
+inline Bounds2iIterator begin(const Bounds2i &b) {
+	return Bounds2iIterator(b, b.min_point);
+}
+
+inline Bounds2iIterator end(const Bounds2i &b) {
+	Point2i pEnd(b.min_point.x, b.max_point.y);
+	if (b.min_point.x >= b.max_point.x || b.min_point.y >= b.max_point.y)
+		pEnd = b.min_point;
+	return Bounds2iIterator(b, pEnd);
+}
+
+
 template<typename T>
 struct Bounds3
 {
     Point3<T> min_point;
     Point3<T> max_point;
-    const Point3<T>& operator[](const int idx) const{
+    FINLINE const Point3<T>& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 
-    Bounds3(){
+    FINLINE Bounds3(){
         T min_value=std::numeric_limits<T>::lowest();
         T max_value=std::numeric_limits<T>::max();
         min_point=Point3<T>(max_value,max_value,max_value);
         max_point=Point3<T>(min_value,min_value,min_value);
     }
 
-    Bounds3(const Point3<T>& p0,const Point3<T>& p1){
+    FINLINE Bounds3(const Point3<T>& p0,const Point3<T>& p1){
         min_point=min(p0,p1);
         max_point=max(p0,p1);
     }
@@ -139,17 +221,17 @@ struct SSE_ALIGNAS SoABounds3f
     SoAPoint3f min_point;
     SoAPoint3f max_point;
 
-    const SoAPoint3f& operator[](const int idx) const{
+    FINLINE const SoAPoint3f& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 
-    SoABounds3f(){
+    FINLINE SoABounds3f(){
         min_point=SoAPoint3f(MAX,MAX,MAX);
         max_point=SoAPoint3f(LOWEST,LOWEST,LOWEST);
     }
 
-    SoABounds3f(const SoAPoint3f& p0,const SoAPoint3f& p1){
+    FINLINE SoABounds3f(const SoAPoint3f& p0,const SoAPoint3f& p1){
         min_point = min(p0,p1);
         max_point = max(p0,p1);
     }
