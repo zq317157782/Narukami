@@ -53,7 +53,7 @@ add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cp
 target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp
-add_executable(narukami_benchmark benchmark/main.cpp src/core/constant.cpp src/core/sse.cpp)
+add_executable(narukami_benchmark benchmark/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
 target_link_libraries(narukami_benchmark benchmark)
 
 #demos
