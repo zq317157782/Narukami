@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/spectrum.h"
 #include "core/geometry.h"
 #include "core/memory.h"
+#include "core/imageio.h"
 NARUKAMI_BEGIN
 
 //16bytes
@@ -34,16 +35,44 @@ struct Pixel
 {
    float rgb[3];
    float weight;
+
+   Pixel(){
+       rgb[0]=0.0f;
+       rgb[1]=0.0f;
+       rgb[2]=0.0f;
+       weight=0.0f;
+   }
 };
 
 class Film{
     private:
+        
         const Point2i _resolution;
         std::unique_ptr<Pixel[]> _pixels;
+        
+        const Pixel& get_pixel(int x,int y) const{
+            return _pixels[y*_resolution.x+x];
+        }
     public:
         Film(const Point2i& resolution):_resolution(resolution){
             _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(_resolution.x*_resolution.y*sizeof(Pixel))));
         }
+
+        void write_to_file(const char* file_name) const{
+            std::vector<float> data;
+            for(size_t y=0;y<_resolution.y;++y){
+                for(size_t x=0;x<_resolution.x;++x){
+                    const auto pixel=get_pixel(x,y);
+                    float inv_w=rcp(pixel.weight);
+                    data.push_back(pixel.rgb[0]*inv_w);
+                    data.push_back(pixel.rgb[1]*inv_w);
+                    data.push_back(pixel.rgb[2]*inv_w);
+                }
+            }
+            write_image_to_file(file_name,&data[0],_resolution.x,_resolution.y);
+        }
+
 };
+
 
 NARUKAMI_END
