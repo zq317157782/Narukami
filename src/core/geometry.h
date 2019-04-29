@@ -102,19 +102,25 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle
     return out;
 } 
 
-struct Box
+template<typename T>
+struct Bounds3
 {
-    Point3f min_point;
-    Point3f max_point;
-    const Point3f& operator[](const int idx) const{
+    Point3<T> min_point;
+    Point3<T> max_point;
+    const Point3<T>& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 };
-FINLINE  std::ostream &operator<<(std::ostream &out, const Box &box) {
+
+template<typename T>
+FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
     return out;
 } 
+
+typedef Bounds3<float> Bounds3f;
+typedef Bounds3<int> Bounds3i;
 
 struct SSE_ALIGNAS SoABox
 {
@@ -265,7 +271,7 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= 
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
-FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Box& box){
+FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Bounds3f& box){
     //x
     t_min = max(t_min,(box[1-isPositive[0]].x-o.x)*inv_d.x);
     t_max = min(t_max,(box[isPositive[0]].x-o.x)*inv_d.x);
