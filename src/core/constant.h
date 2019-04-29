@@ -30,6 +30,8 @@ static   MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
 static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon();
 
 static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
+static   MAYBE_UNUSED constexpr float MAX =std::numeric_limits<float>::max();
+static   MAYBE_UNUSED constexpr float LOWEST =std::numeric_limits<float>::lowest();
 
 
 static MAYBE_UNUSED constexpr float PI = 3.14159265358979323846f;
