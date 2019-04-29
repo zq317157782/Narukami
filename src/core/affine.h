@@ -119,6 +119,11 @@ FINLINE Vector3f sqrt(const Vector3<T> &v1) { return Vector3f(sqrt(v1.x), sqrt(v
 template <typename T>
 FINLINE Vector3f rsqrt(const Vector3<T> &v1){ return Vector3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
 
+template <typename T>
+FINLINE Vector3<T> min(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(min(v0.x,v1.x),min(v0.y,v1.y),min(v0.z,v1.z)); }
+template <typename T>
+FINLINE Vector3<T> max(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(max(v0.x,v1.x),max(v0.y,v1.y),max(v0.z,v1.z)); }
+
 //--- [SSE] ---
 //16 bit
 struct SSE_ALIGNAS SSEVector3f{

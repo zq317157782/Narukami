@@ -317,6 +317,21 @@ TEST(ssevector3f,rsqrt){
     EXPECT_FLOAT_EQ(v2.z,0.25f);
 }
 
+TEST(vector3f,min){
+    Vector3f p0(1,10,2);
+    Vector3f p1(10,3,7);
+    auto min_point=min(p0,p1);
+    EXPECT_EQ(min_point,Vector3f(1,3,2));
+}
+
+TEST(vector3f,max){
+    Vector3f p0(1,10,2);
+    Vector3f p1(10,3,7);
+    auto max_point=max(p0,p1);
+    EXPECT_EQ(max_point,Vector3f(10,10,7));
+}
+
+
 
 TEST(point3f,min){
     Point3f p0(1,10,2);
@@ -1001,6 +1016,7 @@ TEST(lua,init){
     NarukamiLua lua;
     lua.init();
 }
+
 
 TEST(Bounds3f,collide){
     Bounds3f bounds(Point3f(0,0,0),Point3f(1,1,1));
