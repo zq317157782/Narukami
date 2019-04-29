@@ -122,7 +122,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box) {
 typedef Bounds3<float> Bounds3f;
 typedef Bounds3<int> Bounds3i;
 
-struct SSE_ALIGNAS SoABox
+struct SSE_ALIGNAS SoABounds3f
 {
     SoAPoint3f min_point;
     SoAPoint3f max_point;
@@ -133,7 +133,7 @@ struct SSE_ALIGNAS SoABox
     }
 };
 
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoABox &box) {
+FINLINE  std::ostream &operator<<(std::ostream &out, const SoABounds3f &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
 } 
 
@@ -286,7 +286,7 @@ FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_
 }
 
 
-FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABox& box){
+FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
     // x
     t_min = max(t_min,(box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
     t_max = min(t_max,(box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
