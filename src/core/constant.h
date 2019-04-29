@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/platform.h"
 #include "core/narukami.h"
 NARUKAMI_BEGIN
-static   MAYBE_UNUSED const float MIN_RCP_INPUT = 1E-18f;
+static   MAYBE_UNUSED constexpr float MIN_RCP_INPUT = 1E-18f;
 static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon();
 
 static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
@@ -40,6 +40,7 @@ static MAYBE_UNUSED constexpr float INV_TWO_PI = 0.15915494309189533577f;
 static MAYBE_UNUSED constexpr float INV_FOUR_PI = 0.07957747154594766788f;
 static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
 static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
+
 
 
 NARUKAMI_END
