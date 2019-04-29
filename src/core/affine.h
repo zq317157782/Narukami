@@ -224,7 +224,7 @@ struct SSE_ALIGNAS SoAVector3f{
     SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
     SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
 };
-
+ 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
@@ -828,7 +828,7 @@ FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
 
 //TODO need optimal
 FINLINE Matrix4x4 minor(const Matrix4x4& mat){
-    __m128 m0 = swizzle<1,0,0,0>(mat.col[1])
+    float4 m0 = swizzle<1,0,0,0>(mat.col[1])
                *swizzle<2,2,1,1>(mat.col[2])
                *swizzle<3,3,3,2>(mat.col[3]);
     m0 = m0 + swizzle<2,2,1,1>(mat.col[1])
@@ -847,7 +847,7 @@ FINLINE Matrix4x4 minor(const Matrix4x4& mat){
              *swizzle<3,3,3,2>(mat.col[2])
              *swizzle<2,0,0,0>(mat.col[3]);
     
-    __m128 m1 = swizzle<1,0,0,0>(mat.col[0])
+    float4 m1 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<2,2,1,1>(mat.col[2])
                *swizzle<3,3,3,2>(mat.col[3]);
     m1 = m1 + swizzle<2,2,1,1>(mat.col[0])
@@ -866,7 +866,7 @@ FINLINE Matrix4x4 minor(const Matrix4x4& mat){
              *swizzle<3,3,3,2>(mat.col[2])
              *swizzle<2,0,0,0>(mat.col[3]);
      
-   __m128 m2 = swizzle<1,0,0,0>(mat.col[0])
+   float4 m2 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<2,2,1,1>(mat.col[1])
                *swizzle<3,3,3,2>(mat.col[3]);
     m2 = m2 + swizzle<2,2,1,1>(mat.col[0])
@@ -885,7 +885,7 @@ FINLINE Matrix4x4 minor(const Matrix4x4& mat){
              *swizzle<3,3,3,2>(mat.col[1])
              *swizzle<2,0,0,0>(mat.col[3]);
 
-    __m128 m3 = swizzle<1,0,0,0>(mat.col[0])
+    float4 m3 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<2,2,1,1>(mat.col[1])
                *swizzle<3,3,3,2>(mat.col[2]);
     m3 = m3 + swizzle<2,2,1,1>(mat.col[0])
@@ -907,7 +907,7 @@ FINLINE Matrix4x4 minor(const Matrix4x4& mat){
 }
 
 FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
-    __m128 m0 = swizzle<1,0,0,0>(mat.col[1])
+    float4 m0 = swizzle<1,0,0,0>(mat.col[1])
                *swizzle<2,3,1,2>(mat.col[2])
                *swizzle<3,2,3,1>(mat.col[3]);
     m0 = m0 + swizzle<2,2,1,1>(mat.col[1])
@@ -926,7 +926,7 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
              *swizzle<3,2,3,1>(mat.col[2])
              *swizzle<2,3,0,2>(mat.col[3]);
 
-    __m128 m1 = swizzle<1,0,0,0>(mat.col[0])
+    float4 m1 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<3,2,3,1>(mat.col[2])
                *swizzle<2,3,1,2>(mat.col[3]);
     m1 = m1 + swizzle<2,2,1,1>(mat.col[0])
@@ -945,7 +945,7 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
              *swizzle<1,2,0,1>(mat.col[2])
              *swizzle<2,0,1,0>(mat.col[3]);
 
-    __m128 m2 = swizzle<1,0,0,0>(mat.col[0])
+    float4 m2 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<2,3,1,2>(mat.col[1])
                *swizzle<3,2,3,1>(mat.col[3]);
     m2 = m2 + swizzle<2,2,1,1>(mat.col[0])
@@ -964,7 +964,7 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
              *swizzle<3,2,3,1>(mat.col[1])
              *swizzle<2,3,0,2>(mat.col[3]);
 
-    __m128 m3 = swizzle<1,0,0,0>(mat.col[0])
+    float4 m3 = swizzle<1,0,0,0>(mat.col[0])
                *swizzle<3,2,3,1>(mat.col[1])
                *swizzle<2,3,1,2>(mat.col[2]);
     m3 = m3 + swizzle<2,2,1,1>(mat.col[0])

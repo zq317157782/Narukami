@@ -239,6 +239,7 @@ struct SSE_ALIGNAS SoABounds3f
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoABounds3f &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
+    return out;
 } 
 
 
