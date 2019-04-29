@@ -111,6 +111,18 @@ struct Bounds3
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
+
+    Bounds3(){
+        T min_value=std::numeric_limits<T>::lowest();
+        T max_value=std::numeric_limits<T>::max();
+        min_point=Point3<T>(max_value,max_value,max_value);
+        max_point=Point3<T>(min_value,min_value,min_value);
+    }
+
+    Bounds3(const Point3<T>& p0,const Point3<T>& p1){
+        min_point=min(p0,p1);
+        max_point=max(p0,p1);
+    }
 };
 
 template<typename T>
@@ -130,6 +142,16 @@ struct SSE_ALIGNAS SoABounds3f
     const SoAPoint3f& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
+    }
+
+    SoABounds3f(){
+        min_point=SoAPoint3f(MAX,MAX,MAX);
+        max_point=SoAPoint3f(LOWEST,LOWEST,LOWEST);
+    }
+
+    SoABounds3f(const SoAPoint3f& p0,const SoAPoint3f& p1){
+        min_point = min(p0,p1);
+        max_point = max(p0,p1);
     }
 };
 
@@ -266,8 +288,6 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= 
     }
     return true;
 }
-
-
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box

@@ -1002,6 +1002,13 @@ TEST(lua,init){
     lua.init();
 }
 
+TEST(Bounds3f,collide){
+    Bounds3f bounds(Point3f(0,0,0),Point3f(1,1,1));
+    int isPositive[3]={1,1,1};
+    bool isHit=collide(Point3f(0,0,0),Vector3f(INFINITE,INFINITE,1),0,1,isPositive,bounds);
+    EXPECT_TRUE(isHit);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
