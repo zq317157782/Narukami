@@ -257,6 +257,34 @@ FINLINE SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = sa
 FINLINE SoAVector3f load(const Vector3f* vector_array){ return SoAVector3f(vector_array[0],vector_array[1],vector_array[2],vector_array[3]); }
 //---VECTOR3 END---
 
+//---VECTOR2 BEGIN---
+template <typename T>
+struct Vector2
+{
+  public:
+    T x, y;
+    typedef T Scalar;
+    enum
+    {
+        N = 2
+    };
+
+  public:
+    FINLINE Vector2() : x(0.0f), y(0.0f) { }
+    FINLINE explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
+    FINLINE Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    //just for checking assert for debug
+#ifdef NARUKAMI_DEBUG
+    FINLINE Vector2(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;  }
+    FINLINE Vector2 &operator=(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+#endif
+    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+};
+typedef Vector2<float> Vector2f;
+typedef Vector2<int> Vector2i;
+//---VECTOR2 END---
+
 //---POINT3 BEGIN---
 template <typename T>
 struct Point3
@@ -1019,7 +1047,6 @@ FINLINE Point3<T> operator-(const Point3<T> &p, const Vector3<T> &v) {return p+(
 template <typename T>
 FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> p; p.x = p1.x - p2.x; p.y = p1.y - p2.y; p.z = p1.z - p2.z; return p; }
 
-
 FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw+v.xyzw; }
 FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw-v.xyzw; }
 FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return p1.xyzw-p2.xyzw; }
@@ -1027,6 +1054,12 @@ FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return
 FINLINE float distance(const Point3f& p1,const Point3f& p2){ return length(p2-p1); }
 
 FINLINE float distance(const SSEPoint3f& p1,const SSEPoint3f& p2){ return length(p2-p1); }
+
+
+template <typename T>
+FINLINE Point2<T> operator+(const Point2<T> &p, const Vector2<T> &v) { Point2<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; return rp; }
+template <typename T>
+FINLINE Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v) {Point2<T> rp; rp.x = p.x - v.x; rp.y = p.y - v.y; return rp;}
 
 FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   
