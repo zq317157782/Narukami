@@ -540,6 +540,8 @@ struct Point2
     FINLINE Point2() : x(0.0f), y(0.0f) { }
     FINLINE explicit Point2(const float a) : x(a), y(a){ assert(!isnan(a)); }
     FINLINE Point2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); }
+    template<typename U>
+    FINLINE Point2(const Point2<U>& p):x((T)p.x),y((T)p.y){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y }
