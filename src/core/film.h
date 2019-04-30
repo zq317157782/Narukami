@@ -46,22 +46,27 @@ struct Pixel
 
 class Film{
     private:
-        
-        const Point2i _resolution;
+       
         std::unique_ptr<Pixel[]> _pixels;
         
         Pixel& get_pixel(const Point2i& p) const{
-            return _pixels[p.y*_resolution.x+p.x];
+            return _pixels[p.y*resolution.x+p.x];
         }
     public:
-        Film(const Point2i& resolution):_resolution(resolution){
-            _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(_resolution.x*_resolution.y*sizeof(Pixel))));
+        const Point2i resolution;
+        Bounds2i bounds;
+    public:
+        Film(const Point2i& resolution,const Bounds2f& bounds):resolution(resolution){
+            _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(resolution.x*resolution.y*sizeof(Pixel))));
+            Point2i bounds_min_p=Point2i((int)ceil(resolution.x*bounds.min_point.x),(int)ceil(resolution.y*bounds.min_point.y));
+            Point2i bounds_max_p=Point2i((int)floor(resolution.x*bounds.max_point.x),(int)floor(resolution.y*bounds.max_point.y));
+            this->bounds=Bounds2i(bounds_min_p,bounds_max_p);
         }
 
         inline void write_to_file(const char* file_name) const{
             std::vector<float> data;
-            for(int y=0;y<_resolution.y;++y){
-                for(int x=0;x<_resolution.x;++x){
+            for(int y=0;y<resolution.y;++y){
+                for(int x=0;x<resolution.x;++x){
                     const Pixel& pixel=get_pixel(Point2i(x,y));
                     float inv_w=rcp(pixel.weight);
                     data.push_back(pixel.rgb[0]*inv_w);
@@ -69,7 +74,7 @@ class Film{
                     data.push_back(pixel.rgb[2]*inv_w);
                 }
             }
-            write_image_to_file(file_name,&data[0],_resolution.x,_resolution.y);
+            write_image_to_file(file_name,&data[0],resolution.x,resolution.y);
         }
 
         inline void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const{
@@ -81,6 +86,7 @@ class Film{
             pixel.weight = pixel.weight + weight;
         }
 
+    
 };
 
 

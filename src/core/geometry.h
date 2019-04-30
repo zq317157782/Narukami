@@ -116,8 +116,8 @@ struct Bounds2
     FINLINE Bounds2(){
         T min_value=std::numeric_limits<T>::lowest();
         T max_value=std::numeric_limits<T>::max();
-        min_point=Point2<T>(max_value,max_value,max_value);
-        max_point=Point2<T>(min_value,min_value,min_value);
+        min_point=Point2<T>(max_value,max_value);
+        max_point=Point2<T>(min_value,min_value);
     }
 
     FINLINE Bounds2(const Point2<T>& p0,const Point2<T>& p1){

@@ -1027,7 +1027,7 @@ TEST(Bounds3f,collide){
 
 #include "core/film.h"
 TEST(film,construct){
-    Film film(Point2i(128,128));
+    Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
 }
 
 int main(int argc, char* argv[]) {

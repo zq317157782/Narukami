@@ -48,7 +48,7 @@ struct Vector3
     };
 
   public:
-    FINLINE Vector3() : x(0.0f), y(0.0f), z(0.0f) { }
+    FINLINE Vector3() : x((T)0), y((T)0), z((T)0) { }
     FINLINE explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     FINLINE Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
@@ -270,7 +270,7 @@ struct Vector2
     };
 
   public:
-    FINLINE Vector2() : x(0.0f), y(0.0f) { }
+    FINLINE Vector2() : x((T)0), y((T)0) { }
     FINLINE explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
     FINLINE Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     //just for checking assert for debug
@@ -298,7 +298,7 @@ struct Point3
     };
 
   public:
-    FINLINE Point3() : x(0.0f), y(0.0f), z(0.0f) { }
+    FINLINE Point3() : x((T)0), y((T)0), z((T)0) { }
     FINLINE explicit Point3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Point3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     //just for checking assert for debug
@@ -508,7 +508,7 @@ struct Normal3
     };
 
   public:
-    FINLINE Normal3() : x(0.0f), y(0.0f), z(0.0f) { }
+    FINLINE Normal3() : x((T)0), y((T)0), z((T)0) { }
     FINLINE explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     FINLINE Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     FINLINE Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
@@ -537,7 +537,7 @@ struct Point2
     };
 
   public:
-    FINLINE Point2() : x(0.0f), y(0.0f) { }
+    FINLINE Point2() : x((T)0), y((T)0) { }
     FINLINE explicit Point2(const float a) : x(a), y(a){ assert(!isnan(a)); }
     FINLINE Point2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); }
     template<typename U>

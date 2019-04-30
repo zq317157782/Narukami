@@ -197,6 +197,9 @@ FINLINE  float lerp(const float x0,const float x1,const float t){
 FINLINE  float  deg2rad ( const float x )  { return x * 1.74532925199432957692e-2f; }
 FINLINE  float  rad2deg ( const float x )  { return x * 5.72957795130823208768e1f; }
 
+FINLINE float ceil(const float x){ return std::ceilf(x); }
+FINLINE float floor(const float x){ return std::floorf(x); }
+
 
 
 
