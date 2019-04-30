@@ -75,9 +75,9 @@ class Film{
         inline void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const{
             Point2i p = Point2i(pos);
             Pixel& pixel = get_pixel(p);
-            pixel.rgb[0] = pixel.rgb[0] + l.r;
-            pixel.rgb[1] = pixel.rgb[1] + l.g;
-            pixel.rgb[2] = pixel.rgb[2] + l.b;
+            pixel.rgb[0] = pixel.rgb[0] + l.r*weight;
+            pixel.rgb[1] = pixel.rgb[1] + l.g*weight;
+            pixel.rgb[2] = pixel.rgb[2] + l.b*weight;
             pixel.weight = pixel.weight + weight;
         }
 
