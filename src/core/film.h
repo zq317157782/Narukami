@@ -50,19 +50,19 @@ class Film{
         const Point2i _resolution;
         std::unique_ptr<Pixel[]> _pixels;
         
-        const Pixel& get_pixel(int x,int y) const{
-            return _pixels[y*_resolution.x+x];
+        Pixel& get_pixel(const Point2i& p) const{
+            return _pixels[p.y*_resolution.x+p.x];
         }
     public:
         Film(const Point2i& resolution):_resolution(resolution){
             _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(_resolution.x*_resolution.y*sizeof(Pixel))));
         }
 
-        void write_to_file(const char* file_name) const{
+        inline void write_to_file(const char* file_name) const{
             std::vector<float> data;
-            for(size_t y=0;y<_resolution.y;++y){
-                for(size_t x=0;x<_resolution.x;++x){
-                    const auto pixel=get_pixel(x,y);
+            for(int y=0;y<_resolution.y;++y){
+                for(int x=0;x<_resolution.x;++x){
+                    const Pixel& pixel=get_pixel(Point2i(x,y));
                     float inv_w=rcp(pixel.weight);
                     data.push_back(pixel.rgb[0]*inv_w);
                     data.push_back(pixel.rgb[1]*inv_w);
@@ -70,6 +70,15 @@ class Film{
                 }
             }
             write_image_to_file(file_name,&data[0],_resolution.x,_resolution.y);
+        }
+
+        inline void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const{
+            Point2i p = Point2i(pos);
+            Pixel& pixel = get_pixel(p);
+            pixel.rgb[0] = pixel.rgb[0] + l.r;
+            pixel.rgb[1] = pixel.rgb[1] + l.g;
+            pixel.rgb[2] = pixel.rgb[2] + l.b;
+            pixel.weight = pixel.weight + weight;
         }
 
 };
