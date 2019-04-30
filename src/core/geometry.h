@@ -131,8 +131,13 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
     return out;
 } 
 
+template<typename T>
+FINLINE float area(const Bounds2<T>& bounds){ float w=bounds.max_point.x-bounds.min_point.x; float h=bounds.max_point.y-bounds.min_point.y; return w*h; }
+
 typedef Bounds2<float> Bounds2f;
 typedef Bounds2<int> Bounds2i;
+
+
 
 // from PBRT
 class Bounds2iIterator: public std::forward_iterator_tag {

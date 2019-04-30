@@ -48,19 +48,23 @@ class Film{
     private:
        
         std::unique_ptr<Pixel[]> _pixels;
-        
+        Bounds2i _bounds;
         Pixel& get_pixel(const Point2i& p) const{
             return _pixels[p.y*resolution.x+p.x];
         }
     public:
         const Point2i resolution;
-        Bounds2i bounds;
+        
     public:
         Film(const Point2i& resolution,const Bounds2f& bounds):resolution(resolution){
-            _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(resolution.x*resolution.y*sizeof(Pixel))));
             Point2i bounds_min_p=Point2i((int)ceil(resolution.x*bounds.min_point.x),(int)ceil(resolution.y*bounds.min_point.y));
             Point2i bounds_max_p=Point2i((int)floor(resolution.x*bounds.max_point.x),(int)floor(resolution.y*bounds.max_point.y));
-            this->bounds=Bounds2i(bounds_min_p,bounds_max_p);
+            this->_bounds=Bounds2i(bounds_min_p,bounds_max_p);
+             _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(area(_bounds)*sizeof(Pixel))));
+        }
+
+        FINLINE const Bounds2i& Bounds() const{
+            return _bounds;
         }
 
         inline void write_to_file(const char* file_name) const{

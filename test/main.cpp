@@ -1025,10 +1025,17 @@ TEST(Bounds3f,collide){
     EXPECT_TRUE(isHit);
 }
 
-#include "core/film.h"
-TEST(film,construct){
-    Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+TEST(Bounds2f,area){
+    Bounds2f b(Point2f(0,0),Point2f(1,1));
+    EXPECT_EQ(area(b),1);
 }
+
+TEST(Bounds2i,area){
+    Bounds2i b(Point2i(0,0),Point2i(2,2));
+    EXPECT_EQ(area(b),4);
+}
+
+#include "core/film.h"
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
