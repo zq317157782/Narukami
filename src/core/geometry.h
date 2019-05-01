@@ -112,6 +112,10 @@ struct Bounds2
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
+    FINLINE  Point2<T>& operator[](const int idx){
+        assert(idx>=0&&idx<2);
+        return (&min_point)[idx];
+    }
 
     FINLINE Bounds2(){
         T min_value=std::numeric_limits<T>::lowest();

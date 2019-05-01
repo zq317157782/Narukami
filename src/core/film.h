@@ -50,7 +50,11 @@ class Film{
         std::unique_ptr<Pixel[]> _pixels;
         Bounds2i _bounds;
         Pixel& get_pixel(const Point2i& p) const{
-            return _pixels[p.y*resolution.x+p.x];
+            assert(inside_exclusive(p,_bounds));
+            auto width=_bounds[1].x-_bounds[0].x;
+            auto x = p.x -_bounds[0].x;
+            auto y = p.y -_bounds[0].y;
+            return _pixels[y*width+x];
         }
     public:
         const Point2i resolution;
@@ -69,8 +73,8 @@ class Film{
 
         inline void write_to_file(const char* file_name) const{
             std::vector<float> data;
-            for(int y=0;y<resolution.y;++y){
-                for(int x=0;x<resolution.x;++x){
+            for(int y=_bounds[0].y;y<_bounds[1].y;++y){
+                for(int x=_bounds[0].x;x<_bounds[1].x;++x){
                     const Pixel& pixel=get_pixel(Point2i(x,y));
                     float inv_w=rcp(pixel.weight);
                     data.push_back(pixel.rgb[0]*inv_w);
