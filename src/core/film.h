@@ -33,7 +33,7 @@ NARUKAMI_BEGIN
 //16bytes
 struct Pixel
 {
-   float rgb[3];
+   float rgb[3]={0.0f,0.0f,0.0f};
    float weight;
 
    Pixel(){
@@ -60,9 +60,9 @@ class Film{
         const Point2i resolution;
         
     public:
-        Film(const Point2i& resolution,const Bounds2f& bounds):resolution(resolution){
-            Point2i bounds_min_p=Point2i((int)ceil(resolution.x*bounds.min_point.x),(int)ceil(resolution.y*bounds.min_point.y));
-            Point2i bounds_max_p=Point2i((int)ceil(resolution.x*bounds.max_point.x),(int)ceil(resolution.y*bounds.max_point.y));
+        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds):resolution(resolution){
+            Point2i bounds_min_p=Point2i((int)ceil(resolution.x*cropped_pixel_bounds.min_point.x),(int)ceil(resolution.y*cropped_pixel_bounds.min_point.y));
+            Point2i bounds_max_p=Point2i((int)ceil(resolution.x*cropped_pixel_bounds.max_point.x),(int)ceil(resolution.y*cropped_pixel_bounds.max_point.y));
             this->_cropped_pixel_bounds=Bounds2i(bounds_min_p,bounds_max_p);
              _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(area(_cropped_pixel_bounds)*sizeof(Pixel))));
         }
