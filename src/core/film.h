@@ -26,8 +26,6 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/spectrum.h"
 #include "core/geometry.h"
-#include "core/memory.h"
-#include "core/imageio.h"
 NARUKAMI_BEGIN
 
 //16bytes
@@ -46,55 +44,23 @@ struct Pixel
 
 class Film{
     private:
-       
         std::unique_ptr<Pixel[]> _pixels;
         Bounds2i _cropped_pixel_bounds;
-        Pixel& get_pixel(const Point2i& p) const{
-            assert(inside_exclusive(p,_cropped_pixel_bounds));
-            auto width=_cropped_pixel_bounds[1].x-_cropped_pixel_bounds[0].x;
-            auto x = p.x -_cropped_pixel_bounds[0].x;
-            auto y = p.y -_cropped_pixel_bounds[0].y;
-            return _pixels[y*width+x];
-        }
+        float _radius,_B,_C;
+        Pixel& get_pixel(const Point2i& p) const;
+        //from PBRT
+        float mitchell_1D(float x) const;
+
     public:
         const Point2i resolution;
-        
+        static constexpr int filter_LUT_width = 16;
     public:
-        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds):resolution(resolution){
-            Point2i bounds_min_p=Point2i((int)ceil(resolution.x*cropped_pixel_bounds.min_point.x),(int)ceil(resolution.y*cropped_pixel_bounds.min_point.y));
-            Point2i bounds_max_p=Point2i((int)ceil(resolution.x*cropped_pixel_bounds.max_point.x),(int)ceil(resolution.y*cropped_pixel_bounds.max_point.y));
-            this->_cropped_pixel_bounds=Bounds2i(bounds_min_p,bounds_max_p);
-             _pixels=std::unique_ptr<Pixel[]>(static_cast<Pixel*>(alloc_aligned<NARUKAMI_CACHE_LINE>(area(_cropped_pixel_bounds)*sizeof(Pixel))));
-        }
-
+        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds,const float filter_radius=1.0f,const float filter_B=1.0f/3.0f,const float filter_C=1.0f/3.0f);
         FINLINE const Bounds2i& cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
         }
-
-        inline void write_to_file(const char* file_name) const{
-            std::vector<float> data;
-            for(int y=_cropped_pixel_bounds[0].y;y<_cropped_pixel_bounds[1].y;++y){
-                for(int x=_cropped_pixel_bounds[0].x;x<_cropped_pixel_bounds[1].x;++x){
-                    const Pixel& pixel=get_pixel(Point2i(x,y));
-                    float inv_w=rcp(pixel.weight);
-                    data.push_back(pixel.rgb[0]*inv_w);
-                    data.push_back(pixel.rgb[1]*inv_w);
-                    data.push_back(pixel.rgb[2]*inv_w);
-                }
-            }
-            write_image_to_file(file_name,&data[0],resolution.x,resolution.y);
-        }
-
-        inline void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const{
-            Point2i p = Point2i(pos);
-            Pixel& pixel = get_pixel(p);
-            pixel.rgb[0] = pixel.rgb[0] + l.r*weight;
-            pixel.rgb[1] = pixel.rgb[1] + l.g*weight;
-            pixel.rgb[2] = pixel.rgb[2] + l.b*weight;
-            pixel.weight = pixel.weight + weight;
-        }
-
-    
+        void write_to_file(const char* file_name) const;
+        void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
 };
 
 
