@@ -49,7 +49,7 @@ target_link_libraries(narukami glog tinyobjloader)
 # target_link_libraries(narukami embree)
 
 #narukami_test
-add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
+add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
 target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp

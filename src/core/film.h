@@ -42,22 +42,30 @@ struct Pixel
    }
 };
 
+//use Mitchell Filter
 class Film{
+    public:
+        const Point2i resolution;
+        static constexpr float B =1.0f/3.0f;
+        static constexpr float C =1.0f/3.0f;
+        static constexpr int FILTER_LUT_WIDTH = 16;
     private:
         std::unique_ptr<Pixel[]> _pixels;
         Bounds2i _cropped_pixel_bounds;
-        float _radius,_B,_C;
+        float _radius,_inv_radius;
         Pixel& get_pixel(const Point2i& p) const;
         //from PBRT
         float mitchell_1D(float x) const;
-
+        float _filter_lut[FILTER_LUT_WIDTH];
     public:
-        const Point2i resolution;
-        static constexpr int filter_LUT_width = 16;
-    public:
-        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds,const float filter_radius=1.0f,const float filter_B=1.0f/3.0f,const float filter_C=1.0f/3.0f);
-        FINLINE const Bounds2i& cropped_pixel_bounds() const{
+        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds,const float filter_radius=1.0f);
+        FINLINE  Bounds2i cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
+        }
+        FINLINE  Bounds2i sample_bounds() const{
+            Point2f min_point = floor(Point2f(_cropped_pixel_bounds.min_point)+Vector2f(0.5f,0.5f)-_radius);
+            Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+_radius);
+            return Bounds2i(Bounds2f(min_point,max_point));
         }
         void write_to_file(const char* file_name) const;
         void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;

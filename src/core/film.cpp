@@ -26,12 +26,17 @@ SOFTWARE.
 #include "core/imageio.h"
 NARUKAMI_BEGIN
 
-Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, const float filter_radius, const float filter_B, const float filter_C) : resolution(resolution), _radius(filter_radius), _B(filter_B), _C(filter_C)
+Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, const float filter_radius) : resolution(resolution), _radius(filter_radius),_inv_radius(1.0f/filter_radius)
 {
     Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.min_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.min_point.y));
     Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.max_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.max_point.y));
     this->_cropped_pixel_bounds = Bounds2i(bounds_min_p, bounds_max_p);
     _pixels = std::unique_ptr<Pixel[]>(static_cast<Pixel *>(alloc_aligned<NARUKAMI_CACHE_LINE>(area(_cropped_pixel_bounds) * sizeof(Pixel))));
+    //init filter LUT
+    for(int i=0;i<FILTER_LUT_WIDTH;++i){
+        float x = (i+0.5f)/FILTER_LUT_WIDTH*_radius;
+        _filter_lut[i]=mitchell_1D(x);
+    }
 }
 
 Pixel &Film::get_pixel(const Point2i &p) const
@@ -45,13 +50,13 @@ Pixel &Film::get_pixel(const Point2i &p) const
 
 float Film::mitchell_1D(float x) const
 {
-    x = abs(2 * x);
-    if (x > 1)
+    x = abs(2.0f * x);
+    if (x > 1.0f)
     {
-        return ((-_B - 6 * _C) * x * x * x + (6 * _B + 30 * _C) * x * x + (-12 * _B - 48 * _C) * x + (8 * _B + 24 * _C)) * (1.f / 6.f);
+        return ((-B - 6 * C) * x * x * x + (6 * B + 30 * C) * x * x + (-12 * B - 48 * C) * x + (8 * B + 24 * C)) * (1.0f / 6.0f);
     }
     else
-        return ((12 - 9 * _B - 6 * _C) * x * x * x + (-18 + 12 * _B + 6 * _C) * x * x + (6 - 2 * _B)) * (1.f / 6.f);
+        return ((12 - 9 * B - 6 * C) * x * x * x + (-18 + 12 * B + 6 * C) * x * x + (6 - 2 * B)) * (1.0f / 6.0f);
 }
 
 void Film::write_to_file(const char *file_name) const

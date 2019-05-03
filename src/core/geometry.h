@@ -128,6 +128,12 @@ struct Bounds2
         min_point=min(p0,p1);
         max_point=max(p0,p1);
     }
+
+    template<typename U>
+    FINLINE explicit Bounds2(const Bounds2<U>& bounds){
+        min_point=Point2<T>(bounds.min_point);
+        max_point=Point2<T>(bounds.max_point);
+    }
 };
 template<typename T>
 FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
