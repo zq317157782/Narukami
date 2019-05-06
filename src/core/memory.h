@@ -82,4 +82,10 @@ FINLINE void * memcpy(void* const dst,const void* const src,size_t size){
 	return std::memcpy(dst,src,size);
 }
 
+
+#define STACK_ALLOC(T,count) (T*)alloca(count*sizeof(T))
+
+//memory arena from pbrt
+
+
 NARUKAMI_END

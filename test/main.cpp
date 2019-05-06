@@ -837,12 +837,15 @@ TEST(geometry,size_of_soatriangle){
 
 #include "core/memory.h"
 
-// TEST(memory,alloc_aligned){
-//     auto alloced_area=alloc_aligned<128>(1000);
-//     EXPECT_EQ(((int)(alloced_area))%128,0);
-//     free_aligned(alloced_area);
-//     //EXPECT_EQ(alloced_area,nullptr);
-// }
+TEST(memory,alloc_aligned){
+    auto alloced_area=alloc_aligned<128>(1000);
+}
+
+TEST(memory,STACK_ALLOC){
+    auto ptr = STACK_ALLOC(int,32);
+}
+
+
 #include "core/spectrum.h"
 TEST(spectrum,index){
     Spectrum a(1,1,1);
@@ -1041,6 +1044,7 @@ TEST(Film,sample_bounds){
     EXPECT_EQ(bounds.min_point,Point2i(-1,-1));
     EXPECT_EQ(bounds.max_point,Point2i(129,129));
 }
+
 
 
 int main(int argc, char* argv[]) {
