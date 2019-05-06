@@ -29,7 +29,11 @@ SOFTWARE.
 
 NARUKAMI_BEGIN
 
-#define NARUKAMI_CACHE_LINE 64
+#ifndef NARUKAMI_L1_CACHE_LINE
+	#define NARUKAMI_L1_CACHE_LINE 64 //default
+#endif
+
+
 
 template <int LINE_SIZE>
 FINLINE void *alloc_aligned(size_t size){
@@ -48,6 +52,16 @@ FINLINE void *alloc_aligned(size_t size){
 	}
 	return ptr;
 #endif
+}
+
+//L1 aligned
+FINLINE void *alloc_aligned(size_t size){
+	return alloc_aligned<NARUKAMI_L1_CACHE_LINE>(size);
+}
+
+template<typename T>
+FINLINE T *alloc_aligned(size_t size){
+	return alloc_aligned(size * sizeof(T));
 }
 
 FINLINE void free_aligned(void * ptr){
