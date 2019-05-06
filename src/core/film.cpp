@@ -31,7 +31,7 @@ Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, cons
     Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.min_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.min_point.y));
     Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.max_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.max_point.y));
     this->_cropped_pixel_bounds = Bounds2i(bounds_min_p, bounds_max_p);
-    _pixels = std::unique_ptr<Pixel[]>(static_cast<Pixel *>(alloc_aligned<NARUKAMI_CACHE_LINE>(area(_cropped_pixel_bounds) * sizeof(Pixel))));
+    _pixels = std::unique_ptr<Pixel[]>(new Pixel[area(_cropped_pixel_bounds)]);
     //init filter LUT
     for(int i=0;i<FILTER_LUT_WIDTH;++i){
         float x = (i+0.5f)/FILTER_LUT_WIDTH*_radius;
