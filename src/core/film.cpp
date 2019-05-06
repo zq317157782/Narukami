@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/imageio.h"
 NARUKAMI_BEGIN
 
-Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, const float filter_radius) : resolution(resolution), _radius(filter_radius),_inv_radius(1.0f/filter_radius)
+Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds) : resolution(resolution)
 {
     Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.min_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.min_point.y));
     Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.max_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.max_point.y));
@@ -34,7 +34,7 @@ Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, cons
     _pixels = std::unique_ptr<Pixel[]>(new Pixel[area(_cropped_pixel_bounds)]);
     //init filter LUT
     for(int i=0;i<FILTER_LUT_WIDTH;++i){
-        float x = (i+0.5f)/FILTER_LUT_WIDTH*_radius;
+        float x = (i+0.5f)/FILTER_LUT_WIDTH;
         _filter_lut[i]=mitchell_1D(x);
     }
 }
@@ -78,12 +78,34 @@ void Film::write_to_file(const char *file_name) const
 
 void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
 {
-    Point2i p = Point2i(pos);
-    Pixel &pixel = get_pixel(p);
-    pixel.rgb[0] = pixel.rgb[0] + l.r * weight;
-    pixel.rgb[1] = pixel.rgb[1] + l.g * weight;
-    pixel.rgb[2] = pixel.rgb[2] + l.b * weight;
-    pixel.weight = pixel.weight + weight;
+
+    //calculate bounds
+    auto dp=pos-Vector2f(0.5f,0.5f);
+    Point2i p0=(Point2i)ceil(dp-FILTER_RADIUS);
+    Point2i p1=(Point2i)floor(dp+FILTER_RADIUS) + Point2i(1, 1);
+
+    p0=max(p0,_cropped_pixel_bounds.min_point);
+    p1=min(p1,_cropped_pixel_bounds.max_point);
+    for(int x = p0.x;x<p1.x;++x){
+        int idx_x=min((int)floor(abs(x-dp.x)*FILTER_INVERSE_RADIUS*FILTER_LUT_WIDTH),FILTER_LUT_WIDTH-1);
+        float filter_weight_x = _filter_lut[idx_x];
+        for(int y = p0.y;y<p1.y;++y){
+            int idx_y=min((int)floor(abs(y-dp.y)*FILTER_INVERSE_RADIUS*FILTER_LUT_WIDTH),FILTER_LUT_WIDTH-1);
+            float filter_weight = _filter_lut[idx_y]*filter_weight_x;
+            Pixel &pixel = get_pixel( Point2i(x,y));
+            pixel.rgb[0] += l.r * weight*filter_weight;
+            pixel.rgb[1] += l.g * weight*filter_weight;
+            pixel.rgb[2] += l.b * weight*filter_weight;
+            pixel.weight += filter_weight;
+        }
+    }
+
+    // Point2i p = Point2i(pos);
+    // Pixel &pixel = get_pixel(p);
+    // pixel.rgb[0] = pixel.rgb[0] + l.r * weight;
+    // pixel.rgb[1] = pixel.rgb[1] + l.g * weight;
+    // pixel.rgb[2] = pixel.rgb[2] + l.b * weight;
+    // pixel.weight = pixel.weight + weight;
 }
 
 NARUKAMI_END
