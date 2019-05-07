@@ -42,6 +42,12 @@ FINLINE  float cast_i2f(const int x){
     return v.f;
 }
 
+FINLINE  float cast_ui2f(const int x){
+    union {float f;unsigned int i;} v;
+    v.i=x;
+    return v.f;
+}
+
 FINLINE  int cast_f2i(const float x){
     union {float f;int i;} v;
     v.f=x;
