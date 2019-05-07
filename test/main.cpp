@@ -1044,6 +1044,14 @@ TEST(Film,sample_bounds){
     EXPECT_EQ(bounds.min_point,Point2i(-1,-1));
     EXPECT_EQ(bounds.max_point,Point2i(129,129));
 }
+#include "core/rng.h"
+TEST(rng,next_float){
+    RNG rng;
+    
+    float  f = rng.next_float();
+    EXPECT_GE(f,0.0f);
+    EXPECT_LE(f,1.0f);
+}
 
 
 
