@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include "core/narukami.h"
 #include "core/constant.h"
+#include "core/math.h"
 NARUKAMI_BEGIN
 
 //random number generator 
@@ -49,7 +50,7 @@ private:
         z = (z ^ (z >> 27)) * UINT64_C(0x94D049BB133111EB);
         return z ^ (z >> 31);
     }
-    
+
     FINLINE uint64_t next(){
         const uint64_t s0 = _s[0];
 	    uint64_t s1 = _s[1];
