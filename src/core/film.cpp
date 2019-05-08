@@ -68,6 +68,10 @@ void Film::write_to_file(const char *file_name) const
         {
             const Pixel &pixel = get_pixel(Point2i(x, y));
             float inv_w = rcp(pixel.weight);
+            std::cout<<pixel.weight<<std::endl;
+            if(EXPECT_NOT_TAKEN(pixel.weight==0.0f)){
+                inv_w=1.0f;
+            }
             data.push_back(pixel.rgb[0] * inv_w);
             data.push_back(pixel.rgb[1] * inv_w);
             data.push_back(pixel.rgb[2] * inv_w);
