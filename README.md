@@ -24,7 +24,7 @@ lightweight PBRT-style path tracer
  - [ ] sampling methods
     - [x] stratified sampling method
     - [x] Halton sampling method
-    - [ ] Hammersley method 
+    - [x] Hammersley method 
     - [ ] Sobel sampling method
     - [ ] R2 sampling method
  
