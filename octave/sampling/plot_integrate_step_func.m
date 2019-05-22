@@ -1,18 +1,34 @@
 function plot_integrate_step_func()
     true_value = 0.5;
-    x = zeros(100);
-    halton_y = zeros(100);
-    r2_y = zeros(100);
-    stratified_y = zeros(100);
-    hammersley_y = zeros(100);
+    a_size = 50;
+    x = zeros(a_size);
+    halton_y = zeros(a_size);
+    r2_y = zeros(a_size);
+    stratified_y = zeros(a_size);
+    hammersley_y = zeros(a_size);
+    random_y = zeros(a_size);
     #设置样本数
     x(1)=2;
-    for idx=2:100
-        x(idx)=x(idx-1) + 1;
+    for idx=2:a_size
+        x(idx)=idx*idx;
+    end
+
+    
+
+    for idx=1:a_size
+        N=x(idx);
+        sample_sum=0;
+        for u=1:N
+            ux=rand();
+            uy=rand();
+            sample_sum = sample_sum+step_func(ux);
+        end
+        estimate_value=sample_sum/N;
+        random_y(idx)=abs(estimate_value-true_value);
     end
 
 
-    for idx=1:100
+    for idx=1:a_size
         N=x(idx);
         sample_sum=0;
         for u=1:N
@@ -23,7 +39,7 @@ function plot_integrate_step_func()
         halton_y(idx)=abs(estimate_value-true_value);
     end
 
-    for idx=1:100
+    for idx=1:a_size
         N=x(idx);
         sample_sum=0;
         for u=1:N
@@ -34,11 +50,11 @@ function plot_integrate_step_func()
         r2_y(idx)=abs(estimate_value-true_value);
     end
 
-    for idx=1:100
+    for idx=1:a_size
         N=x(idx);
         sample_sum=0;
         for u=1:N
-            [ux,uy]=stratified(u,10,10);
+            [ux,uy]=stratified(u,sqrt(N),sqrt(N));
             sample_sum = sample_sum+step_func(ux);
         end
         estimate_value=sample_sum/N;
@@ -46,11 +62,11 @@ function plot_integrate_step_func()
     end
 
 
-    for idx=1:100
+    for idx=1:a_size
         N=x(idx);
         sample_sum=0;
         for u=1:N
-            [ux,uy]=hammersley_set(u,100);
+            [ux,uy]=hammersley_set(u,N);
             sample_sum = sample_sum+step_func(ux);
         end
         estimate_value=sample_sum/N;
@@ -58,21 +74,26 @@ function plot_integrate_step_func()
     end
 
 
+
     #plot(x,halton_y,"-",x,r2_y,"r.",x,stratified_y,"-",x,hammersley_y,"g.");
-    plot(x,halton_y,"-")
+    
+    plot(x,random_y,"ro")
+
     hold on
-    plot(x,r2_y,"r.")
+    plot(x,halton_y,"b-")
 
-    plot(x,stratified_y,"-")
+    plot(x,r2_y,"r-")
 
-    plot(x,hammersley_y,"g.")
+    plot(x,stratified_y,"go")
+
+    plot(x,hammersley_y,"g-")
     hold off
 
     xlabel("sample number");
     ylabel("integration error");
     title(["step function"]);
-    legend({'halton','r2','stratified','hammersley'})
-    xlim([0 100])
-    ylim([0.0 0.2])
+    legend({'random','halton','r2','stratified','hammersley'})
+    xlim([0 x(a_size)])
+    ylim([0.0 0.05])
     print -dpng step_function.png
 end
