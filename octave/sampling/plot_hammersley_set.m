@@ -9,5 +9,7 @@ function plot_hammersley_set(N)
     xlabel("x");
     ylabel("y");
     title(["hammersley_" num2str(N)]);
+    xlim([0 1])
+    ylim([0 1])
     print -dpng hammersley.png
 end

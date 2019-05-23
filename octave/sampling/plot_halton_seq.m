@@ -9,5 +9,7 @@ function plot_halton_seq(N)
     xlabel("x");
     ylabel("y");
     title(["halton_" num2str(N)]);
+    xlim([0 1])
+    ylim([0 1])
     print -dpng halton.png
 end

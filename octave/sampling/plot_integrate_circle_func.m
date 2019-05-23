@@ -6,6 +6,7 @@ function plot_integrate_circle_func()
     r2_y = zeros(a_size);
     stratified_y = zeros(a_size);
     hammersley_y = zeros(a_size);
+    hypercube_y = zeros(a_size);
     random_y = zeros(a_size);
     #设置样本数
     x(1)=2;
@@ -59,6 +60,23 @@ function plot_integrate_circle_func()
         hammersley_y(idx)=abs(estimate_value-true_value);
     end
 
+    
+
+    for idx=1:a_size
+        N=x(idx);
+        sample_sum=0;
+        px=permutate1D(N);
+        py=permutate1D(N);
+        for u=1:N
+            [ux,uy]=hypercube(u,N,px,py);
+            sample_sum = sample_sum+circle_func(ux,uy);
+        end
+        estimate_value=sample_sum/N;
+        hypercube_y(idx)=abs(estimate_value-true_value);
+    end
+
+
+    
 
     for idx=1:a_size
         N=x(idx);
@@ -82,14 +100,16 @@ function plot_integrate_circle_func()
 
     plot(x,hammersley_y,"g-")
 
+    plot(x,hypercube_y,"-")
+
     plot(x,random_y,"ro")
     hold off
 
     xlabel("sample number");
     ylabel("integration error");
     title(["circle function"]);
-    legend({'halton','r2','stratified','hammersley','random'})
+    legend({'halton','r2','stratified','hammersley','hypercube','random'})
     xlim([0 x(a_size)])
-    ylim([0.0 0.05])
+    ylim([0.0 0.3])
     print -dpng circle_function.png
 end
