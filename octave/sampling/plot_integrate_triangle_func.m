@@ -1,16 +1,17 @@
 function plot_integrate_triangle_func()
     true_value = 0.5;
-    a_size = 50;
+    a_size = 500;
     x = zeros(a_size);
     halton_y = zeros(a_size);
     r2_y = zeros(a_size);
     stratified_y = zeros(a_size);
     hammersley_y = zeros(a_size);
+    hypercube_y = zeros(a_size);
     random_y = zeros(a_size);
     #设置样本数
-    x(1)=2;
+    x(1)=1;
     for idx=2:a_size
-        x(idx)=idx*idx;
+        x(idx)=idx;
     end
 
     
@@ -50,15 +51,29 @@ function plot_integrate_triangle_func()
         r2_y(idx)=abs(estimate_value-true_value);
     end
 
+    % for idx=1:a_size
+    %     N=x(idx);
+    %     sample_sum=0;
+    %     for u=1:N
+    %         [ux,uy]=stratified(u,sqrt(N),sqrt(N));
+    %         sample_sum = sample_sum+triangle_func(ux,uy);
+    %     end
+    %     estimate_value=sample_sum/N;
+    %     stratified_y(idx)=abs(estimate_value-true_value);
+    % end
+
+
     for idx=1:a_size
         N=x(idx);
         sample_sum=0;
+        px=permutate1D(N);
+        py=permutate1D(N);
         for u=1:N
-            [ux,uy]=stratified(u,sqrt(N),sqrt(N));
+            [ux,uy]=hypercube(u,N,px,py);
             sample_sum = sample_sum+triangle_func(ux,uy);
         end
         estimate_value=sample_sum/N;
-        stratified_y(idx)=abs(estimate_value-true_value);
+        hypercube_y(idx)=abs(estimate_value-true_value);
     end
 
 
@@ -84,7 +99,9 @@ function plot_integrate_triangle_func()
 
     plot(x,r2_y,"r-")
 
-    plot(x,stratified_y,"go")
+    % plot(x,stratified_y,"go")
+
+    plot(x,hypercube_y,"-")
 
     plot(x,hammersley_y,"g-")
     hold off
@@ -92,8 +109,8 @@ function plot_integrate_triangle_func()
     xlabel("sample number");
     ylabel("integration error");
     title(["triangle function"]);
-    legend({'random','halton','r2','stratified','hammersley'})
+    legend({'random','halton','r2','hypercube','hammersley'})
     xlim([0 x(a_size)])
-    ylim([0.0 0.05])
+    ylim([0.0 0.2])
     print -dpng triangle_function.png
 end
