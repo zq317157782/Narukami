@@ -1,21 +1,15 @@
-function plot_integrate_circle_func()
+function plot_integration_error_circle_func(t_size,t_step)
     
     true_value = pi*0.25;
-    a_size = 500;
-    x = 1:1:a_size;
+    a_size = t_size/t_step;
+
+    x = 1:t_step:t_size;
     halton_y = zeros(a_size,1);
     r2_y = zeros(a_size,1);
     stratified_y = zeros(a_size,1);
     hammersley_y = zeros(a_size,1);
     hypercube_y = zeros(a_size,1);
     random_y = zeros(a_size,1);
-    #设置样本数
-    % for idx=1:a_size
-    %     x(idx)=idx;
-    % end
-
-
-   
 
     for idx=1:a_size
         N=x(idx);
@@ -96,18 +90,6 @@ function plot_integrate_circle_func()
 
     loglog(x,random_y,"ro",x,halton_y,"--",x,r2_y,":",x,hammersley_y,".",x,hypercube_y,"-");
     legend('random','halton','r2','hammersley','hypercube')
-    % plot(x,halton_y,"b-")
-    % hold on
-    % plot(x,r2_y,"r-")
-
-    % #plot(x,stratified_y,"go")
-
-    % plot(x,hammersley_y,"g-")
-
-    % plot(x,hypercube_y,"-")
-
-    % plot(x,random_y,"ro")
-    % hold off
 
     xlabel("sample number");
     ylabel("integration error");
