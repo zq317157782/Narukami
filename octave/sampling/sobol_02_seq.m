@@ -1,5 +1,4 @@
-function [x,y]=sobol_02_seq(idx)
-    C=load("sobol_matrix.txt");
+function [x,y]=sobol_02_seq(idx,C)
     x=multiply_generator_matrix(idx,C(1,:));
     y=multiply_generator_matrix(idx,C(2,:));
 

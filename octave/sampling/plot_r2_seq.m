@@ -6,6 +6,7 @@ function plot_r2_seq(N)
     end
 
     plot(x,y,".");
+    grid on
     xlabel("x");
     ylabel("y");
     title(["r2_" num2str(N)]);
