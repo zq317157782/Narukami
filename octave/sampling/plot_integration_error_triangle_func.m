@@ -1,5 +1,5 @@
-function plot_integration_error_circle_func(t_size,t_step)
-    true_value = pi*0.25;
+function plot_integration_error_triangle_func(t_size,t_step)
+    true_value = 0.5;
     a_size = t_size/t_step;
 
     x = 1:t_step:t_size;
@@ -25,7 +25,7 @@ function plot_integration_error_circle_func(t_size,t_step)
             uy(5)=rand();
             [ux(6),uy(6)]=sobol_02_seq(u,sobol_02_matrix);
             [ux(7),uy(7)]=scramble_sobol_02_seq(u,sobol_02_matrix,scramble);
-            sample_sum = sample_sum.+circle_func(ux,uy);
+            sample_sum = sample_sum.+triangle_func(ux,uy);
         end
         estimate_value=sample_sum./N;
         error = estimate_value.-true_value;
@@ -36,9 +36,9 @@ function plot_integration_error_circle_func(t_size,t_step)
     legend('halton','r2','hammersley','hypercube','random','0-2','scramble 0-2');
     xlabel("sample number");
     ylabel("squared error");
-    title(["circle function"]);
+    title(["triangle function"]);
 
     %  %xlim([0 x(a_size)])
     %  %ylim([0.0 0.5])
-    print -dpng circle_function.png
+    print -dpng triangle_function.png
 end
