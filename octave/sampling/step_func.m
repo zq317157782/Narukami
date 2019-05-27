@@ -1,7 +1,3 @@
 function y=step_func(x)
-    if (x<0.5)
-        y=1;
-    else
-        y=0;
-    endif
+    y=(x<=0.5);
 end
