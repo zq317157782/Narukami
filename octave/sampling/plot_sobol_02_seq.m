@@ -1,9 +1,9 @@
 function plot_sobol_02_seq(N)
     x = zeros(N,1);
     y = zeros(N,1);
-    C=load("sobol_matrix.txt");
+    load sobol_02_matrix;
     for idx=1:N
-        [x(idx),y(idx)]=sobol_02_seq(idx,C);
+        [x(idx),y(idx)]=sobol_02_seq(idx,sobol_02_matrix);
     end
 
     plot(x,y,".");
