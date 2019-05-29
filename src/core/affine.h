@@ -606,7 +606,7 @@ public:
         N = 16
     };
 public:
-    Matrix4x4(){
+    inline Matrix4x4(){
          //col 0
         m[0]=1.0f;
         m[1]=0.0f;
@@ -628,7 +628,7 @@ public:
         m[14]=0.0f;
         m[15]=1.0f;
     }
-    Matrix4x4(const float m0,const float m1,const float m2,const float m3,const float m4,const float m5,const float m6,const float m7,const float m8,const float m9,const float m10,const float m11,const float m12,const float m13,const float m14,const float m15)
+    inline Matrix4x4(const float m0,const float m1,const float m2,const float m3,const float m4,const float m5,const float m6,const float m7,const float m8,const float m9,const float m10,const float m11,const float m12,const float m13,const float m14,const float m15)
     {
         //col 0
         m[0]=m0;
@@ -652,7 +652,7 @@ public:
         m[15]=m15;
     }
 
-    Matrix4x4(const float* v){
+    inline Matrix4x4(const float* v){
         //col 0
         m[0]=v[0];
         m[1]=v[1];
@@ -674,7 +674,7 @@ public:
         m[14]=v[14];
         m[15]=v[15];
     }
-    Matrix4x4(const float4& col0,const float4& col1,const float4& col2,const float4& col3){
+    inline Matrix4x4(const float4& col0,const float4& col1,const float4& col2,const float4& col3){
         col[0]=col0;
         col[1]=col1;
         col[2]=col2;
@@ -684,7 +684,7 @@ public:
     FINLINE float& operator[](const int idx){ assert(idx >= 0 && idx < N); return m[idx];}
 };
 
-FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
+inline std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
     out<<'(';
     for(int i=0;i<Matrix4x4::N;++i){
         out<<v.m[i];
@@ -693,7 +693,7 @@ FINLINE std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
     return out;
 }
 
-FINLINE bool operator==(const Matrix4x4& A,const Matrix4x4& B){
+inline bool operator==(const Matrix4x4& A,const Matrix4x4& B){
 
     auto bool_i0 = A.col[0]==B.col[0];
     auto bool_i1 = A.col[1]==B.col[1];
@@ -703,7 +703,7 @@ FINLINE bool operator==(const Matrix4x4& A,const Matrix4x4& B){
     return all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
-FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
+inline bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
 
     auto bool_i0 = A.col[0]==B.col[0];
     auto bool_i1 = A.col[1]==B.col[1];
@@ -713,7 +713,7 @@ FINLINE bool operator!=(const Matrix4x4& A,const Matrix4x4& B){
    return not_all((bool_i0&bool_i1)&(bool_i2&bool_i3));
 }
 
-FINLINE Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
+inline Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
     Matrix4x4 r;
     r.col[0] = A.col[0]+B.col[0];
     r.col[1] = A.col[1]+B.col[1];
@@ -722,7 +722,7 @@ FINLINE Matrix4x4 operator+(const Matrix4x4& A,const Matrix4x4& B){
     return r;
 }
 
-FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
+inline Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
     
     Matrix4x4 ret;
 
@@ -754,7 +754,7 @@ FINLINE Matrix4x4 operator*(const Matrix4x4& A,const Matrix4x4& B){
 }
 
 //https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html#_appendix_2
-FINLINE Matrix4x4 transform_inverse_noscale(const Matrix4x4& mat){
+inline Matrix4x4 transform_inverse_noscale(const Matrix4x4& mat){
     Matrix4x4 r;
     //transpose left-upper 3x3
     __m128 t0 = shuffle<0,1,0,1>(mat.col[0],mat.col[1]);// 00,10,01,11
@@ -774,7 +774,7 @@ FINLINE Matrix4x4 transform_inverse_noscale(const Matrix4x4& mat){
 }
 
 
-FINLINE Matrix4x4 transform_inverse(const Matrix4x4& mat){
+inline Matrix4x4 transform_inverse(const Matrix4x4& mat){
     Matrix4x4 r;
     //transpose left-upper 3x3
     __m128 t0 = shuffle<0,1,0,1>(mat.col[0],mat.col[1]);// 00,10,01,11
@@ -816,7 +816,7 @@ static FINLINE __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swiz
 
 //Blockwise inversion
 //https://en.wikipedia.org/wiki/Invertible_matrix#Blockwise_inversion
-FINLINE Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
+inline Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
     Matrix4x4 r;
     //extract 4 sub-matrix2x2
     // | A B |
@@ -863,14 +863,14 @@ FINLINE Matrix4x4 blockwise_inverse(const Matrix4x4& mat){
     return r;
 }
 
-FINLINE Matrix4x4 transpose(const Matrix4x4& mat){
+inline Matrix4x4 transpose(const Matrix4x4& mat){
     Matrix4x4 r(mat);
     _MM_TRANSPOSE4_PS(r.col[0],r.col[1],r.col[2],r.col[3]);
     return r;
 }
 
 //TODO need optimal
-FINLINE Matrix4x4 minor(const Matrix4x4& mat){
+inline Matrix4x4 minor(const Matrix4x4& mat){
     float4 m0 = swizzle<1,0,0,0>(mat.col[1])
                *swizzle<2,2,1,1>(mat.col[2])
                *swizzle<3,3,3,2>(mat.col[3]);
@@ -949,7 +949,7 @@ FINLINE Matrix4x4 minor(const Matrix4x4& mat){
     return Matrix4x4(m0,m1,m2,m3);
 }
 
-FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
+inline Matrix4x4 cofactor(const Matrix4x4& mat){
     float4 m0 = swizzle<1,0,0,0>(mat.col[1])
                *swizzle<2,3,1,2>(mat.col[2])
                *swizzle<3,2,3,1>(mat.col[3]);
@@ -1028,19 +1028,19 @@ FINLINE Matrix4x4 cofactor(const Matrix4x4& mat){
     return Matrix4x4(m0,m1,m2,m3);
 }
 
-FINLINE float  determinant(const Matrix4x4& mat){
+inline float  determinant(const Matrix4x4& mat){
     auto cofactor_mat = cofactor(mat);
     return reduce_add(float4(mat.col[0])*float4(cofactor_mat.col[0]));
 }
 
-FINLINE float sub_matrix3x3_determinant(const Matrix4x4& mat){
+inline float sub_matrix3x3_determinant(const Matrix4x4& mat){
     auto temp = mat.col[0]*swizzle<1,2,0,3>(mat.col[1])*swizzle<2,0,1,3>(mat.col[2])-swizzle<2,1,0,3>(mat.col[0])*swizzle<1,0,2,3>(mat.col[1])*swizzle<0,2,1,3>(mat.col[1]);
     float4 a=temp; float4 b=swizzle<1>(temp); float4 c=swizzle<2>(temp);
     return _mm_cvtss_f32(a+b+c);
 }
 
 //Cramer's rule
-FINLINE Matrix4x4 inverse(const Matrix4x4& mat){
+inline Matrix4x4 inverse(const Matrix4x4& mat){
     auto tran_mat = transpose(mat);
     auto cofactor_mat = cofactor(tran_mat);
     auto det=vreduce_add(float4(tran_mat.col[0])*float4(cofactor_mat.col[0]));
@@ -1076,7 +1076,7 @@ FINLINE Point2<T> operator+(const Point2<T> &p, const Vector2<T> &v) { Point2<T>
 template <typename T>
 FINLINE Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v) {Point2<T> rp; rp.x = p.x - v.x; rp.y = p.y - v.y; return rp;}
 
-FINLINE Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
+inline Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   
     // float4 r=float4(M.col[0])*float4(v.x);
     // r+=float4(M.col[1])*float4(v.y);
@@ -1101,7 +1101,7 @@ FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
 
 
 
-FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
+inline SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     float4 vx=swizzle<0,0,0,0>(v.xyzw);
     float4 vy=swizzle<1,1,1,1>(v.xyzw);
     float4 vz=swizzle<2,2,2,2>(v.xyzw);
@@ -1112,7 +1112,7 @@ FINLINE SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     return SSEVector3f(r.xyzw);
 }
 
-FINLINE SSEPoint3f operator*(const Matrix4x4& M,const SSEPoint3f& v){
+inline SSEPoint3f operator*(const Matrix4x4& M,const SSEPoint3f& v){
     float4 vx=swizzle<0,0,0,0>(v.xyzw);
     float4 vy=swizzle<1,1,1,1>(v.xyzw);
     float4 vz=swizzle<2,2,2,2>(v.xyzw);
@@ -1125,7 +1125,7 @@ FINLINE SSEPoint3f operator*(const Matrix4x4& M,const SSEPoint3f& v){
 }
 
 
-FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
+inline SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
     float4 r_xxxx=    swizzle<0,0,0,0>(M.col[0])/*m00*/*v.xxxx;
     r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.col[1])/*m10*/*v.yyyy;
     r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.col[2])/*m20*/*v.zzzz;
@@ -1141,7 +1141,7 @@ FINLINE SoAVector3f operator*(const Matrix4x4& M,const SoAVector3f& v){
     return SoAVector3f(r_xxxx,r_yyyy,r_zzzz);
 }
 
-FINLINE SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
+inline SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
     float4 r_xxxx=    swizzle<0,0,0,0>(M.col[0])/*m00*/*v.xxxx;
     r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.col[1])/*m10*/*v.yyyy;
     r_xxxx = r_xxxx + swizzle<0,0,0,0>(M.col[2])/*m20*/*v.zzzz;
