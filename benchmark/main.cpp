@@ -756,4 +756,46 @@ static void BM_rng_pbrt_uniform_float(benchmark::State &state)
 }
 BENCHMARK(BM_rng_pbrt_uniform_float)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
+
+static void BM_reverse_u32_bitwise_version(benchmark::State &state)
+{   RNG_pbrt rng;
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(narukami::reverse_u32<2>(i+1));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_reverse_u32_bitwise_version)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+template<uint32_t base>
+uint32_t general_reverse_u32(uint32_t num){
+    auto reverse = num % base;
+    num = num/base;
+    for (size_t i = 0; i < 31; ++i)
+    {
+        reverse=reverse*base+num%base;
+    }
+    return reverse;
+}
+
+static void BM_reverse_u32_general_version(benchmark::State &state)
+{   RNG_pbrt rng;
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(general_reverse_u32<2>(i+1));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_reverse_u32_general_version)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
 BENCHMARK_MAIN();
