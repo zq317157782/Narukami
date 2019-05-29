@@ -81,6 +81,11 @@ TEST(math,lerp){
     EXPECT_FLOAT_EQ(a,0.5f);
 }
 
+TEST(math,reverse_u32){
+    uint32_t num=1;
+    EXPECT_EQ(reverse_u32<2>(1),2147483648);
+}
+
 
 // TEST(type,int_div_zero){
 //     int a= 1/0;

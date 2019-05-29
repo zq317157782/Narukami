@@ -32,13 +32,13 @@ NARUKAMI_BEGIN
 //IEEE float format
 //32 bits
 //[31][30-23][22-0]
-//[31] sign
+//[31] sign 
 //[30-23] exp
 //[22-0] mag
 
 FINLINE  float cast_i2f(const int x){
     union {float f;int i;} v;
-    v.i=x;
+    v.i=x; 
     return v.f;
 }
 
@@ -207,7 +207,16 @@ FINLINE float ceil(const float x){ return std::ceilf(x); }
 FINLINE float floor(const float x){ return std::floorf(x); }
 
 
-
+template<uint32_t base>
+FINLINE uint32_t reverse_u32(uint32_t num){
+    auto reverse = num % base;
+    num = num/base;
+    for (size_t i = 0; i < 31; ++i)
+    {
+        reverse=reverse*base+num%base;
+    }
+    return reverse;
+}
 
 
 
