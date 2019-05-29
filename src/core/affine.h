@@ -450,12 +450,12 @@ struct SSE_ALIGNAS SoAPoint3f{
     typedef float Scalar;
 
 
-    SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
-    explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
-    explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
-    SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
-    SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+    FINLINE SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
+    FINLINE explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    FINLINE SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
+    FINLINE explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    FINLINE SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    FINLINE SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
