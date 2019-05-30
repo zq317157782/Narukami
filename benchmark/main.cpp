@@ -764,7 +764,7 @@ static void BM_reverse_u32_bitwise_version(benchmark::State &state)
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(narukami::reverse_u32<2>(i+1));
+            benchmark::DoNotOptimize(narukami::reverse_bits_u32(i+1));
         }
         
     }
@@ -772,30 +772,72 @@ static void BM_reverse_u32_bitwise_version(benchmark::State &state)
 }
 BENCHMARK(BM_reverse_u32_bitwise_version)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
-template<uint32_t base>
-uint32_t general_reverse_u32(uint32_t num){
-    auto reverse = num % base;
-    num = num/base;
-    for (size_t i = 0; i < 31; ++i)
-    {
-        reverse=reverse*base+num%base;
-    }
-    return reverse;
+
+template<uint32_t base> float radical_inverse_u32_pbrt(uint32_t x){
+         float inv_base = 1.0f/base;
+         uint32_t reverse = 0;
+         float inv_baseN=1.0f;
+         while(x){
+             // int op
+             uint32_t next = static_cast<uint32_t>(x*inv_base);
+             uint32_t digit = x - next*base;
+             reverse = reverse*base + digit;
+              x=next;
+             //float op
+             inv_baseN*=inv_base;
+         }
+
+         return min(reverse*inv_baseN,ONE_MINUS_EPSILON);
 }
 
-static void BM_reverse_u32_general_version(benchmark::State &state)
+
+static void BM_radical_inverse_u32_pbrt_version(benchmark::State &state)
 {   RNG_pbrt rng;
     for (auto _ : state)
     {
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(general_reverse_u32<2>(i+1));
+            benchmark::DoNotOptimize(radical_inverse_u32_pbrt<3>(i+1));
         }
         
     }
 
 }
-BENCHMARK(BM_reverse_u32_general_version)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+BENCHMARK(BM_radical_inverse_u32_pbrt_version)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+#include "core/lowdiscrepancy.h"
+static void BM_radical_inverse_u32_base3(benchmark::State &state)
+{   RNG_pbrt rng;
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(narukami::radical_inverse_u32<3>(i+1));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_radical_inverse_u32_base3)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+
+static void BM_radical_inverse_u32_base2(benchmark::State &state)
+{   RNG_pbrt rng;
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(narukami::radical_inverse_u32<2>(i+1));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_radical_inverse_u32_base2)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+//radical_inverse_u32
 
 BENCHMARK_MAIN();

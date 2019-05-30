@@ -28,26 +28,25 @@ SOFTWARE.
 NARUKAMI_BEGIN
     
     template<uint32_t base> float radical_inverse_u32(uint32_t x){
-         float inv_base = 1.0f/base;
          uint32_t reverse = 0;
+         float inv_base = 1.0f/base;
          float inv_baseN=1.0f;
          while(x){
              // int op
-             uint32_t next = x*inv_base;
+             uint32_t next =x/base;
              uint32_t digit = x - next*base;
              reverse = reverse*base + digit;
+             x=next;
              //float op
              inv_baseN*=inv_base;
-
-             x=next;
          }
-
-         return min(reverse*inv_baseN,ONE_MINUS_EPSILON);
+        //combinition
+        return min(reverse*inv_baseN,ONE_MINUS_EPSILON);
     }
 
 
     template<> FINLINE float radical_inverse_u32<2>(uint32_t x){
-        return reverse_u32<2>(x) * 0x1p-32;
+        return reverse_bits_u32(x) * 0x1p-32;
     }
 
 NARUKAMI_END
