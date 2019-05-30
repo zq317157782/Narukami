@@ -7,6 +7,7 @@ TEST(math,rcp){
     EXPECT_FLOAT_EQ(rcp(3.0f),1.0f/3.0f);
     EXPECT_FLOAT_EQ(rcp(5.0f),1.0f/5.0f);
     EXPECT_FLOAT_EQ(rcp(7.0f),1.0f/7.0f);
+    
 }
 
 TEST(math,isnan){
@@ -1058,6 +1059,13 @@ TEST(rng,next_float){
     EXPECT_LE(f,1.0f);
 }
 
+
+#include "core/lowdiscrepancy.h"
+TEST(lowdiscrepancy,radical_inverse){
+    EXPECT_FLOAT_EQ(radical_inverse_u32<2>(1),0.5f);
+    EXPECT_FLOAT_EQ(radical_inverse_u32<2>(2),0.25f);
+    EXPECT_FLOAT_EQ(radical_inverse_u32<2>(3),0.75f);
+}
 
 
 int main(int argc, char* argv[]) {
