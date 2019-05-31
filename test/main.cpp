@@ -91,6 +91,7 @@ TEST(math,reverse_bits_u32){
 }
 
 
+
 // TEST(type,int_div_zero){
 //     int a= 1/0;
 //     EXPECT_EQ(isnan(a),false);
@@ -1072,6 +1073,17 @@ TEST(lowdiscrepancy,radical_inverse){
     EXPECT_FLOAT_EQ(radical_inverse_u32<2>(5),0.625f);
     EXPECT_FLOAT_EQ(radical_inverse_u32<2>(6),0.375f);
 }
+
+TEST(lowdiscrepancy,scrambled_radical_inverse_u32_base2){
+    uint32_t scramble = 0xFFFFFFFF;
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(1,scramble),0.5f);
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(2,scramble),0.75f);
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(3,scramble),0.25f);
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(4,scramble),0.875f);
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(5,scramble),0.375f);
+    EXPECT_FLOAT_EQ(scrambled_radical_inverse_u32_base2(6,scramble),0.625f);
+}
+
 
 
 int main(int argc, char* argv[]) {
