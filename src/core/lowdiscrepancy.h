@@ -88,9 +88,17 @@ NARUKAMI_BEGIN
     }
 
     uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
+    
+    FINLINE float sample_sobol(const uint32_t idx,const uint32_t* M){
+        return sobol_multi_generator_matrix(idx+1,M) * 0x1p-32f;
+    }
+
+    FINLINE float sample_scrambled_sobol(const uint32_t idx,const uint32_t* M,const uint32_t scramble){
+        return (sobol_multi_generator_matrix(idx+1,M)^scramble)* 0x1p-32f;
+    }
 
 
     Point2f sample_sobol02(const uint32_t idx);
-
+    Point2f sample_scrambled_sobol02(const uint32_t idx,const uint32_t scramble_x,const uint32_t scramble_y);
 
 NARUKAMI_END
