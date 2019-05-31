@@ -21,12 +21,13 @@ lightweight PBRT-style path tracer
     - [x] write PNG
     - [ ] read PNG
  - [ ] basic film structure
- - [ ] sampling methods
+ - [x] sampling methods
     - [x] stratified sampling method
     - [x] Halton sampling method
     - [x] Hammersley method 
-    - [ ] Sobel sampling method
-    - [ ] R2 sampling method
+    - [x] Sobel sampling method
+    - [x] R2 sampling method
+    - [x] compare their integration error
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
