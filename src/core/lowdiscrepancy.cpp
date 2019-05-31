@@ -35,10 +35,11 @@ NARUKAMI_BEGIN
     }
 
 
-    Point2f get_sobol02_sample(const uint32_t idx){
+    Point2f sample_sobol02(const uint32_t idx){
         auto x = sobol_multi_generator_matrix(idx+1,&REVERSED_SOBOL02_GENERATOR_MATRIX[0][0])* 0x1p-32f;
         auto y = sobol_multi_generator_matrix(idx+1,&REVERSED_SOBOL02_GENERATOR_MATRIX[1][0])* 0x1p-32f;
         return Point2f(x,y);
     }
+
 
 NARUKAMI_END

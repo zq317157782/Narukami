@@ -90,6 +90,7 @@ NARUKAMI_BEGIN
     uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
 
 
-    Point2f get_sobol02_sample(const uint32_t idx);
+    Point2f sample_sobol02(const uint32_t idx);
+
 
 NARUKAMI_END

@@ -838,6 +838,22 @@ static void BM_radical_inverse_u32_base2(benchmark::State &state)
 }
 BENCHMARK(BM_radical_inverse_u32_base2)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
+
+static void BM_generate_sobol02_sample(benchmark::State &state)
+{   RNG_pbrt rng;
+    for (auto _ : state)
+    {
+
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+            benchmark::DoNotOptimize(narukami::sample_sobol02(i));
+        }
+        
+    }
+
+}
+BENCHMARK(BM_generate_sobol02_sample)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
 //radical_inverse_u32
 
 BENCHMARK_MAIN();
