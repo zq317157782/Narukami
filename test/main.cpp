@@ -1085,6 +1085,11 @@ TEST(lowdiscrepancy,scrambled_radical_inverse_u32_base2){
 }
 
 
+TEST(lowdiscrepancy,sobol_multi_generator_matrix){
+    EXPECT_EQ(get_sobol02_sample(0),Point2f(0.5f,0.5f));
+}
+
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);

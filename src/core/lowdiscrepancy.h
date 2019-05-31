@@ -25,9 +25,20 @@ SOFTWARE.
 
 #include "core/narukami.h"
 #include "core/math.h"
+#include "core/affine.h"
 
 NARUKAMI_BEGIN
     
+    constexpr uint32_t SOBOL02_GENERATOR_MATRIX[2][32]={
+        {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648},
+        {1,3,5,15,17,51,85,255,257,771,1285,3855,4369,13107,21845,65535,65537,196611,327685,983055,1114129,3342387,5570645,16711935,16843009,50529027,84215045,252645135,286331153,858993459,1431655765,4294967295}
+    };
+
+    constexpr uint32_t REVERSED_SOBOL02_GENERATOR_MATRIX[2][32]={
+        {0x80000000, 0x40000000, 0x20000000, 0x10000000, 0x8000000, 0x4000000, 0x2000000, 0x1000000, 0x800000, 0x400000, 0x200000, 0x100000, 0x80000, 0x40000, 0x20000, 0x10000, 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1},
+        {0x80000000, 0xc0000000, 0xa0000000, 0xf0000000, 0x88000000, 0xcc000000, 0xaa000000, 0xff000000, 0x80800000, 0xc0c00000, 0xa0a00000, 0xf0f00000, 0x88880000, 0xcccc0000, 0xaaaa0000, 0xffff0000, 0x80008000, 0xc000c000, 0xa000a000, 0xf000f000, 0x88008800, 0xcc00cc00, 0xaa00aa00, 0xff00ff00, 0x80808080, 0xc0c0c0c0, 0xa0a0a0a0, 0xf0f0f0f0, 0x88888888, 0xcccccccc, 0xaaaaaaaa, 0xffffffff}
+    };
+
     template<uint32_t base> float radical_inverse_u32(uint32_t x){
          uint32_t reverse = 0;
          float inv_base = 1.0f/base;
@@ -75,5 +86,10 @@ NARUKAMI_BEGIN
     FINLINE float scrambled_radical_inverse_u32_base2(uint32_t x,const uint32_t scramble){
          return (reverse_bits_u32(x)^scramble) * 0x1p-32f;
     }
+
+    uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
+
+
+    Point2f get_sobol02_sample(const uint32_t idx);
 
 NARUKAMI_END
