@@ -142,7 +142,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
 } 
 
 template<typename T>
-FINLINE T area(const Bounds2<T>& bounds){ float w=bounds.max_point.x-bounds.min_point.x; float h=bounds.max_point.y-bounds.min_point.y; return w*h; }
+FINLINE T area(const Bounds2<T>& bounds){ T w=bounds.max_point.x-bounds.min_point.x; T h=bounds.max_point.y-bounds.min_point.y; return w*h; }
 template<typename T>
 FINLINE bool inside_exclusive(const Point2<T>& p,const Bounds2<T>& bounds){
    bool cond_x=p.x>=bounds.min_point.x&&p.x<bounds.max_point.x;
