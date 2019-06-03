@@ -101,4 +101,22 @@ NARUKAMI_BEGIN
     Point2f sample_sobol02(const uint32_t idx);
     Point2f sample_scrambled_sobol02(const uint32_t idx,const uint32_t scramble_x,const uint32_t scramble_y);
 
+
+    FINLINE uint32_t gray_code(const uint32_t n){
+        return (n>>1)^n;
+    }
+
+    FINLINE Point2f sample_scrambled_gray_code_sobol02(const uint32_t idx,uint32_t* scramble_x,uint32_t* scramble_y){
+        assert(scramble_x!=nullptr);
+        assert(scramble_y!=nullptr);
+        uint32_t col = count_trailing_zero(idx+1);
+        (*scramble_x)=(*scramble_x)^REVERSED_SOBOL02_GENERATOR_MATRIX[0][col];
+        (*scramble_y)=(*scramble_y)^REVERSED_SOBOL02_GENERATOR_MATRIX[1][col];
+
+        float x = (*scramble_x)* 0x1p-32f;
+        float y = (*scramble_y)* 0x1p-32f;
+
+        return Point2f(x,y);
+    }
+
 NARUKAMI_END

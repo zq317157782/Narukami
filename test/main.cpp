@@ -1090,10 +1090,19 @@ TEST(lowdiscrepancy,sobol_multi_generator_matrix){
 }
 
 
+
+TEST(lowdiscrepancy,sample_scrambled_gray_code_sobol02){
+    uint32_t sx=0,sy=0;
+    EXPECT_EQ(sample_scrambled_gray_code_sobol02(0,&sx,&sy),Point2f(0.5,0.5));
+    EXPECT_EQ(sample_scrambled_gray_code_sobol02(1,&sx,&sy),Point2f(0.75,0.25));
+}
+
+
 TEST(narukami,count_trailing_zero){
     EXPECT_EQ(count_trailing_zero(1),0);
     EXPECT_EQ(count_trailing_zero(2),1);
 }
+
 
 
 
