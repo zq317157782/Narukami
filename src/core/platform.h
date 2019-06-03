@@ -28,7 +28,7 @@ SOFTWARE.
 #elif defined(__linux__)
 	#define NARUKAMI_IS_LINUX
 #else
-	#define NARUKAMI_IS_WIN 
+	#define NARUKAMI_IS_WIN
 #endif
 
 //from mitsuba
@@ -44,7 +44,8 @@ SOFTWARE.
 #define MM_ALIGN16             __declspec(align(16))
 #define EXPECT_TAKEN(a)        (a)
 #define EXPECT_NOT_TAKEN(a)    (a)
-#define MAYBE_UNUSED           
+#define MAYBE_UNUSED     
+#include <intrin.h>
 #else
 #error Unsupported compiler!
 #endif

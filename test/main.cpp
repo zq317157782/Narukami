@@ -1090,6 +1090,12 @@ TEST(lowdiscrepancy,sobol_multi_generator_matrix){
 }
 
 
+TEST(narukami,count_trailing_zero){
+    EXPECT_EQ(count_trailing_zero(1),0);
+    EXPECT_EQ(count_trailing_zero(2),1);
+}
+
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);

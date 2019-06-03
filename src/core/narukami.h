@@ -42,3 +42,22 @@ narukami.h
 #include <ostream>
 #include <iostream>
 #include "core/platform.h"
+
+
+NARUKAMI_BEGIN
+
+FINLINE int count_trailing_zero(uint32_t v){
+#if defined(__GNUC__) || defined(__clang__)
+	return __builtin_ctz(v);
+#else
+	unsigned long index;
+    if (_BitScanForward(&index, v)){
+        return index;
+    }
+    else{
+         return 32;
+    }
+#endif
+}
+
+NARUKAMI_END
