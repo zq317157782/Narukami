@@ -39,6 +39,45 @@ NARUKAMI_BEGIN
         {0x80000000, 0xc0000000, 0xa0000000, 0xf0000000, 0x88000000, 0xcc000000, 0xaa000000, 0xff000000, 0x80800000, 0xc0c00000, 0xa0a00000, 0xf0f00000, 0x88880000, 0xcccc0000, 0xaaaa0000, 0xffff0000, 0x80008000, 0xc000c000, 0xa000a000, 0xf000f000, 0x88008800, 0xcc00cc00, 0xaa00aa00, 0xff00ff00, 0x80808080, 0xc0c0c0c0, 0xa0a0a0a0, 0xf0f0f0f0, 0x88888888, 0xcccccccc, 0xaaaaaaaa, 0xffffffff}
     };
 
+    // constexpr uint32_t VAN_DER_CORPUT_GENERATOR_MATRIX[32]={
+
+    // };
+
+    constexpr uint32_t REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[32]={
+      0b10000000000000000000000000000000,
+      0b1000000000000000000000000000000,
+      0b100000000000000000000000000000,
+      0b10000000000000000000000000000,
+      0b1000000000000000000000000000,
+      0b100000000000000000000000000,
+      0b10000000000000000000000000,
+      0b1000000000000000000000000,
+      0b100000000000000000000000,
+      0b10000000000000000000000,
+      0b1000000000000000000000,
+      0b100000000000000000000,
+      0b10000000000000000000,
+      0b1000000000000000000,
+      0b100000000000000000,
+      0b10000000000000000,
+      0b1000000000000000,
+      0b100000000000000,
+      0b10000000000000,
+      0b1000000000000,
+      0b100000000000,
+      0b10000000000,
+      0b1000000000,
+      0b100000000,
+      0b10000000,
+      0b1000000,
+      0b100000,
+      0b10000,
+      0b1000,
+      0b100,
+      0b10,
+      0b1
+    };
+
     template<uint32_t base> float radical_inverse_u32(uint32_t x){
          uint32_t reverse = 0;
          float inv_base = 1.0f/base;
@@ -117,6 +156,14 @@ NARUKAMI_BEGIN
         float y = (*scramble_y)* 0x1p-32f;
 
         return Point2f(x,y);
+    }
+
+    
+    FINLINE float sample_scrambled_gray_code_van_der_corput(const uint32_t idx,uint32_t* scramble){
+        assert(scramble!=nullptr);
+        uint32_t col = count_trailing_zero(idx+1);
+        (*scramble)=(*scramble)^REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[col];
+        return (*scramble) * 0x1p-32f;
     }
 
 NARUKAMI_END

@@ -30,20 +30,30 @@ SOFTWARE.
 NARUKAMI_BEGIN
     class Sampler{
         private:
-            uint64_t _current_sample_index;
-            Point2i  _current_pixel;
-            std::vector<uint32_t> _scramble_1d;
-            std::vector<uint32_t> _scramble_2d;
+            uint32_t _current_sample_index;
+            const uint32_t _max_dim;
             uint32_t _sample_1d_offset;
             uint32_t _sample_2d_offset;
+            std::vector<uint32_t> _scramble_1d;
+            std::vector<uint32_t> _scramble_2d;
+            
+            std::vector<uint32_t> _scramble_1d_array;
+            std::vector<uint32_t> _sample_1d_array_index;
+            uint32_t _array_1d_offset;
 
-            const uint32_t _max_dim;
+            std::vector<uint32_t> _scramble_2d_array;
+            std::vector<uint32_t> _sample_2d_array_index;
+            uint32_t _array_2d_offset;
+
+            Point2i  _current_pixel;
+            uint32_t _1d_array_count=0;
+            uint32_t _2d_array_count=0;
+            
             RNG _rng;
         public:
             Sampler(const uint32_t max_dim=5):_max_dim(max_dim){
                 _scramble_1d=std::vector<uint32_t>(_max_dim);
                 _scramble_2d=std::vector<uint32_t>(_max_dim*2);
-
             }
 
             void start_pixel(const Point2i& p){
@@ -58,6 +68,25 @@ NARUKAMI_BEGIN
                    _scramble_2d[i*2]=_rng.next_uint32();
                    _scramble_2d[i*2+1]=_rng.next_uint32();
                 }
+
+                _array_1d_offset = 0;
+                for (size_t i = 0; i < _scramble_1d_array.size(); i++)
+                {
+                    _scramble_1d_array[i]=_rng.next_uint32();
+                    _sample_1d_array_index[i] = 0;
+                }
+
+                _array_2d_offset = 0;
+                for (size_t i = 0; i < _scramble_2d_array.size(); i++)
+                {
+                    _scramble_2d_array[i]=_rng.next_uint32();
+                }
+                for (size_t i = 0; i < _sample_2d_array_index.size(); i++)
+                {
+                   _sample_2d_array_index[i] = 0;
+                }
+                
+                
             }
 
             bool start_next_sample(){
@@ -80,6 +109,58 @@ NARUKAMI_BEGIN
                     return sample;
                 }
                  
+            }
+
+            float get_1D(){
+                 if(EXPECT_TAKEN(_sample_1d_offset<_max_dim)){
+                     auto sample=sample_scrambled_gray_code_van_der_corput(_current_sample_index,&_scramble_1d[_sample_1d_offset]);
+                     _sample_1d_offset++;
+                     return sample;
+                 }
+                 else{
+                     _sample_1d_offset++;
+                     return _rng.next_float();
+                 }
+            }
+
+            void request_1d_array(const uint32_t request_count=1){
+                _1d_array_count+=request_count;
+            }
+
+             void request_2d_array(const uint32_t request_count=1){
+                _2d_array_count+=request_count;
+            }
+
+            void commit(){
+                _scramble_1d_array = std::vector<uint32_t>(_1d_array_count);
+                _sample_1d_array_index = std::vector<uint32_t>(_1d_array_count);
+
+                _scramble_2d_array = std::vector<uint32_t>(_2d_array_count*2);
+                _sample_2d_array_index = std::vector<uint32_t>(_2d_array_count);
+            } 
+
+            bool get_1D_array(const uint32_t num,float* array){
+                if (_array_1d_offset==_1d_array_count){
+                        return false;
+                }
+                for (size_t i = 0; i < num; i++)
+                {
+                    array[i]=sample_scrambled_gray_code_van_der_corput(_sample_1d_array_index[_array_1d_offset]++,&_scramble_1d_array[_array_1d_offset]);
+                }
+                _array_1d_offset++;
+                return true;
+            }
+
+            bool get_2D_array(const uint32_t num,Point2f* array){
+                if (_array_2d_offset==_2d_array_count){
+                        return false;
+                }
+                for (size_t i = 0; i < num; i++)
+                {
+                    array[i]=sample_scrambled_gray_code_sobol02(_sample_2d_array_index[_array_2d_offset]++,&_scramble_2d_array[i*_array_2d_offset],&_scramble_2d_array[i*_array_2d_offset+1]);
+                }
+                _array_2d_offset++;
+                return true;
             }
     };
 NARUKAMI_END

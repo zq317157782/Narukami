@@ -1098,11 +1098,50 @@ TEST(lowdiscrepancy,sample_scrambled_gray_code_sobol02){
 }
 
 
+TEST(lowdiscrepancy,sample_scrambled_gray_code_van_der_corput){
+    uint32_t s=0;
+    EXPECT_EQ(sample_scrambled_gray_code_van_der_corput(0,&s),0.5f);
+    EXPECT_EQ(sample_scrambled_gray_code_van_der_corput(1,&s),0.75f);
+}
+
+
+
+
 TEST(narukami,count_trailing_zero){
     EXPECT_EQ(count_trailing_zero(1),0);
     EXPECT_EQ(count_trailing_zero(2),1);
 }
 
+
+#include "core/sampler.h"
+TEST(sampler,get_1d_array){
+    Sampler sampler;
+    float  array[4]={0,0,0,0};
+    sampler.request_1d_array(2);
+    sampler.commit();
+    sampler.start_pixel(Point2i(0,0));
+    bool f = sampler.get_1D_array(4,array);
+    EXPECT_TRUE(f);
+    f = sampler.get_1D_array(4,array);
+    EXPECT_TRUE(f);
+    f = sampler.get_1D_array(4,array);
+    EXPECT_FALSE(f);
+}
+
+
+TEST(sampler,get_2d_array){
+    Sampler sampler;
+    Point2f  array[4];
+    sampler.request_2d_array(2);
+    sampler.commit();
+    sampler.start_pixel(Point2i(0,0));
+    bool f = sampler.get_2D_array(4,array);
+    EXPECT_TRUE(f);
+    f = sampler.get_2D_array(4,array);
+    EXPECT_TRUE(f);
+    f = sampler.get_2D_array(4,array);
+    EXPECT_FALSE(f);
+}
 
 
 
