@@ -28,6 +28,9 @@ lightweight PBRT-style path tracer
     - [x] Sobel sampling method
     - [x] R2 sampling method
     - [x] compare their integration error
+ - [x] Sobol 02 sampler (it's a (0,2)-sequence,so no max spp limit)
+    - [x] 1D/2D sample component
+    - [x] 1D/2D sample array 
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
@@ -35,4 +38,5 @@ lightweight PBRT-style path tracer
 [Embree](https://embree.github.io/)
 
 [Mitsuba renderer](https://www.mitsuba-renderer.org/)
- 
+
+[The Unreasonable Effectiveness of Quasirandom Sequences](http://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/)
