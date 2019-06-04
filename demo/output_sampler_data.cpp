@@ -3,7 +3,7 @@
 #include <fstream>
 using namespace narukami;
 int main(){
-        Sampler sampler;
+        Sampler sampler(32);
         sampler.request_2d_array();
         sampler.commit();
         sampler.start_pixel(Point2i(0,0));

@@ -31,6 +31,7 @@ NARUKAMI_BEGIN
     class Sampler{
         private:
             uint32_t _current_sample_index;
+            uint32_t _spp;
             const uint32_t _max_dim;
             uint32_t _sample_1d_offset;
             uint32_t _sample_2d_offset;
@@ -51,7 +52,7 @@ NARUKAMI_BEGIN
             
             RNG _rng;
         public:
-            Sampler(const uint32_t max_dim=5):_max_dim(max_dim){
+            Sampler(const uint32_t spp,const uint32_t max_dim=5):_spp(spp),_max_dim(max_dim){
                 _scramble_1d=std::vector<uint32_t>(_max_dim);
                 _scramble_2d=std::vector<uint32_t>(_max_dim*2);
             }
@@ -91,6 +92,9 @@ NARUKAMI_BEGIN
 
             bool start_next_sample(){
                 _current_sample_index++;
+                if (EXPECT_NOT_TAKEN(_current_sample_index>=_spp)){
+                    return false;
+                }
                 _sample_1d_offset = 0;
                 _sample_2d_offset = 0;
                 return true;
@@ -161,6 +165,10 @@ NARUKAMI_BEGIN
                 }
                 _array_2d_offset++;
                 return true;
+            }
+
+            void set_sample_index(const uint32_t idx){
+                _current_sample_index=idx;
             }
     };
 NARUKAMI_END

@@ -1115,7 +1115,7 @@ TEST(narukami,count_trailing_zero){
 
 #include "core/sampler.h"
 TEST(sampler,get_1d_array){
-    Sampler sampler;
+    Sampler sampler(32);
     float  array[4]={0,0,0,0};
     sampler.request_1d_array(2);
     sampler.commit();
@@ -1130,7 +1130,7 @@ TEST(sampler,get_1d_array){
 
 
 TEST(sampler,get_2d_array){
-    Sampler sampler;
+    Sampler sampler(32);
     Point2f  array[4];
     sampler.request_2d_array(2);
     sampler.commit();
