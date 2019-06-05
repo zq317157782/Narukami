@@ -2,6 +2,11 @@
 #include "core/affine.h"
 
 using namespace narukami;
+
+TEST(constant,ONE_MINUS_EPSILON){
+   EXPECT_FLOAT_EQ(ONE_MINUS_EPSILON,1); 
+}
+
 TEST(math,rcp){
     EXPECT_FLOAT_EQ(rcp(2.0f),0.5f);
     EXPECT_FLOAT_EQ(rcp(3.0f),1.0f/3.0f);
