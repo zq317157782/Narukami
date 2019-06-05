@@ -42,7 +42,7 @@ static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
 static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
 
 //from pbrt
-static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON =0.9999999994f;
+static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON = 1.0f -std::numeric_limits<float>::epsilon(); 
 
 
 NARUKAMI_END

@@ -129,11 +129,11 @@ NARUKAMI_BEGIN
     uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
     
     FINLINE float sample_sobol(const uint32_t idx,const uint32_t* M){
-        return sobol_multi_generator_matrix(idx+1,M) * 0x1p-32f;
+        return min(sobol_multi_generator_matrix(idx+1,M) * 0x1p-32f,ONE_MINUS_EPSILON);
     }
 
     FINLINE float sample_scrambled_sobol(const uint32_t idx,const uint32_t* M,const uint32_t scramble){
-        return (sobol_multi_generator_matrix(idx+1,M)^scramble)* 0x1p-32f;
+        return min((sobol_multi_generator_matrix(idx+1,M)^scramble)* 0x1p-32f,ONE_MINUS_EPSILON);
     }
 
 
@@ -152,18 +152,18 @@ NARUKAMI_BEGIN
         (*scramble_x)=(*scramble_x)^REVERSED_SOBOL02_GENERATOR_MATRIX[0][col];
         (*scramble_y)=(*scramble_y)^REVERSED_SOBOL02_GENERATOR_MATRIX[1][col];
 
-        float x = (*scramble_x)* 0x1p-32f;
-        float y = (*scramble_y)* 0x1p-32f;
+        float x = min((*scramble_x)* 0x1p-32f,ONE_MINUS_EPSILON);
+        float y = min((*scramble_y)* 0x1p-32f,ONE_MINUS_EPSILON);
 
         return Point2f(x,y);
     }
 
-    
+
     FINLINE float sample_scrambled_gray_code_van_der_corput(const uint32_t idx,uint32_t* scramble){
         assert(scramble!=nullptr);
         uint32_t col = count_trailing_zero(idx+1);
         (*scramble)=(*scramble)^REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[col];
-        return (*scramble) * 0x1p-32f;
+        return min((*scramble) * 0x1p-32f,ONE_MINUS_EPSILON);
     }
 
 NARUKAMI_END
