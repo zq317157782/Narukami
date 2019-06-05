@@ -27,3 +27,7 @@ texture space:
         (0,0)
 
 handeness: left
+
+sampler is sequeue, so No Sample Number Bound Limit!
+        1D => van der Corput sequeue
+        2D => Sobol (0,2)-sequeue
