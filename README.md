@@ -1,6 +1,22 @@
 # Narukami
 lightweight PBRT-style path tracer
 
+# Experiment Data
+
+
+## some 2D LDS  distribution for first 128 sample
+<img src="./octave/sampling/images/halton.png" width="360" height="270"><img src="./octave/sampling/images/hammersley.png" width="360" height="270">
+<img src="./octave/sampling/images/r2.png" width="360" height="270"><img src="./octave/sampling/images/sobol_02.png" width="360" height="270">
+<img src="./octave/sampling/images/scramble_sobol_02.png" width="360" height="270">
+
+
+## square integration error for some LDS
+![](./octave/sampling/images/linear_function.png)
+![](./octave/sampling/images/triangle_function.png)
+![](./octave/sampling/images/step_function.png)
+![](./octave/sampling/images/circle_function.png)
+
+
 # Todo list
  - [x] element math 
  - [x] vector math
