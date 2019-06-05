@@ -127,11 +127,11 @@ NARUKAMI_BEGIN
                  }
             }
 
-            void request_1d_array(const uint32_t request_count=1){
+            FINLINE void request_1d_array(const uint32_t request_count=1){
                 _1d_array_count+=request_count;
             }
 
-             void request_2d_array(const uint32_t request_count=1){
+            FINLINE void request_2d_array(const uint32_t request_count=1){
                 _2d_array_count+=request_count;
             }
 
@@ -167,8 +167,13 @@ NARUKAMI_BEGIN
                 return true;
             }
 
-            void set_sample_index(const uint32_t idx){
+            FINLINE void set_sample_index(const uint32_t idx){
                 _current_sample_index=idx;
             }
+
+            FINLINE uint32_t get_spp() const {
+                return _spp;
+            }
+
     };
 NARUKAMI_END

@@ -49,8 +49,8 @@ int main()
                 }
 
             } while (sampler.start_next_sample());
-            data[(y*128+x)* 3] /= 16;
-            data[(y*128+x)* 3 + 1] /= 16;
+            data[(y*128+x)* 3] /= sampler.get_spp();
+            data[(y*128+x)* 3 + 1] /= sampler.get_spp();
             data[(y*128+x)* 3 + 2] = 0;
         }
     }
