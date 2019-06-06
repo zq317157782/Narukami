@@ -96,6 +96,11 @@ TEST(math,reverse_bits_u32){
 }
 
 
+TEST(math,zero_mul_infinite){
+    EXPECT_TRUE(isnan(0.0f*(1.0f/0.0f)));
+}
+
+
 
 // TEST(type,int_div_zero){
 //     int a= 1/0;
