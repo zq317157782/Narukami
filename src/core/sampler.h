@@ -175,5 +175,11 @@ NARUKAMI_BEGIN
                 return _spp;
             }
 
+
+            std::unique_ptr<Sampler> clone(const uint64_t seed) const{
+                auto sampler = std::make_unique<Sampler>(*this);
+                sampler->_rng=RNG(seed);
+                return sampler;
+            }
     };
 NARUKAMI_END

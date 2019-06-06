@@ -1154,6 +1154,22 @@ TEST(sampler,get_2d_array){
 }
 
 
+TEST(sampler,clone){
+     Sampler sampler(32);
+     auto sampler2=sampler.clone(0);
+     auto sampler3=sampler.clone(0);
+     auto sampler4=sampler.clone(1);
+
+    sampler2->start_pixel(Point2i(0,0));
+    sampler3->start_pixel(Point2i(0,0));
+    sampler4->start_pixel(Point2i(0,0));
+
+    EXPECT_EQ(sampler2->get_2D(),sampler3->get_2D());
+    EXPECT_EQ(sampler2->get_spp(),sampler4->get_spp());
+
+}
+
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
