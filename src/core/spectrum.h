@@ -30,15 +30,15 @@ SOFTWARE.
 NARUKAMI_BEGIN
     struct Spectrum
     {
-        union { struct { float x,y,z; }; struct { float r,g,b; }; };
+        float r,g,b;
         typedef float Scalar;
         enum { N = 3 };
         FINLINE Spectrum():r(0.0f),g(0.0f),b(0.0f){}
         FINLINE Spectrum(const float r,const float g,const float b):r(r),g(g),b(b){assert(!isnan(r));assert(!isnan(g));assert(!isnan(b)); }
-        FINLINE float operator[](const int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
-        FINLINE float& operator[](const int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
+        FINLINE float operator[](const int idx) const{ assert(idx>=0&&idx<N); return (&r)[idx]; }
+        FINLINE float& operator[](const int idx){ assert(idx>=0&&idx<N); return (&r)[idx]; }
     };
-    FINLINE  std::ostream &operator<<(std::ostream &out, const Spectrum &L) { out << '(' << L.x << ',' << L.y << ',' << L.z << ')'; return out; }
+    FINLINE  std::ostream &operator<<(std::ostream &out, const Spectrum &L) { out << '(' << L.r << ',' << L.g << ',' << L.b << ')'; return out; }
     FINLINE bool operator==(const Spectrum& a,const Spectrum& b){ if((a.r==b.r)&&(a.g==b.g)&&(a.b==b.b)){ return true; } return false; }
     FINLINE bool operator!=(const Spectrum& a,const Spectrum& b){ if((a.r!=b.r)||(a.g!=b.g)||(a.b!=b.b)){ return true; } return false; }
     
