@@ -396,14 +396,14 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= 
 //single ray with four box
 FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Bounds3f& box){
     //x
-    t_min = max(t_min,(box[1-isPositive[0]].x-o.x)*inv_d.x);
-    t_max = min(t_max,(box[isPositive[0]].x-o.x)*inv_d.x);
+    t_min = max((box[1-isPositive[0]].x-o.x)*inv_d.x,t_min);
+    t_max = min((box[isPositive[0]].x-o.x)*inv_d.x,t_max);
     //y
-    t_min = max(t_min,(box[1-isPositive[1]].y-o.y)*inv_d.y);
-    t_max = min(t_max,(box[isPositive[1]].y-o.y)*inv_d.y);
+    t_min = max((box[1-isPositive[1]].y-o.y)*inv_d.y,t_min);
+    t_max = min((box[isPositive[1]].y-o.y)*inv_d.y,t_max);
     //z
-    t_min = max(t_min,(box[1-isPositive[2]].z-o.z)*inv_d.z);
-    t_max = min(t_max,(box[isPositive[2]].z-o.z)*inv_d.z);
+    t_min = max((box[1-isPositive[2]].z-o.z)*inv_d.z,t_min);
+    t_max = min((box[isPositive[2]].z-o.z)*inv_d.z,t_max);
 
     return t_min<=t_max;
 }
@@ -411,16 +411,16 @@ FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_
 
 FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
     // x
-    t_min = max(t_min,(box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
-    t_max = min(t_max,(box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx);
+    t_min = max((box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_min);
+    t_max = min((box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_max);
     
     //y
-    t_min = max(t_min,(box[1-isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy);
-    t_max = min(t_max,(box[isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy);
+    t_min = max((box[1-isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy,t_min);
+    t_max = min((box[isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy,t_max);
     
     //z
-    t_min = max(t_min,(box[1-isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz);
-    t_max = min(t_max,(box[isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz);
+    t_min = max((box[1-isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz,t_min);
+    t_max = min((box[isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz,t_max);
 
     //check
     return movemask(t_min<=t_max);
