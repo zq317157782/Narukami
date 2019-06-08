@@ -172,7 +172,7 @@ FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_m
 
 FINLINE SSEVector3f rcp(const SSEVector3f& v) { return rcp(v.xyzw);}
 //0x7FFFFFFF and x(y,z)
-FINLINE SSEVector3f abs(const SSEVector3f& v){ return abs(v.xyzw); }
+FINLINE SSEVector3f abs(const SSEVector3f& v){ return abs(v.xyzw); }//TODO 在我的败家之眼上，输入(-1,-1,-1,-1)返回的是(nan,nan,nan,nan)
 FINLINE SSEVector3f sign(const SSEVector3f& v){ return sign(v.xyzw); }
 
 //FINLINE float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
