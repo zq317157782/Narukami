@@ -272,7 +272,7 @@ struct Vector2
   public:
     FINLINE Vector2() : x((T)0), y((T)0) { }
     FINLINE explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
-    FINLINE Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    FINLINE Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b));}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Vector2(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;  }
@@ -514,8 +514,8 @@ struct Normal3
     FINLINE Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Normal3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
-    FINLINE Normal3 &operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    FINLINE Normal3(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
+    FINLINE Normal3 &operator=(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
@@ -544,7 +544,7 @@ struct Point2
     FINLINE Point2(const Point2<U>& p):x((T)p.x),y((T)p.y){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y }
+    FINLINE Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;}
     FINLINE Point2 &operator=(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
