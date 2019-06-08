@@ -107,9 +107,9 @@ static void BM_normalize_v1(benchmark::State &state)
 {
     narukami::Vector3f v1(0, 0, 0);
     srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+    float x = (float)rand();
+    float y = (float)rand();
+    float z = (float)rand();
     for (auto _ : state)
     {
         benchmark::DoNotOptimize(v1 += normalize_v1(narukami::Vector3f(x, y, z)));
@@ -121,9 +121,9 @@ static void BM_normalize_v2(benchmark::State &state)
 {
     narukami::Vector3f v1(0, 0, 0);
     srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+    float x = (float)rand();
+    float y = (float)rand();
+    float z = (float)rand();
     for (auto _ : state)
     {
         benchmark::DoNotOptimize(v1 += normalize_v2(narukami::Vector3f(x, y, z)));
@@ -135,9 +135,9 @@ static void BM_normalize_v3(benchmark::State &state)
 {
     narukami::Vector3f v1(0, 0, 0);
     srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+    float x = (float)rand();
+    float y = (float)rand();
+    float z = (float)rand();
     for (auto _ : state)
     {
         benchmark::DoNotOptimize(v1 += normalize_v3(narukami::Vector3f(x, y, z)));
@@ -149,9 +149,9 @@ static void BM_normalize_v4(benchmark::State &state)
 {
     narukami::Vector3f v1(0, 0, 0);
     srand(0);
-    float x = rand();
-    float y = rand();
-    float z = rand();
+    float x = (float)rand();
+    float y = (float)rand();
+    float z = (float)rand();
     for (auto _ : state)
     {
 
@@ -162,9 +162,9 @@ BENCHMARK(BM_normalize_v4);
 
 static void BM_vector3_cross(benchmark::State &state)
 {
-    auto data = new float[6*state.range(0)];
-    for(int i=0;i<6*state.range(0);++i){
-        data[i]=rand();
+    auto data = new float[6*(size_t)state.range(0)];
+    for(size_t i=0;i<6*state.range(0);++i){
+        data[i]=(float)rand();
     }
     for (auto _ : state)
     {
@@ -178,9 +178,9 @@ BENCHMARK(BM_vector3_cross)->Arg(1)->Arg(5)->Arg(10);
 
 static void BM_ssevector3_cross(benchmark::State &state)
 {
-   auto data = new float[6*state.range(0)];
+   auto data = new float[6*(size_t)state.range(0)];
     for(int i=0;i<6*state.range(0);++i){
-        data[i]=rand();
+        data[i]=(float)rand();
     }
     for (auto _ : state)
     {
@@ -195,9 +195,9 @@ BENCHMARK(BM_ssevector3_cross)->Arg(1)->Arg(5)->Arg(10);;
 static void BM_soavector3_cross(benchmark::State &state)
 {
    
-    auto data = new float[6*state.range(0)];
+    auto data = new float[6*(size_t)state.range(0)];
     for(int i=0;i<6*state.range(0);++i){
-        data[i]=rand();
+        data[i]=(float)rand();
     }
 
     for (auto _ : state)
@@ -214,9 +214,9 @@ BENCHMARK(BM_soavector3_cross)->Arg(1)->Arg(5)->Arg(10);
 static void BM_soavector3f_dot(benchmark::State &state)
 {
    
-    auto data = new float[6*state.range(0)];
+    auto data = new float[6*(size_t)state.range(0)];
     for(int i=0;i<6*state.range(0);++i){
-        data[i]=rand();
+        data[i]=(float)rand();
     }
     for (auto _ : state)
     {
@@ -315,7 +315,6 @@ static void BM_matrix4x4_transform_inverse(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
-    bool a;
     for (auto _ : state)
     {
          benchmark::DoNotOptimize(M2=narukami::transform_inverse(M));
@@ -327,7 +326,6 @@ static void BM_matrix4x4_inverse(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
-    bool a;
     for (auto _ : state)
     {
          benchmark::DoNotOptimize(M2=narukami::inverse(M));
@@ -369,7 +367,7 @@ narukami::Matrix4x4 pbrt_inverse(const narukami::Matrix4x4 &m) {
 		
 
 		// Set $m[icol][icol]$ to one by scaling row _icol_ appropriately
-		float pivinv = 1. / minv[icol][icol];
+		float pivinv = 1.f / minv[icol][icol];
 		minv[icol][icol] = 1.;
 		for (int j = 0; j < 4; j++)
 			minv[icol][j] *= pivinv;
@@ -398,7 +396,6 @@ static void BM_matrix4x4_inverse_pbrt(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
-    bool a;
     for (auto _ : state)
     {
          benchmark::DoNotOptimize(M2=pbrt_inverse(M));
@@ -428,7 +425,6 @@ static void BM_matrix4x4_mul_soavector3(benchmark::State &state)
     narukami::Matrix4x4 M;
     narukami::SoAVector3f  v;
     narukami::SoAVector3f  v2;
-    bool a;
     for (auto _ : state)
     {
          benchmark::DoNotOptimize(v2=M*v);
@@ -487,14 +483,14 @@ BENCHMARK(BM_matrix4x4_mul_point3_sse);
 static void BM_intersect_triangle(benchmark::State &state)
 {    float t;
     narukami::Point2f uv;
-     narukami::Ray r(narukami::Point3f(rand(),rand(),rand()),narukami::Vector3f(rand(),rand(),rand()));
-    auto triangles = new narukami::Triangle[state.range(0)];
+     narukami::Ray r(narukami::Point3f((float)rand(),(float)rand(),(float)rand()),narukami::Vector3f((float)rand(),(float)rand(),(float)rand()));
+    auto triangles = new narukami::Triangle[(size_t)state.range(0)];
     
     for(size_t i = 0; i < state.range(0); i++)
     {
-       triangles[i].v0=narukami::Point3f(rand(),rand(),rand());
-       triangles[i].e1 = narukami::Vector3f(rand(),rand(),rand());
-       triangles[i].e2 = narukami::Vector3f(rand(),rand(),rand());
+       triangles[i].v0=  narukami::Point3f((float)rand(),(float)rand(),(float)rand());
+       triangles[i].e1 = narukami::Vector3f((float)rand(),(float)rand(),(float)rand());
+       triangles[i].e2 = narukami::Vector3f((float)rand(),(float)rand(),(float)rand());
     }
     for (auto _ : state)
     {
@@ -514,13 +510,13 @@ static void BM_intersect_soatriangle(benchmark::State &state)
     narukami::Point2f uv;
     float t;
     int index;
-    narukami::SoARay r(narukami::Point3f(rand(),rand(),rand()),narukami::Vector3f(rand(),rand(),rand()));
-    auto triangles = new narukami::SoATriangle[state.range(0)]();
+    narukami::SoARay r(narukami::Point3f((float)rand(),(float)rand(),(float)rand()),narukami::Vector3f((float)rand(),(float)rand(),(float)rand()));
+    auto triangles = new narukami::SoATriangle[(size_t)state.range(0)]();
     for(size_t i = 0; i < state.range(0); i++)
     {
-       triangles[i].v0=narukami::SoAPoint3f(rand(),rand(),rand());
-       triangles[i].e1 = narukami::SoAVector3f(rand(),rand(),rand());
-       triangles[i].e2 = narukami::SoAVector3f(rand(),rand(),rand());
+       triangles[i].v0=narukami::SoAPoint3f((float)rand(),(float)rand(),(float)rand());
+       triangles[i].e1 = narukami::SoAVector3f((float)rand(),(float)rand(),(float)rand());
+       triangles[i].e2 = narukami::SoAVector3f((float)rand(),(float)rand(),(float)rand());
     }
     
     for (auto _ : state)
@@ -588,7 +584,7 @@ static void BM_meshdata_intersect(benchmark::State &state)
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            for(int j=0;j<triangles.size();++j){
+            for(size_t j=0;j<triangles.size();++j){
                 Ray ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
                 benchmark::DoNotOptimize(intersect(ray,(*triangles[j]),&t,&uv));
             }
@@ -616,7 +612,7 @@ static void BM_meshdata_intersect_sse(benchmark::State &state)
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            for(int j=0;j<soa_triangles.size();++j){
+            for(size_t j=0;j<soa_triangles.size();++j){
                 SoARay ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
                 benchmark::DoNotOptimize(intersect(ray,soa_triangles[j],&t,&uv));
             }
@@ -658,7 +654,7 @@ static void BM_rng_next_uint32(benchmark::State &state)
 BENCHMARK(BM_rng_next_uint32)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 
-static const float OneMinusEpsilon = 0.99999994;
+static const float OneMinusEpsilon = 0.99999994f;
 
 
 #define PCG32_DEFAULT_STATE 0x853c49e6748fea9bULL
@@ -858,7 +854,7 @@ BENCHMARK(BM_generate_sobol02_sample)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 #include "core/sampler.h"
 static void BM_sampler_get_2D(benchmark::State &state)
 {    
-    narukami::Sampler s(32,state.range(0));
+    narukami::Sampler s(32,(size_t)state.range(0));
     s.start_pixel(Point2i(0,0));
     for (auto _ : state)
     {   
