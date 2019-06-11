@@ -55,7 +55,15 @@ struct Vector3
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Vector3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
-    FINLINE Vector3 &operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    FINLINE Vector3& operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this);}
+    FINLINE Vector3(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z);}
+    FINLINE Vector3& operator=(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z));x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this);}
+#else
+    FINLINE Vector3(const Vector3 &v1) = default;
+    FINLINE Vector3& operator=(const Vector3 &v1) = default;
+    FINLINE Vector3(Vector3 &&v1) = default;
+    FINLINE Vector3& operator=(Vector3 &&v1) = default;
+    FINLINE ~Vector3() = default;
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
@@ -144,6 +152,12 @@ struct SSE_ALIGNAS SSEVector3f{
     FINLINE explicit SSEVector3f(const float a):xyzw(float4(a)){ }
     FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,0.0f)){ }
 
+    FINLINE SSEVector3f(const SSEVector3f&) = default;
+    FINLINE SSEVector3f(SSEVector3f&&) = default;
+    FINLINE SSEVector3f& operator=(const SSEVector3f&) = default;
+    FINLINE SSEVector3f& operator=(SSEVector3f&&) = default;
+    FINLINE ~SSEVector3f() = default;
+
     FINLINE operator float4&(){ return xyzw; }
     FINLINE  operator const float4&() const { return xyzw; }
 
@@ -217,12 +231,19 @@ struct SSE_ALIGNAS SoAVector3f{
     typedef float Scalar;
 
 
-    SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
-    explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
-    explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
-    SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
-    SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+    FINLINE SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
+    FINLINE explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    FINLINE SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
+    FINLINE explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    FINLINE SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    FINLINE SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+
+    FINLINE SoAVector3f(const SoAVector3f&) = default;
+    FINLINE SoAVector3f(SoAVector3f&&) = default;
+    FINLINE SoAVector3f& operator=(const SoAVector3f&) = default;
+    FINLINE SoAVector3f& operator=(SoAVector3f&&) = default;
+    FINLINE ~SoAVector3f() = default;
+    
 };
  
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
@@ -276,7 +297,15 @@ struct Vector2
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     FINLINE Vector2(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;  }
-    FINLINE Vector2 &operator=(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+    FINLINE Vector2& operator=(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+    FINLINE Vector2(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);  }
+    FINLINE Vector2& operator=(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
+#else
+    FINLINE Vector2(const Vector2 &v1) = default;
+    FINLINE Vector2& operator=(const Vector2 &v1) = default;
+    FINLINE Vector2(Vector2 &&v1) = default;
+    FINLINE Vector2& operator=(Vector2 &&v1) = default;
+    FINLINE ~Vector2() = default;
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
@@ -305,6 +334,14 @@ struct Point3
 #ifdef NARUKAMI_DEBUG
     FINLINE Point3(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
     FINLINE Point3 &operator=(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    FINLINE Point3(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
+    FINLINE Point3 &operator=(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
+#else
+    FINLINE Point3(const Point3 &v1) = default;
+    FINLINE Point3 &operator=(const Point3 &v1) = default;
+    FINLINE Point3(Point3 &&v1) = default;
+    FINLINE Point3 &operator=(Point3 &&v1) = default;
+    FINLINE ~Point3() = default;
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
@@ -384,13 +421,19 @@ struct SSE_ALIGNAS SSEPoint3f{
     FINLINE explicit SSEPoint3f(const float a):xyzw(float4(a)){ }
     FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,1.0f)){ }
 
+    FINLINE SSEPoint3f(const SSEPoint3f&) = default;
+    FINLINE SSEPoint3f(SSEPoint3f&&) = default;
+    FINLINE SSEPoint3f& operator=(const SSEPoint3f&) = default;
+    FINLINE SSEPoint3f& operator=(SSEPoint3f&&) = default;
+    FINLINE ~SSEPoint3f() = default;
+    
     FINLINE operator float4&(){ return xyzw; }
-    FINLINE  operator const float4&() const { return xyzw; }
+    FINLINE operator const float4&() const { return xyzw; }
 
-    FINLINE SSEPoint3f& operator=(const Point3f& v){ x=v.x; y=v.y; z=v.z; return (*this); } 
+    FINLINE SSEPoint3f& operator=(const Point3f& v){x=v.x;y=v.y;z=v.z; return (*this); } 
 
     FINLINE const float& operator[](int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
-    FINLINE  float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    FINLINE float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SSEPoint3f &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
@@ -456,6 +499,11 @@ struct SSE_ALIGNAS SoAPoint3f{
     FINLINE explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
     FINLINE SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
     FINLINE SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+
+    FINLINE SoAPoint3f(const SoAPoint3f&) = default;
+    FINLINE SoAPoint3f(SoAPoint3f&&) = default;
+    FINLINE SoAPoint3f& operator=(const SoAPoint3f&) = default;
+    FINLINE SoAPoint3f& operator=(SoAPoint3f&&) = default;
 };
 
 FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
@@ -516,6 +564,14 @@ struct Normal3
 #ifdef NARUKAMI_DEBUG
     FINLINE Normal3(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
     FINLINE Normal3 &operator=(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    FINLINE Normal3(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
+    FINLINE Normal3 &operator=(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
+#else
+    FINLINE Normal3(const Normal3 &v1) = default;
+    FINLINE Normal3 &operator=(const Normal3 &v1) = default;
+    FINLINE Normal3(Normal3 &&v1) = default;
+    FINLINE Normal3 &operator=(Normal3 &&v1) = default;
+    FINLINE ~Normal3() = default;
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
@@ -546,6 +602,14 @@ struct Point2
 #ifdef NARUKAMI_DEBUG
     FINLINE Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;}
     FINLINE Point2 &operator=(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+    FINLINE Point2(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);}
+    FINLINE Point2 &operator=(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
+#else
+    FINLINE Point2(const Point2 &v1) = default;
+    FINLINE Point2 &operator=(const Point2 &v1) = default;
+    FINLINE Point2(Point2 &&v1) = default;
+    FINLINE Point2 &operator=(Point2 &&v1) = default;
+    FINLINE ~Point2() = default;
 #endif
     FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
     FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
