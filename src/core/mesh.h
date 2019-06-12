@@ -46,13 +46,13 @@ NARUKAMI_BEGIN
             memcpy(_index,idx,sizeof(uint32_t)*3);
         }
 
-        //FINLINE Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
-        FINLINE const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
-        FINLINE  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
-        FINLINE  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
+        //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
+        inline const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
+        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
+        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
     };
 
-    FINLINE bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
+    inline bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
         auto v0 = triangle[0];
         auto e1 = triangle[1]-v0;
         auto e2 = triangle[2]-v0;

@@ -66,21 +66,21 @@ BENCHMARK(BM_fast_rsqrt);
 
 
 template <typename T>
-FINLINE narukami::Vector3f normalize_v1(const narukami::Vector3<T> &v1)
+inline narukami::Vector3f normalize_v1(const narukami::Vector3<T> &v1)
 {
     float l = narukami::length(v1);
     return v1 / l;
 }
 
 template <typename T>
-FINLINE narukami::Vector3f normalize_v2(const narukami::Vector3<T> &v1)
+inline narukami::Vector3f normalize_v2(const narukami::Vector3<T> &v1)
 {
     float inv_l = narukami::rsqrt(dot(v1, v1));
     return v1 * inv_l;
 }
 
 template <typename T>
-FINLINE narukami::Vector3f normalize_v3(const narukami::Vector3<T> &v1)
+inline narukami::Vector3f normalize_v3(const narukami::Vector3<T> &v1)
 {
     const __m128 x = _mm_set_ps(1.0f, v1.z, v1.y, v1.x);
     const __m128 s = _mm_mul_ps(x, x);
@@ -93,7 +93,7 @@ FINLINE narukami::Vector3f normalize_v3(const narukami::Vector3<T> &v1)
 }
 
 template <typename T>
-FINLINE narukami::Vector3f normalize_v4(const narukami::Vector3<T> &a)
+inline narukami::Vector3f normalize_v4(const narukami::Vector3<T> &a)
 {
     const __m128 pa = _mm_max_ss(_mm_set_ss(a.x * a.x + a.y * a.y + a.z * a.z), _mm_set_ss(1.0e-30f));
     const __m128 r = _mm_rsqrt_ss(pa);
@@ -228,7 +228,7 @@ static void BM_soavector3f_dot(benchmark::State &state)
 }
 BENCHMARK(BM_soavector3f_dot)->Arg(1)->Arg(5)->Arg(10);
 
-FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+inline narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
      __m128 xyzw = _mm_set_ps(0.0f,v.z,v.y,v.x);
      
      narukami::float4 r=narukami::float4(M.col[0])*narukami::float4(v.x);
@@ -241,7 +241,7 @@ FINLINE narukami::Vector3f matMulVector_SSE(const narukami::Matrix4x4& M,const n
     return narukami::Vector3f(rr[0],rr[1],rr[2]);
 }
 
-FINLINE narukami::Vector3f matMulVector(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
+inline narukami::Vector3f matMulVector(const narukami::Matrix4x4& M,const narukami::Vector3f& v){
     float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z;
     float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z;
     float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z;
@@ -275,7 +275,7 @@ BENCHMARK(BM_matrix4x4_mul_vector3);
 
 
 
-FINLINE narukami::Matrix4x4 matMul_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
+inline narukami::Matrix4x4 matMul_v2(const narukami::Matrix4x4& A,const narukami::Matrix4x4& B){
     narukami::Matrix4x4 ret;
     for(int r=0;r<4;++r){
         for(int c=0;c<4;++c){
@@ -433,7 +433,7 @@ static void BM_matrix4x4_mul_soavector3(benchmark::State &state)
 BENCHMARK(BM_matrix4x4_mul_soavector3);
 
 
-FINLINE narukami::Point3f mat_mul_point3(const narukami::Matrix4x4& M,const narukami::Point3f& v){
+inline narukami::Point3f mat_mul_point3(const narukami::Matrix4x4& M,const narukami::Point3f& v){
     float x =  M.m[0]*v.x+M.m[4]*v.y+M.m[8]*v.z+M.m[12];
     float y =  M.m[1]*v.x+M.m[5]*v.y+M.m[9]*v.z+M.m[13];
     float z =  M.m[2]*v.x+M.m[6]*v.y+M.m[10]*v.z+M.m[14];
@@ -454,7 +454,7 @@ BENCHMARK(BM_matrix4x4_mul_point3);
 
 
 
-FINLINE narukami::Point3f mat_mul_point3_sse(const narukami::Matrix4x4& M,const narukami::Point3f& v){
+inline narukami::Point3f mat_mul_point3_sse(const narukami::Matrix4x4& M,const narukami::Point3f& v){
     narukami::float4 r=narukami::float4(M.col[0])*narukami::float4(v.x);
     r+=narukami::float4(M.col[1])*narukami::float4(v.y);
     r+=narukami::float4(M.col[2])*narukami::float4(v.z);
@@ -868,6 +868,73 @@ static void BM_sampler_get_2D(benchmark::State &state)
 }
 BENCHMARK(BM_sampler_get_2D)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
-//radical_inverse_u32
+class A{
+    public:
+    std::string value;
+    A(const std::string v):value(v){}
+    A(const A& a):value(a.value){ 
+             
+    }
+    A& operator=(const A& a){
+        value=a.value;
+       
+         return (*this);
+    }
+    //  A& operator=(A&& a){
+    //     value=std::move(a.value);
+    //     std::cout<<"copy"<<std::endl;
+    // }
+};
+
+class B{
+    public:
+    std::string value;
+    B(const std::string v):value(v){}
+    B(const B& b):value(b.value){
+          
+    }
+    B(B&& b):value(b.value){
+         
+    }
+     B& operator=(const B& a){
+        value=a.value;
+        return (*this);
+    }
+     B& operator=(B&& a){
+        value=std::move(a.value);
+        return (*this);
+    }
+};
+
+
+static void BM_construct_lvalue(benchmark::State &state)
+{  
+    for (auto _ : state)
+    {
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+             A a("test");
+             benchmark::DoNotOptimize(a=A("asdasdasdsadasdasdasdasdsadasd"));
+        }
+    }
+
+}
+BENCHMARK(BM_construct_lvalue)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
+static void BM_construct_rvalue(benchmark::State &state)
+{  
+
+    for (auto _ : state)
+    {
+        for(size_t i = 0; i < state.range(0); i++)
+        {
+           B b("test");
+           benchmark::DoNotOptimize(b=B("asdasdasdsadasdasdasdasdsadasd"));
+        }
+    }
+
+}
+BENCHMARK(BM_construct_rvalue)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
 
 BENCHMARK_MAIN();

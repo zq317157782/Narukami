@@ -48,89 +48,89 @@ struct Vector3
     };
 
   public:
-    FINLINE Vector3() : x((T)0), y((T)0), z((T)0) { }
-    FINLINE explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
-    FINLINE Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
-    FINLINE Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
+    inline Vector3() : x((T)0), y((T)0), z((T)0) { }
+    inline explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
+    inline Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    inline Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Vector3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
-    FINLINE Vector3& operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this);}
-    FINLINE Vector3(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z);}
-    FINLINE Vector3& operator=(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z));x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this);}
+    inline Vector3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
+    inline Vector3& operator=(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this);}
+    inline Vector3(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z);}
+    inline Vector3& operator=(Vector3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z));x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this);}
 #else
-    FINLINE Vector3(const Vector3 &v1) = default;
-    FINLINE Vector3& operator=(const Vector3 &v1) = default;
-    FINLINE Vector3(Vector3 &&v1) = default;
-    FINLINE Vector3& operator=(Vector3 &&v1) = default;
-    FINLINE ~Vector3() = default;
+    inline Vector3(const Vector3 &v1) = default;
+    inline Vector3& operator=(const Vector3 &v1) = default;
+    inline Vector3(Vector3 &&v1) = default;
+    inline Vector3& operator=(Vector3 &&v1) = default;
+    inline ~Vector3() = default;
 #endif
-    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
-    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
 typedef Vector3<float> Vector3f;
 typedef Vector3<int> Vector3i;
 
 template <typename T>
-FINLINE  std::ostream &operator<<(std::ostream &out, const Vector3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
+inline  std::ostream &operator<<(std::ostream &out, const Vector3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
 
 
 template <typename T>
-FINLINE Vector3<T> operator+(const Vector3<T>& v){ return v; }
+inline Vector3<T> operator+(const Vector3<T>& v){ return v; }
 template <typename T>
-FINLINE Vector3<T> operator-(const Vector3<T>& v1){ Vector3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
+inline Vector3<T> operator-(const Vector3<T>& v1){ Vector3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
 //compenont wise
 template <typename T>
-FINLINE Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2) { Vector3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
+inline Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2) { Vector3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
 template <typename T>
-FINLINE Vector3<T> operator*(const Vector3<T> &v1, const T &f) { Vector3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
+inline Vector3<T> operator*(const Vector3<T> &v1, const T &f) { Vector3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
 template <typename T>
-FINLINE Vector3<T> operator/(const Vector3<T> &v1, const T &f) { assert(f != 0); Vector3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
+inline Vector3<T> operator/(const Vector3<T> &v1, const T &f) { assert(f != 0); Vector3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
 template <typename T>
-FINLINE Vector3<T> &operator+=(Vector3<T> &v, const Vector3<T> &v1) { v.x += v1.x; v.y += v1.y; v.z += v1.z; return v; }
+inline Vector3<T> &operator+=(Vector3<T> &v, const Vector3<T> &v1) { v.x += v1.x; v.y += v1.y; v.z += v1.z; return v; }
 template <typename T>
-FINLINE Vector3<T> &operator-=(Vector3<T> &v, const Vector3<T> &v1) { v.x -= v1.x; v.y -= v1.y; v.z -= v1.z; return v; }
+inline Vector3<T> &operator-=(Vector3<T> &v, const Vector3<T> &v1) { v.x -= v1.x; v.y -= v1.y; v.z -= v1.z; return v; }
 template <typename T>
-FINLINE Vector3<T> &operator*=(Vector3<T> &v, const Vector3<T> &v1) { v.x *= v1.x; v.y *= v1.y; v.z *= v1.z; return v; }
+inline Vector3<T> &operator*=(Vector3<T> &v, const Vector3<T> &v1) { v.x *= v1.x; v.y *= v1.y; v.z *= v1.z; return v; }
 template <typename T>
-FINLINE Vector3<T> &operator*=(Vector3<T> &v, const T &f) { v.x *= f; v.y *= f; v.z *= f; return v; }
+inline Vector3<T> &operator*=(Vector3<T> &v, const T &f) { v.x *= f; v.y *= f; v.z *= f; return v; }
 template <typename T>
-FINLINE Vector3<T> &operator/=(Vector3<T> &v, const T &f) { assert(f != 0); v.x /= f; v.y /= f; v.z /= f; return v; }
+inline Vector3<T> &operator/=(Vector3<T> &v, const T &f) { assert(f != 0); v.x /= f; v.y /= f; v.z /= f; return v; }
 
 template <typename T>
-FINLINE bool operator==(const Vector3<T> &v1, const Vector3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
+inline bool operator==(const Vector3<T> &v1, const Vector3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
 template <typename T>
-FINLINE bool operator!=(const Vector3<T> &v1, const Vector3<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) || (v1.z != v2.z)) { return true; } return false; }
+inline bool operator!=(const Vector3<T> &v1, const Vector3<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) || (v1.z != v2.z)) { return true; } return false; }
 
 template <typename T>
-FINLINE Vector3f rcp(const Vector3<T> &v1) { return Vector3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
+inline Vector3f rcp(const Vector3<T> &v1) { return Vector3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
 template <typename T>
-FINLINE Vector3<T> abs(const Vector3<T> &v1) { return Vector3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
+inline Vector3<T> abs(const Vector3<T> &v1) { return Vector3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
 template <typename T>
-FINLINE Vector3<T> sign(const Vector3<T> &v1) { return Vector3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
+inline Vector3<T> sign(const Vector3<T> &v1) { return Vector3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
 
 template <typename T>
-FINLINE T dot(const Vector3<T> &v1, const Vector3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
+inline T dot(const Vector3<T> &v1, const Vector3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 template <typename T>
-FINLINE Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
+inline Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
 
 template <typename T>
-FINLINE float length(const Vector3<T> &v) { return sqrt(float(dot(v, v))); }
+inline float length(const Vector3<T> &v) { return sqrt(float(dot(v, v))); }
 template <typename T>
-FINLINE float sqrlen(const Vector3<T> &v) { return float(dot(v, v)); }
+inline float sqrlen(const Vector3<T> &v) { return float(dot(v, v)); }
 template <typename T>
-FINLINE Vector3f normalize(const Vector3<T> &v1) { float inv_l = rsqrt(dot(v1, v1)); return v1 * inv_l; }
+inline Vector3f normalize(const Vector3<T> &v1) { float inv_l = rsqrt(dot(v1, v1)); return v1 * inv_l; }
 
 
 template <typename T>
-FINLINE Vector3f sqrt(const Vector3<T> &v1) { return Vector3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
+inline Vector3f sqrt(const Vector3<T> &v1) { return Vector3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
 template <typename T>
-FINLINE Vector3f rsqrt(const Vector3<T> &v1){ return Vector3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
+inline Vector3f rsqrt(const Vector3<T> &v1){ return Vector3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
 
 template <typename T>
-FINLINE Vector3<T> min(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(min(v0.x,v1.x),min(v0.y,v1.y),min(v0.z,v1.z)); }
+inline Vector3<T> min(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(min(v0.x,v1.x),min(v0.y,v1.y),min(v0.z,v1.z)); }
 template <typename T>
-FINLINE Vector3<T> max(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(max(v0.x,v1.x),max(v0.y,v1.y),max(v0.z,v1.z)); }
+inline Vector3<T> max(const Vector3<T> &v0,const Vector3<T> &v1){ return Vector3<T>(max(v0.x,v1.x),max(v0.y,v1.y),max(v0.z,v1.z)); }
 
 //--- [SSE] ---
 //16 bit
@@ -146,60 +146,60 @@ struct SSE_ALIGNAS SSEVector3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEVector3f():xyzw(float4()){ }
-    FINLINE SSEVector3f(const float4& _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEVector3f(const float x,const float y,const float z):xyzw(float4(x,y,z,0.0f)){ }
-    FINLINE explicit SSEVector3f(const float a):xyzw(float4(a)){ }
-    FINLINE explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,0.0f)){ }
+    inline SSEVector3f():xyzw(float4()){ }
+    inline SSEVector3f(const float4& _xyzw):xyzw(_xyzw){ }
+    inline SSEVector3f(const float x,const float y,const float z):xyzw(float4(x,y,z,0.0f)){ }
+    inline explicit SSEVector3f(const float a):xyzw(float4(a)){ }
+    inline explicit SSEVector3f(const Vector3f& v):xyzw(float4(v.x,v.y,v.z,0.0f)){ }
 
-    FINLINE SSEVector3f(const SSEVector3f&) = default;
-    FINLINE SSEVector3f(SSEVector3f&&) = default;
-    FINLINE SSEVector3f& operator=(const SSEVector3f&) = default;
-    FINLINE SSEVector3f& operator=(SSEVector3f&&) = default;
-    FINLINE ~SSEVector3f() = default;
+    inline SSEVector3f(const SSEVector3f&) = default;
+    inline SSEVector3f(SSEVector3f&&) = default;
+    inline SSEVector3f& operator=(const SSEVector3f&) = default;
+    inline SSEVector3f& operator=(SSEVector3f&&) = default;
+    inline ~SSEVector3f() = default;
 
-    FINLINE operator float4&(){ return xyzw; }
-    FINLINE  operator const float4&() const { return xyzw; }
+    inline operator float4&(){ return xyzw; }
+    inline  operator const float4&() const { return xyzw; }
 
-    FINLINE SSEVector3f& operator=(const Vector3f& v){ x=v.x; y=v.y; z=v.z; return (*this); } 
+    inline SSEVector3f& operator=(const Vector3f& v){ x=v.x; y=v.y; z=v.z; return (*this); } 
 
-    FINLINE const float& operator[](int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
-    FINLINE  float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    inline const float& operator[](int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    inline  float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
 };
 
-FINLINE  std::ostream &operator<<(std::ostream &out, const SSEVector3f &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
+inline  std::ostream &operator<<(std::ostream &out, const SSEVector3f &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
 
-FINLINE SSEVector3f operator+(const SSEVector3f& v){ return v; }
+inline SSEVector3f operator+(const SSEVector3f& v){ return v; }
  //0x80000000 xor x(y,z)
-FINLINE SSEVector3f operator-(const SSEVector3f& v){ return - v.xyzw;}
+inline SSEVector3f operator-(const SSEVector3f& v){ return - v.xyzw;}
 
-FINLINE SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){ return  v1.xyzw*v2.xyzw; }
-FINLINE SSEVector3f operator*(const SSEVector3f& v1,const float a){ return v1.xyzw*float4(a); }
-FINLINE SSEVector3f operator/(const SSEVector3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
+inline SSEVector3f operator*(const SSEVector3f& v1,const SSEVector3f& v2){ return  v1.xyzw*v2.xyzw; }
+inline SSEVector3f operator*(const SSEVector3f& v1,const float a){ return v1.xyzw*float4(a); }
+inline SSEVector3f operator/(const SSEVector3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
 
-FINLINE SSEVector3f& operator*=(SSEVector3f& v1,const float a){ v1=v1*a; return v1; }
-FINLINE SSEVector3f& operator/=(SSEVector3f& v1,const float f){ v1=v1/f; return v1; }
+inline SSEVector3f& operator*=(SSEVector3f& v1,const float a){ v1=v1*a; return v1; }
+inline SSEVector3f& operator/=(SSEVector3f& v1,const float f){ v1=v1/f; return v1; }
 
 //only 3 bit used
-FINLINE bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
-FINLINE bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&0x7)!=0x0; }
+inline bool operator==(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
+inline bool operator!=(const SSEVector3f& v1,const SSEVector3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&0x7)!=0x0; }
 
-FINLINE SSEVector3f rcp(const SSEVector3f& v) { return rcp(v.xyzw);}
+inline SSEVector3f rcp(const SSEVector3f& v) { return rcp(v.xyzw);}
 //0x7FFFFFFF and x(y,z)
-FINLINE SSEVector3f abs(const SSEVector3f& v){ return abs(v.xyzw); }//TODO 在我的败家之眼上，输入(-1,-1,-1,-1)返回的是(nan,nan,nan,nan)
-FINLINE SSEVector3f sign(const SSEVector3f& v){ return sign(v.xyzw); }
+inline SSEVector3f abs(const SSEVector3f& v){ return abs(v.xyzw); }//TODO 在我的败家之眼上，输入(-1,-1,-1,-1)返回的是(nan,nan,nan,nan)
+inline SSEVector3f sign(const SSEVector3f& v){ return sign(v.xyzw); }
 
-//FINLINE float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
+//inline float reduce_add(const SSEVector3f& v){ float4 a(v); float4 b=swizzle<1>(v); float4 c=swizzle<2>(v); return _mm_cvtss_f32(a+b+c);}
 //Use SSE 4.0's _mm_dp_ps
-FINLINE float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_cvtss_f32(_mm_dp_ps(v1.xyzw,v2.xyzw,0x7F)); }
-FINLINE SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){ float4 a0=v1.xyzw; float4 b0=swizzle<1,2,0,3>(v2.xyzw); float4 a1=swizzle<1,2,0,3>(v1.xyzw); float4 b1=v2.xyzw; return swizzle<1,2,0,3>(msub(a0,b0,a1*b1)); }
+inline float dot(const SSEVector3f& v1,const SSEVector3f& v2){ return _mm_cvtss_f32(_mm_dp_ps(v1.xyzw,v2.xyzw,0x7F)); }
+inline SSEVector3f cross(const SSEVector3f& v1,const SSEVector3f& v2){ float4 a0=v1.xyzw; float4 b0=swizzle<1,2,0,3>(v2.xyzw); float4 a1=swizzle<1,2,0,3>(v1.xyzw); float4 b1=v2.xyzw; return swizzle<1,2,0,3>(msub(a0,b0,a1*b1)); }
 
-FINLINE float length(const SSEVector3f& v){ return sqrt(dot(v,v));}
-FINLINE float sqrlen(const SSEVector3f& v){ return dot(v,v);}
-FINLINE SSEVector3f normalize(const SSEVector3f& v){ return v*rsqrt(dot(v,v)); }
+inline float length(const SSEVector3f& v){ return sqrt(dot(v,v));}
+inline float sqrlen(const SSEVector3f& v){ return dot(v,v);}
+inline SSEVector3f normalize(const SSEVector3f& v){ return v*rsqrt(dot(v,v)); }
 
-FINLINE SSEVector3f sqrt(const SSEVector3f& v){ return sqrt(v.xyzw); }
-FINLINE SSEVector3f rsqrt(const SSEVector3f& v){return rsqrt(v.xyzw);}
+inline SSEVector3f sqrt(const SSEVector3f& v){ return sqrt(v.xyzw); }
+inline SSEVector3f rsqrt(const SSEVector3f& v){return rsqrt(v.xyzw);}
 
 
 //SoA struct vector3f
@@ -231,22 +231,22 @@ struct SSE_ALIGNAS SoAVector3f{
     typedef float Scalar;
 
 
-    FINLINE SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
-    FINLINE explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    FINLINE SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
-    FINLINE explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
-    FINLINE SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
-    FINLINE SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+    inline SoAVector3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
+    inline explicit SoAVector3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    inline SoAVector3f(const Vector3f& v0,const Vector3f& v1,const Vector3f& v2,const Vector3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
+    inline explicit SoAVector3f(const Vector3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    inline SoAVector3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    inline SoAVector3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
 
-    FINLINE SoAVector3f(const SoAVector3f&) = default;
-    FINLINE SoAVector3f(SoAVector3f&&) = default;
-    FINLINE SoAVector3f& operator=(const SoAVector3f&) = default;
-    FINLINE SoAVector3f& operator=(SoAVector3f&&) = default;
-    FINLINE ~SoAVector3f() = default;
+    inline SoAVector3f(const SoAVector3f&) = default;
+    inline SoAVector3f(SoAVector3f&&) = default;
+    inline SoAVector3f& operator=(const SoAVector3f&) = default;
+    inline SoAVector3f& operator=(SoAVector3f&&) = default;
+    inline ~SoAVector3f() = default;
     
 };
  
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
+inline  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) { 
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
     out << '(' << v.x2 << ',' << v.y2 << ',' << v.z2 << ')';
@@ -254,7 +254,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAVector3f &v) {
     return out;
 }
 
-FINLINE int operator==(const SoAVector3f& v0,const SoAVector3f& v1){
+inline int operator==(const SoAVector3f& v0,const SoAVector3f& v1){
 
     bool4  mask_xxxx =(v0.xxxx==v1.xxxx);
     bool4  mask_yyyy =(v0.yyyy==v1.yyyy);
@@ -262,20 +262,20 @@ FINLINE int operator==(const SoAVector3f& v0,const SoAVector3f& v1){
 
     return movemask((mask_xxxx&mask_yyyy)&mask_zzzz);
 }
-FINLINE int operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
+inline int operator!=(const SoAVector3f& v0,const SoAVector3f& v1){
     bool4  mask_xxxx =(v0.xxxx!=v1.xxxx);
     bool4  mask_yyyy =(v0.yyyy!=v1.yyyy);
     bool4  mask_zzzz =(v0.zzzz!=v1.zzzz);
     return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
-FINLINE float4 dot(const SoAVector3f& v0,const SoAVector3f& v1){ return v0.xxxx*v1.xxxx+v0.yyyy*v1.yyyy+v0.zzzz*v1.zzzz; }
+inline float4 dot(const SoAVector3f& v0,const SoAVector3f& v1){ return v0.xxxx*v1.xxxx+v0.yyyy*v1.yyyy+v0.zzzz*v1.zzzz; }
 
-FINLINE SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 xxxx=v0.yyyy*v1.zzzz-v0.zzzz*v1.yyyy; float4 yyyy=v0.zzzz*v1.xxxx-v0.xxxx*v1.zzzz; float4 zzzz=v0.xxxx*v1.yyyy-v0.yyyy*v1.xxxx; return SoAVector3f(xxxx,yyyy,zzzz); }
+inline SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 xxxx=v0.yyyy*v1.zzzz-v0.zzzz*v1.yyyy; float4 yyyy=v0.zzzz*v1.xxxx-v0.xxxx*v1.zzzz; float4 zzzz=v0.xxxx*v1.yyyy-v0.yyyy*v1.xxxx; return SoAVector3f(xxxx,yyyy,zzzz); }
 
-FINLINE SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(v.xxxx); vv.yyyy = rcp(v.yyyy); vv.zzzz = rcp(v.zzzz); return vv; }
-FINLINE SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(v.xxxx); vv.yyyy = safe_rcp(v.yyyy); vv.zzzz = safe_rcp(v.zzzz); return vv; }
-FINLINE SoAVector3f load(const Vector3f* vector_array){ return SoAVector3f(vector_array[0],vector_array[1],vector_array[2],vector_array[3]); }
+inline SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(v.xxxx); vv.yyyy = rcp(v.yyyy); vv.zzzz = rcp(v.zzzz); return vv; }
+inline SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(v.xxxx); vv.yyyy = safe_rcp(v.yyyy); vv.zzzz = safe_rcp(v.zzzz); return vv; }
+inline SoAVector3f load(const Vector3f* vector_array){ return SoAVector3f(vector_array[0],vector_array[1],vector_array[2],vector_array[3]); }
 //---VECTOR3 END---
 
 //---VECTOR2 BEGIN---
@@ -291,24 +291,24 @@ struct Vector2
     };
 
   public:
-    FINLINE Vector2() : x((T)0), y((T)0) { }
-    FINLINE explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
-    FINLINE Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b));}
+    inline Vector2() : x((T)0), y((T)0) { }
+    inline explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
+    inline Vector2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b));}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Vector2(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;  }
-    FINLINE Vector2& operator=(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
-    FINLINE Vector2(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);  }
-    FINLINE Vector2& operator=(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
+    inline Vector2(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;  }
+    inline Vector2& operator=(const Vector2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+    inline Vector2(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);  }
+    inline Vector2& operator=(Vector2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
 #else
-    FINLINE Vector2(const Vector2 &v1) = default;
-    FINLINE Vector2& operator=(const Vector2 &v1) = default;
-    FINLINE Vector2(Vector2 &&v1) = default;
-    FINLINE Vector2& operator=(Vector2 &&v1) = default;
-    FINLINE ~Vector2() = default;
+    inline Vector2(const Vector2 &v1) = default;
+    inline Vector2& operator=(const Vector2 &v1) = default;
+    inline Vector2(Vector2 &&v1) = default;
+    inline Vector2& operator=(Vector2 &&v1) = default;
+    inline ~Vector2() = default;
 #endif
-    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
-    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
 typedef Vector2<float> Vector2f;
 typedef Vector2<int> Vector2i;
@@ -327,77 +327,77 @@ struct Point3
     };
 
   public:
-    FINLINE Point3() : x((T)0), y((T)0), z((T)0) { }
-    FINLINE explicit Point3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
-    FINLINE Point3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    inline Point3() : x((T)0), y((T)0), z((T)0) { }
+    inline explicit Point3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
+    inline Point3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Point3(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
-    FINLINE Point3 &operator=(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
-    FINLINE Point3(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
-    FINLINE Point3 &operator=(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
+    inline Point3(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
+    inline Point3 &operator=(const Point3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    inline Point3(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
+    inline Point3 &operator=(Point3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
 #else
-    FINLINE Point3(const Point3 &v1) = default;
-    FINLINE Point3 &operator=(const Point3 &v1) = default;
-    FINLINE Point3(Point3 &&v1) = default;
-    FINLINE Point3 &operator=(Point3 &&v1) = default;
-    FINLINE ~Point3() = default;
+    inline Point3(const Point3 &v1) = default;
+    inline Point3 &operator=(const Point3 &v1) = default;
+    inline Point3(Point3 &&v1) = default;
+    inline Point3 &operator=(Point3 &&v1) = default;
+    inline ~Point3() = default;
 #endif
-    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
-    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
 typedef Point3<float> Point3f;
 typedef Point3<int> Point3i;
 
 template <typename T>
-FINLINE  std::ostream &operator<<(std::ostream &out, const Point3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
+inline  std::ostream &operator<<(std::ostream &out, const Point3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
 
 
 template <typename T>
-FINLINE Point3<T> operator+(const Point3<T>& v){ return v; }
+inline Point3<T> operator+(const Point3<T>& v){ return v; }
 template <typename T>
-FINLINE Point3<T> operator-(const Point3<T>& v1){ Point3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
+inline Point3<T> operator-(const Point3<T>& v1){ Point3<T> v; v.x=-v1.x; v.y=-v1.y; v.z=-v1.z; return v; }
 
 
 //operator+  =>  just for affine interpolation
 template <typename T>
-FINLINE Point3<T> operator+(const Point3<T> &v1, const Point3<T> &v2){ Point3<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; v.z = v1.z + v2.z; return v; }
+inline Point3<T> operator+(const Point3<T> &v1, const Point3<T> &v2){ Point3<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; v.z = v1.z + v2.z; return v; }
 //compenont wise
 template <typename T>
-FINLINE Point3<T> operator*(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
+inline Point3<T> operator*(const Point3<T> &v1, const Point3<T> &v2) { Point3<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; v.z = v1.z * v2.z; return v; }
 template <typename T>
-FINLINE Point3<T> operator*(const Point3<T> &v1, const T &f) { Point3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
+inline Point3<T> operator*(const Point3<T> &v1, const T &f) { Point3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
 template <typename T>
-FINLINE Point3<T> operator/(const Point3<T> &v1, const T &f) { assert(f != 0); Point3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
+inline Point3<T> operator/(const Point3<T> &v1, const T &f) { assert(f != 0); Point3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
 template <typename T>
-FINLINE Point3<T> &operator*=(Point3<T> &v, const Point3<T> &v1) { v.x *= v1.x; v.y *= v1.y; v.z *= v1.z; return v; }
+inline Point3<T> &operator*=(Point3<T> &v, const Point3<T> &v1) { v.x *= v1.x; v.y *= v1.y; v.z *= v1.z; return v; }
 template <typename T>
-FINLINE Point3<T> &operator*=(Point3<T> &v, const T &f) { v.x *= f; v.y *= f; v.z *= f; return v; }
+inline Point3<T> &operator*=(Point3<T> &v, const T &f) { v.x *= f; v.y *= f; v.z *= f; return v; }
 template <typename T>
-FINLINE Point3<T> &operator/=(Point3<T> &v, const T &f) { assert(f != 0); v.x /= f; v.y /= f; v.z /= f; return v; }
+inline Point3<T> &operator/=(Point3<T> &v, const T &f) { assert(f != 0); v.x /= f; v.y /= f; v.z /= f; return v; }
 
 template <typename T>
-FINLINE bool operator==(const Point3<T> &v1, const Point3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
+inline bool operator==(const Point3<T> &v1, const Point3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
 template <typename T>
-FINLINE bool operator!=(const Point3<T> &v1, const Point3<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) || (v1.z != v2.z)) { return true; } return false; }
+inline bool operator!=(const Point3<T> &v1, const Point3<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) || (v1.z != v2.z)) { return true; } return false; }
 
 template <typename T>
-FINLINE Point3f rcp(const Point3<T> &v1) { return Point3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
+inline Point3f rcp(const Point3<T> &v1) { return Point3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
 template <typename T>
-FINLINE Point3<T> abs(const Point3<T> &v1) { return Point3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
+inline Point3<T> abs(const Point3<T> &v1) { return Point3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
 template <typename T>
-FINLINE Point3<T> sign(const Point3<T> &v1) { return Point3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
+inline Point3<T> sign(const Point3<T> &v1) { return Point3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
 
 
 template <typename T>
-FINLINE Point3f sqrt(const Point3<T> &v1) { return Point3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
+inline Point3f sqrt(const Point3<T> &v1) { return Point3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
 template <typename T>
-FINLINE Point3f rsqrt(const Point3<T> &v1){ return Point3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
+inline Point3f rsqrt(const Point3<T> &v1){ return Point3f(rsqrt(v1.x), rsqrt(v1.y), rsqrt(v1.z)); }
 
 template <typename T>
-FINLINE Point3<T> min(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(min(p0.x,p1.x),min(p0.y,p1.y),min(p0.z,p1.z)); }
+inline Point3<T> min(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(min(p0.x,p1.x),min(p0.y,p1.y),min(p0.z,p1.z)); }
 template <typename T>
-FINLINE Point3<T> max(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(max(p0.x,p1.x),max(p0.y,p1.y),max(p0.z,p1.z)); }
+inline Point3<T> max(const Point3<T> &p0,const Point3<T> &p1){ return Point3<T>(max(p0.x,p1.x),max(p0.y,p1.y),max(p0.z,p1.z)); }
 
 
 
@@ -415,53 +415,53 @@ struct SSE_ALIGNAS SSEPoint3f{
         struct{float x,y,z,_w;};
     };
 
-    FINLINE SSEPoint3f():xyzw(float4()){ }
-    FINLINE SSEPoint3f(const float4& _xyzw):xyzw(_xyzw){ }
-    FINLINE SSEPoint3f(const float x,const float y,const float z):xyzw(float4(x,y,z,1.0f)){ }
-    FINLINE explicit SSEPoint3f(const float a):xyzw(float4(a)){ }
-    FINLINE explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,1.0f)){ }
+    inline SSEPoint3f():xyzw(float4()){ }
+    inline SSEPoint3f(const float4& _xyzw):xyzw(_xyzw){ }
+    inline SSEPoint3f(const float x,const float y,const float z):xyzw(float4(x,y,z,1.0f)){ }
+    inline explicit SSEPoint3f(const float a):xyzw(float4(a)){ }
+    inline explicit SSEPoint3f(const Point3f& v):xyzw(float4(v.x,v.y,v.z,1.0f)){ }
 
-    FINLINE SSEPoint3f(const SSEPoint3f&) = default;
-    FINLINE SSEPoint3f(SSEPoint3f&&) = default;
-    FINLINE SSEPoint3f& operator=(const SSEPoint3f&) = default;
-    FINLINE SSEPoint3f& operator=(SSEPoint3f&&) = default;
-    FINLINE ~SSEPoint3f() = default;
+    inline SSEPoint3f(const SSEPoint3f&) = default;
+    inline SSEPoint3f(SSEPoint3f&&) = default;
+    inline SSEPoint3f& operator=(const SSEPoint3f&) = default;
+    inline SSEPoint3f& operator=(SSEPoint3f&&) = default;
+    inline ~SSEPoint3f() = default;
     
-    FINLINE operator float4&(){ return xyzw; }
-    FINLINE operator const float4&() const { return xyzw; }
+    inline operator float4&(){ return xyzw; }
+    inline operator const float4&() const { return xyzw; }
 
-    FINLINE SSEPoint3f& operator=(const Point3f& v){x=v.x;y=v.y;z=v.z; return (*this); } 
+    inline SSEPoint3f& operator=(const Point3f& v){x=v.x;y=v.y;z=v.z; return (*this); } 
 
-    FINLINE const float& operator[](int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
-    FINLINE float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    inline const float& operator[](int idx) const{ assert(idx>=0&&idx<N); return (&x)[idx]; }
+    inline float& operator[](int idx){ assert(idx>=0&&idx<N); return (&x)[idx]; }
 };
 
-FINLINE  std::ostream &operator<<(std::ostream &out, const SSEPoint3f &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
+inline  std::ostream &operator<<(std::ostream &out, const SSEPoint3f &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
 
-FINLINE SSEPoint3f operator+(const SSEPoint3f& v){ return v; }
+inline SSEPoint3f operator+(const SSEPoint3f& v){ return v; }
  //0x80000000 xor x(y,z)
-FINLINE SSEPoint3f operator-(const SSEPoint3f& v){ return -v.xyzw;}
+inline SSEPoint3f operator-(const SSEPoint3f& v){ return -v.xyzw;}
 
-FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const SSEPoint3f& v2){ return v1.xyzw*v2.xyzw; }
-FINLINE SSEPoint3f operator*(const SSEPoint3f& v1,const float a){ return v1.xyzw*float4(a); }
-FINLINE SSEPoint3f operator/(const SSEPoint3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
+inline SSEPoint3f operator*(const SSEPoint3f& v1,const SSEPoint3f& v2){ return v1.xyzw*v2.xyzw; }
+inline SSEPoint3f operator*(const SSEPoint3f& v1,const float a){ return v1.xyzw*float4(a); }
+inline SSEPoint3f operator/(const SSEPoint3f& v1,const float a){ assert(a!=0); return v1.xyzw/float4(a); }
 
-FINLINE SSEPoint3f& operator*=(SSEPoint3f& v1,const float a){ v1=v1*a; return v1; }
-FINLINE SSEPoint3f& operator/=(SSEPoint3f& v1,const float f){ v1=v1/f; return v1; }
+inline SSEPoint3f& operator*=(SSEPoint3f& v1,const float a){ v1=v1*a; return v1; }
+inline SSEPoint3f& operator/=(SSEPoint3f& v1,const float f){ v1=v1/f; return v1; }
 
 //only 3 bit used
-FINLINE bool operator==(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
-FINLINE bool operator!=(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0; }
+inline bool operator==(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpeq_ps(v1.xyzw,v2.xyzw))&7)==7; }
+inline bool operator!=(const SSEPoint3f& v1,const SSEPoint3f& v2){ return (_mm_movemask_ps(_mm_cmpneq_ps(v1.xyzw,v2.xyzw))&7)!=0; }
 
-FINLINE SSEPoint3f rcp(const SSEPoint3f& v) {return rcp(v.xyzw);}
+inline SSEPoint3f rcp(const SSEPoint3f& v) {return rcp(v.xyzw);}
 //0x7FFFFFFF and x(y,z)
-FINLINE SSEPoint3f abs(const SSEPoint3f& v){return abs(v.xyzw);}
-FINLINE SSEPoint3f sign(const SSEPoint3f& v){return sign(v.xyzw);}
+inline SSEPoint3f abs(const SSEPoint3f& v){return abs(v.xyzw);}
+inline SSEPoint3f sign(const SSEPoint3f& v){return sign(v.xyzw);}
 
-//FINLINE float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v.xyzw); float4 c=swizzle<2>(v.xyzw); return _mm_cvtss_f32(a+b+c);}
+//inline float sum(const SSEPoint3f& v){ float4 a(v); float4 b=swizzle<1>(v.xyzw); float4 c=swizzle<2>(v.xyzw); return _mm_cvtss_f32(a+b+c);}
 
-FINLINE SSEPoint3f sqrt(const SSEPoint3f& v){ return sqrt(v.xyzw); }
-FINLINE SSEPoint3f rsqrt(const SSEPoint3f& v){return rsqrt(v.xyzw);}
+inline SSEPoint3f sqrt(const SSEPoint3f& v){ return sqrt(v.xyzw); }
+inline SSEPoint3f rsqrt(const SSEPoint3f& v){return rsqrt(v.xyzw);}
 
 
 //TODO : need to refactor 
@@ -493,20 +493,20 @@ struct SSE_ALIGNAS SoAPoint3f{
     typedef float Scalar;
 
 
-    FINLINE SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
-    FINLINE explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
-    FINLINE SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
-    FINLINE explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
-    FINLINE SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
-    FINLINE SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
+    inline SoAPoint3f():xxxx(0.0f),yyyy(0.0f),zzzz(0.0f){}
+    inline explicit SoAPoint3f(const float a):xxxx(a),yyyy(a),zzzz(a){assert(!isnan(a));}
+    inline SoAPoint3f(const Point3f& v0,const Point3f& v1,const Point3f& v2,const Point3f& v3):xxxx(v0.x,v1.x,v2.x,v3.x),yyyy(v0.y,v1.y,v2.y,v3.y),zzzz(v0.z,v1.z,v2.z,v3.z){ }
+    inline explicit SoAPoint3f(const Point3f& v):xxxx(v.x),yyyy(v.y),zzzz(v.z){ }
+    inline SoAPoint3f(const float4& x,const float4& y,const float4& z):xxxx(x),yyyy(y),zzzz(z){}
+    inline SoAPoint3f(const float x,const float y,const float z):xxxx(x),yyyy(y),zzzz(z){}
 
-    FINLINE SoAPoint3f(const SoAPoint3f&) = default;
-    FINLINE SoAPoint3f(SoAPoint3f&&) = default;
-    FINLINE SoAPoint3f& operator=(const SoAPoint3f&) = default;
-    FINLINE SoAPoint3f& operator=(SoAPoint3f&&) = default;
+    inline SoAPoint3f(const SoAPoint3f&) = default;
+    inline SoAPoint3f(SoAPoint3f&&) = default;
+    inline SoAPoint3f& operator=(const SoAPoint3f&) = default;
+    inline SoAPoint3f& operator=(SoAPoint3f&&) = default;
 };
 
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
+inline  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
     out << '(' << v.x2 << ',' << v.y2 << ',' << v.z2 << ')';
@@ -515,7 +515,7 @@ FINLINE  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) {
 }
 
 
-FINLINE int operator==(const SoAPoint3f& v0,const SoAPoint3f& v1){
+inline int operator==(const SoAPoint3f& v0,const SoAPoint3f& v1){
 
     bool4  mask_xxxx =(v0.xxxx==v1.xxxx);
     bool4  mask_yyyy =(v0.yyyy==v1.yyyy);
@@ -523,22 +523,22 @@ FINLINE int operator==(const SoAPoint3f& v0,const SoAPoint3f& v1){
 
     return movemask((mask_xxxx&mask_yyyy)&mask_zzzz);
 }
-FINLINE int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
+inline int operator!=(const SoAPoint3f& v0,const SoAPoint3f& v1){
     bool4  mask_xxxx =(v0.xxxx!=v1.xxxx);
     bool4  mask_yyyy =(v0.yyyy!=v1.yyyy);
     bool4  mask_zzzz =(v0.zzzz!=v1.zzzz);
     return movemask((mask_xxxx|mask_yyyy)|mask_zzzz);
 }
 
-FINLINE SoAPoint3f min(const SoAPoint3f& p0,const SoAPoint3f& p1){
+inline SoAPoint3f min(const SoAPoint3f& p0,const SoAPoint3f& p1){
     return SoAPoint3f(min(p0.xxxx,p1.xxxx),min(p0.yyyy,p1.yyyy),min(p0.zzzz,p1.zzzz));
 }
 
-FINLINE SoAPoint3f max(const SoAPoint3f& p0,const SoAPoint3f& p1){
+inline SoAPoint3f max(const SoAPoint3f& p0,const SoAPoint3f& p1){
     return SoAPoint3f(max(p0.xxxx,p1.xxxx),max(p0.yyyy,p1.yyyy),max(p0.zzzz,p1.zzzz));
 }
 
-FINLINE SoAPoint3f load(const Point3f* point_array){ 
+inline SoAPoint3f load(const Point3f* point_array){ 
     return SoAPoint3f(point_array[0],point_array[1],point_array[2],point_array[3]); 
 }
 //---POINT3 END---
@@ -556,25 +556,25 @@ struct Normal3
     };
 
   public:
-    FINLINE Normal3() : x((T)0), y((T)0), z((T)0) { }
-    FINLINE explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
-    FINLINE Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
-    FINLINE Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
+    inline Normal3() : x((T)0), y((T)0), z((T)0) { }
+    inline explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
+    inline Normal3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
+    inline Normal3(const Vector3<T>& v):x(v.x), y(v.y), z(v.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Normal3(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
-    FINLINE Normal3 &operator=(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
-    FINLINE Normal3(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
-    FINLINE Normal3 &operator=(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
+    inline Normal3(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
+    inline Normal3 &operator=(const Normal3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; return (*this); }
+    inline Normal3(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); }
+    inline Normal3 &operator=(Normal3 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = std::move(v1.x); y = std::move(v1.y); z = std::move(v1.z); return (*this); }
 #else
-    FINLINE Normal3(const Normal3 &v1) = default;
-    FINLINE Normal3 &operator=(const Normal3 &v1) = default;
-    FINLINE Normal3(Normal3 &&v1) = default;
-    FINLINE Normal3 &operator=(Normal3 &&v1) = default;
-    FINLINE ~Normal3() = default;
+    inline Normal3(const Normal3 &v1) = default;
+    inline Normal3 &operator=(const Normal3 &v1) = default;
+    inline Normal3(Normal3 &&v1) = default;
+    inline Normal3 &operator=(Normal3 &&v1) = default;
+    inline ~Normal3() = default;
 #endif
-    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
-    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
 typedef Normal3<float> Normal3f;
 typedef Normal3<int> Normal3i;
@@ -593,64 +593,64 @@ struct Point2
     };
 
   public:
-    FINLINE Point2() : x((T)0), y((T)0) { }
-    FINLINE explicit Point2(const float a) : x(a), y(a){ assert(!isnan(a)); }
-    FINLINE Point2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); }
+    inline Point2() : x((T)0), y((T)0) { }
+    inline explicit Point2(const float a) : x(a), y(a){ assert(!isnan(a)); }
+    inline Point2(const T &a, const T &b) : x(a), y(b) { assert(!isnan(a)); assert(!isnan(b)); }
     template<typename U>
-    FINLINE Point2(const Point2<U>& p):x((T)p.x),y((T)p.y){}
+    inline Point2(const Point2<U>& p):x((T)p.x),y((T)p.y){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
-    FINLINE Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;}
-    FINLINE Point2 &operator=(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
-    FINLINE Point2(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);}
-    FINLINE Point2 &operator=(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
+    inline Point2(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y;}
+    inline Point2 &operator=(const Point2 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = v1.x; y = v1.y; return (*this); }
+    inline Point2(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y);}
+    inline Point2 &operator=(Point2 &&v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y));  x = std::move(v1.x); y = std::move(v1.y); return (*this); }
 #else
-    FINLINE Point2(const Point2 &v1) = default;
-    FINLINE Point2 &operator=(const Point2 &v1) = default;
-    FINLINE Point2(Point2 &&v1) = default;
-    FINLINE Point2 &operator=(Point2 &&v1) = default;
-    FINLINE ~Point2() = default;
+    inline Point2(const Point2 &v1) = default;
+    inline Point2 &operator=(const Point2 &v1) = default;
+    inline Point2(Point2 &&v1) = default;
+    inline Point2 &operator=(Point2 &&v1) = default;
+    inline ~Point2() = default;
 #endif
-    FINLINE const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
-    FINLINE T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline const T& operator[](const int idx) const { assert(idx >= 0 && idx < N); return (&x)[idx]; }
+    inline T &operator[](const int idx) { assert(idx >= 0 && idx < N); return (&x)[idx]; }
 };
 
 
 template <typename T>
-FINLINE  std::ostream &operator<<(std::ostream &out, const Point2<T> &v) { out << '(' << v.x << ',' << v.y <<  ')'; return out; }
+inline  std::ostream &operator<<(std::ostream &out, const Point2<T> &v) { out << '(' << v.x << ',' << v.y <<  ')'; return out; }
 
 template <typename T>
-FINLINE bool operator==(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y)) { return true; } return false; }
+inline bool operator==(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y)) { return true; } return false; }
 template <typename T>
-FINLINE bool operator!=(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) ) { return true; } return false; }
+inline bool operator!=(const Point2<T> &v1, const Point2<T> &v2) { if ((v1.x != v2.x) || (v1.y != v2.y) ) { return true; } return false; }
 
 
 //operator+  =>  just for affine interpolation
 template <typename T>
-FINLINE Point2<T> operator+(const Point2<T> &v1, const Point2<T> &v2){ Point2<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; return v; }
+inline Point2<T> operator+(const Point2<T> &v1, const Point2<T> &v2){ Point2<T> v; v.x = v1.x + v2.x; v.y = v1.y + v2.y; return v; }
 template <typename T>
-FINLINE Point2<T> operator+(const Point2<T> &v1, const T& f){ Point2<T> v; v.x = v1.x + f; v.y = v1.y + f; return v; }
+inline Point2<T> operator+(const Point2<T> &v1, const T& f){ Point2<T> v; v.x = v1.x + f; v.y = v1.y + f; return v; }
 template <typename T>
-FINLINE Point2<T> operator-(const Point2<T> &v1, const T& f){ Point2<T> v; v.x = v1.x - f; v.y = v1.y - f; return v; }
+inline Point2<T> operator-(const Point2<T> &v1, const T& f){ Point2<T> v; v.x = v1.x - f; v.y = v1.y - f; return v; }
 template <typename T>
-FINLINE Point2<T> operator*(const Point2<T> &v1, const Point2<T> &v2) { Point2<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; return v; }
+inline Point2<T> operator*(const Point2<T> &v1, const Point2<T> &v2) { Point2<T> v; v.x = v1.x * v2.x; v.y = v1.y * v2.y; return v; }
 template <typename T>
-FINLINE Point2<T> operator*(const Point2<T> &v1, const T &f) { Point2<T> v; v.x = v1.x * f; v.y = v1.y * f; return v; }
+inline Point2<T> operator*(const Point2<T> &v1, const T &f) { Point2<T> v; v.x = v1.x * f; v.y = v1.y * f; return v; }
 
 
 template <typename T>
-FINLINE Point2<T> min(const Point2<T> &p0,const Point2<T> &p1){ return Point2<T>(min(p0.x,p1.x),min(p0.y,p1.y)); }
+inline Point2<T> min(const Point2<T> &p0,const Point2<T> &p1){ return Point2<T>(min(p0.x,p1.x),min(p0.y,p1.y)); }
 template <typename T>
-FINLINE Point2<T> max(const Point2<T> &p0,const Point2<T> &p1){ return Point2<T>(max(p0.x,p1.x),max(p0.y,p1.y)); }
+inline Point2<T> max(const Point2<T> &p0,const Point2<T> &p1){ return Point2<T>(max(p0.x,p1.x),max(p0.y,p1.y)); }
 
 typedef Point2<float> Point2f;
 typedef Point2<int> Point2i;
 
-FINLINE Point2f ceil(const Point2f& p){
+inline Point2f ceil(const Point2f& p){
     return Point2f(ceil(p.x),ceil(p.y));
 }
 
-FINLINE Point2f floor(const Point2f& p){
+inline Point2f floor(const Point2f& p){
     return Point2f(floor(p.x),floor(p.y));
 }
 
@@ -752,8 +752,8 @@ public:
     inline ~Matrix4x4() = default;
     
 
-    FINLINE const float& operator[](const int idx) const { assert(idx >= 0 && idx < N); return m[idx];}
-    FINLINE float& operator[](const int idx){ assert(idx >= 0 && idx < N); return m[idx];}
+    inline const float& operator[](const int idx) const { assert(idx >= 0 && idx < N); return m[idx];}
+    inline float& operator[](const int idx){ assert(idx >= 0 && idx < N); return m[idx];}
 };
 
 inline std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v){
@@ -881,9 +881,9 @@ inline Matrix4x4 transform_inverse(const Matrix4x4& mat){
 }
 
 
-static FINLINE __m128 adj2x2(const __m128 m){ return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(1.0f,-1.0f,-1.0f,1.0f)); }
-static FINLINE __m128 mul2x2(const __m128 m0,const __m128 m1){ return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1))); }
-static FINLINE __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swizzle<0,0,0,0>(m)/*a*/,swizzle<3,3,3,3>(m)/*d*/), _mm_mul_ps(swizzle<1,1,1,1>(m)/*c*/,swizzle<2,2,2,2>(m)/*b*/) ); }
+static inline __m128 adj2x2(const __m128 m){ return _mm_mul_ps(swizzle<3,2,1,0>(m),_mm_set_ps(1.0f,-1.0f,-1.0f,1.0f)); }
+static inline __m128 mul2x2(const __m128 m0,const __m128 m1){ return _mm_add_ps(_mm_mul_ps(swizzle<0,1,0,1>(m0),swizzle<0,0,2,2>(m1)),_mm_mul_ps(swizzle<2,3,2,3>(m0),swizzle<1,1,3,3>(m1))); }
+static inline __m128 det2x2(const __m128 m){ return _mm_sub_ps( _mm_mul_ps(swizzle<0,0,0,0>(m)/*a*/,swizzle<3,3,3,3>(m)/*d*/), _mm_mul_ps(swizzle<1,1,1,1>(m)/*c*/,swizzle<2,2,2,2>(m)/*b*/) ); }
 
 
 //Blockwise inversion
@@ -1128,25 +1128,25 @@ inline Matrix4x4 inverse(const Matrix4x4& mat){
 
 //---GENERAL BEGIN---
 template <typename T>
-FINLINE Point3<T> operator+(const Point3<T> &p, const Vector3<T> &v) { Point3<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; rp.z = p.z + v.z; return rp; }
+inline Point3<T> operator+(const Point3<T> &p, const Vector3<T> &v) { Point3<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; rp.z = p.z + v.z; return rp; }
 template <typename T>
-FINLINE Point3<T> operator-(const Point3<T> &p, const Vector3<T> &v) {return p+(-v);}
+inline Point3<T> operator-(const Point3<T> &p, const Vector3<T> &v) {return p+(-v);}
 template <typename T>
-FINLINE Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> p; p.x = p1.x - p2.x; p.y = p1.y - p2.y; p.z = p1.z - p2.z; return p; }
+inline Vector3<T> operator-(const Point3<T> &p1, const Point3<T> &p2) { Vector3<T> p; p.x = p1.x - p2.x; p.y = p1.y - p2.y; p.z = p1.z - p2.z; return p; }
 
-FINLINE SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw+v.xyzw; }
-FINLINE SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw-v.xyzw; }
-FINLINE SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return p1.xyzw-p2.xyzw; }
+inline SSEVector3f operator+(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw+v.xyzw; }
+inline SSEVector3f operator-(const SSEPoint3f&  p ,const SSEVector3f& v ){ return p.xyzw-v.xyzw; }
+inline SSEVector3f operator-(const SSEPoint3f& p1,const SSEPoint3f& p2){ return p1.xyzw-p2.xyzw; }
 
-FINLINE float distance(const Point3f& p1,const Point3f& p2){ return length(p2-p1); }
+inline float distance(const Point3f& p1,const Point3f& p2){ return length(p2-p1); }
 
-FINLINE float distance(const SSEPoint3f& p1,const SSEPoint3f& p2){ return length(p2-p1); }
+inline float distance(const SSEPoint3f& p1,const SSEPoint3f& p2){ return length(p2-p1); }
 
 
 template <typename T>
-FINLINE Point2<T> operator+(const Point2<T> &p, const Vector2<T> &v) { Point2<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; return rp; }
+inline Point2<T> operator+(const Point2<T> &p, const Vector2<T> &v) { Point2<T> rp; rp.x = p.x + v.x; rp.y = p.y + v.y; return rp; }
 template <typename T>
-FINLINE Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v) {Point2<T> rp; rp.x = p.x - v.x; rp.y = p.y - v.y; return rp;}
+inline Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v) {Point2<T> rp; rp.x = p.x - v.x; rp.y = p.y - v.y; return rp;}
 
 inline Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     // 8ns   
@@ -1163,7 +1163,7 @@ inline Vector3f operator*(const Matrix4x4& M,const Vector3f& v){
     return Vector3f(x,y,z);
 }
 
-FINLINE Point3f operator*(const Matrix4x4& M,const Point3f& v){
+inline Point3f operator*(const Matrix4x4& M,const Point3f& v){
     float4 r=M.col[0]*v.x;
     r+=M.col[1]*v.y;
     r+=M.col[2]*v.z;
@@ -1232,7 +1232,7 @@ inline SoAPoint3f operator*(const Matrix4x4& M,const SoAPoint3f& v){
     return SoAPoint3f(r_xxxx,r_yyyy,r_zzzz);
 }
 
-FINLINE SoAVector3f operator-(const SoAPoint3f& p0, const SoAPoint3f& p1){
+inline SoAVector3f operator-(const SoAPoint3f& p0, const SoAPoint3f& p1){
     auto xxxx=p0.xxxx - p1.xxxx;
     auto yyyy=p0.yyyy - p1.yyyy;
     auto zzzz=p0.zzzz - p1.zzzz;

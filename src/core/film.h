@@ -59,10 +59,10 @@ class Film{
         float _filter_lut[FILTER_LUT_WIDTH];
     public:
         Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds);
-        FINLINE  Bounds2i cropped_pixel_bounds() const{
+        inline  Bounds2i cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
         }
-        FINLINE  Bounds2i sample_bounds() const{
+        inline  Bounds2i sample_bounds() const{
             Point2f min_point = floor(Point2f(_cropped_pixel_bounds.min_point)+Vector2f(0.5f,0.5f)-FILTER_RADIUS);
             Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+FILTER_RADIUS);
             return Bounds2i(Bounds2f(min_point,max_point));

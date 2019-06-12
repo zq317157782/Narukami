@@ -96,7 +96,7 @@ NARUKAMI_BEGIN
     }
 
 
-    template<> FINLINE float radical_inverse_u32<2>(uint32_t x){
+    template<> inline float radical_inverse_u32<2>(uint32_t x){
         return reverse_bits_u32(x) * 0x1p-32f;
     }
 
@@ -122,17 +122,17 @@ NARUKAMI_BEGIN
     
 
     //scramble after reverse 
-    FINLINE float scrambled_radical_inverse_u32_base2(uint32_t x,const uint32_t scramble){
+    inline float scrambled_radical_inverse_u32_base2(uint32_t x,const uint32_t scramble){
          return (reverse_bits_u32(x)^scramble) * 0x1p-32f;
     }
 
     uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
     
-    FINLINE float sample_sobol(const uint32_t idx,const uint32_t* M){
+    inline float sample_sobol(const uint32_t idx,const uint32_t* M){
         return min(sobol_multi_generator_matrix(idx+1,M) * 0x1p-32f,ONE_MINUS_EPSILON);
     }
 
-    FINLINE float sample_scrambled_sobol(const uint32_t idx,const uint32_t* M,const uint32_t scramble){
+    inline float sample_scrambled_sobol(const uint32_t idx,const uint32_t* M,const uint32_t scramble){
         return min((sobol_multi_generator_matrix(idx+1,M)^scramble)* 0x1p-32f,ONE_MINUS_EPSILON);
     }
 
@@ -141,11 +141,11 @@ NARUKAMI_BEGIN
     Point2f sample_scrambled_sobol02(const uint32_t idx,const uint32_t scramble_x,const uint32_t scramble_y);
 
 
-    FINLINE uint32_t gray_code(const uint32_t n){
+    inline uint32_t gray_code(const uint32_t n){
         return (n>>1)^n;
     }
 
-    FINLINE Point2f sample_scrambled_gray_code_sobol02(const uint32_t idx,uint32_t* scramble_x,uint32_t* scramble_y){
+    inline Point2f sample_scrambled_gray_code_sobol02(const uint32_t idx,uint32_t* scramble_x,uint32_t* scramble_y){
         assert(scramble_x!=nullptr);
         assert(scramble_y!=nullptr);
         uint32_t col = count_trailing_zero(idx+1);
@@ -159,7 +159,7 @@ NARUKAMI_BEGIN
     }
 
 
-    FINLINE float sample_scrambled_gray_code_van_der_corput(const uint32_t idx,uint32_t* scramble){
+    inline float sample_scrambled_gray_code_van_der_corput(const uint32_t idx,uint32_t* scramble){
         assert(scramble!=nullptr);
         uint32_t col = count_trailing_zero(idx+1);
         (*scramble)=(*scramble)^REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[col];

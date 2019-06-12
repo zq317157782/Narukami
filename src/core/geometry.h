@@ -42,8 +42,8 @@ NARUKAMI_BEGIN
 //         memcpy(buffer.get(),data,sizeof(T)*size);
 //     }
     
-//     FINLINE T& operator[](const int idx){ assert(idx>=0&&idx<size); return buffer[idx]; }
-//     FINLINE T& operator[](const int idx) const{ assert(idx>=0&&idx<size); return buffer[idx]; }
+//     inline T& operator[](const int idx){ assert(idx>=0&&idx<size); return buffer[idx]; }
+//     inline T& operator[](const int idx) const{ assert(idx>=0&&idx<size); return buffer[idx]; }
 // };
 
 // template <typename T>
@@ -58,10 +58,10 @@ struct Ray{
    Vector3f d;
    mutable float t_max;
 
-   FINLINE Ray():o(Point3f(0,0,0)),d(Vector3f(0,0,1)),t_max(INFINITE){}
-   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(o),d(d),t_max(t_max){}
+   inline Ray():o(Point3f(0,0,0)),d(Vector3f(0,0,1)),t_max(INFINITE){}
+   inline Ray(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(o),d(d),t_max(t_max){}
 };
-FINLINE  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
+inline  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
     out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.t_max<<"]";
     return out;
 } 
@@ -72,10 +72,10 @@ struct SSE_ALIGNAS SoARay
     SoAVector3f d;
     mutable float4 t_max;
      
-    FINLINE SoARay(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(SoAPoint3f(o)),d(SoAVector3f(d)),t_max(t_max){}
-    FINLINE explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),t_max(ray.t_max){}
+    inline SoARay(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(SoAPoint3f(o)),d(SoAVector3f(d)),t_max(t_max){}
+    inline explicit SoARay(const Ray& ray):o(ray.o),d(ray.d),t_max(ray.t_max){}
 };
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
+inline  std::ostream &operator<<(std::ostream &out, const SoARay &ray) {
     out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<float4(ray.t_max)<<"]";
     return out;
 } 
@@ -85,7 +85,7 @@ struct Triangle{
     Vector3f e1;
     Vector3f e2;
 };
-FINLINE  std::ostream &operator<<(std::ostream &out, const Triangle &triangle) {
+inline  std::ostream &operator<<(std::ostream &out, const Triangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
     return out;
 } 
@@ -96,7 +96,7 @@ struct SSE_ALIGNAS SoATriangle{
     SoAVector3f e1;
     SoAVector3f e2;
 };
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
+inline  std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle) {
     out<<"[v0:"<<triangle.v0<<" e1:"<<triangle.e1<<" e2:"<<triangle.e2<<"]";
     return out;
 } 
@@ -107,43 +107,43 @@ struct Bounds2
 {
     Point2<T> min_point;
     Point2<T> max_point;
-    FINLINE const Point2<T>& operator[](const int idx) const{
+    inline const Point2<T>& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
-    FINLINE  Point2<T>& operator[](const int idx){
+    inline  Point2<T>& operator[](const int idx){
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 
-    FINLINE Bounds2(){
+    inline Bounds2(){
         T min_value=std::numeric_limits<T>::lowest();
         T max_value=std::numeric_limits<T>::max();
         min_point=Point2<T>(max_value,max_value);
         max_point=Point2<T>(min_value,min_value);
     }
 
-    FINLINE Bounds2(const Point2<T>& p0,const Point2<T>& p1){
+    inline Bounds2(const Point2<T>& p0,const Point2<T>& p1){
         min_point=min(p0,p1);
         max_point=max(p0,p1);
     }
 
     template<typename U>
-    FINLINE explicit Bounds2(const Bounds2<U>& bounds){
+    inline explicit Bounds2(const Bounds2<U>& bounds){
         min_point=Point2<T>(bounds.min_point);
         max_point=Point2<T>(bounds.max_point);
     }
 };
 template<typename T>
-FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
+inline  std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
     return out;
 } 
 
 template<typename T>
-FINLINE T area(const Bounds2<T>& bounds){ T w=bounds.max_point.x-bounds.min_point.x; T h=bounds.max_point.y-bounds.min_point.y; return w*h; }
+inline T area(const Bounds2<T>& bounds){ T w=bounds.max_point.x-bounds.min_point.x; T h=bounds.max_point.y-bounds.min_point.y; return w*h; }
 template<typename T>
-FINLINE bool inside_exclusive(const Point2<T>& p,const Bounds2<T>& bounds){
+inline bool inside_exclusive(const Point2<T>& p,const Bounds2<T>& bounds){
    bool cond_x=p.x>=bounds.min_point.x&&p.x<bounds.max_point.x;
    bool cond_y=p.y>=bounds.min_point.y&&p.y<bounds.max_point.y;
    return (cond_x&&cond_y);
@@ -208,26 +208,26 @@ struct Bounds3
 {
     Point3<T> min_point;
     Point3<T> max_point;
-    FINLINE const Point3<T>& operator[](const int idx) const{
+    inline const Point3<T>& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 
-    FINLINE Bounds3(){
+    inline Bounds3(){
         T min_value=std::numeric_limits<T>::lowest();
         T max_value=std::numeric_limits<T>::max();
         min_point=Point3<T>(max_value,max_value,max_value);
         max_point=Point3<T>(min_value,min_value,min_value);
     }
 
-    FINLINE Bounds3(const Point3<T>& p0,const Point3<T>& p1){
+    inline Bounds3(const Point3<T>& p0,const Point3<T>& p1){
         min_point=min(p0,p1);
         max_point=max(p0,p1);
     }
 };
 
 template<typename T>
-FINLINE  std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box) {
+inline  std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
     return out;
 } 
@@ -240,30 +240,30 @@ struct SSE_ALIGNAS SoABounds3f
     SoAPoint3f min_point;
     SoAPoint3f max_point;
 
-    FINLINE const SoAPoint3f& operator[](const int idx) const{
+    inline const SoAPoint3f& operator[](const int idx) const{
         assert(idx>=0&&idx<2);
         return (&min_point)[idx];
     }
 
-    FINLINE SoABounds3f(){
+    inline SoABounds3f(){
         min_point=SoAPoint3f(MAX,MAX,MAX);
         max_point=SoAPoint3f(LOWEST,LOWEST,LOWEST);
     }
 
-    FINLINE SoABounds3f(const SoAPoint3f& p0,const SoAPoint3f& p1){
+    inline SoABounds3f(const SoAPoint3f& p0,const SoAPoint3f& p1){
         min_point = min(p0,p1);
         max_point = max(p0,p1);
     }
 };
 
-FINLINE  std::ostream &operator<<(std::ostream &out, const SoABounds3f &box) {
+inline  std::ostream &operator<<(std::ostream &out, const SoABounds3f &box) {
     out<<"[min point:"<<box.min_point<<" max point:"<<box.max_point<<"]";
     return out;
 } 
 
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt= nullptr,Point2f* uv= nullptr){
+inline bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ray_t_max,const Point3f& v0,const Vector3f& e1,const Vector3f& e2,float* tt= nullptr,Point2f* uv= nullptr){
     auto O = ray_o;
     auto D = ray_d;
 
@@ -306,12 +306,12 @@ FINLINE bool intersect(const Point3f& ray_o,const Vector3f& ray_d,const float ra
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const Ray& ray,const Triangle& triangle,float* t= nullptr,Point2f* uv = nullptr){
+inline bool intersect(const Ray& ray,const Triangle& triangle,float* t= nullptr,Point2f* uv = nullptr){
     return intersect(ray.o,ray.d,ray.t_max,triangle.v0,triangle.e1,triangle.e2,t,uv);
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= nullptr,Point2f* uv= nullptr,int*index= nullptr,__m128 mask=SSE_MASK_TRUE){
+inline bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= nullptr,Point2f* uv= nullptr,int*index= nullptr,__m128 mask=SSE_MASK_TRUE){
     auto O =ray.o;
     auto D =ray.d;
     auto V0 = triangle.v0;
@@ -393,7 +393,7 @@ FINLINE bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= 
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
-FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Bounds3f& box){
+inline bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_max,const int isPositive[3],const Bounds3f& box){
     //x
     t_min = max((box[1-isPositive[0]].x-o.x)*inv_d.x,t_min);
     t_max = min((box[isPositive[0]].x-o.x)*inv_d.x,t_max);
@@ -408,7 +408,7 @@ FINLINE bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_
 }
 
 
-FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
+inline int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
     // x
     t_min = max((box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_min);
     t_max = min((box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_max);
@@ -426,7 +426,7 @@ FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,fl
 }
 
 
-// FINLINE int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const float4 isPositive[3],const SoABox& box){
+// inline int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const float4 isPositive[3],const SoABox& box){
 //     // x
 //     t_min = max(t_min,(select(isPositive[0],box[0].xxxx,box[1].xxxx)-o.xxxx)*inv_d.xxxx);
 //     t_max = min(t_max,(select(isPositive[0],box[1].xxxx,box[0].xxxx)-o.xxxx)*inv_d.xxxx);
