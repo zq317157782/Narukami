@@ -58,9 +58,8 @@ struct Ray{
    Vector3f d;
    mutable float t_max;
 
-   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(o),d(d),t_max(t_max){
-
-   }
+   FINLINE Ray():o(Point3f(0,0,0)),d(Vector3f(0,0,1)),t_max(INFINITE){}
+   FINLINE Ray(const Point3f& o,const Vector3f& d,const float t_max = INFINITE):o(o),d(d),t_max(t_max){}
 };
 FINLINE  std::ostream &operator<<(std::ostream &out, const Ray &ray) {
     out<<"[o:"<<ray.o<<" d:"<<ray.d<<" t:"<<ray.t_max<<"]";

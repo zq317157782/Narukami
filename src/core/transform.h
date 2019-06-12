@@ -32,17 +32,25 @@ NARUKAMI_BEGIN
 struct SSE_ALIGNAS Transform{
     Matrix4x4 mat;
     Matrix4x4 inv_mat;
-    Transform(const Matrix4x4& mat):mat(mat),inv_mat(inverse(mat)){}
-    Transform(const float* mat):mat(mat),inv_mat(inverse(this->mat)){}
-    Transform(const Matrix4x4& mat,const Matrix4x4& inv_mat):mat(mat),inv_mat(inv_mat){}
-    Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
+    FINLINE Transform():mat(Matrix4x4()),inv_mat(Matrix4x4()){}
+    FINLINE Transform(const Matrix4x4& mat):mat(mat),inv_mat(inverse(mat)){}
+    FINLINE Transform(const float* mat):mat(mat),inv_mat(inverse(this->mat)){}
+    FINLINE Transform(const Matrix4x4& mat,const Matrix4x4& inv_mat):mat(mat),inv_mat(inv_mat){}
+    FINLINE Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
+
+    FINLINE Transform(const Transform&) = default;
+    FINLINE Transform(Transform&&) = default;
+    FINLINE Transform& operator=(const Transform&) = default;
+    FINLINE Transform& operator=(Transform&&) = default;
+    FINLINE ~Transform() = default;
 
     FINLINE Point3f operator()(const Point3f& p) const{ return mat*p; }
     FINLINE SoAPoint3f operator()(const SoAPoint3f& p) const{ return mat*p; }
     FINLINE Vector3f operator()(const Vector3f& v) const{ return mat*v;}
     FINLINE SoAVector3f operator()(const SoAVector3f& v) const{ return mat*v;}
     FINLINE Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
-    FINLINE Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat); }
+    FINLINE Ray operator()(const Ray& ray) const{ Ray r(ray); r.o=(*this)(ray.o); r.d=(*this)(ray.d); return r; }
+    FINLINE Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat);}
 };
 
 FINLINE Transform inverse(const Transform& transform){
@@ -156,5 +164,13 @@ FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f&
 FINLINE bool swap_handedness(const Transform& t){
     return (sub_matrix3x3_determinant(t.mat)<0.0f);
 }
+
+FINLINE Transform operator*(const Transform& t1,const Transform& t2){return t1(t2);}
+
+FINLINE Transform orthographic(float near,float far){
+    return scale(1.0f,1.0f,1.0f/(far-near))*translate(Vector3f(0,0,-near));
+}
+
+
 
 NARUKAMI_END

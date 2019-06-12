@@ -5,10 +5,13 @@
 #include "core/film.h"
 #include "core/spectrum.h"
 #include "core/sampler.h"
+#include "core/transform.h"
+#include "cameras/orthographic.h"
 using namespace narukami;
 int main(){
     Sampler sampler(1024);
     Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+    OrthographicCamera camera(Transform(),{{0,0},{1,1}},&film);
     SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     Bounds3f bound2(Point3f(0.1,0.1,0.1),Point3f(0.9,0.9,0.9));
     int isPositive[3]={1,1,1};
@@ -16,13 +19,11 @@ int main(){
          for(int x=0;x<128;++x){
              sampler.start_pixel(Point2i(x,y));
              do{
-                auto sample = sampler.get_2D();
-               
-                float px=x+sample.x;
-                float py=y+sample.y;
-               // if(collide(SoAPoint3f(px/128.0f,py/128.0f,0),SoAVector3f(INFINITE,INFINITE,1),float4(0),float4(1),isPositive,bound)){
-                if(collide(Point3f(px/128.0f,py/128.0f,0),Vector3f(INFINITE,INFINITE,1),0,1,isPositive,bound2)){
-                    film.add_sample(Point2f(px,py),Spectrum(1,1,1),1);
+                auto cameraSample = sampler.get_camera_sample(Point2i(x,y));
+                Ray ray;
+                camera.generate_normalized_ray(cameraSample,&ray);
+                if(collide(ray.o,Vector3f(1.0f/ray.d.x,1.0f/ray.d.y,1.0f/ray.d.z),0,1,isPositive,bound2)){
+                    film.add_sample(cameraSample.pFilm,Spectrum(1,1,1),1);
                 }
              }while(sampler.start_next_sample());
             
