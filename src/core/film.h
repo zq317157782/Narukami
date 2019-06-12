@@ -31,13 +31,11 @@ NARUKAMI_BEGIN
 //16bytes
 struct Pixel
 {
-   float rgb[3]={0.0f,0.0f,0.0f};
+   Spectrum rgb;
    float weight;
 
    Pixel(){
-       rgb[0]=0.0f;
-       rgb[1]=0.0f;
-       rgb[2]=0.0f;
+       rgb=Spectrum();
        weight=0.0f;
    }
 };
