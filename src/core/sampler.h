@@ -28,6 +28,12 @@ SOFTWARE.
 #include "core/lowdiscrepancy.h"
 #include <vector>
 NARUKAMI_BEGIN
+    struct CameraSample{
+        Point2f pFilm;
+        Point2f pLens;
+        float time;
+    };
+
     class Sampler{
         private:
             uint32_t _current_sample_index;
@@ -127,6 +133,14 @@ NARUKAMI_BEGIN
                  }
             }
 
+            CameraSample get_camera_sample(){
+                CameraSample cs;
+                cs.pFilm = get_2D()+ Point2f(_current_pixel);
+                cs.pLens = get_2D();
+                cs.time  = get_1D();
+                return cs;
+            }
+
             FINLINE void request_1d_array(const uint32_t request_count=1){
                 _1d_array_count+=request_count;
             }
@@ -134,7 +148,7 @@ NARUKAMI_BEGIN
             FINLINE void request_2d_array(const uint32_t request_count=1){
                 _2d_array_count+=request_count;
             }
-
+    
             void commit(){
                 _scramble_1d_array = std::vector<uint32_t>(_1d_array_count);
                 _sample_1d_array_index = std::vector<uint32_t>(_1d_array_count);
