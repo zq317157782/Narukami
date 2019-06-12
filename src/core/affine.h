@@ -744,6 +744,14 @@ public:
         col[2]=col2;
         col[3]=col3;
     }
+
+    inline Matrix4x4(const Matrix4x4&) = default;
+    inline Matrix4x4(Matrix4x4&&) = default;
+    inline Matrix4x4& operator=(const Matrix4x4&) = default;
+    inline Matrix4x4& operator=(Matrix4x4&&) = default;
+    inline ~Matrix4x4() = default;
+    
+
     FINLINE const float& operator[](const int idx) const { assert(idx >= 0 && idx < N); return m[idx];}
     FINLINE float& operator[](const int idx){ assert(idx >= 0 && idx < N); return m[idx];}
 };
