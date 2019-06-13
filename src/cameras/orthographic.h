@@ -32,7 +32,7 @@ NARUKAMI_BEGIN
         public:
             inline OrthographicCamera(const Transform&  camera2world,const Bounds2f& screen_windows, Film * film):ProjectiveCamera(camera2world,orthographic(0.0f,1.0f),screen_windows,film){}
             
-             
+            
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{
                 auto pCamera=raster2camera(Point3f(sample.pFilm.x,sample.pFilm.y,0));
                 Ray rayCamera(pCamera,Vector3f(0,0,1));
