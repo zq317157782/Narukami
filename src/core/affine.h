@@ -578,6 +578,10 @@ struct Normal3
 };
 typedef Normal3<float> Normal3f;
 typedef Normal3<int> Normal3i;
+
+
+template <typename T>
+inline bool operator==(const Normal3<T> &v1, const Normal3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
 //---NORMAL3 END---
 
 //---POINT2 BEGIN---
