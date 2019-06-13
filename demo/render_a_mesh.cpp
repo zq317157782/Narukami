@@ -10,12 +10,12 @@
 #include "core/meshloader.h"
 using namespace narukami;
 int main(){
-    Sampler sampler(16);
+    Sampler sampler(32);
     Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
     OrthographicCamera camera(Transform(),{{0,0},{1,1}},&film);
     
-    auto transform = translate(Vector3f(0.5, 0, 2))*scale(4,4,4);
-    auto inv_transform = translate(Vector3f(-0.5, 0, -2))*scale(-0.25,-0.25,-0.25);
+    auto transform = translate(Vector3f(0.5, 0, 1))*scale(4,4,4);
+    auto inv_transform = translate(Vector3f(-0.5, 0, -1))*scale(-0.25,-0.25,-0.25);
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
     auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());
 
@@ -53,7 +53,7 @@ int main(){
             
          }
     }
-    film.write_to_file("mesh_16ssp.png");
+    film.write_to_file("mesh_32ssp.png");
 
 }
 
