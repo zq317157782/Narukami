@@ -165,7 +165,7 @@ inline bool swap_handedness(const Transform& t){
     return (sub_matrix3x3_determinant(t.mat)<0.0f);
 }
 
-inline Transform operator*(const Transform& t1,const Transform& t2){return t2(t1);}
+inline Transform operator*(const Transform& t1,const Transform& t2){return t1(t2);}
 
 inline Transform orthographic(float near,float far){
     return scale(1.0f,1.0f,1.0f/(far-near))*translate(Vector3f(0,0,-near));
