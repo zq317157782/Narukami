@@ -361,23 +361,18 @@ inline bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= n
     }
 
     if(tt){
-        bool4 min_bool4=reduce_min_mask(t,tt);
-        min_bool4=min_bool4&bool4(mask);
-        auto min_mask=movemask(min_bool4);
-        int idx=0;
-        if(index||uv){
-            if(min_mask&0x1){
-                idx=0;
+        float min_t=INFINITE;
+        auto valid_mask=movemask(mask);
+        int idx = -1;
+        for(size_t x=valid_mask,i=0;x!=0;x>>=1,++i){
+            if( (x&0x1) && min_t>t[i]){
+                min_t=t[i];
+                idx = i;
             }
-            else if(min_mask&0x2){
-                idx=1;
-            }
-            else if(min_mask&0x4){
-                idx=2;
-            }
-            else if(min_mask&0x8){
-                idx=3;
-            }
+        }
+
+        if(idx!=-1){
+            (*tt)=min_t;
             if(index){
                  (*index) = idx;
             }
@@ -386,7 +381,6 @@ inline bool intersect(const SoARay& ray,const SoATriangle& triangle,float* tt= n
                  uv->y=v[idx];
             }
         }
-
     }
     return true;
 }
