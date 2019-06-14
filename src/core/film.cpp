@@ -62,7 +62,7 @@ float Film::mitchell_1D(float x) const
 void Film::write_to_file(const char *file_name) const
 {
     std::vector<float> data;
-    for (int y = _cropped_pixel_bounds[1].y-1; y >= _cropped_pixel_bounds[0].y; --y)
+    for (int y = _cropped_pixel_bounds[0].y; y < _cropped_pixel_bounds[1].y; ++y)
     {
         for (int x = _cropped_pixel_bounds[0].x; x < _cropped_pixel_bounds[1].x; ++x)
         {
