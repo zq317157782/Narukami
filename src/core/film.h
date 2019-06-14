@@ -44,27 +44,27 @@ struct Pixel
 class Film{
     public:
         const Point2i resolution;
-        static constexpr float B =1.0f/3.0f;
-        static constexpr float C =1.0f/3.0f;
-        static constexpr int FILTER_LUT_WIDTH = 16;
-        static constexpr float FILTER_RADIUS = 1.0f;
-        static constexpr float FILTER_INVERSE_RADIUS = 1.0f;
+        static constexpr int   FILTER_LUT_WIDTH = 32;
     private:
         std::unique_ptr<Pixel[]> _pixels;
         Bounds2i _cropped_pixel_bounds;
         
         Pixel& get_pixel(const Point2i& p) const;
         //from PBRT
-        float mitchell_1D(float x) const;
-        float _filter_lut[FILTER_LUT_WIDTH];
+        float gaussian_1D(float x) const;
+        float _filter_lut[FILTER_LUT_WIDTH]; 
+        const float _gaussian_exp;
+        const float _gaussian_alpha;
+        const float _filter_radius;
+        const float _inv_filter_radius;
     public:
-        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds);
+        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds,float const filter_radius=1.0f, float gaussian_alpha=1.0f);
         inline  Bounds2i cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
         }
         inline  Bounds2i sample_bounds() const{
-            Point2f min_point = floor(Point2f(_cropped_pixel_bounds.min_point)+Vector2f(0.5f,0.5f)-FILTER_RADIUS);
-            Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+FILTER_RADIUS);
+            Point2f min_point = floor(Point2f(_cropped_pixel_bounds.min_point)+Vector2f(0.5f,0.5f)-_filter_radius);
+            Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+_filter_radius);
             return Bounds2i(Bounds2f(min_point,max_point));
         }
         void write_to_file(const char* file_name) const;
