@@ -47,7 +47,7 @@ NARUKAMI_BEGIN
             Transform raster2camera;
          public:
             ProjectiveCamera(const Transform&  camera2world,const Transform&  camera2screen,const Bounds2f& screen_windows,Film * film):Camera(camera2world,film),camera2screen(camera2screen){ 
-                screen2raster = scale(film->resolution.x,film->resolution.y,1)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0));
+                screen2raster = scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f));
                 raster2screen = inverse(screen2raster);
                 raster2camera=inverse(camera2screen)/*screen2camera*/*raster2screen;
             }

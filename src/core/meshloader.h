@@ -88,7 +88,7 @@ for (size_t s = 0; s < shapes.size(); s++) {
   // Loop over faces(polygon)
   size_t index_offset = 0;
   for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-    int fv = shapes[s].mesh.num_face_vertices[f];
+    size_t fv = shapes[s].mesh.num_face_vertices[f];
    
     // Loop over vertices in the face.
     for (size_t v = 0; v < fv; v++) {
