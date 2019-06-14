@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/imageio.h"
 NARUKAMI_BEGIN
 
-Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds,float const filter_radius,const float gaussian_alpha) : resolution(resolution),_filter_radius(filter_radius),_inv_filter_radius(1.0f/filter_radius),_gaussian_alpha(gaussian_alpha),_gaussian_exp(exp(-gaussian_alpha*FILTER_RADIUS*FILTER_RADIUS))
+Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds,float const filter_radius,const float gaussian_alpha) : resolution(resolution),_filter_radius(filter_radius),_inv_filter_radius(1.0f/filter_radius),_gaussian_alpha(gaussian_alpha),_gaussian_exp(exp(-gaussian_alpha*filter_radius*filter_radius))
 {
     Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.min_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.min_point.y));
     Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.max_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.max_point.y));
