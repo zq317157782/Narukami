@@ -151,6 +151,10 @@ inline  float abs(const float x){
     return std::abs(x);
 }
 
+inline float exp(const float x){
+    return std::exp(x);
+}
+
 inline  float sin(const float x){
     return std::sinf(x);
 }
