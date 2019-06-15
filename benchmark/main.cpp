@@ -587,7 +587,7 @@ static void BM_meshdata_intersect(benchmark::State &state)
         {
             for(size_t j=0;j<triangles.size();++j){
                 Ray ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
-                benchmark::DoNotOptimize(intersect(ray,(*triangles[j]),&t,&uv));
+                benchmark::DoNotOptimize(intersect(ray,triangles[j],&t,&uv));
             }
         }
         

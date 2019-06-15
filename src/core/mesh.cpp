@@ -25,7 +25,7 @@ NARUKAMI_BEGIN
   }
 
   //TODO SSE alignas
-  std::vector<SoATriangle> cast2SoA(const std::vector<std::shared_ptr<MeshTriangle>>& triangles,uint32_t start,uint32_t count){
+  std::vector<SoATriangle> cast2SoA(const std::vector<MeshTriangle>& triangles,uint32_t start,uint32_t count){
         assert(count>0);
         assert((start+count)<=triangles.size());
 
@@ -37,9 +37,9 @@ NARUKAMI_BEGIN
 
         for(size_t i=0;i<soa_count*SSE_FLOAT_COUNT;++i){
             if(i<count){
-                auto v0 = (*triangles[start+i])[0];
-                auto e1 = (*triangles[start+i])[1]-v0;
-                auto e2 = (*triangles[start+i])[2]-v0;
+                auto v0 = triangles[start+i][0];
+                auto e1 = triangles[start+i][1]-v0;
+                auto e2 = triangles[start+i][2]-v0;
                
                 v0_array.push_back(v0);
                 e1_array.push_back(e1);
@@ -65,12 +65,12 @@ NARUKAMI_BEGIN
       
     }
 
-std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs){
+std::vector<MeshTriangle> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs){
      std::shared_ptr<MeshData> mesh_data=std::make_shared<MeshData>(*object2wrold,indices,vertices,normals,uvs);
-     std::vector<std::shared_ptr<MeshTriangle>> triangles;
+     std::vector<MeshTriangle> triangles;
      auto triangle_num = indices.size()/3;
      for(size_t i=0;i<triangle_num;++i){
-          triangles.push_back(std::make_shared<MeshTriangle>(object2wrold,world2object,mesh_data,&indices[3*i]));
+          triangles.push_back(MeshTriangle(object2wrold,world2object,mesh_data,&indices[3*i]));
      }
      return triangles;
 }

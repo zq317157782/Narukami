@@ -51,8 +51,8 @@ inline bool operator==(const Vertex& v0,const Vertex& v1){
 
 //load mesh from obj file
 //use syoyo's tinyobjloader
-std::vector<std::vector<std::shared_ptr<MeshTriangle>>> load_mesh_triangles_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
-   std::vector<std::vector<std::shared_ptr<MeshTriangle>>>  triangles;
+std::vector<std::vector<MeshTriangle>> load_mesh_triangles_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
+   std::vector<std::vector<MeshTriangle>>  triangles;
     
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;

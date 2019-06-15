@@ -1034,7 +1034,7 @@ TEST(mesh,create_mesh_triangles){
      auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
      EXPECT_EQ(triangles.size(),2);
      auto triange = triangles[0];
-     auto p = (*triange)[1];
+     auto p = triange[1];
      EXPECT_EQ(p,Point3f(1,0,0));
 }
 
