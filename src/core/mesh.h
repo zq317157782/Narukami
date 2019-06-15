@@ -25,15 +25,16 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/affine.h"
 #include "core/transform.h"
+#include <vector>
 NARUKAMI_BEGIN
     class MeshData{
         public:
-            std::unique_ptr<Point3f[]> vertices;
-            std::unique_ptr<Normal3f[]> normals;
-            std::unique_ptr<Point2f[]> uvs;
-            std::unique_ptr<uint32_t[]> indices;
+            std::vector<Point3f> vertices;
+            std::vector<Normal3f> normals;
+            std::vector<Point2f> uvs;
+            std::vector<uint32_t> indices;
         
-        MeshData(const Transform& object2wrold,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
+        MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);
     };
 
     class MeshTriangle{
@@ -48,8 +49,8 @@ NARUKAMI_BEGIN
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
         inline const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
-        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
-        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
+        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
+        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
         friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->vertices[v._index[0]] << ',' << v._mesh->vertices[v._index[1]] << ',' << v._mesh->vertices[v._index[2]] << ')'; return out; }
     };
 
@@ -65,7 +66,7 @@ NARUKAMI_BEGIN
 
     std::vector<SoATriangle> cast2SoA(const std::vector<std::shared_ptr<MeshTriangle>>& triangles,uint32_t start,uint32_t count);
 
-    std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
+    std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);
 
 
 NARUKAMI_END

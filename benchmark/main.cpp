@@ -571,12 +571,13 @@ BENCHMARK(BM_sub_matrix3x3_determinant_common)->Arg(1)->Arg(5)->Arg(10)->Arg(50)
 #include "core/mesh.h"
 static void BM_meshdata_intersect(benchmark::State &state)
 {   
-     Point3f vertices[4]={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
-     Point2f uvs[4] = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
-     uint32_t indices[6]={0,1,3,1,2,3};
+     std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
+     std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
+     std::vector<Normal3f> normals;
+     std::vector<uint32_t> indices={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=create_mesh_triangles(&transform,&transform2,2,indices,4,vertices,nullptr,uvs);
+     auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
      float t;
      Point2f uv;
     for (auto _ : state)
@@ -598,12 +599,13 @@ BENCHMARK(BM_meshdata_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 static void BM_meshdata_intersect_sse(benchmark::State &state)
 {   
-     Point3f vertices[4]={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
-     Point2f uvs[4] = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
-     uint32_t indices[6]={0,1,3,1,2,3};
+    std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
+     std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
+     std::vector<Normal3f> normals;
+     std::vector<uint32_t> indices={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=create_mesh_triangles(&transform,&transform2,2,indices,4,vertices,nullptr,uvs);
+     auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
      auto soa_triangles=cast2SoA(triangles,0,2);
      float t;
      Point2f uv;

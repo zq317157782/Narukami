@@ -138,7 +138,7 @@ for (size_t s = 0; s < shapes.size(); s++) {
       normal_array.push_back(v.normal);
       uv_array.push_back(v.uv);
   }
-  triangles.push_back(create_mesh_triangles(object2wrold,world2object,shapes[s].mesh.num_face_vertices.size(),&indices[0],vertex_array.size(),&(vertex_array[0]),has_normal?&normal_array[0]:nullptr,has_uv?&uv_array[0]:nullptr));
+  triangles.push_back(create_mesh_triangles(object2wrold,world2object,indices,vertex_array,normal_array,uv_array));
 }
 
     return triangles;
