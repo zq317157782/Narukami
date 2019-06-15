@@ -23,28 +23,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include "core/platform.h"
 #include "core/narukami.h"
+#include "core/camera.h"
 NARUKAMI_BEGIN
-static   MAYBE_UNUSED constexpr float MIN_RCP_INPUT = 1E-18f;
-static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon();
+    class OrthographicCamera:public ProjectiveCamera{
+        private:
 
-static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
-static   MAYBE_UNUSED constexpr float MAX =std::numeric_limits<float>::max();
-static   MAYBE_UNUSED constexpr float LOWEST =std::numeric_limits<float>::lowest();
-
-
-static MAYBE_UNUSED constexpr float PI = 3.14159265358979323846f;
-static MAYBE_UNUSED constexpr float INV_PI = 0.31830988618379067154f;
-static MAYBE_UNUSED constexpr float INV_TWO_PI = 0.15915494309189533577f;
-static MAYBE_UNUSED constexpr float INV_FOUR_PI = 0.07957747154594766788f;
-static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
-static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
-
-
-static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON = 1.0f -std::numeric_limits<float>::epsilon(); 
-
-
-
-
+        public:
+            inline OrthographicCamera(const Transform&  camera2world,const Bounds2f& screen_windows, Film * film):ProjectiveCamera(camera2world,orthographic(0.0f,1.0f),screen_windows,film){}
+            
+            
+            inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{
+                auto pCamera=raster2camera(Point3f(sample.pFilm.x,sample.pFilm.y,0));
+                Ray rayCamera(pCamera,Vector3f(0,0,1));
+                (*ray)=camera2world(rayCamera);
+                return 1.0f;
+            }  
+    };
 NARUKAMI_END
+

@@ -59,7 +59,8 @@ target_link_libraries(narukami_benchmark benchmark)
 #demos
 add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp)
 add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
-               src/core/imageio.cpp)
+               src/core/imageio.cpp src/core/film.cpp)
+target_link_libraries(narukami_demo_render_a_mesh tinyobjloader)
 add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
 add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/film.cpp src/core/lowdiscrepancy.cpp)
 add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp src/core/constant.cpp)

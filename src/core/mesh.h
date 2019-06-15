@@ -46,13 +46,17 @@ NARUKAMI_BEGIN
             memcpy(_index,idx,sizeof(uint32_t)*3);
         }
 
-        //FINLINE Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
-        FINLINE const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
-        FINLINE  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
-        FINLINE  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
+        //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
+        inline const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}
+        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<2); if(_mesh->uvs){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
+        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
+        friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->vertices[v._index[0]] << ',' << v._mesh->vertices[v._index[1]] << ',' << v._mesh->vertices[v._index[2]] << ')'; return out; }
     };
 
-    FINLINE bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
+
+    
+
+    inline bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
         auto v0 = triangle[0];
         auto e1 = triangle[1]-v0;
         auto e2 = triangle[2]-v0;
@@ -62,7 +66,6 @@ NARUKAMI_BEGIN
     std::vector<SoATriangle> cast2SoA(const std::vector<std::shared_ptr<MeshTriangle>>& triangles,uint32_t start,uint32_t count);
 
     std::vector<std::shared_ptr<MeshTriangle>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals=nullptr,const Point2f *uvs=nullptr);
-
 
 
 NARUKAMI_END

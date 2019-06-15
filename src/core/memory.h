@@ -36,7 +36,7 @@ NARUKAMI_BEGIN
 
 
 template <int LINE_SIZE>
-FINLINE void *alloc_aligned(size_t size){
+inline void *alloc_aligned(size_t size){
 #ifdef NARUKAMI_IS_OSX
 	void* ptr;
 	if(posix_memalign(&ptr,LINE_SIZE,size)!=0){
@@ -55,16 +55,16 @@ FINLINE void *alloc_aligned(size_t size){
 }
 
 //L1 aligned
-FINLINE void *alloc_aligned(size_t size){
+inline void *alloc_aligned(size_t size){
 	return alloc_aligned<NARUKAMI_L1_CACHE_LINE>(size);
 }
 
 template<typename T>
-FINLINE T *alloc_aligned(size_t size){
+inline T *alloc_aligned(size_t size){
 	return alloc_aligned(size * sizeof(T));
 }
 
-FINLINE void free_aligned(void * ptr){
+inline void free_aligned(void * ptr){
 	if(!ptr){
 		return;
 	}
@@ -78,7 +78,7 @@ FINLINE void free_aligned(void * ptr){
 }
 
 
-FINLINE void * memcpy(void* const dst,const void* const src,size_t size){
+inline void * memcpy(void* const dst,const void* const src,size_t size){
 	return std::memcpy(dst,src,size);
 }
 

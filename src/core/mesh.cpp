@@ -1,6 +1,7 @@
 #include "core/mesh.h"
 #include "core/memory.h"
 #include <vector>
+
 NARUKAMI_BEGIN
 
   MeshData::MeshData(const Transform& object2wrold,int triangle_num,const uint32_t *indices,int vertex_num,const Point3f *vertices,const Normal3f *normals,const Point2f *uvs){

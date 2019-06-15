@@ -35,12 +35,12 @@ void write_image_to_file(const char* file_name,const float* data,const int width
         //TODO opmtize by thread
         std::vector<uint8_t> image;
 
-        for(int y=height-1;y>=0;--y){
+        for(int y=0;y<height;++y){
             for(int x = 0;x<width;++x){
                 float rgb[3];
-			    rgb[0] = data[(y*height+x)*3];
-			    rgb[1] = data[(y*height+x)*3+1];
-			    rgb[2] = data[(y*height+x)*3+2];
+			    rgb[0] = data[(y*width+x)*3];
+			    rgb[1] = data[(y*width+x)*3+1];
+			    rgb[2] = data[(y*width+x)*3+2];
 
                 image.push_back(rgb[0] * 255);//R
 			    image.push_back(rgb[1] * 255);//G

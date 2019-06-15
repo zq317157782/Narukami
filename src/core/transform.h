@@ -32,41 +32,49 @@ NARUKAMI_BEGIN
 struct SSE_ALIGNAS Transform{
     Matrix4x4 mat;
     Matrix4x4 inv_mat;
-    Transform(const Matrix4x4& mat):mat(mat),inv_mat(inverse(mat)){}
-    Transform(const float* mat):mat(mat),inv_mat(inverse(this->mat)){}
-    Transform(const Matrix4x4& mat,const Matrix4x4& inv_mat):mat(mat),inv_mat(inv_mat){}
-    Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
+    inline Transform():mat(Matrix4x4()),inv_mat(Matrix4x4()){}
+    inline Transform(const Matrix4x4& mat):mat(mat),inv_mat(inverse(mat)){}
+    inline Transform(const float* mat):mat(mat),inv_mat(inverse(this->mat)){}
+    inline Transform(const Matrix4x4& mat,const Matrix4x4& inv_mat):mat(mat),inv_mat(inv_mat){}
+    inline Transform(const float* mat,const float* inv_mat):mat(mat),inv_mat(inv_mat){}
 
-    FINLINE Point3f operator()(const Point3f& p) const{ return mat*p; }
-    FINLINE SoAPoint3f operator()(const SoAPoint3f& p) const{ return mat*p; }
-    FINLINE Vector3f operator()(const Vector3f& v) const{ return mat*v;}
-    FINLINE SoAVector3f operator()(const SoAVector3f& v) const{ return mat*v;}
-    FINLINE Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
-    FINLINE Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat); }
+    inline Transform(const Transform&) = default;
+    inline Transform(Transform&&) = default;
+    inline Transform& operator=(const Transform&) = default;
+    inline Transform& operator=(Transform&&) = default;
+    inline ~Transform() = default;
+
+    inline Point3f operator()(const Point3f& p) const{ return mat*p; }
+    inline SoAPoint3f operator()(const SoAPoint3f& p) const{ return mat*p; }
+    inline Vector3f operator()(const Vector3f& v) const{ return mat*v;}
+    inline SoAVector3f operator()(const SoAVector3f& v) const{ return mat*v;}
+    inline Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
+    inline Ray operator()(const Ray& ray) const{ Ray r(ray); r.o=(*this)(ray.o); r.d=(*this)(ray.d); return r; }
+    inline Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat);}
 };
 
-FINLINE Transform inverse(const Transform& transform){
+inline Transform inverse(const Transform& transform){
     return Transform(transform.inv_mat,transform.mat);
 }
 
-FINLINE Transform transpose(const Transform& transform){
+inline Transform transpose(const Transform& transform){
     return Transform(transpose(transform.mat),transpose(transform.inv_mat));
 }
 
-FINLINE Transform translate(const Vector3f& delta){
+inline Transform translate(const Vector3f& delta){
     Matrix4x4 mat(1.0f,0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,delta.x, delta.y,delta.z,1.0f);
     Matrix4x4 inv_mat(1.0f,0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,-delta.x, -delta.y,-delta.z,1.0f);
     return Transform(mat,inv_mat);
 }
 
-FINLINE Transform scale(const float x,const float y,const float z){
+inline Transform scale(const float x,const float y,const float z){
     Matrix4x4 mat(x,0.0f,0.0f,0.0f, 0.0f,y,0.0f, 0.0f,0.0f,0.0f, z,0.0f,0.0f, 0.0f,0.0f,1.0f);
     Matrix4x4 inv_mat(rcp(x),0.0f,0.0f,0.0f, 0.0f,rcp(y),0.0f, 0.0f,0.0f,0.0f, rcp(z),0.0f,0.0f, 0.0f,0.0f,1.0f);
     return Transform(mat,inv_mat);
 }
 
 //clockwise
-FINLINE Transform rotate_x(const float theta){
+inline Transform rotate_x(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
@@ -75,7 +83,7 @@ FINLINE Transform rotate_x(const float theta){
     return Transform(mat,transpose(mat));
 }
 //clockwise
-FINLINE Transform rotate_y(const float theta){
+inline Transform rotate_y(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
@@ -84,7 +92,7 @@ FINLINE Transform rotate_y(const float theta){
     return Transform(mat,transpose(mat));
 }
 //clockwise
-FINLINE Transform rotate_z(const float theta){
+inline Transform rotate_z(const float theta){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
@@ -94,7 +102,7 @@ FINLINE Transform rotate_z(const float theta){
 
 //http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf
 //clockwise
-FINLINE Transform rotate(const float theta,const Vector3f& axis){
+inline Transform rotate(const float theta,const Vector3f& axis){
     auto rad=deg2rad(theta);
     auto sin_theta=sin(rad);
     auto cos_theta=cos(rad);
@@ -124,7 +132,7 @@ FINLINE Transform rotate(const float theta,const Vector3f& axis){
     return Transform(mat,transpose(mat));
 }
 
-FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f& up){
+inline Transform look_at(const Point3f& o,const Point3f& target,const Vector3f& up){
     auto forward=normalize(target-o);
     auto right=cross(normalize(up),forward);
     auto newUp=cross(forward,right);
@@ -153,8 +161,16 @@ FINLINE Transform look_at(const Point3f& o,const Point3f& target,const Vector3f&
     return Transform(transform_inverse_noscale(cam2wrold),cam2wrold);
 }
 
-FINLINE bool swap_handedness(const Transform& t){
+inline bool swap_handedness(const Transform& t){
     return (sub_matrix3x3_determinant(t.mat)<0.0f);
 }
+
+inline Transform operator*(const Transform& t1,const Transform& t2){return t1(t2);}
+
+inline Transform orthographic(float near,float far){
+    return scale(1.0f,1.0f,1.0f/(far-near))*translate(Vector3f(0,0,-near));
+}
+
+
 
 NARUKAMI_END

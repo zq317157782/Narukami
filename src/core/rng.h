@@ -32,7 +32,7 @@ NARUKAMI_BEGIN
 //use xoroshiro128+
 //http://xoshiro.di.unimi.it/xoroshiro128plus.c
 
-static FINLINE uint64_t rotl(const uint64_t x, int k) {
+static inline uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
 }
 
@@ -44,14 +44,14 @@ private:
     uint64_t _s[2];//state
 
 
-    FINLINE uint64_t splitmix64(uint64_t seed)const{
+    inline uint64_t splitmix64(uint64_t seed)const{
         uint64_t z = (seed += UINT64_C(0x9E3779B97F4A7C15));
         z = (z ^ (z >> 30)) * UINT64_C(0xBF58476D1CE4E5B9);
         z = (z ^ (z >> 27)) * UINT64_C(0x94D049BB133111EB);
         return z ^ (z >> 31);
     }
 
-    FINLINE uint64_t next(){
+    inline uint64_t next(){
         const uint64_t s0 = _s[0];
 	    uint64_t s1 = _s[1];
 	    const uint64_t result = s0 + s1;
@@ -63,17 +63,17 @@ private:
 	    return result;
     }
 public:
-    FINLINE RNG(const uint64_t seed=DEFAULT_STATE){
+    inline RNG(const uint64_t seed=DEFAULT_STATE){
         _s[0]=splitmix64(seed);
     }
 
-    FINLINE uint32_t next_uint32(){
+    inline uint32_t next_uint32(){
         uint64_t rand_num_64=next();
         uint32_t rand_num_32=(uint32_t)(rand_num_64>>32);
         return rand_num_32;
     }
 
-    FINLINE float next_float(){
+    inline float next_float(){
         //constant from pbrt
         return min(ONE_MINUS_EPSILON,next_uint32()* 2.3283064365386963e-10f);
     }

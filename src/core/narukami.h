@@ -46,7 +46,7 @@ narukami.h
 
 NARUKAMI_BEGIN
 
-FINLINE int count_trailing_zero(uint32_t v){
+inline int count_trailing_zero(uint32_t v){
 #if defined(__GNUC__) || defined(__clang__)
 	return __builtin_ctz(v);
 #else
