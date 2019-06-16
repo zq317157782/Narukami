@@ -69,7 +69,14 @@ class Film{
         }
         void write_to_file(const char* file_name) const;
         void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
+
+        friend inline  std::ostream &operator<<(std::ostream &out, const Film &film) {
+            out<<"[resolution:"<<film.resolution<<" cropped pixel bounds:"<<film._cropped_pixel_bounds<<"]";
+            return out;
+        } 
 };
+
+
 
 
 NARUKAMI_END
