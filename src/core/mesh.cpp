@@ -24,6 +24,48 @@ NARUKAMI_BEGIN
             
   }
 
+  MeshData::MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices){
+       for (auto &&i : indices)
+        {
+            this->indices.push_back(i);
+        }
+        for (auto &&i : vertices)
+        {
+            this->vertices.push_back(object2wrold(i));
+        }
+  }
+
+  MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals){
+      for (auto &&i : indices)
+            {
+                this->indices.push_back(i);
+            }
+            for (auto &&i : vertices)
+            {
+                this->vertices.push_back(object2wrold(i));
+            }
+            for (auto &&i : normals)
+            {
+                this->normals.push_back(object2wrold(i));
+            }
+  }
+
+  MeshData::MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Point2f>&uvs){
+            for (auto &&i : indices)
+            {
+                this->indices.push_back(i);
+            }
+            for (auto &&i : vertices)
+            {
+                this->vertices.push_back(object2wrold(i));
+            }
+            for (auto &&i : uvs)
+            {
+                this->uvs.push_back(i);
+            }
+            
+  }
+
   //TODO SSE alignas
   std::vector<SoATriangle> cast2SoA(const std::vector<MeshTriangle>& triangles,uint32_t start,uint32_t count){
         assert(count>0);
