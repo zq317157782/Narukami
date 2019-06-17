@@ -1159,10 +1159,10 @@ TEST(sampler,get_2d_array){
 
 
 TEST(sampler,clone){
-     Sampler sampler(32);
-     auto sampler2=sampler.clone(0);
-     auto sampler3=sampler.clone(0);
-     auto sampler4=sampler.clone(1);
+    Sampler sampler(32);
+    auto sampler2=sampler.clone(0);
+    auto sampler3=sampler.clone(0);
+    auto sampler4=sampler.clone(1);
 
     sampler2->start_pixel(Point2i(0,0));
     sampler3->start_pixel(Point2i(0,0));
@@ -1172,8 +1172,19 @@ TEST(sampler,clone){
     EXPECT_EQ(sampler2->get_spp(),sampler4->get_spp());
 
 }
+#include "cameras/orthographic.h"
+#include "core/integrator.h"
 
+TEST(orthographic,size){
+    EXPECT_EQ(sizeof(OrthographicCamera)%16,0);
+}
 
+// TEST(integrator,integrator){
+//     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+//     auto camera = std::make_shared<OrthographicCamera>(new OrthographicCamera(Transform(),{{0,0},{1,1}},film));
+//     // auto sampler = std::make_shared<Sampler>();
+//     // Integrator integrator(camera,sampler);
+// }
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
