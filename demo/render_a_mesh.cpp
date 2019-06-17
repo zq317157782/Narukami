@@ -11,8 +11,8 @@
 using namespace narukami;
 int main(){
     Sampler sampler(32);
-    Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    OrthographicCamera camera(Transform(),{{0,0},{1,1}},&film);
+    auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+    OrthographicCamera camera(Transform(),{{0,0},{1,1}},film);
     
     auto transform = translate(Vector3f(0.5, 0, 1))*scale(4,4,4);
     auto inv_transform = translate(Vector3f(-0.5, 0, -1))*scale(-0.25,-0.25,-0.25);
@@ -47,13 +47,15 @@ int main(){
 
                 if (triangles_index!=-1)
                 {
-                    film.add_sample(cameraSample.pFilm,Spectrum(min(t,1.0f),min(t,1.0f),min(t,1.0f)),1);                    
+                    film->add_sample(cameraSample.pFilm,Spectrum(min(t,1.0f),min(t,1.0f),min(t,1.0f)),1);                    
+                }else{
+                    film->add_sample(cameraSample.pFilm,Spectrum(0,0,0),1);     
                 }
              }while(sampler.start_next_sample());
             
          }
     }
-    film.write_to_file("mesh_32ssp.png");
+    film->write_to_file("mesh_32ssp.png");
 
 }
 

@@ -31,11 +31,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
     class Camera{
         protected:
-            Film* film;
+            std::shared_ptr<Film> film;
         public:
             const Transform camera2world;
-            inline Camera(const Transform&  camera2world,Film * film):camera2world(camera2world),film(film){}
-            inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;   
+            inline Camera(const Transform&  camera2world,std::shared_ptr<Film> film):camera2world(camera2world),film(film){}
+            inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
     };
 
 
@@ -46,7 +46,7 @@ NARUKAMI_BEGIN
             Transform raster2screen;
             Transform raster2camera;
          public:
-            ProjectiveCamera(const Transform&  camera2world,const Transform&  camera2screen,const Bounds2f& screen_windows,Film * film):Camera(camera2world,film),camera2screen(camera2screen){ 
+            ProjectiveCamera(const Transform&  camera2world,const Transform&  camera2screen,const Bounds2f& screen_windows,std::shared_ptr<Film> film):Camera(camera2world,film),camera2screen(camera2screen){ 
                 screen2raster = scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f));
                 raster2screen = inverse(screen2raster);
                 raster2camera=inverse(camera2screen)/*screen2camera*/*raster2screen;

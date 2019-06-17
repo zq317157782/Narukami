@@ -10,16 +10,16 @@
 using namespace narukami;
 int main(){
     Sampler sampler(16);
-    Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    OrthographicCamera camera(Transform(),{{0,0},{1,1}},&film);
+    auto film =std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+    OrthographicCamera camera(Transform(),{{0,0},{1,1}},film);
     
      sampler.start_pixel(Point2i(0,0));
      do{
           auto cameraSample = sampler.get_camera_sample(Point2i(0,0));
           cameraSample.pFilm.x=cameraSample.pFilm.x*128;
           cameraSample.pFilm.y=cameraSample.pFilm.y*128;
-          film.add_sample(cameraSample.pFilm,Spectrum(1,1,1),1);
+          film->add_sample(cameraSample.pFilm,Spectrum(1,1,1),1);
      }while(sampler.start_next_sample());
-     film.write_to_file("sobol.png");
+     film->write_to_file("sobol.png");
 
 }
