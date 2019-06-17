@@ -148,6 +148,11 @@ inline bool inside_exclusive(const Point2<T>& p,const Bounds2<T>& bounds){
    bool cond_y=p.y>=bounds.min_point.y&&p.y<bounds.max_point.y;
    return (cond_x&&cond_y);
 }
+template<typename T>
+inline T width(const Bounds2<T>& bounds){ return bounds.max_point.x-bounds.min_point.x;}
+template<typename T>
+inline T height(const Bounds2<T>& bounds){ return bounds.max_point.y-bounds.min_point.y;}
+
 typedef Bounds2<float> Bounds2f;
 typedef Bounds2<int> Bounds2i;
 
