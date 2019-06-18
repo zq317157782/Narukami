@@ -9,8 +9,7 @@ int main(){
         sampler.start_pixel(Point2i(0,0));
         std::ofstream outfile;
         outfile.open("sampler.dat");
-        Point2f array[32];
-        sampler.get_2D_array(32,array);
+        auto array=sampler.get_2D_array(32);
         for (size_t i = 0; i < 32; i++)
         {
             outfile << array[i].x<<" "<<array[i].y<<std::endl;

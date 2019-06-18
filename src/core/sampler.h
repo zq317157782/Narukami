@@ -157,28 +157,34 @@ NARUKAMI_BEGIN
                 _sample_2d_array_index = std::vector<uint32_t>(_2d_array_count);
             } 
 
-            bool get_1D_array(const uint32_t num,float* array){
-                if (_array_1d_offset==_1d_array_count){
-                        return false;
-                }
+            std::vector<float> get_1D_array(const uint32_t num){
+                 std::vector<float> array;
+                 if (_array_1d_offset==_1d_array_count){
+                         return array;
+                 }
+               
                 for (size_t i = 0; i < num; i++)
                 {
-                    array[i]=sample_scrambled_gray_code_van_der_corput(_sample_1d_array_index[_array_1d_offset]++,&_scramble_1d_array[_array_1d_offset]);
+                    array.push_back(sample_scrambled_gray_code_van_der_corput(_sample_1d_array_index[_array_1d_offset]++,&_scramble_1d_array[_array_1d_offset]));
                 }
                 _array_1d_offset++;
-                return true;
+                return array;
+                //return true;
             }
 
-            bool get_2D_array(const uint32_t num,Point2f* array){
+            std::vector<Point2f> get_2D_array(const uint32_t num){
+                std::vector<Point2f> array;
                 if (_array_2d_offset==_2d_array_count){
-                        return false;
+                         return array;
                 }
+                
                 for (size_t i = 0; i < num; i++)
                 {
-                    array[i]=sample_scrambled_gray_code_sobol02(_sample_2d_array_index[_array_2d_offset]++,&_scramble_2d_array[i*_array_2d_offset],&_scramble_2d_array[i*_array_2d_offset+1]);
+                    array.push_back(sample_scrambled_gray_code_sobol02(_sample_2d_array_index[_array_2d_offset]++,&_scramble_2d_array[2*_array_2d_offset],&_scramble_2d_array[2*_array_2d_offset+1]));
                 }
                 _array_2d_offset++;
-                return true;
+                return array;
+                //return true;
             }
 
             inline void set_sample_index(const uint32_t idx){

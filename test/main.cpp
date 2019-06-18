@@ -1130,31 +1130,29 @@ TEST(narukami,count_trailing_zero){
 #include "core/sampler.h"
 TEST(sampler,get_1d_array){
     Sampler sampler(32);
-    float  array[4]={0,0,0,0};
     sampler.request_1d_array(2);
     sampler.commit();
     sampler.start_pixel(Point2i(0,0));
-    bool f = sampler.get_1D_array(4,array);
-    EXPECT_TRUE(f);
-    f = sampler.get_1D_array(4,array);
-    EXPECT_TRUE(f);
-    f = sampler.get_1D_array(4,array);
-    EXPECT_FALSE(f);
+    auto array = sampler.get_1D_array(4);
+    EXPECT_TRUE(array.size()>0);
+    array = sampler.get_1D_array(4);
+    EXPECT_TRUE(array.size()>0);
+    array = sampler.get_1D_array(4);
+    EXPECT_FALSE(array.size()>0);
 }
 
 
 TEST(sampler,get_2d_array){
     Sampler sampler(32);
-    Point2f  array[4];
     sampler.request_2d_array(2);
     sampler.commit();
     sampler.start_pixel(Point2i(0,0));
-    bool f = sampler.get_2D_array(4,array);
-    EXPECT_TRUE(f);
-    f = sampler.get_2D_array(4,array);
-    EXPECT_TRUE(f);
-    f = sampler.get_2D_array(4,array);
-    EXPECT_FALSE(f);
+    auto array = sampler.get_2D_array(4);
+    EXPECT_TRUE(array.size()>0);
+    array = sampler.get_2D_array(4);
+    EXPECT_TRUE(array.size()>0);
+    array = sampler.get_2D_array(4);
+    EXPECT_FALSE(array.size()>0);
 }
 
 
@@ -1186,10 +1184,17 @@ TEST(memory,make_unique){
 
 // TEST(integrator,integrator){
 //     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-//     auto camera = std::make_shared<OrthographicCamera>(new OrthographicCamera(Transform(),{{0,0},{1,1}},film));
-//     //auto sampler = std::make_shared<Sampler>();
+//     Transform t;
+//     Bounds2f b={{0,0},{1,1}};
+//     auto camera = std::shared_ptr<Camera>( new OrthographicCamera(t,b,film));
+//     auto sampler = std::make_shared<Sampler>(1024);
 //     //Integrator integrator(camera,sampler);
 // }
+
+TEST(asdsad,sadasd){
+    auto a =new(alloc_aligned<16>(4)) int;
+    EXPECT_EQ(*a ,100);
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
