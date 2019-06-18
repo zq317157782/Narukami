@@ -8,6 +8,8 @@ set(CMAKE_BUILD_TYPE release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
 
+
+
 include_directories(src)
 include_directories(external)
 #include_directories(external/embree/include/embree3)
@@ -66,6 +68,14 @@ add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/c
 add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp src/core/constant.cpp)
 add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp src/core/constant.cpp src/core/lowdiscrepancy.cpp)
 add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
+
+if(MSVC AND ${MSVC_VERSION} GREATER_EQUAL 1915)
+  # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
+  # We get this due to using Eigen objects and allocating those objects with make_shared
+  target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+endif()
+
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
