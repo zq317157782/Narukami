@@ -33,20 +33,19 @@ class Integrator{
         std::shared_ptr<const Camera> _camera;
         std::shared_ptr<Sampler> _sampler;
     public:
-        Integrator(std::shared_ptr<const Camera> camera,std::shared_ptr<Sampler> sampler):_camera(camera),_sampler(sampler){}
+        Integrator(std::shared_ptr<const Camera> camera,std::shared_ptr<Sampler> sampler):_camera(std::move(camera)),_sampler(std::move(sampler)){}
 
         void render(const Scene& scene){
-            // auto film = _camera->get_film();
-            // auto cropped_pixel_bounds=film->cropped_pixel_bounds;
-            // for (auto &&pixel : cropped_pixel_bounds)
-            // {
-            //     auto sampler = _sampler->clone(pixel.x+pixel.y*width(cropped_pixel_bounds));
-            //     sampler->start_pixel(pixel);
-            //     do{
-            //         auto camera_sample=sampler->get_camera_sample(pixel);
-            //     }while(sampler->start_next_sample())
-            // }
-            
+            auto film = _camera->get_film();
+            auto cropped_pixel_bounds=film->cropped_pixel_bounds();
+            for (auto &&pixel : cropped_pixel_bounds)
+            {
+                auto sampler = _sampler->clone(pixel.x+pixel.y*width(cropped_pixel_bounds));
+                sampler->start_pixel(pixel);
+                do{
+                    auto camera_sample=sampler->get_camera_sample(pixel);
+                }while(sampler->start_next_sample());
+            }
         }
 };
 NARUKAMI_END

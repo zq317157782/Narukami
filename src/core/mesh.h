@@ -46,9 +46,9 @@ NARUKAMI_BEGIN
             std::shared_ptr<MeshData> _mesh;
             uint32_t _index[3];
         public:
-        MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):_object2world(object2world),_world2object(world2object),_mesh(mesh){
+        MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):_object2world(object2world),_world2object(world2object),_mesh(std::move(mesh)){
             memcpy(_index,idx,sizeof(uint32_t)*3);
-        }
+        } 
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
         inline const Point3f& operator[](const int i)const { assert(i>=0&&i<2); return _mesh->vertices[_index[i]];}

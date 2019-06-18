@@ -1186,13 +1186,14 @@ TEST(memory,make_unique){
 //     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
 //     Transform t;
 //     Bounds2f b={{0,0},{1,1}};
-//     auto camera = std::shared_ptr<Camera>( new OrthographicCamera(t,b,film));
+//     auto a = std::make_shared<Transform>();
+//     auto camera = std::shared_ptr<const Camera>( new OrthographicCamera(t,b,film));
 //     auto sampler = std::make_shared<Sampler>(1024);
-//     //Integrator integrator(camera,sampler);
+//     Integrator integrator(camera,sampler);
 // }
 
-TEST(asdsad,sadasd){
-    auto a =new(alloc_aligned<16>(4)) int;
+TEST(memory,alloc_aligned_test){
+    auto a =new(alloc_aligned<16>(4)) int(100);
     EXPECT_EQ(*a ,100);
 }
 

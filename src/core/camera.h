@@ -36,6 +36,7 @@ NARUKAMI_BEGIN
             const Transform camera2world;
             inline Camera(const Transform&  camera2world,std::shared_ptr<Film> film):camera2world(camera2world),film(std::move(film)){}
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
+            inline std::shared_ptr<Film> get_film() const {return film;}
     };
 
 
