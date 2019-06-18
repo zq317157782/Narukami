@@ -30,7 +30,7 @@ NARUKAMI_BEGIN
         private:
 
         public:
-            inline OrthographicCamera(const Transform&  camera2world,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera2world,orthographic(0.0f,1.0f),screen_windows,film){}
+            inline OrthographicCamera(const Transform&  camera2world,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera2world,orthographic(0.0f,1.0f),screen_windows,std::move(film)){}
             
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{
