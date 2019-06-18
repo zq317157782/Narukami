@@ -34,5 +34,19 @@ class Scene{
         Scene(const std::vector<MeshTriangle>& triangles){
            _triangles=cast2SoA(triangles,0,triangles.size());
         }
+
+        inline bool intersect(const Ray& ray,float* t,Point2f* uv) const{
+            SoARay soa_ray(ray);
+            bool is_hit=false;
+            for (size_t i = 0; i < _triangles.size(); ++i)
+            {   
+                int index;
+                if(::intersect(soa_ray,_triangles[i],t,uv,&index)){
+                    soa_ray.t_max=float4(*t);
+                    is_hit=true;
+                }   
+            }
+            return is_hit;
+        }
 };
 NARUKAMI_END
