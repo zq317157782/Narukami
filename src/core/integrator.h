@@ -44,7 +44,18 @@ class Integrator{
                 sampler->start_pixel(pixel);
                 do{
                     auto camera_sample=sampler->get_camera_sample(pixel);
+                    Ray ray;
+                    float w=_camera->generate_normalized_ray(camera_sample,&ray);
+                    float t;
+                    Point2f uv;
+                    if(scene.intersect(ray,&t,&uv)){
+                        film->add_sample(camera_sample.pFilm,{1,1,1},w);
+                    }else{
+                        film->add_sample(camera_sample.pFilm,{0,0,0},w);
+                    }
+                   
                 }while(sampler->start_next_sample());
+                
             }
         }
 };

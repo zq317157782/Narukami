@@ -8,53 +8,61 @@
 #include "core/transform.h"
 #include "cameras/orthographic.h"
 #include "core/meshloader.h"
+#include "core/integrator.h"
+#include "core/scene.h"
 using namespace narukami;
 int main(){
-    Sampler sampler(32);
+    auto sampler = std::make_shared<Sampler>(32);
     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    OrthographicCamera camera(Transform(),{{0,0},{1,1}},film);
+    auto camera = std::shared_ptr<Camera>( new OrthographicCamera(Transform(),{{0,0},{1,1}},film));
     
     auto transform = translate(Vector3f(0.5, 0, 1))*scale(4,4,4);
     auto inv_transform = translate(Vector3f(-0.5, 0, -1))*scale(-0.25,-0.25,-0.25);
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
-    auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());
+    
+    Scene scene(triangles[0]);
+    Integrator integrator(camera,sampler);
+    integrator.render(scene);
 
-    for(int y=0;y<128;++y){
-         for(int x=0;x<128;++x){
-             sampler.start_pixel(Point2i(x,y));
-             do{
-                auto cameraSample = sampler.get_camera_sample(Point2i(x,y));
-                //std::cout<<cameraSample.pFilm<<std::endl;
-                Ray ray;
-                camera.generate_normalized_ray(cameraSample,&ray);
-                SoARay soa_ray(ray);
-                //std::cout<<ray<<std::endl;;
-                Point2f uv;
-                float t=0;
-                int index;
-                int triangles_index=-1;
-                bool is_hit = false; 
+    
+   // auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());
+
+    // for(int y=0;y<128;++y){
+    //      for(int x=0;x<128;++x){
+    //          sampler.start_pixel(Point2i(x,y));
+    //          do{
+    //             auto cameraSample = sampler.get_camera_sample(Point2i(x,y));
+    //             //std::cout<<cameraSample.pFilm<<std::endl;
+    //             Ray ray;
+    //             camera.generate_normalized_ray(cameraSample,&ray);
+    //             SoARay soa_ray(ray);
+    //             //std::cout<<ray<<std::endl;;
+    //             Point2f uv;
+    //             float t=0;
+    //             int index;
+    //             int triangles_index=-1;
+    //             bool is_hit = false; 
                 
-                for(size_t i=0;i<soa_triangles.size();++i){
+    //             for(size_t i=0;i<soa_triangles.size();++i){
                    
-                    is_hit = intersect(soa_ray, soa_triangles[i], &t, &uv, &index);
-                    if(is_hit){
-                        soa_ray.t_max=float4(t);
-                        triangles_index=i*4+index;
+    //                 is_hit = intersect(soa_ray, soa_triangles[i], &t, &uv, &index);
+    //                 if(is_hit){
+    //                     soa_ray.t_max=float4(t);
+    //                     triangles_index=i*4+index;
                        
-                    }
-                }
+    //                 }
+    //             }
 
-                if (triangles_index!=-1)
-                {
-                    film->add_sample(cameraSample.pFilm,Spectrum(min(t,1.0f),min(t,1.0f),min(t,1.0f)),1);                    
-                }else{
-                    film->add_sample(cameraSample.pFilm,Spectrum(0,0,0),1);     
-                }
-             }while(sampler.start_next_sample());
+    //             if (triangles_index!=-1)
+    //             {
+    //                 film->add_sample(cameraSample.pFilm,Spectrum(min(t,1.0f),min(t,1.0f),min(t,1.0f)),1);                    
+    //             }else{
+    //                 film->add_sample(cameraSample.pFilm,Spectrum(0,0,0),1);     
+    //             }
+    //          }while(sampler.start_next_sample());
             
-         }
-    }
+    //      }
+    // }
     film->write_to_file("mesh_32ssp.png");
 
 }

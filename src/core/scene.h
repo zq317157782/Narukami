@@ -41,7 +41,7 @@ class Scene{
             for (size_t i = 0; i < _triangles.size(); ++i)
             {   
                 int index;
-                if(::intersect(soa_ray,_triangles[i],t,uv,&index)){
+                if(narukami::intersect(soa_ray,_triangles[i],t,uv,&index)){
                     soa_ray.t_max=float4(*t);
                     is_hit=true;
                 }   
