@@ -1179,11 +1179,16 @@ TEST(orthographic,size){
     EXPECT_EQ(sizeof(OrthographicCamera)%16,0);
 }
 
+TEST(memory,make_unique){
+   auto a= make_unique<int>(1);
+   EXPECT_EQ(*a,1);
+}
+
 // TEST(integrator,integrator){
 //     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
 //     auto camera = std::make_shared<OrthographicCamera>(new OrthographicCamera(Transform(),{{0,0},{1,1}},film));
-//     // auto sampler = std::make_shared<Sampler>();
-//     // Integrator integrator(camera,sampler);
+//     //auto sampler = std::make_shared<Sampler>();
+//     //Integrator integrator(camera,sampler);
 // }
 
 int main(int argc, char* argv[]) {

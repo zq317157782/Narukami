@@ -85,6 +85,12 @@ inline void * memcpy(void* const dst,const void* const src,size_t size){
 
 #define STACK_ALLOC(T,count) (T*)alloca(count*sizeof(T))
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 //memory arena from pbrt
 
 
