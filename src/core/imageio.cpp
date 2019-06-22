@@ -42,9 +42,9 @@ void write_image_to_file(const char* file_name,const float* data,const int width
 			    rgb[1] = data[(y*width+x)*3+1];
 			    rgb[2] = data[(y*width+x)*3+2];
 
-                image.push_back(rgb[0] * 255);//R
-			    image.push_back(rgb[1] * 255);//G
-			    image.push_back(rgb[2] * 255);//B
+                image.push_back(static_cast<uint8_t>(rgb[0] * 255));//R
+			    image.push_back(static_cast<uint8_t>(rgb[1] * 255));//G
+			    image.push_back(static_cast<uint8_t>(rgb[2] * 255));//B
 			    image.push_back(255);		//A
             }
         }
