@@ -30,6 +30,8 @@ SOFTWARE.
 #include "core/memory.h"
 NARUKAMI_BEGIN
 
+
+
 struct SSE_ALIGNAS Transform{
     Matrix4x4 mat;
     Matrix4x4 inv_mat;
@@ -52,6 +54,12 @@ struct SSE_ALIGNAS Transform{
     inline Normal3f operator()(const Normal3f& n)const{ return transpose(inv_mat)*Vector3f(n);}
     inline Ray operator()(const Ray& ray) const{ Ray r(ray); r.o=(*this)(ray.o); r.d=(*this)(ray.d); return r; }
     inline Transform operator()(const Transform& t) const{ return Transform(mat*t.mat,t.inv_mat*inv_mat);}
+    inline static void* operator new(size_t sz){
+        return alloc_aligned<SSE_LINE_SIZE>(sz);
+    }
+    inline static void operator delete(void* ptr){
+        free_aligned(ptr);
+    }
 };
 
 inline Transform inverse(const Transform& transform){

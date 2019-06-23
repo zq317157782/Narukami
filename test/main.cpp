@@ -1197,9 +1197,11 @@ TEST(memory,alloc_aligned_test){
     EXPECT_EQ(*a ,100);
 }
 
-TEST(memory,alloc_transform){
-    auto a=std::allocate_shared<Transform>(alloc_transform);
-    //EXPECT_EQ(*a,1);
+TEST(transform,new){
+    //auto a=std::make_shared<Transform>();
+    //EXPECT_EQ(*a,Transform());
+    auto a=new Transform();
+    EXPECT_TRUE((reinterpret_cast<uint32_t>(a)%16)==0);
 }
 
 int main(int argc, char* argv[]) {
