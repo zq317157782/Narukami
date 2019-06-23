@@ -1197,6 +1197,11 @@ TEST(memory,alloc_aligned_test){
     EXPECT_EQ(*a ,100);
 }
 
+TEST(memory,alloc_transform){
+    auto a=std::allocate_shared<Transform>(alloc_transform);
+    //EXPECT_EQ(*a,1);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();

@@ -51,7 +51,8 @@ target_link_libraries(narukami glog tinyobjloader)
 # target_link_libraries(narukami embree)
 
 #narukami_test
-add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/math.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/lowdiscrepancy.cpp)
+add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/math.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/lowdiscrepancy.cpp 
+src/core/transform.cpp)
 target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp
@@ -73,6 +74,7 @@ if(MSVC AND ${MSVC_VERSION} GREATER_EQUAL 1915)
   # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
   # We get this due to using Eigen objects and allocating those objects with make_shared
   target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+  target_compile_definitions( narukami_demo_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
 endif()
 
 

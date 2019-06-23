@@ -22,44 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
-/*
-narukami.h
-*/
-
-//marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
-
-//define DEBUG marco
-#ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
-#else
-    #define NARUKAMI_DEBUG
-#endif
-
-#include <assert.h>
-#include <ostream>
-#include <iostream>
-#include "core/platform.h"
-
-
-
+#include "core/transform.h"
 NARUKAMI_BEGIN
-
-inline int count_trailing_zero(uint32_t v){
-#if defined(__GNUC__) || defined(__clang__)
-	return __builtin_ctz(v);
-#else
-	unsigned long index;
-    if (_BitScanForward(&index, v)){
-        return index;
-    }
-    else{
-         return 32;
-    }
-#endif
-}
-
-
+SSEAllocator<Transform> alloc_transform;
 NARUKAMI_END

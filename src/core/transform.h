@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/affine.h"
 #include "core/geometry.h"
+#include "core/memory.h"
 NARUKAMI_BEGIN
 
 struct SSE_ALIGNAS Transform{
@@ -171,6 +172,6 @@ inline Transform orthographic(float near,float far){
     return scale(1.0f,1.0f,1.0f/(far-near))*translate(Vector3f(0,0,-near));
 }
 
-
+extern SSEAllocator<Transform> alloc_transform;
 
 NARUKAMI_END
