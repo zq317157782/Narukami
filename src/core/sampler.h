@@ -26,6 +26,7 @@ SOFTWARE.
 #include "core/affine.h"
 #include "core/rng.h"
 #include "core/lowdiscrepancy.h"
+#include "core/memory.h"
 #include <vector>
 NARUKAMI_BEGIN
     struct CameraSample{
@@ -197,7 +198,7 @@ NARUKAMI_BEGIN
 
 
             std::unique_ptr<Sampler> clone(const uint64_t seed) const{
-                auto sampler = std::make_unique<Sampler>(*this);
+                auto sampler = narukami::make_unique<Sampler>(*this);
                 sampler->_rng=RNG(seed);
                 return sampler;
             }

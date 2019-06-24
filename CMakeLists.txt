@@ -70,11 +70,13 @@ add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_numbe
 add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp src/core/constant.cpp src/core/lowdiscrepancy.cpp)
 add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
 
-if(MSVC AND ${MSVC_VERSION} GREATER_EQUAL 1915)
-  # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
-  # We get this due to using Eigen objects and allocating those objects with make_shared
-  target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-  target_compile_definitions( narukami_demo_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+if(MSVC)
+  if(${MSVC_VERSION} GREATER_EQUAL 1915)
+    # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
+    # We get this due to using Eigen objects and allocating those objects with make_shared
+    target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+    target_compile_definitions( narukami_demo_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+  endif()
 endif()
 
 

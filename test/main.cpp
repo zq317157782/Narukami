@@ -1201,7 +1201,7 @@ TEST(transform,new){
     //auto a=std::make_shared<Transform>();
     //EXPECT_EQ(*a,Transform());
     auto a=new Transform();
-    EXPECT_TRUE((reinterpret_cast<uint32_t>(a)%16)==0);
+    EXPECT_TRUE(((uint64_t)a%16)==0);
 }
 
 int main(int argc, char* argv[]) {
