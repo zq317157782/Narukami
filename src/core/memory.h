@@ -108,5 +108,7 @@ struct SSEAllocator {
 
 //memory arena from pbrt
 
-
 NARUKAMI_END
+
+void* operator new(size_t sz);
+void operator delete(void* ptr);

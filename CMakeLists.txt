@@ -52,7 +52,7 @@ target_link_libraries(narukami glog tinyobjloader)
 
 #narukami_test
 add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/math.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/lowdiscrepancy.cpp 
-src/core/transform.cpp)
+src/core/transform.cpp src/core/memory.cpp)
 target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp
@@ -62,7 +62,7 @@ target_link_libraries(narukami_benchmark benchmark)
 #demos
 add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp)
 add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
-               src/core/imageio.cpp src/core/film.cpp)
+               src/core/imageio.cpp src/core/film.cpp src/core/memory.cpp)
 target_link_libraries(narukami_demo_render_a_mesh tinyobjloader)
 add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
 add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/film.cpp src/core/lowdiscrepancy.cpp)
