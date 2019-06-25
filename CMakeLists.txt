@@ -52,7 +52,7 @@ target_link_libraries(narukami glog tinyobjloader)
 
 #narukami_test
 add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/math.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/lowdiscrepancy.cpp 
-src/core/transform.cpp src/core/memory.cpp)
+src/core/transform.cpp src/core/memory.cpp src/core/primitive.cpp)
 target_link_libraries(narukami_test gtest lua5.3.4)
 
 #benchmark rcp

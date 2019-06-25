@@ -46,6 +46,12 @@ NARUKAMI_BEGIN
             std::shared_ptr<MeshData> _mesh;
             uint32_t _index[3];
         public:
+        MeshTriangle() = default;
+        MeshTriangle(const MeshTriangle&) = default;
+        MeshTriangle(MeshTriangle&&) = default;
+        MeshTriangle& operator=(const MeshTriangle&) = default;
+        MeshTriangle& operator=(MeshTriangle&&) = default;
+        ~MeshTriangle()=default;
         MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):_object2world(object2world),_world2object(world2object),_mesh(std::move(mesh)){
             memcpy(_index,idx,sizeof(uint32_t)*3);
         } 
