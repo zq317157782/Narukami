@@ -240,6 +240,35 @@ inline  std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box) {
 typedef Bounds3<float> Bounds3f;
 typedef Bounds3<int> Bounds3i;
 
+
+template<typename T>
+inline bool operator==(const Bounds3<T>&b0,const Bounds3<T>&b1){
+    return (b0.min_point==b1.min_point)&&(b0.max_point==b1.max_point);
+}
+template<typename T>
+inline bool operator!=(const Bounds3<T>&b0,const Bounds3<T>&b1){
+    return (b0.min_point!=b1.min_point)||(b0.max_point!=b1.max_point);
+}
+
+template<typename T>
+inline Bounds3<T> _union(const Point3<T>& p0,const Point3<T>& p1){
+    return Bounds3<T>(p0,p1);
+}
+template<typename T>
+inline Bounds3<T> _union(const Bounds3<T>& b0,const Point3<T>& p1){
+    return Bounds3<T>(min(b0.min_point,p1),max(b0.max_point,p1));
+}
+template<typename T>
+inline Bounds3<T> _union(const Point3<T>& p1,const Bounds3<T>& b0){
+    return _union(b0,p1);
+}
+template<typename T>
+inline Bounds3<T> _union(const Bounds3<T>& b0,const Bounds3<T>& b1){
+    return _union(min(b0.min_point,b1.min_point),max(b0.max_point,b1.max_point));
+}
+
+
+
 struct SSE_ALIGNAS SoABounds3f
 {
     SoAPoint3f min_point;

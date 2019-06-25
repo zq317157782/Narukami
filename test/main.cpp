@@ -1204,6 +1204,18 @@ TEST(transform,new){
     EXPECT_TRUE(((uint64_t)a%16)==0);
 }
 
+TEST(Bounds3f,_union){
+    Point3f p0(0,0,0);
+    Point3f p1(2,2,2);
+    Bounds3f b0=_union(p0,p1);
+    Bounds3f b1={{0,0,0},{2,2,2}};
+    EXPECT_EQ(b0,b1);
+    Bounds3f b2={{0,0,0},{-2,-2,-2}};
+    b0=_union(b2,b0);
+    Bounds3f b3={{2,2,2},{-2,-2,-2}};
+    EXPECT_EQ(b0,b3);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
