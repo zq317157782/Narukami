@@ -26,6 +26,8 @@ SOFTWARE.
 #include "narukami.h"
 #include "platform.h"
 #include "sse.h"
+#include "math.h"
+#include <list>
 
 NARUKAMI_BEGIN
 
@@ -61,7 +63,7 @@ inline void *alloc_aligned(size_t size){
 
 template<typename T>
 inline T *alloc_aligned(size_t size){
-	return alloc_aligned(size * sizeof(T));
+	return reinterpret_cast<T*>(alloc_aligned(size * sizeof(T)));
 }
 
 inline void free_aligned(void * ptr){
@@ -107,6 +109,81 @@ struct SSEAllocator {
 // constexpr bool operator!= (const SSEAllocator<T>&, const SSEAllocator<U>&) noexcept{return false;}
 
 //memory arena from pbrt
+
+class MemoryArena{
+	private:
+		const size_t _block_size;
+		uint8_t* _current_block;
+		size_t _current_block_pos;
+		size_t _current_alloc_size;
+		std::list<std::pair<size_t,uint8_t*>> _used,_available;
+	public:
+		//default 256kb
+		MemoryArena(const size_t block_size=262144):_block_size(block_size),_current_block(nullptr),_current_block_pos(0),_current_alloc_size(0){}
+		
+		void* alloc(size_t sz){
+			//16 byte align
+			sz=(sz+15)&(~15);
+
+			if(_current_block_pos+sz > _current_alloc_size){
+				if(_current_block){
+					_used.push_back({_current_alloc_size,_current_block});
+					_current_block = nullptr;
+				}
+
+				for (auto i = _available.begin(); i!= _available.end(); i++)
+				{
+					if(i->first>=sz){
+						_current_alloc_size = i->first;
+						_current_block = i->second;
+						_available.erase(i);
+						break;
+					}
+				}
+				
+				if(!_current_block){
+					_current_alloc_size=max(_block_size,sz);
+					_current_block = alloc_aligned<uint8_t>(_current_alloc_size);
+				}
+
+				_current_block_pos=0;
+			}
+
+			auto ret=_current_block+_current_block_pos;
+			_current_block_pos+=sz;
+			return ret;
+		}
+
+		template<typename T>
+		T* alloc(size_t sz,bool run_ctor=true){
+			auto ret=reinterpret_cast<T*>(alloc(sizeof(T)*sz));
+			if(run_ctor){
+				for (size_t i = 0; i < sz; ++i)
+				{
+					new (&ret[i]) T();
+				}
+			}
+			return ret;
+		}
+
+		void reset(){
+			_available.splice(_available.begin(),_used);
+			_current_block_pos=0;
+		}
+
+		~MemoryArena(){
+			for (auto &i : _used )
+			{
+				free_aligned(i.second);
+			}
+			for (auto &i : _available )
+			{
+				free_aligned(i.second);
+			}
+			
+		}
+
+};
 
 NARUKAMI_END
 

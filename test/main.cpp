@@ -1061,7 +1061,7 @@ TEST(primitive,create_primitives){
      auto transform2 = translate(Vector3f(-1,0,0));
      auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
      auto primitives=create_primitives(triangles);
-     EXPECT_EQ(primitives.size(),4);
+     EXPECT_EQ(primitives.size(),2);
 }
 
 #include "lua/narukami_lua.h"
@@ -1228,6 +1228,20 @@ TEST(transform,new){
     //EXPECT_EQ(*a,Transform());
     auto a=new Transform();
     EXPECT_TRUE(((uint64_t)a%16)==0);
+}
+
+
+TEST(memory,MemoryArena){
+    MemoryArena arena;
+    auto a=arena.alloc<int>(256);
+    for (size_t i = 0; i < 256; i++)
+    {
+        EXPECT_EQ(a[i],0);
+    }
+    
+   
+    arena.reset();
+   
 }
 
 TEST(Bounds3f,_union){

@@ -119,6 +119,10 @@ inline  int min(const int x,const int y){
     return x<y?x:y;
 }
 
+inline  size_t min(const size_t x,const size_t y){
+    return x<y?x:y;
+}
+
 template <typename T>
 inline  T min(const T& x,const T& y,const T& z){
     return min(min(x,y),z);
@@ -136,6 +140,13 @@ inline  float max(const float x,const float y){
 inline  int max(const int x,const int y){
     return x>y?x:y;
 }
+
+
+inline  size_t max(const size_t x,const size_t y){
+    return x>y?x:y;
+}
+
+
 
 template <typename T>
 inline  T max(const T& x,const T& y,const T& z){
