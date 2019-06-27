@@ -29,7 +29,7 @@ NARUKAMI_BEGIN
     class Primitive{
         public:
         MeshTriangle triangle;
-        
+
         Primitive() = default;
         Primitive(const Primitive&) = default;
         Primitive(Primitive&&) = default;
@@ -38,6 +38,8 @@ NARUKAMI_BEGIN
         ~Primitive()=default;
 
         Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)){}
+
+        Bounds3f get_bounds() const{return triangle.get_bounds();}
     };
 
     std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);

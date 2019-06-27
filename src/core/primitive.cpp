@@ -25,10 +25,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
 std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles){
     std::vector<Primitive> primitives(triangles.size());
-    for (auto &tri : triangles)
+    for (size_t i = 0; i < triangles.size(); ++i)
     {
-        primitives.push_back(Primitive(tri));
+        primitives[i]=Primitive(triangles[i]);
     }
+    
     return primitives;
 }
 NARUKAMI_END

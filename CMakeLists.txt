@@ -69,6 +69,10 @@ add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/c
 add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp src/core/constant.cpp)
 add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp src/core/constant.cpp src/core/lowdiscrepancy.cpp)
 add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
+add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
+               src/core/imageio.cpp src/core/film.cpp src/core/memory.cpp src/core/primitive.cpp)
+target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
+
 
 if(MSVC)
   if(${MSVC_VERSION} GREATER_EQUAL 1915)
@@ -76,6 +80,7 @@ if(MSVC)
     # We get this due to using Eigen objects and allocating those objects with make_shared
     target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
     target_compile_definitions( narukami_demo_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+    target_compile_definitions( narukami_demo_accelerator_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
   endif()
 endif()
 
