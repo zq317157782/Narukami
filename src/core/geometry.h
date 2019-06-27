@@ -267,7 +267,17 @@ inline Bounds3<T> _union(const Bounds3<T>& b0,const Bounds3<T>& b1){
     return _union(min(b0.min_point,b1.min_point),max(b0.max_point,b1.max_point));
 }
 
-
+template<typename T>
+inline int max_extent(const Bounds3<T>& b0){
+    Vector3<T> v= b0.max_point-b0.min_point;
+    if(v[0]>v[1]&&v[0]>v[2]){
+        return 0;
+    }else if(v[1]>v[2]){
+        return 1;
+    }else{
+        return 2;
+    }
+}
 
 struct SSE_ALIGNAS SoABounds3f
 {

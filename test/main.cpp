@@ -1256,6 +1256,13 @@ TEST(Bounds3f,_union){
     EXPECT_EQ(b0,b3);
 }
 
+TEST(Bounds3f,max_extent){
+    Point3f p0(0,0,0);
+    Point3f p1(1,2,3);
+    Bounds3f b0=_union(p0,p1);
+    EXPECT_EQ(max_extent(b0),2);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();
