@@ -51,6 +51,11 @@ lightweight PBRT-style path tracer
  - [ ] basic Camera
     - [x] orthographic camera
     - [ ] perspective camera
+ - [ ] memory
+    - [x] SSE algins global memory alloc and delloc
+    - [x] memory arena from PBRT
+ - [ ] MBVH
+     - [x] build binary BVH
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
