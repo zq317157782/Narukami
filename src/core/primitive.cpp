@@ -32,4 +32,50 @@ std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triang
     
     return primitives;
 }
+
+
+std::vector<SoATriangle> cast2SoA(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
+{
+    assert(count > 0);
+    assert((start + count) <= triangles.size());
+
+    size_t soa_count = (uint32_t)count / SSE_FLOAT_COUNT + 1;
+
+    std::vector<Point3f> v0_array;
+    std::vector<Vector3f> e1_array;
+    std::vector<Vector3f> e2_array;
+
+    for (size_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
+    {
+        if (i < count)
+        {
+            auto v0 = triangles[start + i].triangle[0];
+            auto e1 = triangles[start + i].triangle[1] - v0;
+            auto e2 = triangles[start + i].triangle[2] - v0;
+
+            v0_array.push_back(v0);
+            e1_array.push_back(e1);
+            e2_array.push_back(e2);
+        }
+        else
+        {
+            v0_array.push_back(Point3f());
+            e1_array.push_back(Vector3f());
+            e2_array.push_back(Vector3f());
+        }
+    }
+    std::vector<SoATriangle> soa_triangles;
+
+    for (size_t i = 0; i < soa_count; ++i)
+    {
+        SoATriangle triangle;
+        triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
+        triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
+        triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
+        soa_triangles.push_back(triangle);
+    }
+
+    return soa_triangles;
+}
+
 NARUKAMI_END

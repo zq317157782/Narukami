@@ -1262,6 +1262,29 @@ TEST(Bounds3f,max_extent){
     Bounds3f b0=_union(p0,p1);
     EXPECT_EQ(max_extent(b0),2);
 }
+#include "core/accelerator.h"
+TEST(QBVHNode,size){
+    EXPECT_EQ(sizeof(QBVHNode),128);
+}
+
+TEST(QBVHNode,is_leaf){
+    uint32_t a=0;
+    EXPECT_TRUE(!is_leaf(a));
+    a=leaf(10,4);
+    EXPECT_TRUE(is_leaf(a));
+}
+
+TEST(QBVHNode,leaf_num){
+    uint32_t a=0;
+    a=leaf(10,4);
+    EXPECT_EQ(leaf_num(a),4);
+}
+
+TEST(QBVHNode,leaf_offset){
+    uint32_t a=0;
+    a=leaf(10,4);
+    EXPECT_EQ(leaf_offset(a),10);
+}
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
