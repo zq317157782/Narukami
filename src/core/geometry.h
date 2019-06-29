@@ -298,6 +298,11 @@ struct SSE_ALIGNAS SoABounds3f
         min_point = min(p0,p1);
         max_point = max(p0,p1);
     }
+
+    inline SoABounds3f(const Bounds3f bounds[4]){
+        min_point = SoAPoint3f(bounds[0].min_point,bounds[1].min_point,bounds[2].min_point,bounds[3].min_point);
+        max_point = SoAPoint3f(bounds[0].max_point,bounds[1].max_point,bounds[2].max_point,bounds[3].max_point);
+    }
 };
 
 inline  std::ostream &operator<<(std::ostream &out, const SoABounds3f &box) {
