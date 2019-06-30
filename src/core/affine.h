@@ -275,6 +275,7 @@ inline SoAVector3f cross(const SoAVector3f& v0,const SoAVector3f& v1){ float4 xx
 
 inline SoAVector3f rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = rcp(v.xxxx); vv.yyyy = rcp(v.yyyy); vv.zzzz = rcp(v.zzzz); return vv; }
 inline SoAVector3f safe_rcp(const SoAVector3f& v){ SoAVector3f vv; vv.xxxx = safe_rcp(v.xxxx); vv.yyyy = safe_rcp(v.yyyy); vv.zzzz = safe_rcp(v.zzzz); return vv; }
+inline SoAVector3f robust_rcp(const SoAVector3f& v){SoAVector3f vv; auto one = float4(1.0f); vv.xxxx = one/v.xxxx; vv.yyyy = one/v.yyyy; vv.zzzz = one/v.zzzz; return vv;}
 inline SoAVector3f load(const Vector3f* vector_array){ return SoAVector3f(vector_array[0],vector_array[1],vector_array[2],vector_array[3]); }
 //---VECTOR3 END---
 
