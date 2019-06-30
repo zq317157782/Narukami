@@ -26,6 +26,7 @@ int main(){
     auto primitives=create_primitives(triangles[0]);
     std::cout<<primitives.size();
     Accelerator acc(primitives);
+    acc.intersect(Ray(Point3f(0,0,0),Vector3f(0,0,1)));
     // Scene scene(triangles[0]);
     // Integrator integrator(camera,sampler);
     // integrator.render(scene);

@@ -831,21 +831,26 @@ TEST(geometry,size_of_soatriangle){
     EXPECT_EQ(sizeof(SoATriangle),144);
 }
 
-// TEST(soabox,collide){
+TEST(SoAbound3f,collide){
     
-//     SoABox box;
-//     box.min_point = SoAPoint3f(0,0,0);
-//     box.max_point = SoAPoint3f(1,1,1);
-//     __m128 sign[3]={bool4(true,true,true,true),bool4(true,true,true,true),bool4(true,true,true,true)};
+    SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
+    int p[3]={1,1,1};
+    auto a=collide(ray.o,SoAVector3f(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
+    EXPECT_EQ(any(a),true);
+}
 
-//     SoARay ray(Point3f(0.5,0.5,0),Vector3f(0,0,1));
-//     auto a=collide(ray.o,safe_rcp(ray.d),float4(0),float4(Infinite),sign,box);
-//     EXPECT_TRUE(a==15);
 
-//     SoARay ray2(Point3f(1.001,0.5,0),Vector3f(0,0,1));
-//     auto b=collide(ray2.o,safe_rcp(ray2.d),float4(0),float4(Infinite),sign,box);
-//     EXPECT_TRUE(b==0);
-// }
+TEST(SoAbound3f,intersect){
+    
+    SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
+    int p[3]={1,1,1};
+    float4 tHit;
+    auto a=intersect(ray.o,safe_rcp(ray.d),float4(0.0f),float4(INFINITE),p,bound,&tHit);
+    EXPECT_EQ(any(a),true);
+    EXPECT_FLOAT_EQ(tHit[0],0.1f);
+}
 
 
 // #include "core/qbvh.h"
@@ -1284,6 +1289,24 @@ TEST(QBVHNode,leaf_offset){
     uint32_t a=0;
     a=leaf(10,4);
     EXPECT_EQ(leaf_offset(a),10);
+}
+
+
+TEST(math,max_nan){
+    float zero=0.0f;
+    float x=0.0f/zero;
+    auto a =max(1.0f,x);
+    EXPECT_TRUE(isnan(a));
+}
+
+TEST(float4,max_nan){
+    float4 zero=float4(0.0f);
+    float4 x=float4(0.0f)/zero;
+    auto a =max(float4(1.0f),x);
+    EXPECT_TRUE(isnan(a[0]));
+    EXPECT_TRUE(isnan(a[1]));
+    EXPECT_TRUE(isnan(a[2]));
+    EXPECT_TRUE(isnan(a[3]));
 }
 
 int main(int argc, char* argv[]) {

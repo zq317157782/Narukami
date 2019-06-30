@@ -25,28 +25,39 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/geometry.h"
 #include "core/mesh.h"
+#include "core/accelerator.h"
+#include "core/primitive.h"
 #include <vector>
 NARUKAMI_BEGIN
 class Scene{
     private:
         std::vector<SoATriangle> _triangles;
+        Accelerator _accelerator;
     public:
         Scene(const std::vector<MeshTriangle>& triangles){
            _triangles=cast2SoA(triangles,0,triangles.size());
+           std::vector<Primitive> primitives=create_primitives(triangles);
+           _accelerator=Accelerator(primitives);
         }
 
         inline bool intersect(const Ray& ray,float* t,Point2f* uv) const{
-            SoARay soa_ray(ray);
-            bool is_hit=false;
-            for (size_t i = 0; i < _triangles.size(); ++i)
-            {   
-                int index;
-                if(narukami::intersect(soa_ray,_triangles[i],t,uv,&index)){
-                    soa_ray.t_max=float4(*t);
-                    is_hit=true;
-                }   
-            }
-            return is_hit;
+
+            return _accelerator.intersect(ray);
+
+            // SoARay soa_ray(ray);
+            // bool is_hit=false;
+            // float t_hit;
+            // for (size_t i = 0; i < _triangles.size(); ++i)
+            // {   
+            //     int index;
+            //     if(narukami::intersect(soa_ray,_triangles[i],&t_hit,uv,&index)&&t_hit<(*t)){
+            //         (*t)=t_hit;
+            //         soa_ray.t_max=float4(*t);
+            //         is_hit=true;
+            //     }   
+            // }
+            // std::cout<<(*t)<<" ";
+            // return is_hit;
         }
 };
 NARUKAMI_END

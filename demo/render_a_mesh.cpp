@@ -12,13 +12,13 @@
 #include "core/scene.h"
 using namespace narukami;
 int main(){
-    auto sampler = std::make_shared<Sampler>(1);
-    auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+    auto sampler = std::make_shared<Sampler>(64);
+    auto film = std::make_shared<Film>(Point2i(256,256),Bounds2f(Point2f(0,0),Point2f(1,1)));
     SSEAllocator<OrthographicCamera> alloc_camera;
     auto camera = std::allocate_shared<OrthographicCamera>(alloc_camera,Transform(),Bounds2f{{0,0},{1,1}},film);
     
-    auto transform = translate(Vector3f(0.5f, 0.0f, 1.0f))*scale(0.1f,0.1f,0.1f);
-    auto inv_transform = translate(Vector3f(-0.5, 0, -1))*scale(-0.25,-0.25,-0.25);
+    auto transform = translate(Vector3f(0.5f, 0.5f, 1.0f))*scale(0.2f,0.2f,0.2f);
+    auto inv_transform = translate(Vector3f(-0.5, -0.5, -1))*scale(-0.25,-0.25,-0.25);
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
     
     Scene scene(triangles[0]);

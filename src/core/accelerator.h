@@ -28,6 +28,7 @@ SOFTWARE.
 #include "core/memory.h"
 #include "core/geometry.h"
 #include <vector>
+#include <stack>
 #include <algorithm>
 NARUKAMI_BEGIN
 
@@ -96,6 +97,14 @@ inline uint32_t leaf(const uint32_t offset,const uint32_t num){
     bits=(((num-1)&0XF)|bits);//set number 4 bits
     return bits;
 }
+
+inline uint32_t empty_leaf(){
+    return 0XFFFFFFFF;
+}
+inline bool leaf_is_empty(const uint32_t bits){
+    return (bits&0XFFFFFFFF)==0XFFFFFFFF;
+}
+
 inline uint32_t interior(const uint32_t bits){
     return (bits&0x7FFFFFFF);
 }
@@ -133,7 +142,7 @@ inline void init_QBVH_node(QBVHNode*node, const QBVHCollapseNode* cn){
         node->childrens[0]=leaf(cn->data[0]->offset,cn->data[0]->num);
     }
     if(cn->data[1]==nullptr){
-        node->childrens[1]=leaf(-1,0);
+        node->childrens[1]=empty_leaf();
     }
     else if(is_leaf(cn->data[1])){
         node->childrens[1]=leaf(cn->data[1]->offset,cn->data[1]->num);
@@ -142,7 +151,7 @@ inline void init_QBVH_node(QBVHNode*node, const QBVHCollapseNode* cn){
         node->childrens[2]=leaf(cn->data[2]->offset,cn->data[2]->num);
     }
     if(cn->data[3]==nullptr){
-        node->childrens[3]=leaf(-1,0);
+        node->childrens[3]=empty_leaf();
     }
     else if(is_leaf(cn->data[3])){
         node->childrens[3]=leaf(cn->data[3]->offset,cn->data[3]->num);
@@ -286,6 +295,7 @@ private:
     }
 
 public:
+    Accelerator()=default;
     Accelerator(std::vector<Primitive> primitives) : _primitives(std::move(primitives))
     {
         std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
@@ -307,7 +317,61 @@ public:
         
         uint32_t offset=0;
         flatten(collapse_root,&offset);
+    }
 
+    bool intersect(const Ray& ray)const{
+        std::stack<std::pair<QBVHNode,float>> node_stack;
+        SoARay soa_ray(ray);
+        int is_positive[3]={ray.d[0]>=0?1:0,ray.d[1]>=0?1:0,ray.d[2]>=0?1:0};
+        node_stack.push({_nodes[0],0});
+        float t=INFINITE;
+        bool is_hit_ret=false;
+        while(!node_stack.empty()){
+            
+            if(node_stack.top().second>t){
+                node_stack.pop();
+                continue;
+            }
+            
+            auto node = node_stack.top().first;
+            node_stack.pop();
+            float4 box_t;
+            auto box_hits=narukami::intersect(soa_ray.o,robust_rcp(soa_ray.d),float4(0),float4(soa_ray.t_max),is_positive,node.bounds,&box_t);
+
+            bool push_child[4]={false,false,false,false};
+
+            for (size_t i = 0; i < 4; ++i)
+            {
+                if(box_hits[i]&&box_t[i]<t){
+                    if(is_leaf(node.childrens[i])){
+                        auto offset=leaf_offset(node.childrens[i]);
+                        auto num=leaf_num(node.childrens[i]);
+                        for (size_t j = offset; j <offset+num ;++j)
+                        {
+                            Point2f uv;
+                            int index;
+                            auto is_hit=narukami::intersect(soa_ray,_triangles[j],&t,&uv,&index);
+                            if(is_hit ){
+                                soa_ray.t_max=float4(t);
+                                is_hit_ret=true;
+                            }
+                        }
+                        
+                    }else{
+                        push_child[i]=true;
+                    }
+                }
+            }
+
+            for (size_t i = 0; i < 4; i++)
+            {   
+                if(push_child[i]){
+                     node_stack.push({_nodes[node.childrens[i]],box_t[i]});
+                }
+            }
+            
+        }
+        return is_hit_ret;
     }
 };
 NARUKAMI_END
