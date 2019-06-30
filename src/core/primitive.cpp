@@ -39,7 +39,7 @@ std::vector<SoATriangle> cast2SoA(const std::vector<Primitive> &triangles, uint3
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    size_t soa_count = (uint32_t)count / SSE_FLOAT_COUNT + 1;
+    size_t soa_count = (uint32_t)(count-1)/ SSE_FLOAT_COUNT + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;

@@ -74,7 +74,7 @@ std::vector<SoATriangle> cast2SoA(const std::vector<MeshTriangle> &triangles, ui
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    size_t soa_count = (uint32_t)count / SSE_FLOAT_COUNT + 1;
+    size_t soa_count = (uint32_t)(count-1) / SSE_FLOAT_COUNT + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;
@@ -94,9 +94,9 @@ std::vector<SoATriangle> cast2SoA(const std::vector<MeshTriangle> &triangles, ui
         }
         else
         {
-            v0_array.push_back(Point3f());
-            e1_array.push_back(Vector3f());
-            e2_array.push_back(Vector3f());
+            v0_array.push_back(Point3f(0,0,0));
+            e1_array.push_back(Vector3f(0,0,0));
+            e2_array.push_back(Vector3f(0,0,0));
         }
     }
     std::vector<SoATriangle> soa_triangles;
