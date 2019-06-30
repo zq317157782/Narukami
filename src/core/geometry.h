@@ -451,7 +451,7 @@ inline bool collide(const Point3f& o,const Vector3f& inv_d,float t_min,float t_m
 }
 
 
-inline int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
+inline bool4 collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box){
     // x
     t_min = max((box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_min);
     t_max = min((box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_max);
@@ -465,7 +465,27 @@ inline int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,flo
     t_max = min((box[isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz,t_max);
 
     //check
-    return movemask(t_min<=t_max);
+    return t_min<=t_max;
+}
+
+
+inline bool4 intersect(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const int isPositive[3],const SoABounds3f& box,float4* t){
+    // x
+    t_min = max((box[1-isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_min);
+    t_max = min((box[isPositive[0]].xxxx-o.xxxx)*inv_d.xxxx,t_max);
+    
+    //y
+    t_min = max((box[1-isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy,t_min);
+    t_max = min((box[isPositive[1]].yyyy-o.yyyy)*inv_d.yyyy,t_max);
+    
+    //z
+    t_min = max((box[1-isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz,t_min);
+    t_max = min((box[isPositive[2]].zzzz-o.zzzz)*inv_d.zzzz,t_max);
+    
+    (*t)=t_min;
+
+    //check
+    return t_min<=t_max;
 }
 
 
