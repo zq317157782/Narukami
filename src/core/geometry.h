@@ -479,17 +479,17 @@ inline bool4 intersect(const SoARay &ray, const SoATriangle &triangle, float4 *t
     mask = mask & (t <= float4(ray.t_max));
     mask = mask & (t >= zero);
 
-    if (t_results)
+    if (EXPECT_TAKEN(t_results))
     {
         (*t_results) = t;
     }
 
-    if (u_results)
+    if (EXPECT_TAKEN(u_results))
     {
         (*t_results) = u;
     }
 
-    if (v_results)
+    if (EXPECT_TAKEN(v_results))
     {
         (*t_results) = v;
     }
