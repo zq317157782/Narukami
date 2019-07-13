@@ -74,7 +74,7 @@ add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_d
 add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
 
-
+ 
 if(MSVC)
   if(${MSVC_VERSION} GREATER_EQUAL 1915)
     # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
