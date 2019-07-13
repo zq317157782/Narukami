@@ -18,6 +18,10 @@ include_directories(external/lodepng)
 include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
 
+
+aux_source_directory(src/core SRC_CORE)
+aux_source_directory(src/cameras SRC_CAMERAS)
+aux_source_directory(external/lodepng EXT_LODEPNG)
 #add gtest
 set(gtest_force_shared_crt ON)
 set(BUILD_GMOCK OFF)
@@ -46,31 +50,28 @@ SET(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 add_subdirectory(external/benchmark)
  
 #narukami
-add_executable(narukami src/main.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp)
+add_executable(narukami src/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami glog tinyobjloader)
 # target_link_libraries(narukami embree)
 
 #narukami_test
-add_executable(narukami_test test/main.cpp src/core/constant.cpp src/core/math.cpp src/core/sse.cpp src/core/mesh.cpp src/core/film.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/lowdiscrepancy.cpp 
-src/core/transform.cpp src/core/memory.cpp src/core/primitive.cpp)
+add_executable(narukami_test test/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_test gtest lua5.3.4)
 
-#benchmark rcp
-add_executable(narukami_benchmark benchmark/main.cpp  src/core/math.cpp src/core/constant.cpp src/core/sse.cpp src/core/mesh.cpp src/core/lowdiscrepancy.cpp)
+#benchmark 
+add_executable(narukami_benchmark benchmark/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_benchmark benchmark)
 
 #demos
-add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp)
-add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
-               src/core/imageio.cpp src/core/film.cpp src/core/memory.cpp)
+add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_demo_render_a_mesh tinyobjloader)
-add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
-add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp src/core/film.cpp src/core/lowdiscrepancy.cpp)
-add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp src/core/constant.cpp)
-add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp src/core/constant.cpp src/core/lowdiscrepancy.cpp)
-add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp src/core/film.cpp src/core/constant.cpp src/core/imageio.cpp external/lodepng/lodepng.cpp)
-add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp external/lodepng/lodepng.cpp src/core/sse.cpp src/core/constant.cpp src/core/mesh.cpp 
-               src/core/imageio.cpp src/core/film.cpp src/core/memory.cpp src/core/primitive.cpp)
+add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
 
 
