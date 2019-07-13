@@ -37,6 +37,7 @@ struct bool4
     union { __m128 xyzw; int i[4]; struct { int x,y,z,w; }; };
     
     public:
+    inline bool4()=default;
     inline bool4(const bool4&) = default;
     inline bool4(bool4&&) = default;
     inline bool4& operator=(const bool4&) = default;
