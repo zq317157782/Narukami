@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/primitive.h"
 #include "core/memory.h"
 #include "core/geometry.h"
+#include "core/stat.h"
 #include <vector>
 #include <stack>
 #include <algorithm>
@@ -177,6 +178,9 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     }
 }
 
+
+STAT_MEMORY_COUNTER("SoATriangle",SoATriangle_memory_cost)
+STAT_MEMORY_COUNTER("QBVH node",QBVH_node_memory_cost)
 class Accelerator
 {
 private:

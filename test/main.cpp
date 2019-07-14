@@ -1309,6 +1309,13 @@ TEST(float4,max_nan){
     EXPECT_TRUE(isnan(a[3]));
 }
 
+
+#include "core/stat.h"
+STAT_MEMORY_COUNTER("memory_count",memory_count)
+TEST(stat,memory_counter){
+    STAT_INCREASE_MEMORY_COUNTER(memory_count,1024);
+}
+
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc,argv);
     auto ret = RUN_ALL_TESTS();

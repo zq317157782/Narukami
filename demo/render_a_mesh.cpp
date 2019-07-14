@@ -10,6 +10,7 @@
 #include "core/meshloader.h"
 #include "core/integrator.h"
 #include "core/scene.h"
+#include "core/stat.h"
 using namespace narukami;
 int main(){
     auto sampler = std::make_shared<Sampler>(64);
@@ -24,6 +25,8 @@ int main(){
     Scene scene(triangles[0]);
     Integrator integrator(camera,sampler);
     integrator.render(scene);
+    report_thread_statistics();
+    print_statistics(std::cout);
 
     
    // auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());

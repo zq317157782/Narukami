@@ -43,9 +43,11 @@ Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::m
     auto build_root = build(arena, 0, primitive_infos.size(), primitive_infos, _ordered_primitives, &total_build_node_num);
     auto collapse_root = collapse(arena, build_root, &total_collapse_node_num);
     _primitives = _ordered_primitives;
+
+    STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost,sizeof(QBVHNode)*total_collapse_node_num)
     _nodes.resize(total_collapse_node_num);
     build_soa_triangles(build_root);
-
+    STAT_INCREASE_MEMORY_COUNTER(SoATriangle_memory_cost,sizeof(SoATriangle)*_triangles.size())
     uint32_t offset = 0;
     flatten(collapse_root, &offset);
 }
