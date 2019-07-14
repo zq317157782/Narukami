@@ -179,6 +179,7 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
 }
 
 
+STAT_MEMORY_COUNTER("Primitive",Primitive_memory_cost)
 STAT_MEMORY_COUNTER("SoATriangle",SoATriangle_memory_cost)
 STAT_MEMORY_COUNTER("QBVH node",QBVH_node_memory_cost)
 class Accelerator
