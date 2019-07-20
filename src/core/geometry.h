@@ -317,6 +317,11 @@ inline int max_extent(const Bounds3<T> &b0)
     }
 }
 
+template<typename T>
+inline Vector3f offset(const Bounds3<T> &b0,const Point3<T>& p0){
+    return static_cast<Vector3f>(p0-b0.min_point)/static_cast<Vector3f>(b0.max_point-b0.min_point);
+}
+
 struct SSE_ALIGNAS SoABounds3f
 {
     SoAPoint3f min_point;

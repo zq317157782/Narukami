@@ -85,6 +85,8 @@ inline Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2) { Vector
 template <typename T>
 inline Vector3<T> operator*(const Vector3<T> &v1, const T &f) { Vector3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
 template <typename T>
+inline Vector3<T> operator/(const Vector3<T> &v1, const Vector3<T> &v2) { assert(v2.x != 0); assert(v2.y != 0); assert(v2.z!= 0); Vector3<T> v; v.x = v1.x / v2.x; v.y = v1.y / v2.y; v.z = v1.z / v2.z; return v; }
+template <typename T>
 inline Vector3<T> operator/(const Vector3<T> &v1, const T &f) { assert(f != 0); Vector3<T> v; v.x = v1.x / f; v.y = v1.y / f; v.z = v1.z / f; return v; }
 template <typename T>
 inline Vector3<T> &operator+=(Vector3<T> &v, const Vector3<T> &v1) { v.x += v1.x; v.y += v1.y; v.z += v1.z; return v; }

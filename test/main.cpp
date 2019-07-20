@@ -1309,6 +1309,11 @@ TEST(float4,max_nan){
     EXPECT_TRUE(isnan(a[3]));
 }
 
+TEST(bounds3f,offset){
+    Bounds3f a={{0,0,0},{1,1,1}};
+    auto b=offset(a,Point3f(0.5f,2.0f,-1.0f));
+    EXPECT_EQ(b,Vector3f(0.5f,2.0f,-1.0f));
+}
 
 #include "core/stat.h"
 STAT_MEMORY_COUNTER("memory_count",memory_count)
