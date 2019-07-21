@@ -322,6 +322,16 @@ inline Vector3f offset(const Bounds3<T> &b0,const Point3<T>& p0){
     return static_cast<Vector3f>(p0-b0.min_point)/static_cast<Vector3f>(b0.max_point-b0.min_point);
 }
 
+template <typename T>
+inline T surface_area(const Bounds3<T> &bounds)
+{
+    T w = bounds.max_point.x - bounds.min_point.x;
+    T h = bounds.max_point.y - bounds.min_point.y;
+    T d = bounds.max_point.z - bounds.min_point.z;
+
+    return (w * h + w * d + d * h)*2;
+}
+
 struct SSE_ALIGNAS SoABounds3f
 {
     SoAPoint3f min_point;
