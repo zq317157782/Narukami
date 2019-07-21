@@ -31,16 +31,28 @@ NARUKAMI_BEGIN
 class StatsAccumulator
 {
 private:
+    std::map<std::string, uint64_t> _counters;
     std::map<std::string, uint64_t> _memory_counters;
 
 public:
+    void report_counter(const std::string &name, const uint64_t count)
+    {
+        _counters[name] += count;
+    }
+
+
     void report_memory_counter(const std::string &name, const uint64_t count)
     {
         _memory_counters[name] += count;
     }
 
+
     void print(std::ostream &out) const{
 
+        for (const auto &i : _counters){
+             out<<i.first<<" : "<<i.second<<std::endl;
+        }
+        
         for (const auto &i : _memory_counters)
         {   
             static std::string sy_byte="byte";
@@ -89,6 +101,21 @@ public:
         }
     }
 };
+#define STAT_COUNTER(name,var)\
+static thread_local uint64_t var;\
+static void stat_func_##var(StatsAccumulator& stats_acc){\
+    stats_acc.report_counter(name,var);\
+    var=0;\
+}\
+static StatRegisterer stat_reg_##var(stat_func_##var);\
+
+#define STAT_INCREASE_COUNTER(var,count)\
+var+=count;\
+
+#define STAT_INCREASE_COUNTER_CONDITION(var,count,condition)\
+if(condition){\
+    var+=count;\
+}\
 
 
 #define STAT_MEMORY_COUNTER(name,var)\
