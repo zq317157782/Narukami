@@ -55,7 +55,9 @@ lightweight PBRT-style path tracer
     - [x] SSE algins global memory alloc and delloc
     - [x] memory arena from PBRT
  - [ ] MBVH
-     - [x] build binary BVH
+     - [x] build binary BVH with SAH
+     - [x] collapse into MBVH 
+     - [ ] precompute travel orders
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
