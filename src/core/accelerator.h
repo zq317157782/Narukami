@@ -33,6 +33,9 @@ SOFTWARE.
 #include <algorithm>
 NARUKAMI_BEGIN
 
+constexpr uint32_t ACCELERATOR_TIRANGLE_NUM_PER_LEAF=64;
+constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
+
 struct BVHPrimitiveInfo
 {
     size_t prim_index;
@@ -179,9 +182,16 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
 }
 
 
-STAT_MEMORY_COUNTER("Primitive",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("SoATriangle",SoATriangle_memory_cost)
-STAT_MEMORY_COUNTER("QBVH node",QBVH_node_memory_cost)
+struct BucketInfo{
+    Bounds3f bounds;
+    uint32_t count=0;
+};
+
+STAT_COUNTER("count of SoATriangle",SoATriangle_count)
+STAT_COUNTER("count of SoATriangle without four triangle",SoATriangle_notfull_count)
+STAT_MEMORY_COUNTER("memory cost for Primitive array",Primitive_memory_cost)
+STAT_MEMORY_COUNTER("memory cost for SoATriangle array",SoATriangle_memory_cost)
+STAT_MEMORY_COUNTER("memory cost for QBVH node array",QBVH_node_memory_cost)
 class Accelerator
 {
 private:

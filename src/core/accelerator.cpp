@@ -63,7 +63,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
         max_bounds = _union(max_bounds, primitive_infos[i].bounds);
     }
     uint32_t num = end - start;
-    if (num <= 64)
+    if (num <= ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
     {
         auto offset = ordered.size();
         for (size_t i = start; i < end; i++)
@@ -81,17 +81,73 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
         }
 
         auto dim = max_extent(centroid_bounds);
-
+        
         if (centroid_bounds.min_point[dim] == centroid_bounds.max_point[dim])
         {
+            //degenerate
             auto mid = (start + end) / 2;
+            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+        }
+        else if(num<=2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF){
+            auto mid = start+ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
+            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+        }else if(num<=4*ACCELERATOR_TIRANGLE_NUM_PER_LEAF){
+            auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
         else
         {
-            auto mid_point = (centroid_bounds.max_point[dim] + centroid_bounds.min_point[dim]) / 2;
-            auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
+            //SAH
+            BucketInfo bucket_infos[ACCELERATOR_SAH_BUCKET_NUM];
+
+            for(size_t i = start;i<num;++i){
+                 auto bucket_index=static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM*offset(centroid_bounds,primitive_infos[i].centroid)[dim]);
+                 bucket_index = min(bucket_index,ACCELERATOR_SAH_BUCKET_NUM-1);
+                 bucket_infos[bucket_index].bounds=_union(bucket_infos[bucket_index].bounds,primitive_infos[i].bounds);
+                 bucket_infos[bucket_index].count++;
+            }
+            
+            //compute cost function 
+            float costs[ACCELERATOR_SAH_BUCKET_NUM-1];
+            for (size_t i = 0; i < ACCELERATOR_SAH_BUCKET_NUM-1; i++)
+            {
+                Bounds3f b0,b1;
+                uint32_t count0=0,count1=0;
+                for (size_t j = 0; j <= i; j++)
+                {
+                    b0=_union(b0,bucket_infos[j].bounds);
+                    count0+=bucket_infos[j].count;
+                }
+                for (size_t j = i+1; j <ACCELERATOR_SAH_BUCKET_NUM; j++)
+                {
+                    b1=_union(b1,bucket_infos[j].bounds);
+                    count1+=bucket_infos[j].count;
+                }
+               
+                costs[i]=0.125f+(count0*surface_area(b0)+count1*surface_area(b1))/surface_area(max_bounds);
+            }
+            
+
+            float min_cost=costs[0];
+            int min_cost_bucket_index=0;
+            for (size_t i = 1; i < ACCELERATOR_SAH_BUCKET_NUM-1; i++)
+            {
+                if(costs[i]<min_cost){
+                    min_cost=costs[i];
+                    min_cost_bucket_index=i;
+                }
+            }
+            
+            // auto mid_point = (centroid_bounds.max_point[dim] + centroid_bounds.min_point[dim]) / 2;
+            // auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
+            auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [=](const BVHPrimitiveInfo &pi) {
+                 auto bucket_index=static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM*offset(centroid_bounds,pi.centroid)[dim]);
+                 bucket_index = min(bucket_index,ACCELERATOR_SAH_BUCKET_NUM-1);
+                 return bucket_index <= min_cost_bucket_index; 
+            });
             auto mid = static_cast<uint32_t>(mid_ptr - &primitive_infos[0]);
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
@@ -101,12 +157,14 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
 
 void Accelerator::build_soa_triangles(BVHBuildNode *node)
 {
+    STAT_INCREASE_COUNTER_CONDITION(SoATriangle_notfull_count,1,(node->num%4)!=0)
     if (is_leaf(node))
     {
         auto tris = cast2SoA(_primitives, node->offset, node->num);
         node->num = tris.size();
         node->offset = _triangles.size();
         _triangles.insert(_triangles.end(), tris.begin(), tris.end());
+        STAT_INCREASE_COUNTER(SoATriangle_count,tris.size())
     }
     if (node->childrens[0] && node->childrens[1])
     {
