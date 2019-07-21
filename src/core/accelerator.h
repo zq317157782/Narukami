@@ -87,7 +87,7 @@ struct QBVHCollapseNode
 };
 
 //128 bytes
-struct QBVHNode
+struct  SSE_ALIGNAS QBVHNode
 {
     SoABounds3f bounds;
     uint32_t childrens[4];
