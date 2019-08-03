@@ -81,9 +81,9 @@ inline bool is_leaf(const BVHBuildNode *node)
 
 struct QBVHCollapseNode
 {
-
     const BVHBuildNode *data[4];
     QBVHCollapseNode *childrens[4];
+    uint32_t axis0, axis1, axis2;
 };
 
 //128 bytes
@@ -203,6 +203,7 @@ private:
     void build_soa_triangles(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
+    void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;
 public:
     Accelerator() = default;
     Accelerator(std::vector<Primitive> primitives);

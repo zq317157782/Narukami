@@ -218,6 +218,9 @@ QBVHCollapseNode *Accelerator::collapse(MemoryArena &arena, const BVHBuildNode *
         }
     }
 
+    node->axis0 = subtree_root->split_axis;
+    node->axis1 = subtree_root->childrens[0]->split_axis;
+    node->axis2 = subtree_root->childrens[1]->split_axis;
     return node;
 }
 
@@ -244,7 +247,30 @@ uint32_t Accelerator::flatten(const QBVHCollapseNode *c_node, uint32_t *offset)
         _nodes[cur_offset].childrens[3] = flatten(c_node->childrens[3], offset);
     }
 
+    //set QBVH's split axis
+    _nodes[cur_offset].axis0 = c_node->axis0;
+    _nodes[cur_offset].axis1 = c_node->axis1;
+    _nodes[cur_offset].axis2 = c_node->axis2;
+
     return cur_offset;
+}
+
+void Accelerator::get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const{
+    orders[0] = 0;
+    orders[1] = 1;
+    orders[2] = 2;
+    orders[3] = 3;
+
+    if(dir[node.axis1]<=0){
+         std::swap(orders[0],orders[1]);
+    }
+    if(dir[node.axis2]<=0){
+         std::swap(orders[2],orders[3]);
+    }
+    if(dir[node.axis0]<=0){
+        std::swap(orders[0],orders[2]);
+        std::swap(orders[1],orders[3]);
+    }
 }
 
 bool Accelerator::intersect(const Ray &ray) const
@@ -270,15 +296,18 @@ bool Accelerator::intersect(const Ray &ray) const
         auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node.bounds, &box_t);
 
         bool push_child[4] = {false, false, false, false};
+        uint32_t orders[4];
+        get_traversal_orders(node,ray.d,orders);
 
         for (size_t i = 0; i < 4; ++i)
         {
-            if (box_hits[i] && box_t[i] < t)
+            uint32_t index = orders[i];
+            if (box_hits[index] && box_t[index] < t)
             {
-                if (is_leaf(node.childrens[i]))
+                if (is_leaf(node.childrens[index]))
                 {
-                    auto offset = leaf_offset(node.childrens[i]);
-                    auto num = leaf_num(node.childrens[i]);
+                    auto offset = leaf_offset(node.childrens[index]);
+                    auto num = leaf_num(node.childrens[index]);
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         Point2f uv;
@@ -293,16 +322,17 @@ bool Accelerator::intersect(const Ray &ray) const
                 }
                 else
                 {
-                    push_child[i] = true;
+                    push_child[index] = true;
                 }
             }
         }
 
         for (size_t i = 0; i < 4; i++)
         {
-            if (push_child[i])
+            uint32_t index = orders[i];
+            if (push_child[index])
             {
-                node_stack.push({_nodes[node.childrens[i]], box_t[i]});
+                node_stack.push({_nodes[node.childrens[index]], box_t[index]});
             }
         }
     }
