@@ -155,7 +155,7 @@ class MemoryArena{
 		}
 
 		template<typename T>
-		T* alloc(size_t sz,bool run_ctor=true){
+		T* alloc(size_t sz=1,bool run_ctor=true){
 			auto ret=reinterpret_cast<T*>(alloc(sizeof(T)*sz));
 			if(run_ctor){
 				for (size_t i = 0; i < sz; ++i)

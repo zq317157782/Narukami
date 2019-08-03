@@ -24,17 +24,14 @@ SOFTWARE.
 #pragma once
 
 #include "core/narukami.h"
-#include "core/camera.h"
-#include "core/scene.h"
-#include "core/sampler.h"
-#include "core/interaction.h"
+#include "core/affine.h"
 NARUKAMI_BEGIN
-class Integrator{
-    private:
-        std::shared_ptr<const Camera> _camera;
-        std::shared_ptr<Sampler> _sampler;
-    public:
-        Integrator(std::shared_ptr<const Camera> camera,std::shared_ptr<Sampler> sampler):_camera(std::move(camera)),_sampler(std::move(sampler)){}
-        void render(const Scene& scene);
+
+//basic interaction
+class Interaction{
+public:
+    Point3f p;
+    float hit_t;
 };
+
 NARUKAMI_END

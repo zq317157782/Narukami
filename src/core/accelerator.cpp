@@ -273,18 +273,19 @@ void Accelerator::get_traversal_orders(const QBVHNode& node,const Vector3f& dir,
     }
 }
 
-bool Accelerator::intersect(const Ray &ray) const
+bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const
 {
     std::stack<std::pair<QBVHNode, float>> node_stack;
     SoARay soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({_nodes[0], 0});
-    float t = INFINITE;
-    bool is_hit_ret = false;
+    float closest_hit_t = INFINITE;
+    bool has_hit_event = false;
+    HitTriangleEvent hit_triangle_event;
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > t)
+        if (node_stack.top().second > closest_hit_t)
         {
             node_stack.pop();
             continue;
@@ -302,7 +303,7 @@ bool Accelerator::intersect(const Ray &ray) const
         for (size_t i = 0; i < 4; ++i)
         {
             uint32_t index = orders[i];
-            if (box_hits[index] && box_t[index] < t)
+            if (box_hits[index] && box_t[index] < closest_hit_t)
             {
                 if (is_leaf(node.childrens[index]))
                 {
@@ -311,12 +312,12 @@ bool Accelerator::intersect(const Ray &ray) const
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         Point2f uv;
-                        int index;
-                        auto is_hit = narukami::intersect(soa_ray, _triangles[j], &t, &uv, &index);
+                        auto is_hit = narukami::intersect(soa_ray, _triangles[j], &closest_hit_t, &uv, &hit_triangle_event.sub_offset);
                         if (is_hit)
                         {
-                            soa_ray.t_max = float4(t);
-                            is_hit_ret = true;
+                            soa_ray.t_max = float4(closest_hit_t);
+                            has_hit_event = true;
+                            hit_triangle_event.offset = j;
                         }
                     }
                 }
@@ -336,7 +337,13 @@ bool Accelerator::intersect(const Ray &ray) const
             }
         }
     }
-    return is_hit_ret;
+
+    if(has_hit_event&&interaction!=nullptr){
+       interaction->hit_t = closest_hit_t;
+       interaction->p = ray.o + ray.d*closest_hit_t;
+    }
+
+    return has_hit_event;
 }
 
 NARUKAMI_END

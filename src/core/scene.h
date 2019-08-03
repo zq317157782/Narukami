@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/mesh.h"
 #include "core/accelerator.h"
 #include "core/primitive.h"
+#include "core/interaction.h"
 #include <vector>
 NARUKAMI_BEGIN
 class Scene{
@@ -40,9 +41,9 @@ class Scene{
            _accelerator=Accelerator(primitives);
         }
 
-        inline bool intersect(const Ray& ray,float* t,Point2f* uv) const{
+        inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
 
-            return _accelerator.intersect(ray);
+            return _accelerator.intersect(arena,ray,interaction);
 
             // SoARay soa_ray(ray);
             // bool is_hit=false;

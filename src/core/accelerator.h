@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/primitive.h"
 #include "core/memory.h"
 #include "core/geometry.h"
+#include "core/interaction.h"
 #include "core/stat.h"
 #include <vector>
 #include <stack>
@@ -187,6 +188,12 @@ struct BucketInfo{
     uint32_t count=0;
 };
 
+
+struct HitTriangleEvent{
+    int offset;
+    int sub_offset;
+};
+
 STAT_COUNTER("count of SoATriangle",SoATriangle_count)
 STAT_COUNTER("count of SoATriangle without four triangle",SoATriangle_notfull_count)
 STAT_MEMORY_COUNTER("memory cost for Primitive array",Primitive_memory_cost)
@@ -207,6 +214,6 @@ private:
 public:
     Accelerator() = default;
     Accelerator(std::vector<Primitive> primitives);
-    bool intersect(const Ray &ray) const;
+    bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
 };
 NARUKAMI_END

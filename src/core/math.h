@@ -221,6 +221,10 @@ inline  float  rad2deg ( const float x )  { return x * 5.72957795130823208768e1f
 inline float ceil(const float x){ return std::ceilf(x); }
 inline float floor(const float x){ return std::floorf(x); }
 
+inline float clamp(const float x,const float x0,const float x1){
+    assert(x0<=x1);
+    return min(max(x,x0),x1);
+}
 
 //from pbrt
 inline uint32_t reverse_bits_u32(uint32_t x){ 
