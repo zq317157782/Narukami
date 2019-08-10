@@ -31,7 +31,12 @@ NARUKAMI_BEGIN
 class Interaction{
 public:
     Point3f p;
+    Normal3f n;
     float hit_t;
 };
+
+bool is_surface_interaction(const Interaction& interaction){
+     return dot(interaction.n,interaction.n)!=0;
+}
 
 NARUKAMI_END
