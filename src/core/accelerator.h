@@ -43,7 +43,7 @@ struct BVHPrimitiveInfo
     Bounds3f bounds;
     Point3f centroid;
     BVHPrimitiveInfo() = default;
-    BVHPrimitiveInfo(const Primitive &p, size_t index) : prim_index(index), bounds(p.get_bounds()), centroid((p.get_bounds().min_point + p.get_bounds().max_point) * 0.5f) {}
+    BVHPrimitiveInfo(const Primitive &p, size_t index) : prim_index(index), bounds(p.get_world_bounds()), centroid((p.get_world_bounds().min_point + p.get_world_bounds().max_point) * 0.5f) {}
 };
 
 struct BVHBuildNode

@@ -39,7 +39,7 @@ NARUKAMI_BEGIN
 
         Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)){}
 
-        Bounds3f get_bounds() const{return triangle.get_bounds();}
+        Bounds3f get_world_bounds() const{return triangle.get_world_bounds();}
     };
 
     std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);

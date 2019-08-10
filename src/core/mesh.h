@@ -60,7 +60,7 @@ NARUKAMI_BEGIN
         inline const Point3f& operator[](const int i)const { assert(i>=0&&i<=2); return _mesh->vertices[_index[i]];}
         inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<=2); if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
         inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
-        inline  Bounds3f get_bounds() const{return _union(_union(_mesh->vertices[_index[0]],_mesh->vertices[_index[1]]),_mesh->vertices[_index[2]]);}
+        inline  Bounds3f get_world_bounds() const{return _union(_union(_mesh->vertices[_index[0]],_mesh->vertices[_index[1]]),_mesh->vertices[_index[2]]);}
         friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->vertices[v._index[0]] << ',' << v._mesh->vertices[v._index[1]] << ',' << v._mesh->vertices[v._index[2]] << ')'; return out; }
     };
 

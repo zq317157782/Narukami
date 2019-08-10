@@ -1043,7 +1043,7 @@ TEST(mesh,create_mesh_triangles){
      EXPECT_EQ(p,Point3f(1,0,0));
 }
 
-TEST(mesh,get_bounds){
+TEST(mesh,get_world_bounds){
     std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
      std::vector<Normal3f> normals;
      std::vector<Point2f> uvs;
@@ -1052,7 +1052,7 @@ TEST(mesh,get_bounds){
      auto transform2 = translate(Vector3f(-1,0,0));
      auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
 
-     auto triangle_bounds=triangles[0].get_bounds();
+     auto triangle_bounds=triangles[0].get_world_bounds();
      Bounds3f b0{{1,0,0},{2,1,0}};
      EXPECT_EQ(triangle_bounds,b0);
 }
