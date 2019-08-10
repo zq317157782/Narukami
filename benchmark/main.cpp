@@ -639,7 +639,7 @@ static void BM_meshdata_intersect_sse(benchmark::State &state)
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
      auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
-     auto soa_triangles=cast2SoA(triangles,0,2);
+     auto soa_triangles=cast_to_SoA_structure(triangles,0,2);
      float t;
      Point2f uv;
     for (auto _ : state)

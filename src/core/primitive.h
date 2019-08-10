@@ -43,5 +43,5 @@ NARUKAMI_BEGIN
     };
 
     std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);
-    std::vector<SoATriangle> cast2SoA(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count);
+    std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

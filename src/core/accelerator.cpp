@@ -160,7 +160,7 @@ void Accelerator::build_soa_triangles(BVHBuildNode *node)
     STAT_INCREASE_COUNTER_CONDITION(SoATriangle_notfull_count,1,(node->num%4)!=0)
     if (is_leaf(node))
     {
-        auto tris = cast2SoA(_primitives, node->offset, node->num);
+        auto tris = cast_to_SoA_structure(_primitives, node->offset, node->num);
         node->num = tris.size();
         node->offset = _triangles.size();
         _triangles.insert(_triangles.end(), tris.begin(), tris.end());

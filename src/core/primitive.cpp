@@ -34,7 +34,7 @@ std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triang
 }
 
 
-std::vector<SoATriangle> cast2SoA(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
+std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());

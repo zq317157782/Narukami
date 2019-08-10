@@ -69,7 +69,7 @@ MeshData::MeshData(const Transform &object2wrold, const std::vector<uint32_t> &i
 }
 
 //TODO SSE alignas
-std::vector<SoATriangle> cast2SoA(const std::vector<MeshTriangle> &triangles, uint32_t start, uint32_t count)
+std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());

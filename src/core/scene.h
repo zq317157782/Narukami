@@ -36,7 +36,7 @@ class Scene{
         Accelerator _accelerator;
     public:
         Scene(const std::vector<MeshTriangle>& triangles){
-           _triangles=cast2SoA(triangles,0,triangles.size());
+           _triangles=cast_to_SoA_structure(triangles,0,triangles.size());
            std::vector<Primitive> primitives=create_primitives(triangles);
            _accelerator=Accelerator(primitives);
         }

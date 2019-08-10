@@ -28,7 +28,7 @@ int main(){
     print_statistics(std::cout);
 
     
-   // auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());
+   // auto soa_triangles = cast_to_SoA_structure(triangles[0], 0, triangles[0].size());
 
     // for(int y=0;y<128;++y){
     //      for(int x=0;x<128;++x){
@@ -90,7 +90,7 @@ int main(){
 //     auto transform = scale(4,4,4)*translate(Vector3f(0.5, 0, 1));
 //     auto inv_transform = scale(-0.25f,-0.25f,-0.25f)*translate(Vector3f(-0.5, 0, 1));
 //     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
-//     auto soa_triangles = cast2SoA(triangles[0], 0, triangles[0].size());
+//     auto soa_triangles = cast_to_SoA_structure(triangles[0], 0, triangles[0].size());
 
 //     std::vector<uint8_t> image;
 //     float data[128 * 128 * 3];
