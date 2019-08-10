@@ -40,7 +40,8 @@ void Integrator::render(const Scene& scene){
                     Interaction interaction;
                     if(scene.intersect(arena,ray,&interaction)){
                         float t =clamp(interaction.hit_t,0,1);
-                        film->add_sample(camera_sample.pFilm,{t,t,t},w);
+                        auto N = (interaction.n + 1.0f) * 0.5f;
+                        film->add_sample(camera_sample.pFilm,{N.x,N.y,N.z},w);
                     }else{
                         film->add_sample(camera_sample.pFilm,{0,0,0},w);
                     }

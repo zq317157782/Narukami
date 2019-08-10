@@ -72,7 +72,7 @@ std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive>
         primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
-        primitive.offset = i * SSE_FLOAT_COUNT;
+        primitive.offset = start + i * SSE_FLOAT_COUNT;
         soa_primitives.push_back(primitive);
     }
 

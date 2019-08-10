@@ -87,6 +87,12 @@ struct Triangle
     Vector3f e1;
     Vector3f e2;
 };
+
+
+inline Normal3f get_normal(const Triangle& tri){
+    return normalize(cross(tri.e1,tri.e2));
+}
+
 inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";
@@ -99,7 +105,19 @@ struct SSE_ALIGNAS SoATriangle
     SoAPoint3f v0;
     SoAVector3f e1;
     SoAVector3f e2;
+
+    Triangle operator[](const uint32_t idx) const {
+        assert(idx>=0&&idx<SSE_FLOAT_COUNT);
+        Triangle triangle;
+        triangle.v0 =  v0[idx];
+        triangle.e1 =  e1[idx];
+        triangle.e2 =  e2[idx];
+        return triangle;
+    }
 };
+
+
+
 inline std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";

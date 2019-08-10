@@ -281,7 +281,7 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
     node_stack.push({_nodes[0], 0});
     float closest_hit_t = INFINITE;
     bool has_hit_event = false;
-    HitTriangleEvent hit_triangle_event;
+    HitPrimitiveEvent hit_primitive_event;
     while (!node_stack.empty())
     {
 
@@ -312,12 +312,12 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         Point2f uv;
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &hit_triangle_event.sub_offset);
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &hit_primitive_event.triangle_offset);
                         if (is_hit)
                         {
                             soa_ray.t_max = float4(closest_hit_t);
                             has_hit_event = true;
-                            hit_triangle_event.offset = j;
+                            hit_primitive_event.soa_primitive_info_offset = j;
                         }
                     }
                 }
@@ -341,6 +341,7 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
     if(has_hit_event&&interaction!=nullptr){
        interaction->hit_t = closest_hit_t;
        interaction->p = ray.o + ray.d*closest_hit_t;
+       interaction->n = get_normal(_soa_primitive_infos[ hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
     }
 
     return has_hit_event;

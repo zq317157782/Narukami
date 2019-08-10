@@ -189,9 +189,9 @@ struct BucketInfo{
 };
 
 
-struct HitTriangleEvent{
-    int offset;
-    int sub_offset;
+struct HitPrimitiveEvent{
+    int soa_primitive_info_offset;
+    int triangle_offset;
 };
 
 STAT_COUNTER("count of SoAPrimitiveInfo",SoAPrimitiveInfo_count)

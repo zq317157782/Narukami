@@ -245,6 +245,8 @@ struct SSE_ALIGNAS SoAVector3f{
     inline SoAVector3f& operator=(const SoAVector3f&) = default;
     inline SoAVector3f& operator=(SoAVector3f&&) = default;
     inline ~SoAVector3f() = default;
+
+     inline Vector3f operator[](const int idx) const { assert(idx >= 0 && idx < SSE_FLOAT_COUNT); return Vector3f(xxxx[idx],yyyy[idx],zzzz[idx]); }
     
 };
  
@@ -507,6 +509,8 @@ struct SSE_ALIGNAS SoAPoint3f{
     inline SoAPoint3f(SoAPoint3f&&) = default;
     inline SoAPoint3f& operator=(const SoAPoint3f&) = default;
     inline SoAPoint3f& operator=(SoAPoint3f&&) = default;
+
+    inline Point3f operator[](const int idx) const { assert(idx >= 0 && idx < SSE_FLOAT_COUNT); return Point3f(xxxx[idx],yyyy[idx],zzzz[idx]); }
 };
 
 inline  std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v) { 
@@ -582,7 +586,12 @@ struct Normal3
 typedef Normal3<float> Normal3f;
 typedef Normal3<int> Normal3i;
 
-
+template <typename T>
+inline  std::ostream &operator<<(std::ostream &out, const Normal3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
+template <typename T>
+inline Normal3<T> operator+(const Normal3<T> &v1, const T &x) { Normal3<T> v; v.x = v1.x + x; v.y = v1.y + x; v.z = v1.z + x; return v; }
+template <typename T>
+inline Normal3<T> operator*(const Normal3<T> &v1, const T &f) { Normal3<T> v; v.x = v1.x * f; v.y = v1.y * f; v.z = v1.z * f; return v; }
 template <typename T>
 inline bool operator==(const Normal3<T> &v1, const Normal3<T> &v2) { if ((v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z)) { return true; } return false; }
 template <typename T>
