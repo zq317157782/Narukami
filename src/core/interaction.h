@@ -35,7 +35,7 @@ public:
     float hit_t;
 };
 
-bool is_surface_interaction(const Interaction& interaction){
+FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;
 }
 
