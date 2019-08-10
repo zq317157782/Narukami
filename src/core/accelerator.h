@@ -194,20 +194,20 @@ struct HitTriangleEvent{
     int sub_offset;
 };
 
-STAT_COUNTER("count of SoATriangle",SoATriangle_count)
-STAT_COUNTER("count of SoATriangle without four triangle",SoATriangle_notfull_count)
+STAT_COUNTER("count of SoAPrimitiveInfo",SoAPrimitiveInfo_count)
+STAT_COUNTER("count of SoAPrimitiveInfo without four triangle",SoAPrimitiveInfo_notfull_count)
 STAT_MEMORY_COUNTER("memory cost for Primitive array",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("memory cost for SoATriangle array",SoATriangle_memory_cost)
+STAT_MEMORY_COUNTER("memory cost for SoAPrimitiveInfo array",SoAPrimitiveInfo_memory_cost)
 STAT_MEMORY_COUNTER("memory cost for QBVH node array",QBVH_node_memory_cost)
 class Accelerator
 {
 private:
     std::vector<Primitive> _primitives;
-    std::vector<SoATriangle> _triangles;
+    std::vector<SoAPrimitiveInfo> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
 
     BVHBuildNode *build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total);
-    void build_soa_triangles(BVHBuildNode *node);
+    void build_soa_primitive_info(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
     void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;

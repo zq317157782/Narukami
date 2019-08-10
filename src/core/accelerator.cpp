@@ -47,8 +47,8 @@ Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::m
 
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost,sizeof(QBVHNode)*total_collapse_node_num)
     _nodes.resize(total_collapse_node_num);
-    build_soa_triangles(build_root);
-    STAT_INCREASE_MEMORY_COUNTER(SoATriangle_memory_cost,sizeof(SoATriangle)*_triangles.size())
+    build_soa_primitive_info(build_root);
+    STAT_INCREASE_MEMORY_COUNTER(SoAPrimitiveInfo_memory_cost,sizeof(SoAPrimitiveInfo)*_soa_primitive_infos.size())
     uint32_t offset = 0;
     flatten(collapse_root, &offset);
 }
@@ -155,21 +155,21 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
     return node;
 }
 
-void Accelerator::build_soa_triangles(BVHBuildNode *node)
+void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
 {
-    STAT_INCREASE_COUNTER_CONDITION(SoATriangle_notfull_count,1,(node->num%4)!=0)
+    STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_notfull_count,1,(node->num%4)!=0)
     if (is_leaf(node))
     {
-        auto tris = cast_to_SoA_structure(_primitives, node->offset, node->num);
-        node->num = tris.size();
-        node->offset = _triangles.size();
-        _triangles.insert(_triangles.end(), tris.begin(), tris.end());
-        STAT_INCREASE_COUNTER(SoATriangle_count,tris.size())
+        auto primitive_infos = cast_to_SoA_structure(_primitives, node->offset, node->num);
+        node->num = primitive_infos.size();
+        node->offset = _soa_primitive_infos.size();
+        _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_count,primitive_infos.size())
     }
     if (node->childrens[0] && node->childrens[1])
     {
-        build_soa_triangles(node->childrens[0]);
-        build_soa_triangles(node->childrens[1]);
+        build_soa_primitive_info(node->childrens[0]);
+        build_soa_primitive_info(node->childrens[1]);
     }
 }
 
@@ -312,7 +312,7 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         Point2f uv;
-                        auto is_hit = narukami::intersect(soa_ray, _triangles[j], &closest_hit_t, &uv, &hit_triangle_event.sub_offset);
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &hit_triangle_event.sub_offset);
                         if (is_hit)
                         {
                             soa_ray.t_max = float4(closest_hit_t);

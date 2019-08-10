@@ -25,6 +25,7 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/mesh.h"
+#include "core/geometry.h"
 NARUKAMI_BEGIN
     class Primitive{
         public:
@@ -43,5 +44,16 @@ NARUKAMI_BEGIN
     };
 
     std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);
-    std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count);
+
+
+    struct SoAPrimitiveInfo{
+        SoATriangle triangle;
+        
+        //*** 128 bit
+        uint32_t offset;
+        uint32_t pad0,pad1,pad2;
+        //***
+    };
+
+    std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

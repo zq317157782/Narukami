@@ -34,7 +34,7 @@ std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triang
 }
 
 
-std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
+std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -64,18 +64,19 @@ std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<Primitive> &tri
             e2_array.push_back(Vector3f());
         }
     }
-    std::vector<SoATriangle> soa_triangles;
+    std::vector<SoAPrimitiveInfo> soa_primitives;
 
     for (size_t i = 0; i < soa_count; ++i)
     {
-        SoATriangle triangle;
-        triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
-        triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
-        triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
-        soa_triangles.push_back(triangle);
+        SoAPrimitiveInfo primitive;
+        primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
+        primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
+        primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
+        primitive.offset = i * SSE_FLOAT_COUNT;
+        soa_primitives.push_back(primitive);
     }
 
-    return soa_triangles;
+    return soa_primitives;
 }
 
 NARUKAMI_END
