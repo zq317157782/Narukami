@@ -47,8 +47,11 @@ void Integrator::render(const Scene& scene){
                         {
                             Vector3f wi;
                             float pdf;
-                            auto Li = light->sample_Li(interaction,sampler->get_2D(),&wi,&pdf);
-                            L = L + INV_PI * saturate(dot(interaction.n,wi)) * Li*rcp(pdf);
+                            VisibilityTester tester;
+                            auto Li = light->sample_Li(interaction,sampler->get_2D(),&wi,&pdf,&tester);
+                            if(tester.unoccluded(scene)){
+                                  L = L + INV_PI * saturate(dot(interaction.n,wi)) * Li*rcp(pdf);
+                            }
                         }
                         
                         film->add_sample(camera_sample.pFilm,L,w);

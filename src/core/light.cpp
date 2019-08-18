@@ -22,36 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include "core/narukami.h"
-#include "core/geometry.h"
-#include "core/mesh.h"
-#include "core/accelerator.h"
-#include "core/primitive.h"
-#include "core/interaction.h"
+
 #include "core/light.h"
-#include <vector>
+#include "core/scene.h"
 NARUKAMI_BEGIN
-class Scene{
-    private:
-        Accelerator _accelerator;
-    public:
-        const std::vector<std::shared_ptr<Light>> lights;
-    public:
-        Scene(const std::vector<MeshTriangle>& triangles,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
-        Scene(const std::vector<MeshTriangle>& triangles){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
+bool VisibilityTester::unoccluded(const Scene &scene) const
+{
+    //TODO float percise
+    Ray ray(_p0.p+normalize(_p1.p - _p0.p)*(EPSION*3), _p1.p - _p0.p, 0.9999995f);
+    return !scene.collide(ray);
+}
 
-        inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator.intersect(arena,ray,interaction);
-        }
-
-        inline bool collide(const Ray& ray) const{
-             return _accelerator.collide(ray);
-        }
-};
 NARUKAMI_END

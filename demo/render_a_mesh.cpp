@@ -19,16 +19,21 @@ int main(){
     auto film = std::make_shared<Film>(Point2i(256,256),Bounds2f(Point2f(0,0),Point2f(1,1)));
     auto camera = std::make_shared<OrthographicCamera>(Transform(),Bounds2f{{0,0},{1,1}},film);
     
-    auto transform = translate(Vector3f(0.5f, 0.5f, 1.0f))*scale(0.2f,0.2f,0.2f);
-    auto inv_transform = translate(Vector3f(-0.5, -0.5, -1))*scale(-0.25,-0.25,-0.25);
+    auto transform = translate(Vector3f(0.5f, 0.5f, 1.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
+    auto inv_transform = translate(Vector3f(-0.5, -0.5, -1))*scale(-0.2,-0.2,-0.2)*rotate(-90,Vector3f(0,1,0));
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
 
-    auto light_transform = translate(Vector3f(0.5f, 0.5f, 0.0f));
+    auto transform2 = translate(Vector3f(1.0f,0.5f, 1.0f))*scale(0.2f,0.2f,0.2f);
+    auto inv_transform2 = translate(Vector3f(1.0f,-0.5, -1))*scale(-0.2,-0.2,-0.2);
+    auto triangles2=load_mesh_triangles_from_obj(&transform2,&inv_transform2,"bunny.obj",".");
+
+    triangles[0].insert(triangles[0].end(),triangles2[0].begin(),triangles2[0].end());
+
+
+    auto light_transform = translate(Vector3f(0.5f, 0.0f, 0.0f));
 
     auto point_light = std::make_shared<PointLight>(light_transform,Spectrum(1,1,1));
     std::vector<std::shared_ptr<Light>> lights;
-    lights.push_back(point_light);
-    lights.push_back(point_light);
     lights.push_back(point_light);
     Scene scene(triangles[0],lights);
     Integrator integrator(camera,sampler);

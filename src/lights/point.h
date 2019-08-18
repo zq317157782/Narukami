@@ -31,12 +31,16 @@ NARUKAMI_BEGIN
             Spectrum _radiance;
         public:
             PointLight(const Transform& light_to_world,const Spectrum& L):Light(light_to_world),_radiance(L){}
-            Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf) override{
+            Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) override{
                 auto light_position = _light_to_world(Point3f(0.0f,0.0f,0.0f));
                 (*wi)=normalize(light_position - interaction.p);
                 if(pdf){
                     (*pdf) = 1;
                 }
+                if(tester){
+                    (*tester) = VisibilityTester(interaction,Interaction(light_position));
+                }
+                
                 return _radiance;
             }
     };

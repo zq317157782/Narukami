@@ -28,13 +28,24 @@ SOFTWARE.
 #include "core/spectrum.h"
 #include "core/interaction.h"
 NARUKAMI_BEGIN
+    // _p0 is the start point
+    // _p1 is the end point
+    class VisibilityTester{
+        private:
+            Interaction _p0,_p1;
+        public:
+            VisibilityTester() = default;
+            VisibilityTester(const Interaction& p0,const Interaction& p1):_p0(p0),_p1(p1){}
+            bool unoccluded(const Scene& scene) const;
+    };
+
     class Light{
         protected:
             const Transform _light_to_world;
             const Transform _world_to_light;
         public:
             Light(const Transform& light_to_world):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)){}
-            virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf) = 0;
+            virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) = 0;
 
     };
 NARUKAMI_END

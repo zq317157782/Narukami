@@ -46,6 +46,7 @@ narukami.h
 
 
 NARUKAMI_BEGIN
+class Scene;
 
 inline int count_trailing_zero(uint32_t v){
 #if defined(__GNUC__) || defined(__clang__)

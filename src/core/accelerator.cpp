@@ -93,11 +93,11 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
             auto mid = start+ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
-        }else if(num<=4*ACCELERATOR_TIRANGLE_NUM_PER_LEAF){
-            auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
-            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
-        }
+         }//else if(num<=4*ACCELERATOR_TIRANGLE_NUM_PER_LEAF){
+        //     auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
+        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+        //     init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+        // }
         else
         {
             //SAH
@@ -345,6 +345,67 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
     }
 
     return has_hit_event;
+}
+
+bool Accelerator::collide(const Ray &ray) const{
+    std::stack<std::pair<const QBVHNode*, float>> node_stack;
+    SoARay soa_ray(ray);
+    int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
+    node_stack.push({&_nodes[0], 0.0f});
+    float closest_hit_t = INFINITE;
+    while (!node_stack.empty())
+    {
+
+        if (node_stack.top().second > closest_hit_t)
+        {
+            node_stack.pop();
+            continue;
+        }
+
+        auto node = node_stack.top().first;
+        node_stack.pop();
+        float4 box_t;
+        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
+        
+        bool push_child[4] = {false, false, false, false};
+        uint32_t orders[4];
+        get_traversal_orders((*node),ray.d,orders);
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            uint32_t index = orders[i];
+            if (box_hits[index] && box_t[index] < closest_hit_t)
+            {
+                if (is_leaf(node->childrens[index]))
+                {
+                    auto offset = leaf_offset(node->childrens[index]);
+                    auto num = leaf_num(node->childrens[index]);
+                    for (size_t j = offset; j < offset + num; ++j)
+                    {
+                        auto is_hit = narukami::collide(soa_ray, _soa_primitive_infos[j].triangle);
+                        if (is_hit)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    push_child[index] = true;
+                }
+            }
+        }
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            uint32_t index = orders[i];
+            if (push_child[index])
+            {
+                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
+            }
+        }
+    }
+    return false;
 }
 
 NARUKAMI_END

@@ -616,6 +616,61 @@ inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_r
     return true;
 }
 
+inline bool collide(const SoARay &ray, const SoATriangle &triangle,bool4 mask = SSE_MASK_TRUE)
+{
+    auto O = ray.o;
+    auto D = ray.d;
+    auto V0 = triangle.v0;
+    auto E1 = triangle.e1;
+    auto E2 = triangle.e2;
+
+    auto T = O - V0;
+
+    auto P = cross(D, E2);
+    auto Q = cross(T, E1);
+
+    auto P_dot_E1 = dot(P, E1);
+
+    auto P_dot_T = dot(P, T);
+    auto Q_dot_D = dot(Q, D);
+
+    float4 zero = _mm_setzero_ps();
+    float4 one = float4(1.0f);
+
+    float4 inv_P_dot_E1 = one / float4(P_dot_E1);
+
+    float4 u = float4(P_dot_T) * float4(inv_P_dot_E1);
+    float4 v = float4(Q_dot_D) * float4(inv_P_dot_E1);
+
+    //check det
+    bool4 mask_det = (float4(P_dot_E1) >= float4(EPSION));
+    mask_det = mask_det | (float4(P_dot_E1) <= float4(-EPSION));
+
+    mask = mask & mask_det;
+
+    //check u/v
+    mask = mask & (u >= zero);
+    mask = mask & (v >= zero);
+    mask = mask & ((u + v) <= one);
+    if (EXPECT_TAKEN(none(mask)))
+    {
+        return false;
+    }
+    auto Q_dot_E2 = dot(Q, E2);
+    float4 t = float4(Q_dot_E2) * inv_P_dot_E1;
+    //check t
+    mask = mask & (t <= float4(ray.t_max));
+    mask = mask & (t >= zero);
+
+    if (EXPECT_TAKEN(none(mask)))
+    {
+        return false;
+    }
+    return true;
+}
+
+
+
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
 inline bool collide(const Point3f &o, const Vector3f &inv_d, float t_min, float t_max, const int isPositive[3], const Bounds3f &box)

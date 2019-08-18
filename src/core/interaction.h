@@ -33,6 +33,9 @@ public:
     Point3f p;
     Normal3f n;
     float hit_t;
+public:
+    Interaction() = default;
+    Interaction(const Point3f& p):p(p){}
 };
 
 FINLINE bool is_surface_interaction(const Interaction& interaction){
