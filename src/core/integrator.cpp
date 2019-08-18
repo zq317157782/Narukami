@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "core/integrator.h"
+#include "core/affine.h"
 NARUKAMI_BEGIN
 
 void Integrator::render(const Scene& scene){
@@ -39,9 +40,18 @@ void Integrator::render(const Scene& scene){
                     float w=_camera->generate_normalized_ray(camera_sample,&ray);
                     Interaction interaction;
                     if(scene.intersect(arena,ray,&interaction)){
-                        float t =clamp(interaction.hit_t,0,1);
-                        auto N = (interaction.n + 1.0f) * 0.5f;
-                        film->add_sample(camera_sample.pFilm,{N.x,N.y,N.z},w);
+                        
+                        Spectrum L(0.0f,0.0f,0.0f);
+
+                        for (auto &light : scene.lights)
+                        {
+                            Vector3f wi;
+                            float pdf;
+                            auto Li = light->sample_Li(interaction,sampler->get_2D(),&wi,&pdf);
+                            L = L + INV_PI * saturate(dot(interaction.n,wi)) * Li*rcp(pdf);
+                        }
+                        
+                        film->add_sample(camera_sample.pFilm,L,w);
                     }else{
                         film->add_sample(camera_sample.pFilm,{0,0,0},w);
                     }

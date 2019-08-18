@@ -22,32 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include "core/narukami.h"
-#include "core/geometry.h"
-#include "core/mesh.h"
-#include "core/accelerator.h"
-#include "core/primitive.h"
-#include "core/interaction.h"
-#include "core/light.h"
-#include <vector>
-NARUKAMI_BEGIN
-class Scene{
-    private:
-        Accelerator _accelerator;
-    public:
-        const std::vector<std::shared_ptr<Light>> lights;
-    public:
-        Scene(const std::vector<MeshTriangle>& triangles,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
-        Scene(const std::vector<MeshTriangle>& triangles){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
 
-        inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator.intersect(arena,ray,interaction);
-        }
-};
+#include "core/light.h"
+
+NARUKAMI_BEGIN
+    class PointLight:public Light{
+        private:
+            Spectrum _radiance;
+        public:
+            PointLight(const Transform& light_to_world,const Spectrum& L):Light(light_to_world),_radiance(L){}
+            Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf) override{
+                auto light_position = _light_to_world(Point3f(0.0f,0.0f,0.0f));
+                (*wi)=normalize(light_position - interaction.p);
+                if(pdf){
+                    (*pdf) = 1;
+                }
+                return _radiance;
+            }
+    };
 NARUKAMI_END

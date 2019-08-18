@@ -22,32 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include "core/narukami.h"
-#include "core/geometry.h"
-#include "core/mesh.h"
-#include "core/accelerator.h"
-#include "core/primitive.h"
-#include "core/interaction.h"
-#include "core/light.h"
-#include <vector>
-NARUKAMI_BEGIN
-class Scene{
-    private:
-        Accelerator _accelerator;
-    public:
-        const std::vector<std::shared_ptr<Light>> lights;
-    public:
-        Scene(const std::vector<MeshTriangle>& triangles,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
-        Scene(const std::vector<MeshTriangle>& triangles){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
 
-        inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator.intersect(arena,ray,interaction);
-        }
-};
+#include "core/narukami.h"
+#include "core/transform.h"
+#include "core/spectrum.h"
+#include "core/interaction.h"
+NARUKAMI_BEGIN
+    class Light{
+        protected:
+            Transform _light_to_world;
+            Transform _world_to_light;
+        public:
+            Light(const Transform& light_to_world):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)){}
+            virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf) = 0;
+
+    };
 NARUKAMI_END

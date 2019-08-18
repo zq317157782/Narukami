@@ -226,6 +226,10 @@ inline float clamp(const float x,const float x0,const float x1){
     return min(max(x,x0),x1);
 }
 
+inline float saturate(const float x){
+    return min(max(x,0.0f),1.0f);
+}
+
 //from pbrt
 inline uint32_t reverse_bits_u32(uint32_t x){ 
     x=(x<<16)|(x>>16);

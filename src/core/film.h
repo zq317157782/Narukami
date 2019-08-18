@@ -40,7 +40,7 @@ struct Pixel
    }
 };
 
-//use Mitchell Filter
+
 class Film{
     public:
         const Point2i resolution;

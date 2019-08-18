@@ -42,8 +42,10 @@ NARUKAMI_BEGIN
     inline bool operator==(const Spectrum& a,const Spectrum& b){ if((a.r==b.r)&&(a.g==b.g)&&(a.b==b.b)){ return true; } return false; }
     inline bool operator!=(const Spectrum& a,const Spectrum& b){ if((a.r!=b.r)||(a.g!=b.g)||(a.b!=b.b)){ return true; } return false; }
     
+    inline Spectrum operator+(const Spectrum& L1,const Spectrum& L2){ Spectrum L; L.r = L1.r+L2.r; L.g = L1.g+L2.g; L.b = L1.b+L2.b; return L; }
     inline Spectrum operator*(const Spectrum& L1,const Spectrum& L2){ Spectrum L; L.r = L1.r*L2.r; L.g = L1.g*L2.g; L.b = L1.b*L2.b; return L; }
     inline Spectrum operator*(const Spectrum& L1,const float f){assert(!isnan(f));Spectrum L; L.r = L1.r*f; L.g = L1.g*f; L.b = L1.b*f; return L; }
+    inline Spectrum operator*(const float f,const Spectrum& L1){return L1 * f;}
 
 
   

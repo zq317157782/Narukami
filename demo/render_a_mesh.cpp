@@ -11,6 +11,8 @@
 #include "core/integrator.h"
 #include "core/scene.h"
 #include "core/stat.h"
+#include "core/light.h"
+#include "lights/point.h"
 using namespace narukami;
 int main(){
     auto sampler = std::make_shared<Sampler>(64);
@@ -20,8 +22,15 @@ int main(){
     auto transform = translate(Vector3f(0.5f, 0.5f, 1.0f))*scale(0.2f,0.2f,0.2f);
     auto inv_transform = translate(Vector3f(-0.5, -0.5, -1))*scale(-0.25,-0.25,-0.25);
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
-    
-    Scene scene(triangles[0]);
+
+    auto light_transform = translate(Vector3f(0.5f, 0.5f, 0.0f));
+
+    auto point_light = std::make_shared<PointLight>(light_transform,Spectrum(1,1,1));
+    std::vector<std::shared_ptr<Light>> lights;
+    lights.push_back(point_light);
+    lights.push_back(point_light);
+    lights.push_back(point_light);
+    Scene scene(triangles[0],lights);
     Integrator integrator(camera,sampler);
     integrator.render(scene);
     report_thread_statistics();
