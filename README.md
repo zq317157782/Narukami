@@ -31,7 +31,7 @@ lightweight PBRT-style path tracer
  - [x] basic/SoA AABB structure(for QBVH) and intersect scheme
  - [x] basic spectrum structure
  - [x] basic triangle mesh structure 
-    - [ ] read obj model 
+    - [x] read obj model 
  - [ ] basic path tracing framework
  - [ ] basic image i/o 
     - [x] write PNG
@@ -57,7 +57,8 @@ lightweight PBRT-style path tracer
  - [ ] MBVH
      - [x] build binary BVH with SAH
      - [x] collapse into MBVH 
-     - [ ] precompute travel orders
+     - [x] precompute travel orders
+ - [ ] Light Source
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
