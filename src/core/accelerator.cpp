@@ -275,10 +275,10 @@ void Accelerator::get_traversal_orders(const QBVHNode& node,const Vector3f& dir,
 
 bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const
 {
-    std::stack<std::pair<QBVHNode, float>> node_stack;
+    std::stack<std::pair<const QBVHNode*, float>> node_stack;
     SoARay soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    node_stack.push({_nodes[0], 0});
+    node_stack.push({&_nodes[0], 0.0f});
     float closest_hit_t = INFINITE;
     bool has_hit_event = false;
     HitPrimitiveEvent hit_primitive_event;
@@ -294,21 +294,21 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
         auto node = node_stack.top().first;
         node_stack.pop();
         float4 box_t;
-        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node.bounds, &box_t);
+        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
         bool push_child[4] = {false, false, false, false};
         uint32_t orders[4];
-        get_traversal_orders(node,ray.d,orders);
+        get_traversal_orders((*node),ray.d,orders);
 
         for (size_t i = 0; i < 4; ++i)
         {
             uint32_t index = orders[i];
             if (box_hits[index] && box_t[index] < closest_hit_t)
             {
-                if (is_leaf(node.childrens[index]))
+                if (is_leaf(node->childrens[index]))
                 {
-                    auto offset = leaf_offset(node.childrens[index]);
-                    auto num = leaf_num(node.childrens[index]);
+                    auto offset = leaf_offset(node->childrens[index]);
+                    auto num = leaf_num(node->childrens[index]);
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         Point2f uv;
@@ -333,7 +333,7 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
             uint32_t index = orders[i];
             if (push_child[index])
             {
-                node_stack.push({_nodes[node.childrens[index]], box_t[index]});
+                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
             }
         }
     }
