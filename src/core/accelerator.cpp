@@ -341,7 +341,7 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
     if(has_hit_event&&interaction!=nullptr){
        interaction->hit_t = closest_hit_t;
        interaction->p = ray.o + ray.d*closest_hit_t;
-       interaction->n = get_normal(_soa_primitive_infos[ hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
+       interaction->n = get_normalized_normal(_soa_primitive_infos[ hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
     }
 
     return has_hit_event;

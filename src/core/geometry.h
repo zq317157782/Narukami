@@ -88,8 +88,11 @@ struct Triangle
     Vector3f e2;
 };
 
+inline Normal3f get_unnormalized_normal(const Triangle& tri){
+     return cross(tri.e1,tri.e2);
+}
 
-inline Normal3f get_normal(const Triangle& tri){
+inline Normal3f get_normalized_normal(const Triangle& tri){
     return normalize(cross(tri.e1,tri.e2));
 }
 

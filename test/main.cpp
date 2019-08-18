@@ -797,13 +797,13 @@ TEST(geometry,ray_intersect_triangle){
     EXPECT_EQ(a4,false);
 }
 
-TEST(geometry,get_normal){
+TEST(geometry,get_normalized_normal){
     Triangle triangle;
     triangle.v0 = Point3f(0,0,0);
     triangle.e1 = Vector3f(1,0,0);
     triangle.e2 = Vector3f(0,1,0);
     
-    auto N = get_normal(triangle);
+    auto N = get_normalized_normal(triangle);
     EXPECT_EQ(N,Normal3f(0,0,1));
 }
 
