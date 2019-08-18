@@ -33,8 +33,8 @@ NARUKAMI_BEGIN
         protected:
             std::shared_ptr<Film> film;
         public:
-            const Transform camera2world;
-            inline Camera(const Transform&  camera2world,std::shared_ptr<Film> film):camera2world(camera2world),film(std::move(film)){}
+            const Transform camera_to_world;
+            inline Camera(const Transform&  camera_to_world,std::shared_ptr<Film> film):camera_to_world(camera_to_world),film(std::move(film)){}
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
             inline std::shared_ptr<Film> get_film() const {return film;}
     };
@@ -42,15 +42,15 @@ NARUKAMI_BEGIN
 
     class ProjectiveCamera:public Camera{
          protected:
-            Transform camera2screen;
-            Transform screen2raster;
-            Transform raster2screen;
-            Transform raster2camera;
+            Transform _camera_to_screen;
+            Transform _screen_to_raster;
+            Transform _raster_to_screen;
+            Transform _raster_to_camera;
          public:
-            ProjectiveCamera(const Transform&  camera2world,const Transform&  camera2screen,const Bounds2f& screen_windows,std::shared_ptr<Film> film):Camera(camera2world,film),camera2screen(camera2screen){ 
-                screen2raster = scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f));
-                raster2screen = inverse(screen2raster);
-                raster2camera=inverse(camera2screen)/*screen2camera*/*raster2screen;
+            ProjectiveCamera(const Transform&  camera_to_world,const Transform&  _camera_to_screen,const Bounds2f& screen_windows,std::shared_ptr<Film> film):Camera(camera_to_world,film),_camera_to_screen(_camera_to_screen){ 
+                _screen_to_raster = scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f));
+                _raster_to_screen = inverse(_screen_to_raster);
+                _raster_to_camera=inverse(_camera_to_screen)/*screen2camera*/*_raster_to_screen;
             }
     };
 NARUKAMI_END

@@ -30,8 +30,8 @@ SOFTWARE.
 NARUKAMI_BEGIN
     class Light{
         protected:
-            Transform _light_to_world;
-            Transform _world_to_light;
+            const Transform _light_to_world;
+            const Transform _world_to_light;
         public:
             Light(const Transform& light_to_world):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)){}
             virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf) = 0;
