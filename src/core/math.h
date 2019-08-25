@@ -267,6 +267,11 @@ inline float saturate(const float x)
     return min(max(x, 0.0f), 1.0f);
 }
 
+inline float offset(const float x0,const float x1,const float x){
+    assert( (x1-x0)!=0 );
+    return (x-x0)/(x1-x0);
+}
+
 //from pbrt
 inline uint32_t reverse_bits_u32(uint32_t x)
 {

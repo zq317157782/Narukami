@@ -144,7 +144,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
             // auto mid_point = (centroid_bounds.max_point[dim] + centroid_bounds.min_point[dim]) / 2;
             // auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
             auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [=](const BVHPrimitiveInfo &pi) {
-                 auto bucket_index=static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM*offset(centroid_bounds,pi.centroid)[dim]);
+                 auto bucket_index=static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM*offset(centroid_bounds.min_point[dim],centroid_bounds.max_point[dim],pi.centroid[dim]));
                  bucket_index = min(bucket_index,ACCELERATOR_SAH_BUCKET_NUM-1);
                  return bucket_index <= min_cost_bucket_index; 
             });
