@@ -47,6 +47,8 @@ NARUKAMI_BEGIN
     inline Spectrum operator*(const Spectrum& L1,const float f){assert(!isnan(f));Spectrum L; L.r = L1.r*f; L.g = L1.g*f; L.b = L1.b*f; return L; }
     inline Spectrum operator*(const float f,const Spectrum& L1){return L1 * f;}
 
+    inline bool is_black(const Spectrum& L){return L.r==0&&L.g==0&&L.b==0;}
+
 
   
 NARUKAMI_END

@@ -13,9 +13,10 @@
 #include "core/stat.h"
 #include "core/light.h"
 #include "lights/point.h"
+#include "lights/rect.h"
 using namespace narukami;
 int main(){
-    auto sampler = std::make_shared<Sampler>(64);
+    auto sampler = std::make_shared<Sampler>(128);
     auto film = std::make_shared<Film>(Point2i(256,256),Bounds2f(Point2f(0,0),Point2f(1,1)));
     auto camera = std::make_shared<OrthographicCamera>(Transform(),Bounds2f{{0,0},{1,1}},film);
     
@@ -27,12 +28,15 @@ int main(){
     auto inv_transform2 = translate(Vector3f(1.0f,-0.5, -1))*scale(-0.2,-0.2,-0.2);
     auto triangles2=load_mesh_triangles_from_obj(&transform2,&inv_transform2,"bunny.obj",".");
 
+    //for(int i=0;i<100;++i)
     triangles[0].insert(triangles[0].end(),triangles2[0].begin(),triangles2[0].end());
+  
 
 
-    auto light_transform = translate(Vector3f(0.5f, 0.0f, 0.0f));
+    auto light_transform = translate(Vector3f(0.0f, 0.0f, 0.0f));
 
-    auto point_light = std::make_shared<PointLight>(light_transform,Spectrum(1,1,1));
+    //auto point_light = std::make_shared<PointLight>(light_transform,Spectrum(1,1,1));
+    auto point_light = std::make_shared<RectLight>(light_transform,Spectrum(1,1,1),1,2,2);
     std::vector<std::shared_ptr<Light>> lights;
     lights.push_back(point_light);
     Scene scene(triangles[0],lights);

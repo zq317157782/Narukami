@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "core/imageio.h"
+#include "core/math.h"
 #include "lodepng.h"
 
 NARUKAMI_BEGIN
@@ -41,6 +42,11 @@ void write_image_to_file(const char* file_name,const float* data,const int width
 			    rgb[0] = data[(y*width+x)*3];
 			    rgb[1] = data[(y*width+x)*3+1];
 			    rgb[2] = data[(y*width+x)*3+2];
+
+                //clamp to 0~1 for png
+                rgb[0] = clamp(rgb[0],0.0f,1.0f);
+                rgb[1] = clamp(rgb[1],0.0f,1.0f);
+                rgb[2] = clamp(rgb[2],0.0f,1.0f);
 
                 image.push_back(static_cast<uint8_t>(rgb[0] * 255));//R
 			    image.push_back(static_cast<uint8_t>(rgb[1] * 255));//G

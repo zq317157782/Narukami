@@ -22,20 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-
 #include "core/light.h"
+#include "core/monte.h"
 
+
+/*
+rect light local space
+x axis  = width
+y axis  = height
+z aixs  = front face
+*/
 NARUKAMI_BEGIN
-    class PointLight:public Light{
+    class RectLight:public Light{
         private:
             Spectrum _radiance;
+            float _width,_height;
+            float area() const{
+                return _width * _height;
+            }
         public:
-            PointLight(const Transform& light_to_world,const Spectrum& L):Light(light_to_world,1),_radiance(L){}
+            RectLight(const Transform& light_to_world,const Spectrum& L,const size_t sample_count=4,const float w = 1.0f,const float h = 1.0f):Light(light_to_world,sample_count),_radiance(L),_width(w),_height(h){}
+           
             Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) override{
-                auto light_position = _light_to_world(Point3f(0.0f,0.0f,0.0f));
-                (*wi)=normalize(light_position - interaction.p);
+                
+                Point3f local_position((u.x-0.5f)*_width,(u.y-0.5f)*_height,0);
+                auto light_position = _light_to_world(local_position);
+                auto unnormalized_wi = light_position - interaction.p;
+                auto distance_sqr = sqrlen(unnormalized_wi); 
+                (*wi)=normalize(unnormalized_wi);
+                
+                auto costheta = _world_to_light(*wi).z;
+                
                 if(pdf){
-                    (*pdf) = 1;
+                    (*pdf) = pdf_area_to_solid_angle(1.0f/area(),distance_sqr,abs(costheta));
                 }
                 if(tester){
                     (*tester) = VisibilityTester(interaction,Interaction(light_position));
@@ -44,4 +63,6 @@ NARUKAMI_BEGIN
                 return _radiance;
             }
     };
+
+
 NARUKAMI_END

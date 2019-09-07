@@ -26,42 +26,48 @@ SOFTWARE.
 #include "core/affine.h"
 NARUKAMI_BEGIN
 
-void Integrator::render(const Scene& scene){
-            MemoryArena arena;
-            auto film = _camera->get_film();
-            auto cropped_pixel_bounds=film->cropped_pixel_bounds();
-            for (auto &&pixel : cropped_pixel_bounds)
-            {
-                auto sampler = _sampler->clone(pixel.x+pixel.y*width(cropped_pixel_bounds));
-                sampler->start_pixel(pixel);
-                do{
-                    auto camera_sample=sampler->get_camera_sample(pixel);
-                    Ray ray;
-                    float w=_camera->generate_normalized_ray(camera_sample,&ray);
-                    Interaction interaction;
-                    if(scene.intersect(arena,ray,&interaction)){
-                        
-                        Spectrum L(0.0f,0.0f,0.0f);
+void Integrator::render(const Scene &scene)
+{
+    MemoryArena arena;
+    auto film = _camera->get_film();
+    auto cropped_pixel_bounds = film->cropped_pixel_bounds();
+    for (auto &&pixel : cropped_pixel_bounds)
+    {
+        auto sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));
+        sampler->start_pixel(pixel);
+        do
+        {
+            auto camera_sample = sampler->get_camera_sample(pixel);
+            Ray ray;
+            float w = _camera->generate_normalized_ray(camera_sample, &ray);
+            Interaction interaction;
 
-                        for (auto &light : scene.lights)
-                        {
-                            Vector3f wi;
-                            float pdf;
-                            VisibilityTester tester;
-                            auto Li = light->sample_Li(interaction,sampler->get_2D(),&wi,&pdf,&tester);
-                            if(tester.unoccluded(scene)){
-                                  L = L + INV_PI * saturate(dot(interaction.n,wi)) * Li*rcp(pdf);
-                            }
-                        }
-                        
-                        film->add_sample(camera_sample.pFilm,L,w);
-                    }else{
-                        film->add_sample(camera_sample.pFilm,{0,0,0},w);
+            if (scene.intersect(arena, ray, &interaction))
+            {
+
+                Spectrum L(0.0f, 0.0f, 0.0f);
+                for (auto &light : scene.lights)
+                {
+                    Vector3f wi;
+                    float pdf;
+                    VisibilityTester tester;
+                    sampler->get_2D();
+                    auto Li = light->sample_Li(interaction, sampler->get_2D(), &wi, &pdf, &tester);
+                    if (!is_black(Li) && pdf > 0 && tester.unoccluded(scene))
+                    {
+                        L = L + INV_PI * saturate(dot(interaction.n, wi)) * Li * rcp(pdf);
                     }
-                   
-                }while(sampler->start_next_sample());
-                
+                }
+
+                film->add_sample(camera_sample.pFilm, L, w);
             }
-        }
+            else
+            {
+                film->add_sample(camera_sample.pFilm, {0, 0, 0}, w);
+            }
+
+        } while (sampler->start_next_sample());
+    }
+}
 
 NARUKAMI_END

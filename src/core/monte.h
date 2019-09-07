@@ -22,33 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-
 #include "core/narukami.h"
-#include "core/transform.h"
-#include "core/spectrum.h"
-#include "core/interaction.h"
 NARUKAMI_BEGIN
-    // _p0 is the start point
-    // _p1 is the end point
-    class VisibilityTester{
-        private:
-            Interaction _p0,_p1;
-        public:
-            VisibilityTester() = default;
-            VisibilityTester(const Interaction& p0,const Interaction& p1):_p0(p0),_p1(p1){}
-            bool unoccluded(const Scene& scene) const;
-    };
 
-    class Light{
-        protected:
-            const Transform _light_to_world;
-            const Transform _world_to_light;
-
-            const size_t _sample_count;
-        public:
-            Light(const Transform& light_to_world,size_t sample_count):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)),_sample_count(sample_count){}
-            virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) = 0;
-
-            size_t get_sample_count() const {return _sample_count;}
-    };
+    // d_omega = costheta * d_area / distance^2
+    inline float pdf_area_to_solid_angle(float area_pdf,float distance_sqr,float costheta){
+        return area_pdf * distance_sqr / costheta;
+    }
 NARUKAMI_END
