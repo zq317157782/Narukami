@@ -33,15 +33,13 @@ y axis  = height
 z aixs  = front face
 */
 NARUKAMI_BEGIN
-    class RectLight:public Light{
+    class RectLight:public AreaLight{
         private:
             Spectrum _radiance;
             float _width,_height;
-            float area() const{
-                return _width * _height;
-            }
+            
         public:
-            RectLight(const Transform& light_to_world,const Spectrum& L,const size_t sample_count=4,const float w = 1.0f,const float h = 1.0f):Light(light_to_world,sample_count),_radiance(L),_width(w),_height(h){}
+            RectLight(const Transform& light_to_world,const Spectrum& L,const size_t sample_count=4,const float w = 1.0f,const float h = 1.0f):AreaLight(light_to_world,sample_count),_radiance(L),_width(w),_height(h){}
            
             Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) override{
                 
@@ -54,12 +52,19 @@ NARUKAMI_BEGIN
                 auto costheta = _world_to_light(*wi).z;
                 
                 if(pdf){
-                    (*pdf) = pdf_area_to_solid_angle(1.0f/area(),distance_sqr,abs(costheta));
+                    (*pdf) = to_solid_angle_measure_pdf(rcp(area()),distance_sqr,abs(costheta));
                 }
                 if(tester){
                     (*tester) = VisibilityTester(interaction,Interaction(light_position));
                 }
                 
+                return _radiance;
+            }
+
+            float area() const override{
+                return _width * _height;
+            }
+            Spectrum L(const Interaction& interaction,const Vector3f& wi) const override{
                 return _radiance;
             }
     };

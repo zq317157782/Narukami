@@ -44,22 +44,28 @@ void Integrator::render(const Scene &scene)
 
             if (scene.intersect(arena, ray, &interaction))
             {
-
-                Spectrum L(0.0f, 0.0f, 0.0f);
-                for (auto &light : scene.lights)
+                if (is_surface_interaction(interaction))
                 {
-                    Vector3f wi;
-                    float pdf;
-                    VisibilityTester tester;
-                    sampler->get_2D();
-                    auto Li = light->sample_Li(interaction, sampler->get_2D(), &wi, &pdf, &tester);
-                    if (!is_black(Li) && pdf > 0 && tester.unoccluded(scene))
-                    {
-                        L = L + INV_PI * saturate(dot(interaction.n, wi)) * Li * rcp(pdf);
-                    }
-                }
+                    SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
+                    Spectrum L(0.0f, 0.0f, 0.0f);
 
-                film->add_sample(camera_sample.pFilm, L, w);
+                    L = L + Le(surface_interaction,ray.d);
+
+                    for (auto &light : scene.lights)
+                    {
+                        Vector3f wi;
+                        float pdf;
+                        VisibilityTester tester;
+                        sampler->get_2D();
+                        auto Li = light->sample_Li(surface_interaction, sampler->get_2D(), &wi, &pdf, &tester);
+                        if (!is_black(Li) && pdf > 0 && tester.unoccluded(scene))
+                        {
+                            L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * Li * rcp(pdf);
+                        }
+                    }
+
+                    film->add_sample(camera_sample.pFilm, L, w);
+                }
             }
             else
             {
@@ -67,6 +73,7 @@ void Integrator::render(const Scene &scene)
             }
 
         } while (sampler->start_next_sample());
+        arena.reset();
     }
 }
 

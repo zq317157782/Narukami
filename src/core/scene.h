@@ -45,6 +45,9 @@ class Scene{
            std::vector<Primitive> primitives=create_primitives(triangles);
            _accelerator=Accelerator(primitives);
         }
+        Scene(const std::vector<Primitive>& primitives,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
+             _accelerator=Accelerator(primitives);
+        }
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
             return _accelerator.intersect(arena,ray,interaction);

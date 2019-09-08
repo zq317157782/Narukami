@@ -25,6 +25,8 @@ SOFTWARE.
 
 #include "core/narukami.h"
 #include "core/affine.h"
+#include "core/primitive.h"
+#include "core/spectrum.h"
 NARUKAMI_BEGIN
 
 //basic interaction
@@ -33,13 +35,21 @@ public:
     Point3f p;
     Normal3f n;
     float hit_t;
+    const Primitive * primitive;
 public:
     Interaction() = default;
     Interaction(const Point3f& p):p(p){}
+    Interaction(const Point3f& p,const Normal3f& n):p(p),n(n){}
 };
 
 FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;
 }
+
+class SurfaceInteraction:public Interaction{
+public:
+};
+
+Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi);
 
 NARUKAMI_END

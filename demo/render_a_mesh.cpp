@@ -39,7 +39,10 @@ int main(){
     auto point_light = std::make_shared<RectLight>(light_transform,Spectrum(1,1,1),1,2,2);
     std::vector<std::shared_ptr<Light>> lights;
     lights.push_back(point_light);
-    Scene scene(triangles[0],lights);
+    
+    auto primitives = create_primitives(triangles[0],point_light.get());
+    
+    Scene scene(primitives,lights);
     Integrator integrator(camera,sampler);
     integrator.render(scene);
     report_thread_statistics();

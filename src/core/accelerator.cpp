@@ -21,8 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "accelerator.h"
-
+#include "core/accelerator.h"
 NARUKAMI_BEGIN
 
 
@@ -338,10 +337,12 @@ bool Accelerator::intersect(MemoryArena &arena,const Ray &ray,Interaction* inter
         }
     }
 
-    if(has_hit_event&&interaction!=nullptr){
-       interaction->hit_t = closest_hit_t;
-       interaction->p = ray.o + ray.d*closest_hit_t;
-       interaction->n = get_normalized_normal(_soa_primitive_infos[ hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
+    if(has_hit_event){
+        interaction->p = ray.o + ray.d*closest_hit_t;
+        interaction->n = get_normalized_normal(_soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
+        auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset;
+        interaction->primitive = &_primitives[primitive_offset];
+        interaction->hit_t = closest_hit_t;
     }
 
     return has_hit_event;

@@ -29,178 +29,197 @@ SOFTWARE.
 #include "core/memory.h"
 #include <vector>
 NARUKAMI_BEGIN
-    struct CameraSample{
-        Point2f pFilm;
-        Point2f pLens;
-        float time;
-    };
+struct CameraSample
+{
+    Point2f pFilm;
+    Point2f pLens;
+    float time;
+};
 
-    class Sampler{
-        private:
-            uint32_t _current_sample_index;
-            uint32_t _spp;
-            const uint32_t _max_dim;
-            uint32_t _sample_1d_offset;
-            uint32_t _sample_2d_offset;
-            std::vector<uint32_t> _scramble_1d;
-            std::vector<uint32_t> _scramble_2d;
-            
-            std::vector<uint32_t> _scramble_1d_array;
-            std::vector<uint32_t> _sample_1d_array_index;
-            uint32_t _array_1d_offset;
+class Sampler
+{
+private:
+    uint32_t _current_sample_index;
+    uint32_t _spp;
+    const uint32_t _max_dim;
+    uint32_t _sample_1d_offset;
+    uint32_t _sample_2d_offset;
+    std::vector<uint32_t> _scramble_1d;
+    std::vector<uint32_t> _scramble_2d;
 
-            std::vector<uint32_t> _scramble_2d_array;
-            std::vector<uint32_t> _sample_2d_array_index;
-            uint32_t _array_2d_offset;
+    std::vector<uint32_t> _scramble_1d_array;
+    std::vector<uint32_t> _sample_1d_array_index;
+    uint32_t _array_1d_offset;
 
-            Point2i  _current_pixel;
-            uint32_t _1d_array_count=0;
-            uint32_t _2d_array_count=0;
-            
-            RNG _rng;
-        public:
-            Sampler(const uint32_t spp,const uint32_t max_dim=5):_spp(spp),_max_dim(max_dim){
-                _scramble_1d=std::vector<uint32_t>(_max_dim);
-                _scramble_2d=std::vector<uint32_t>(_max_dim*2);
-            }
+    std::vector<uint32_t> _scramble_2d_array;
+    std::vector<uint32_t> _sample_2d_array_index;
+    uint32_t _array_2d_offset;
 
-            void start_pixel(const Point2i& p){
-                _current_pixel=p;
-                _current_sample_index=0;
-                _sample_1d_offset = 0;
-                _sample_2d_offset = 0;
-                //generate all scramble number
-                for (size_t i = 0; i < _max_dim; i++)
-                {
-                   _scramble_1d[i]=_rng.next_uint32();
-                   _scramble_2d[i*2]=_rng.next_uint32();
-                   _scramble_2d[i*2+1]=_rng.next_uint32();
-                }
+    Point2i _current_pixel;
+    uint32_t _1d_array_count = 0;
+    uint32_t _2d_array_count = 0;
 
-                _array_1d_offset = 0;
-                for (size_t i = 0; i < _scramble_1d_array.size(); i++)
-                {
-                    _scramble_1d_array[i]=_rng.next_uint32();
-                    _sample_1d_array_index[i] = 0;
-                }
+    RNG _rng;
 
-                _array_2d_offset = 0;
-                for (size_t i = 0; i < _scramble_2d_array.size(); i++)
-                {
-                    _scramble_2d_array[i]=_rng.next_uint32();
-                }
-                for (size_t i = 0; i < _sample_2d_array_index.size(); i++)
-                {
-                   _sample_2d_array_index[i] = 0;
-                }
-                
-                
-            }
+public:
+    Sampler(const uint32_t spp, const uint32_t max_dim = 5) : _spp(spp), _max_dim(max_dim)
+    {
+        _scramble_1d = std::vector<uint32_t>(_max_dim);
+        _scramble_2d = std::vector<uint32_t>(_max_dim * 2);
+    }
 
-            bool start_next_sample(){
-                _current_sample_index++;
-                if (EXPECT_NOT_TAKEN(_current_sample_index>=_spp)){
-                    return false;
-                }
-                _sample_1d_offset = 0;
-                _sample_2d_offset = 0;
-                return true;
-            }
+    void start_pixel(const Point2i &p)
+    {
+        _current_pixel = p;
+        _current_sample_index = 0;
+        _sample_1d_offset = 0;
+        _sample_2d_offset = 0;
+        //generate all scramble number
+        for (size_t i = 0; i < _max_dim; i++)
+        {
+            _scramble_1d[i] = _rng.next_uint32();
+            _scramble_2d[i * 2] = _rng.next_uint32();
+            _scramble_2d[i * 2 + 1] = _rng.next_uint32();
+        }
 
+        _array_1d_offset = 0;
+        for (size_t i = 0; i < _scramble_1d_array.size(); i++)
+        {
+            _scramble_1d_array[i] = _rng.next_uint32();
+            _sample_1d_array_index[i] = 0;
+        }
 
-            Point2f get_2D(){
-                if(EXPECT_TAKEN(_sample_2d_offset<_max_dim)){
-                    auto sample= sample_scrambled_gray_code_sobol02(_current_sample_index,&_scramble_2d[_sample_2d_offset*2],&_scramble_2d[_sample_2d_offset*2+1]);
-                    _sample_2d_offset++;
-                    return sample;
-                }
-                else{
-                    auto sample= Point2f(_rng.next_float(),_rng.next_float());
-                    _sample_2d_offset++;
-                    return sample;
-                }
-                 
-            }
+        _array_2d_offset = 0;
+        for (size_t i = 0; i < _scramble_2d_array.size(); i++)
+        {
+            _scramble_2d_array[i] = _rng.next_uint32();
+        }
+        for (size_t i = 0; i < _sample_2d_array_index.size(); i++)
+        {
+            _sample_2d_array_index[i] = 0;
+        }
+    }
 
-            float get_1D(){
-                 if(EXPECT_TAKEN(_sample_1d_offset<_max_dim)){
-                     auto sample=sample_scrambled_gray_code_van_der_corput(_current_sample_index,&_scramble_1d[_sample_1d_offset]);
-                     _sample_1d_offset++;
-                     return sample;
-                 }
-                 else{
-                     _sample_1d_offset++;
-                     return _rng.next_float();
-                 }
-            }
+    bool start_next_sample()
+    {
+        _current_sample_index++;
+        if (EXPECT_NOT_TAKEN(_current_sample_index >= _spp))
+        {
+            return false;
+        }
+        _sample_1d_offset = 0;
+        _sample_2d_offset = 0;
+        return true;
+    }
 
-            CameraSample get_camera_sample(const Point2i& raster){
-                CameraSample cs;
-                cs.pFilm = get_2D()+ Point2f(raster);
-                cs.pLens = get_2D();
-                cs.time  = get_1D();
-                return cs;
-            }
+    Point2f get_2D()
+    {
+        if (EXPECT_TAKEN(_sample_2d_offset < _max_dim))
+        {
+            auto sample = sample_scrambled_gray_code_sobol02(_current_sample_index, &_scramble_2d[_sample_2d_offset * 2], &_scramble_2d[_sample_2d_offset * 2 + 1]);
+            _sample_2d_offset++;
+            return sample;
+        }
+        else
+        {
+            auto sample = Point2f(_rng.next_float(), _rng.next_float());
+            _sample_2d_offset++;
+            return sample;
+        }
+    }
 
-            inline void request_1d_array(const uint32_t request_count=1){
-                _1d_array_count+=request_count;
-            }
+    float get_1D()
+    {
+        if (EXPECT_TAKEN(_sample_1d_offset < _max_dim))
+        {
+            auto sample = sample_scrambled_gray_code_van_der_corput(_current_sample_index, &_scramble_1d[_sample_1d_offset]);
+            _sample_1d_offset++;
+            return sample;
+        }
+        else
+        {
+            _sample_1d_offset++;
+            return _rng.next_float();
+        }
+    }
 
-            inline void request_2d_array(const uint32_t request_count=1){
-                _2d_array_count+=request_count;
-            }
+    CameraSample get_camera_sample(const Point2i &raster)
+    {
+        CameraSample cs;
+        cs.pFilm = get_2D() + Point2f(raster);
+        cs.pLens = get_2D();
+        cs.time = get_1D();
+        return cs;
+    }
 
-            void commit(){
-                _scramble_1d_array = std::vector<uint32_t>(_1d_array_count);
-                _sample_1d_array_index = std::vector<uint32_t>(_1d_array_count);
+    inline void request_1d_array(const uint32_t request_count = 1)
+    {
+        _1d_array_count += request_count;
+    }
 
-                _scramble_2d_array = std::vector<uint32_t>(_2d_array_count*2);
-                _sample_2d_array_index = std::vector<uint32_t>(_2d_array_count);
-            } 
+    inline void request_2d_array(const uint32_t request_count = 1)
+    {
+        _2d_array_count += request_count;
+    }
 
-            std::vector<float> get_1D_array(const uint32_t num){
-                 std::vector<float> array;
-                 if (_array_1d_offset==_1d_array_count){
-                         return array;
-                 }
-               
-                for (size_t i = 0; i < num; i++)
-                {
-                    array.push_back(sample_scrambled_gray_code_van_der_corput(_sample_1d_array_index[_array_1d_offset]++,&_scramble_1d_array[_array_1d_offset]));
-                }
-                _array_1d_offset++;
-                return array;
-                //return true;
-            }
+    void commit()
+    {
+        _scramble_1d_array = std::vector<uint32_t>(_1d_array_count);
+        _sample_1d_array_index = std::vector<uint32_t>(_1d_array_count);
 
-            std::vector<Point2f> get_2D_array(const uint32_t num){
-                std::vector<Point2f> array;
-                if (_array_2d_offset==_2d_array_count){
-                         return array;
-                }
-                
-                for (size_t i = 0; i < num; i++)
-                {
-                    array.push_back(sample_scrambled_gray_code_sobol02(_sample_2d_array_index[_array_2d_offset]++,&_scramble_2d_array[2*_array_2d_offset],&_scramble_2d_array[2*_array_2d_offset+1]));
-                }
-                _array_2d_offset++;
-                return array;
-                //return true;
-            }
+        _scramble_2d_array = std::vector<uint32_t>(_2d_array_count * 2);
+        _sample_2d_array_index = std::vector<uint32_t>(_2d_array_count);
+    }
 
-            inline void set_sample_index(const uint32_t idx){
-                _current_sample_index=idx;
-            }
+    std::vector<float> get_1D_array(const uint32_t num)
+    {
+        std::vector<float> array;
+        if (_array_1d_offset == _1d_array_count)
+        {
+            return array;
+        }
 
-            inline uint32_t get_spp() const {
-                return _spp;
-            }
+        for (size_t i = 0; i < num; i++)
+        {
+            array.push_back(sample_scrambled_gray_code_van_der_corput(_sample_1d_array_index[_array_1d_offset]++, &_scramble_1d_array[_array_1d_offset]));
+        }
+        _array_1d_offset++;
+        return array;
+        //return true;
+    }
 
+    std::vector<Point2f> get_2D_array(const uint32_t num)
+    {
+        std::vector<Point2f> array;
+        if (_array_2d_offset == _2d_array_count)
+        {
+            return array;
+        }
 
-            std::unique_ptr<Sampler> clone(const uint64_t seed) const{
-                auto sampler = narukami::make_unique<Sampler>(*this);
-                sampler->_rng=RNG(seed);
-                return sampler;
-            }
-    };
+        for (size_t i = 0; i < num; i++)
+        {
+            array.push_back(sample_scrambled_gray_code_sobol02(_sample_2d_array_index[_array_2d_offset]++, &_scramble_2d_array[2 * _array_2d_offset], &_scramble_2d_array[2 * _array_2d_offset + 1]));
+        }
+        _array_2d_offset++;
+        return array;
+        //return true;
+    }
+
+    inline void set_sample_index(const uint32_t idx)
+    {
+        _current_sample_index = idx;
+    }
+
+    inline uint32_t get_spp() const
+    {
+        return _spp;
+    }
+
+    std::unique_ptr<Sampler> clone(const uint64_t seed) const
+    {
+        auto sampler = narukami::make_unique<Sampler>(*this);
+        sampler->_rng = RNG(seed);
+        return sampler;
+    }
+};
 NARUKAMI_END

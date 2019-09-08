@@ -26,10 +26,13 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/mesh.h"
 #include "core/geometry.h"
+#include "core/spectrum.h"
+
 NARUKAMI_BEGIN
     class Primitive{
         public:
         MeshTriangle triangle;
+        const AreaLight* area_light;
 
         Primitive() = default;
         Primitive(const Primitive&) = default;
@@ -37,14 +40,14 @@ NARUKAMI_BEGIN
         Primitive& operator=(const Primitive&) = default;
         Primitive& operator=(Primitive&&) = default;
         ~Primitive()=default;
-
-        Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)){}
-
-        Bounds3f get_world_bounds() const{return triangle.get_world_bounds();}
+        Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)),area_light(nullptr){}
+        Primitive(MeshTriangle _triangle,const AreaLight*area_light):triangle(std::move(_triangle)),area_light(area_light){}
     };
 
-    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);
+    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.triangle.get_world_bounds();}
+    //inline Spectrum Le(const Primitive& primitive){ ()}
 
+    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light = nullptr);
 
     struct SoAPrimitiveInfo{
         SoATriangle triangle;

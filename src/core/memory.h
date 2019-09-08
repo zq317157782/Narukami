@@ -109,7 +109,7 @@ struct SSEAllocator {
 // constexpr bool operator!= (const SSEAllocator<T>&, const SSEAllocator<U>&) noexcept{return false;}
 
 //memory arena from pbrt
-
+#define ARENA_ALLOC(arena, Type) new ((arena).alloc(sizeof(Type))) Type
 class MemoryArena{
 	private:
 		const size_t _block_size;
