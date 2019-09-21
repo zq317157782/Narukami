@@ -65,6 +65,12 @@ private:
 public:
     inline RNG(const uint64_t seed=DEFAULT_STATE){
         _s[0]=splitmix64(seed);
+        _s[1]=0;
+    }
+
+    inline void set_seed(const uint64_t seed){
+        _s[0]=splitmix64(seed);
+        _s[1]=0;
     }
 
     inline uint32_t next_uint32(){
@@ -76,6 +82,13 @@ public:
     inline float next_float(){
         //constant from pbrt
         return min(ONE_MINUS_EPSILON,next_uint32()* 2.3283064365386963e-10f);
+    }
+
+    inline void state(uint64_t* s0,uint64_t* s1){
+        assert(s0!=nullptr);
+        assert(s1!=nullptr);
+        (*s0) = _s[0];
+        (*s1) = _s[1];
     }
     
 };

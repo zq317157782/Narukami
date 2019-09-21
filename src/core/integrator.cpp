@@ -33,11 +33,11 @@ void Integrator::render(const Scene &scene)
     auto cropped_pixel_bounds = film->cropped_pixel_bounds();
     for (auto &&pixel : cropped_pixel_bounds)
     {
-        auto sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));
-        sampler->start_pixel(pixel);
+        auto clone_sampler = _sampler->clone(pixel.x+pixel.y*width(cropped_pixel_bounds));
+        clone_sampler->start_pixel(pixel);
         do
         {
-            auto camera_sample = sampler->get_camera_sample(pixel);
+            auto camera_sample = clone_sampler->get_camera_sample(pixel);
             Ray ray;
             float w = _camera->generate_normalized_ray(camera_sample, &ray);
             Interaction interaction;
@@ -56,8 +56,7 @@ void Integrator::render(const Scene &scene)
                         Vector3f wi;
                         float pdf;
                         VisibilityTester tester;
-                        sampler->get_2D();
-                        auto Li = light->sample_Li(surface_interaction, sampler->get_2D(), &wi, &pdf, &tester);
+                        auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
                         if (!is_black(Li) && pdf > 0 && tester.unoccluded(scene))
                         {
                             L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * Li * rcp(pdf);
@@ -72,7 +71,7 @@ void Integrator::render(const Scene &scene)
                 film->add_sample(camera_sample.pFilm, {0, 0, 0}, w);
             }
 
-        } while (sampler->start_next_sample());
+        } while (clone_sampler->start_next_sample());
         arena.reset();
     }
 }

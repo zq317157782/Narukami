@@ -60,6 +60,7 @@ private:
     uint32_t _2d_array_count = 0;
 
     RNG _rng;
+    uint64_t _rng_seed;
 
 public:
     Sampler(const uint32_t spp, const uint32_t max_dim = 5) : _spp(spp), _max_dim(max_dim)
@@ -68,18 +69,32 @@ public:
         _scramble_2d = std::vector<uint32_t>(_max_dim * 2);
     }
 
+    // Sampler(const Sampler& sampler):_spp(sampler._spp),_max_dim(sampler._max_dim){
+    //     _scramble_1d = std::vector<uint32_t>(sampler._max_dim);
+    //     _scramble_2d = std::vector<uint32_t>(sampler._max_dim * 2);
+
+    //      _scramble_1d_array = sampler._scramble_1d_array;
+    //     _sample_1d_array_index = sampler._sample_1d_array_index;
+
+    //     _scramble_2d_array = sampler._scramble_2d_array;
+    //     _sample_2d_array_index = sampler._sample_2d_array_index;
+    // }
+
     void start_pixel(const Point2i &p)
     {
         _current_pixel = p;
         _current_sample_index = 0;
         _sample_1d_offset = 0;
         _sample_2d_offset = 0;
+
+        _rng.set_seed(_rng_seed);
         //generate all scramble number
         for (size_t i = 0; i < _max_dim; i++)
         {
             _scramble_1d[i] = _rng.next_uint32();
             _scramble_2d[i * 2] = _rng.next_uint32();
             _scramble_2d[i * 2 + 1] = _rng.next_uint32();
+        
         }
 
         _array_1d_offset = 0;
@@ -218,7 +233,7 @@ public:
     std::unique_ptr<Sampler> clone(const uint64_t seed) const
     {
         auto sampler = narukami::make_unique<Sampler>(*this);
-        sampler->_rng = RNG(seed);
+        sampler->_rng_seed = seed;
         return sampler;
     }
 };

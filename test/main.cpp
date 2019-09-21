@@ -1119,6 +1119,13 @@ TEST(rng,next_float){
     EXPECT_LE(f,1.0f);
 }
 
+TEST(rng,seed){
+    RNG rng(1024);
+    RNG rng2(1024);
+    
+    EXPECT_EQ(rng.next_uint32(),rng2.next_uint32());
+}
+
 
 #include "core/lowdiscrepancy.h"
 TEST(lowdiscrepancy,radical_inverse){

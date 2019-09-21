@@ -40,7 +40,7 @@ int main(){
     std::vector<std::shared_ptr<Light>> lights;
     lights.push_back(point_light);
     
-    auto primitives = create_primitives(triangles[0],point_light.get());
+    auto primitives = create_primitives(triangles[0]);
     
     Scene scene(primitives,lights);
     Integrator integrator(camera,sampler);
