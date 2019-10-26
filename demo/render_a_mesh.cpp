@@ -16,15 +16,15 @@
 #include "lights/rect.h"
 using namespace narukami;
 int main(){
-    auto sampler = std::make_shared<Sampler>(128);
+    auto sampler = std::make_shared<Sampler>(32);
     auto film = std::make_shared<Film>(Point2i(256,256),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    auto camera = std::make_shared<OrthographicCamera>(Transform(),Bounds2f{{0,0},{1,1}},film);
+    auto camera = std::make_shared<OrthographicCamera>(Transform(),Bounds2f{{-1,-1},{1,1}},film);
     
-    auto transform = translate(Vector3f(0.5f, 0.5f, 1.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
+    auto transform = translate(Vector3f(0, 0, 1.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
     auto inv_transform = translate(Vector3f(-0.5, -0.5, -1))*scale(-0.2,-0.2,-0.2)*rotate(-90,Vector3f(0,1,0));
     auto triangles=load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj",".");
 
-    auto transform2 = translate(Vector3f(1.0f,0.5f, 1.0f))*scale(0.2f,0.2f,0.2f);
+    auto transform2 = translate(Vector3f(0.5f,0, 1.0f))*scale(0.2f,0.2f,0.2f);
     auto inv_transform2 = translate(Vector3f(1.0f,-0.5, -1))*scale(-0.2,-0.2,-0.2);
     auto triangles2=load_mesh_triangles_from_obj(&transform2,&inv_transform2,"bunny.obj",".");
 
@@ -33,14 +33,18 @@ int main(){
   
 
 
-    auto light_transform = translate(Vector3f(0.0f, 0.0f, 0.0f));
+    auto light_transform = translate(Vector3f(0.0f, 1.0f, 1.0f)) * rotate(135,Vector3f(1,0,0));
 
     //auto point_light = std::make_shared<PointLight>(light_transform,Spectrum(1,1,1));
-    auto point_light = std::make_shared<RectLight>(light_transform,Spectrum(1,1,1),1,2,2);
+    auto rect_light = std::make_shared<RectLight>(light_transform,Spectrum(1,1,1),1,1,1);
+    auto rectlight_triangles = load_mesh(*rect_light);
+    
     std::vector<std::shared_ptr<Light>> lights;
-    lights.push_back(point_light);
+    lights.push_back(rect_light);
     
     auto primitives = create_primitives(triangles[0]);
+    auto light_primitives = create_primitives(rectlight_triangles,rect_light.get());
+    primitives.insert(primitives.end(),light_primitives.begin(),light_primitives.end());
     
     Scene scene(primitives,lights);
     Integrator integrator(camera,sampler);
@@ -87,7 +91,7 @@ int main(){
             
     //      }
     // }
-    film->write_to_file("mesh_32ssp.png");
+    film->write_to_file("demo_mesh.png");
 
 }
 

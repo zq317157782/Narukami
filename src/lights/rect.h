@@ -67,7 +67,21 @@ NARUKAMI_BEGIN
             Spectrum L(const Interaction& interaction,const Vector3f& wi) const override{
                 return _radiance;
             }
+
+            friend std::vector<MeshTriangle> load_mesh(const RectLight& rectlight)
+            {
+                 std::vector<std::vector<MeshTriangle>>  triangles;
+                 float hw = rectlight._width*0.5f;
+                 float hh = rectlight._height*0.5f;
+                 std::vector<Point3f> vertices = {Point3f(-hw,hh,0),Point3f(-hw,-hh,0),Point3f(hw,-hh,0),Point3f(hw,hh,0)};
+                 std::vector<Normal3f> normals = {Normal3f(0,0,1),Normal3f(0,0,1),Normal3f(0,0,1),Normal3f(0,0,1)};
+                 std::vector<Point2f>  uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
+                 std::vector<uint32_t> indices = {0,1,2,0,2,3};
+
+                 return create_mesh_triangles(&rectlight._world_to_light,&rectlight._light_to_world,indices,vertices,normals,uvs);
+            }
     };
 
+  
 
 NARUKAMI_END

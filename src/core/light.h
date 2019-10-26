@@ -56,6 +56,8 @@ NARUKAMI_BEGIN
         public:
             AreaLight(const Transform& light_to_world,size_t sample_count):Light(light_to_world,sample_count){}
             virtual float area() const = 0; 
-            virtual Spectrum L(const Interaction& interaction,const Vector3f& wi) const = 0;
+            virtual Spectrum L(const Interaction& interaction,const Vector3f& wi) const = 0; 
     };
+
+    
 NARUKAMI_END
