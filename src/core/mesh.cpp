@@ -125,4 +125,13 @@ std::vector<MeshTriangle> create_mesh_triangles(const Transform *object2wrold, c
     return triangles;
 }
 
+std::vector<MeshTriangle> _union(std::vector<MeshTriangle>& a,std::vector<MeshTriangle>& b)
+{
+    std::vector<MeshTriangle> c;
+    c.insert(c.end(),a.begin(),a.end());
+    c.insert(c.end(),b.begin(),b.end());
+    return c;
+}
+
+
 NARUKAMI_END

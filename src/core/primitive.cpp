@@ -79,4 +79,12 @@ std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive>
     return soa_primitives;
 }
 
+std::vector<Primitive> _union(const std::vector<Primitive>& a,const std::vector<Primitive>& b)
+{
+    std::vector<Primitive> c;
+    c.insert(c.end(),a.begin(),a.end());
+    c.insert(c.end(),b.begin(),b.end());
+    return c;
+}
+
 NARUKAMI_END

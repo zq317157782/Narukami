@@ -51,7 +51,7 @@ inline bool operator==(const Vertex& v0,const Vertex& v1){
 
 //load mesh from obj file
 //use syoyo's tinyobjloader
-std::vector<std::vector<MeshTriangle>> load_mesh_triangles_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
+std::vector<std::vector<MeshTriangle>> load_mesh_triangles_list_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
    std::vector<std::vector<MeshTriangle>>  triangles;
     
     tinyobj::attrib_t attrib;
@@ -141,6 +141,27 @@ for (size_t s = 0; s < shapes.size(); s++) {
   triangles.push_back(create_mesh_triangles(object2wrold,world2object,indices,vertex_array,normal_array,uv_array));
 }
 
-    return triangles;
+   return triangles;
 }
+
+std::vector<MeshTriangle> load_mesh_triangles_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr)
+{
+    auto list = load_mesh_triangles_list_from_obj(object2wrold,world2object,obj_file_name,base_path);
+    std::vector<MeshTriangle> all_triangles;
+     for(size_t i=0;i<list.size();++i)
+     {
+         all_triangles.insert(all_triangles.end(),list[i].begin(),list[i].end());
+     }
+     return all_triangles;
+}
+
+//  std::vector<MeshTriangle> _union(std::vector<std::vector<MeshTriangle>>& triangles)
+//  {
+//      std::vector<MeshTriangle> all_triangles;
+//      for(int i=0;i<triangles.size();++i)
+//      {
+//          all_triangles.insert(all_triangles.end(),all_triangles.begin(),all_triangles.end());
+//      }
+//      return all_triangles;
+//  }
 NARUKAMI_END

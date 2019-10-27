@@ -78,6 +78,7 @@ NARUKAMI_BEGIN
 
     std::vector<MeshTriangle> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);
 
-
+    std::vector<MeshTriangle> _union(std::vector<MeshTriangle>& a,std::vector<MeshTriangle>& b);
+    
 NARUKAMI_END
 
