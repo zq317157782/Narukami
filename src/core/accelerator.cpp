@@ -166,9 +166,10 @@ void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
         STAT_INCREASE_COUNTER(SoAPrimitiveInfo_count, primitive_infos.size())
     }
+    //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
     {
-        build_soa_primitive_info(node->childrens[0]);
+        build_soa_primitive_info(node->childrens[0]); 
         build_soa_primitive_info(node->childrens[1]);
     }
 }
@@ -346,7 +347,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
     {
         interaction->p = ray.o + ray.d * closest_hit_t;
         interaction->n = get_normalized_normal(_soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
-        auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset;
+        auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset + hit_primitive_event.triangle_offset;
         interaction->primitive = &_primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;
     }
