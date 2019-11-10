@@ -36,10 +36,11 @@ NARUKAMI_BEGIN
     class RectLight:public AreaLight{
         private:
             Spectrum _radiance;
+            bool _two_side;
             float _width,_height;
             
         public:
-            RectLight(const Transform& light_to_world,const Spectrum& L,const size_t sample_count=4,const float w = 1.0f,const float h = 1.0f):AreaLight(light_to_world,sample_count),_radiance(L),_width(w),_height(h){}
+            RectLight(const Transform& light_to_world,const Spectrum& L,bool two_side,const float w,const float h,const size_t sample_count=4):AreaLight(light_to_world,sample_count),_radiance(L),_two_side(two_side),_width(w),_height(h){}
            
             Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) override{
                 
@@ -50,7 +51,10 @@ NARUKAMI_BEGIN
                 (*wi)=normalize(unnormalized_wi);
                 
                 auto costheta = _world_to_light(*wi).z;
-                
+                if(!_two_side&&costheta<0.0f)
+                {
+                    return Spectrum(0.0f,0.0f,0.0f);
+                }
                 if(pdf){
                     (*pdf) = to_solid_angle_measure_pdf(rcp(area()),distance_sqr,abs(costheta));
                 }
@@ -65,6 +69,10 @@ NARUKAMI_BEGIN
                 return _width * _height;
             }
             Spectrum L(const Interaction& interaction,const Vector3f& wi) const override{
+                if(!_two_side&&_world_to_light(wi).z >= 0)
+                {
+                    return Spectrum(0.0f,0.0f,0.0f);
+                }
                 return _radiance;
             }
 
