@@ -51,10 +51,11 @@ NARUKAMI_BEGIN
                 (*wi)=normalize(unnormalized_wi);
                 
                 auto costheta = _world_to_light(*wi).z;
-                if(!_two_side&&costheta<0.0f)
+                if(!_two_side&&costheta>=0.0f)
                 {
                     return Spectrum(0.0f,0.0f,0.0f);
                 }
+
                 if(pdf){
                     (*pdf) = to_solid_angle_measure_pdf(rcp(area()),distance_sqr,abs(costheta));
                 }
