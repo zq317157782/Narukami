@@ -78,7 +78,7 @@ NARUKAMI_BEGIN
                  std::vector<Point2f>  uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
                  std::vector<uint32_t> indices = {0,1,2,0,2,3};
 
-                 return create_mesh_triangles(&rectlight._world_to_light,&rectlight._light_to_world,indices,vertices,normals,uvs);
+                 return create_mesh_triangles(&rectlight._light_to_world,&rectlight._world_to_light,indices,vertices,normals,uvs);
             }
     };
 
