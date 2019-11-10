@@ -73,7 +73,7 @@ NARUKAMI_BEGIN
                  std::vector<std::vector<MeshTriangle>>  triangles;
                  float hw = rectlight._width*0.5f;
                  float hh = rectlight._height*0.5f;
-                 std::vector<Point3f> vertices = {Point3f(-hw,hh,0),Point3f(-hw,-hh,0),Point3f(hw,-hh,0),Point3f(hw,hh,0)};
+                 std::vector<Point3f> vertices = {Point3f(hw,hh,0),Point3f(hw,-hh,0),Point3f(-hw,-hh,0),Point3f(-hw,hh,0)};
                  std::vector<Normal3f> normals = {Normal3f(0,0,1),Normal3f(0,0,1),Normal3f(0,0,1),Normal3f(0,0,1)};
                  std::vector<Point2f>  uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
                  std::vector<uint32_t> indices = {0,1,2,0,2,3};
