@@ -59,6 +59,8 @@ lightweight PBRT-style path tracer
      - [x] collapse into MBVH 
      - [x] precompute travel orders
  - [ ] Light Source
+     - [x] point light
+     - [x] rect light
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
