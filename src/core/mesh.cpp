@@ -74,7 +74,7 @@ std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    size_t soa_count = (uint32_t)(count-1) / SSE_FLOAT_COUNT + 1;
+    size_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;
@@ -94,9 +94,9 @@ std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &
         }
         else
         {
-            v0_array.push_back(Point3f(0,0,0));
-            e1_array.push_back(Vector3f(0,0,0));
-            e2_array.push_back(Vector3f(0,0,0));
+            v0_array.push_back(Point3f(0, 0, 0));
+            e1_array.push_back(Vector3f(0, 0, 0));
+            e2_array.push_back(Vector3f(0, 0, 0));
         }
     }
     std::vector<SoATriangle> soa_triangles;
@@ -125,13 +125,25 @@ std::vector<MeshTriangle> create_mesh_triangles(const Transform *object2wrold, c
     return triangles;
 }
 
-std::vector<MeshTriangle> _union(std::vector<MeshTriangle>& a,std::vector<MeshTriangle>& b)
+std::vector<MeshTriangle> _union(std::vector<MeshTriangle> &a, std::vector<MeshTriangle> &b)
 {
     std::vector<MeshTriangle> c;
-    c.insert(c.end(),a.begin(),a.end());
-    c.insert(c.end(),b.begin(),b.end());
+    c.insert(c.end(), a.begin(), a.end());
+    c.insert(c.end(), b.begin(), b.end());
     return c;
 }
 
+std::vector<MeshTriangle> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
+{
+    std::vector<std::vector<MeshTriangle>> triangles;
+    float hw = width * 0.5f;
+    float hh = height * 0.5f;
+    std::vector<Point3f> vertices = {Point3f(hw, hh, 0), Point3f(hw, -hh, 0), Point3f(-hw, -hh, 0), Point3f(-hw, hh, 0)};
+    std::vector<Normal3f> normals = {Normal3f(0, 0, 1), Normal3f(0, 0, 1), Normal3f(0, 0, 1), Normal3f(0, 0, 1)};
+    std::vector<Point2f> uvs = {Point2f(0, 1), Point2f(0, 0), Point2f(1, 0), Point2f(1, 1)};
+    std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
+
+    return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+}
 
 NARUKAMI_END
