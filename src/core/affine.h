@@ -35,6 +35,9 @@ struct Vector3;
 template <typename T>
 struct Normal3;
 
+template <typename T>
+struct Point3;
+
 //---VECTOR3 BEGIN---
 template <typename T>
 struct Vector3
@@ -52,6 +55,7 @@ struct Vector3
     inline explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     inline Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c) { assert(!isnan(a)); assert(!isnan(b)); assert(!isnan(c)); }
     inline Vector3(const Normal3<T>& n):x(n.x), y(n.y), z(n.z){}
+    inline Vector3(const Point3<T>& n):x(n.x), y(n.y), z(n.z){}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     inline Vector3(const Vector3 &v1) { assert(!isnan(v1.x)); assert(!isnan(v1.y)); assert(!isnan(v1.z)); x = v1.x; y = v1.y; z = v1.z; }
@@ -1193,7 +1197,21 @@ inline Point3f operator*(const Matrix4x4& M,const Point3f& v){
     return Point3f(r.x,r.y,r.z);
 }
 
+inline Point3f mul(const Matrix4x4& M,const Point3f& v)
+{
+    return M * v;
+}
 
+//general
+inline Point3f mulh(const Matrix4x4& M,const Point3f& v)
+{
+    float4 r=M.col[0]*v.x;
+    r+=M.col[1]*v.y;
+    r+=M.col[2]*v.z;
+    r+=M.col[3]*1.0f;
+    float inv_w = 1.0f/r.w;
+    return Point3f(r.x*inv_w,r.y*inv_w,r.z*inv_w);
+}
 
 inline SSEVector3f operator*(const Matrix4x4& M,const SSEVector3f& v){
     float4 vx=swizzle<0,0,0,0>(v.xyzw);

@@ -61,6 +61,11 @@ struct SSE_ALIGNAS Transform
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
 };
 
+inline Point3f transform_h(const Transform &t,const Point3f &p)
+{
+    return mulh(t.mat,p);
+}
+
 inline Transform inverse(const Transform &transform)
 {
     return Transform(transform.inv_mat, transform.mat);
@@ -158,7 +163,7 @@ inline Transform rotate(const float theta, const Vector3f &axis)
 
 inline Transform rotate(const float theta, const float axis_x, const float axis_y, const float axis_z)
 {
-    return rotate(theta,Vector3f(axis_x,axis_y,axis_z));
+    return rotate(theta, Vector3f(axis_x, axis_y, axis_z));
 }
 
 inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f &up)
@@ -203,6 +208,19 @@ inline Transform orthographic(float near, float far)
     return scale(1.0f, 1.0f, 1.0f / (far - near)) * translate(Vector3f(0, 0, -near));
 }
 
+//fov (angle space)
+inline Transform perspective(float fov,float n, float f)
+{
+    Matrix4x4 m = {
+        1.0f, 0.0f, 0.0f, 0.0f,            //col0
+        0.0f, 1.0f, 0.0f, 0.0f,            //col1
+        0.0f, 0.0f, f / (f - n), 1.0f,     //col2
+        0.0f, 0.0f, -f * n / (f - n), 0.0f //col3
+    };
+
+    float inv_tan_fov = 1.0f/std::tan(deg2rad(fov/2));
+    return scale(inv_tan_fov,inv_tan_fov,1.0f) * Transform(m);
+}
 extern SSEAllocator<Transform> alloc_transform;
 
 NARUKAMI_END
