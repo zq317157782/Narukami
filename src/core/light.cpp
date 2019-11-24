@@ -29,7 +29,8 @@ NARUKAMI_BEGIN
 bool VisibilityTester::unoccluded(const Scene &scene) const
 {
     //TODO float percise
-    Ray ray(_p0.p+normalize(_p1.p - _p0.p)*(EPSION*3), _p1.p - _p0.p, 0.9999995f);
+    Ray ray(_p0.p, _p1.p - _p0.p, 0.99f);
+    ray = offset_ray(ray, _p0.n);
     return !scene.collide(ray);
 }
 

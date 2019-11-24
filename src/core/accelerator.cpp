@@ -351,7 +351,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         //"Realtime Ray Tracing Gems" chapter 6
         auto triangle = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset];
         interaction->p = barycentric_interpolate_position(triangle,uv);
-        interaction->n = get_normalized_normal(triangle);
+        interaction->n = flip_normal(get_normalized_normal(triangle),-ray.d);
         auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset + hit_primitive_event.triangle_offset;
         interaction->primitive = &_primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;

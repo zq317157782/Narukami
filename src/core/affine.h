@@ -591,6 +591,8 @@ typedef Normal3<float> Normal3f;
 typedef Normal3<int> Normal3i;
 
 template <typename T>
+inline Normal3<T> operator-(const Normal3<T> &v1) { Normal3<T> v; v.x = -v1.x; v.y = -v1.y; v.z = -v1.z; return v;}
+template <typename T>
 inline  std::ostream &operator<<(std::ostream &out, const Normal3<T> &v) { out << '(' << v.x << ',' << v.y << ',' << v.z << ')'; return out; }
 template <typename T>
 inline Normal3<T> operator+(const Normal3<T> &v1, const T &x) { Normal3<T> v; v.x = v1.x + x; v.y = v1.y + x; v.z = v1.z + x; return v; }
@@ -1278,6 +1280,9 @@ inline SoAVector3f operator-(const SoAPoint3f& p0, const SoAPoint3f& p1){
     auto zzzz=p0.zzzz - p1.zzzz;
     return SoAVector3f(xxxx,yyyy,zzzz);
 }
-
+inline Normal3f flip_normal(const Normal3f& n,const Vector3f& wo)
+{
+    return dot(n,wo) > 0 ? n : -n;
+}
 //---GENERAL END---
 NARUKAMI_END

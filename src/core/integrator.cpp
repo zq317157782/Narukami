@@ -37,6 +37,7 @@ void Integrator::render(const Scene &scene)
         clone_sampler->start_pixel(pixel);
         do
         {
+           // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
             auto camera_sample = clone_sampler->get_camera_sample(pixel);
             Ray ray;
             float w = _camera->generate_normalized_ray(camera_sample, &ray);
@@ -57,13 +58,15 @@ void Integrator::render(const Scene &scene)
                         float pdf;
                         VisibilityTester tester;
                         auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
-                        if (!is_black(Li) && pdf > 0 && tester.unoccluded(scene))
+                        if (pdf > 0 && !is_black(Li)  && tester.unoccluded(scene))
                         {
                             L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * Li * rcp(pdf);
                         }
                     }
 
                     film->add_sample(camera_sample.pFilm, L, w);
+                //    auto nn = surface_interaction.n * 0.5f + 0.5f;
+                //     film->add_sample(camera_sample.pFilm,Spectrum(nn.x,nn.y,nn.z), w);
                 }
             }
             else

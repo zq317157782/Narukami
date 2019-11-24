@@ -66,6 +66,24 @@ inline std::ostream &operator<<(std::ostream &out, const Ray &ray)
     return out;
 }
 
+// Normal points outward for rays exiting the surface, else is flipped
+// "Realtime Ray Tracing Gems" chapter 6
+inline Ray offset_ray(const Ray &ray, const Normal3f &n)
+{
+    constexpr float origin = 1.0f / 32.0f;
+    constexpr float int_scale = 256.0f;
+    constexpr float float_scale = 1.0f / 65536.0f;
+    Point3i of_i(static_cast<int>(int_scale * n.x), static_cast<int>(int_scale * n.y), static_cast<int>(int_scale * n.z));
+    Point3f p_i(cast_i2f(cast_f2i(ray.o.x) + ((ray.o.x < 0) ? -of_i.x : of_i.x)),
+                cast_i2f(cast_f2i(ray.o.y) + ((ray.o.y < 0) ? -of_i.y : of_i.y)),
+                cast_i2f(cast_f2i(ray.o.z) + ((ray.o.z < 0) ? -of_i.z : of_i.z)));
+    Point3f o_offseted(fabsf(ray.o.x) < origin ? ray.o.x + float_scale * n.x : p_i.x,
+                       fabsf(ray.o.y) < origin ? ray.o.y + float_scale * n.y : p_i.y,
+                       fabsf(ray.o.z) < origin ? ray.o.z + float_scale * n.z : p_i.z);
+    float epsion = length(o_offseted - ray.o);
+    return Ray(o_offseted,ray.d,max(0.0f,ray.t_max-epsion));
+}
+
 struct SSE_ALIGNAS SoARay
 {
     SoAPoint3f o;
@@ -100,7 +118,7 @@ inline Normal3f get_normalized_normal(const Triangle &tri)
 
 inline Point3f barycentric_interpolate_position(const Triangle &tri, const Point2f &uv)
 {
-    return tri.v0 + tri.e1*uv.x +  tri.e2*uv.y;
+    return tri.v0 + tri.e1 * uv.x + tri.e2 * uv.y;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
