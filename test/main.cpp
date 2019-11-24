@@ -1028,6 +1028,13 @@ TEST(transform,swap_handedness){
     EXPECT_TRUE(swap_handedness(transform));
 }
 
+TEST(transform,perspective){
+   auto persp = perspective(120,1,10);
+   Point3f a(0,0,10);
+   auto b = transform_h(persp,a);
+   EXPECT_EQ(b,Point3f(0,0,1));
+}
+
 
 #include "core/mesh.h"
 TEST(mesh,meshdata){
@@ -1177,32 +1184,32 @@ TEST(narukami,count_trailing_zero){
 
 
 #include "core/sampler.h"
-TEST(sampler,get_1d_array){
-    Sampler sampler(32);
-    sampler.request_1d_array(2);
-    sampler.commit();
-    sampler.start_pixel(Point2i(0,0));
-    auto array = sampler.get_1D_array(4);
-    EXPECT_TRUE(array.size()>0);
-    array = sampler.get_1D_array(4);
-    EXPECT_TRUE(array.size()>0);
-    array = sampler.get_1D_array(4);
-    EXPECT_FALSE(array.size()>0);
-}
+// TEST(sampler,get_1d_array){
+//     Sampler sampler(32);
+//     sampler.request_1d_array(2);
+//     sampler.commit();
+//     sampler.start_pixel(Point2i(0,0));
+//     auto array = sampler.get_1D_array(4);
+//     EXPECT_TRUE(array.size()>0);
+//     array = sampler.get_1D_array(4);
+//     EXPECT_TRUE(array.size()>0);
+//     array = sampler.get_1D_array(4);
+//     EXPECT_FALSE(array.size()>0);
+// }
 
 
-TEST(sampler,get_2d_array){
-    Sampler sampler(32);
-    sampler.request_2d_array(2);
-    sampler.commit();
-    sampler.start_pixel(Point2i(0,0));
-    auto array = sampler.get_2D_array(4);
-    EXPECT_TRUE(array.size()>0);
-    array = sampler.get_2D_array(4);
-    EXPECT_TRUE(array.size()>0);
-    array = sampler.get_2D_array(4);
-    EXPECT_FALSE(array.size()>0);
-}
+// TEST(sampler,get_2d_array){
+//     Sampler sampler(32);
+//     sampler.request_2d_array(2);
+//     sampler.commit();
+//     sampler.start_pixel(Point2i(0,0));
+//     auto array = sampler.get_2D_array(4);
+//     EXPECT_TRUE(array.size()>0);
+//     array = sampler.get_2D_array(4);
+//     EXPECT_TRUE(array.size()>0);
+//     array = sampler.get_2D_array(4);
+//     EXPECT_FALSE(array.size()>0);
+// }
 
 
 TEST(sampler,clone){

@@ -26,16 +26,17 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/camera.h"
 NARUKAMI_BEGIN
-    class OrthographicCamera:public ProjectiveCamera{
+    class PerspectiveCamera:public ProjectiveCamera{
         private:
 
         public:
-            inline OrthographicCamera(const Transform&  camera_to_world,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,orthographic(0.0f,1.0f),screen_windows,std::move(film)){}
+            inline PerspectiveCamera(const Transform&  camera_to_world,const Bounds2f& screen_windows, const float fov, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,perspective(fov,1e-2f,1000.0f),screen_windows,std::move(film)){}
             
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{
-                auto pCamera=transform_h(_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
-                Ray rayCamera(pCamera,Vector3f(0,0,1));
+                Point3f pFilm(sample.pFilm.x,sample.pFilm.y,0);
+                Point3f pCamera = transform_h(_raster_to_camera,pFilm);
+                Ray rayCamera(Point3f(0,0,0),normalize(Vector3f(pCamera)));
                 (*ray)=camera_to_world(rayCamera);
                 return 1.0f;
             }  
