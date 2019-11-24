@@ -88,12 +88,19 @@ struct Triangle
     Vector3f e2;
 };
 
-inline Normal3f get_unnormalized_normal(const Triangle& tri){
-     return cross(tri.e1,tri.e2);
+inline Normal3f get_unnormalized_normal(const Triangle &tri)
+{
+    return cross(tri.e1, tri.e2);
 }
 
-inline Normal3f get_normalized_normal(const Triangle& tri){
-    return normalize(cross(tri.e1,tri.e2));
+inline Normal3f get_normalized_normal(const Triangle &tri)
+{
+    return normalize(cross(tri.e1, tri.e2));
+}
+
+inline Point3f barycentric_interpolate_position(const Triangle &tri, const Point2f &uv)
+{
+    return tri.v0 + tri.e1*uv.x +  tri.e2*uv.y;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
@@ -109,17 +116,16 @@ struct SSE_ALIGNAS SoATriangle
     SoAVector3f e1;
     SoAVector3f e2;
 
-    Triangle operator[](const uint32_t idx) const {
-        assert(idx>=0&&idx<SSE_FLOAT_COUNT);
+    Triangle operator[](const uint32_t idx) const
+    {
+        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
         Triangle triangle;
-        triangle.v0 =  v0[idx];
-        triangle.e1 =  e1[idx];
-        triangle.e2 =  e2[idx];
+        triangle.v0 = v0[idx];
+        triangle.e1 = e1[idx];
+        triangle.e2 = e2[idx];
         return triangle;
     }
 };
-
-
 
 inline std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle)
 {
@@ -338,9 +344,10 @@ inline int max_extent(const Bounds3<T> &b0)
     }
 }
 
-template<typename T>
-inline Vector3f offset(const Bounds3<T> &b0,const Point3<T>& p0){
-    return static_cast<Vector3f>(p0-b0.min_point)/static_cast<Vector3f>(b0.max_point-b0.min_point);
+template <typename T>
+inline Vector3f offset(const Bounds3<T> &b0, const Point3<T> &p0)
+{
+    return static_cast<Vector3f>(p0 - b0.min_point) / static_cast<Vector3f>(b0.max_point - b0.min_point);
 }
 
 template <typename T>
@@ -350,7 +357,7 @@ inline T surface_area(const Bounds3<T> &bounds)
     T h = bounds.max_point.y - bounds.min_point.y;
     T d = bounds.max_point.z - bounds.min_point.z;
 
-    return (w * h + w * d + d * h)*2;
+    return (w * h + w * d + d * h) * 2;
 }
 
 struct SSE_ALIGNAS SoABounds3f
@@ -453,7 +460,7 @@ FINLINE int check(const bool4 &mask, const float4 &t_results, const float4 &u_re
     {
         if ((x & 0x1) && min_t > t_results[i])
         {
-            min_t =  t_results[i];
+            min_t = t_results[i];
             idx = i;
         }
     }
@@ -464,7 +471,7 @@ FINLINE int check(const bool4 &mask, const float4 &t_results, const float4 &u_re
         uv->x = u_results[idx];
         uv->y = v_results[idx];
     }
-    
+
     return idx;
 }
 
@@ -616,7 +623,7 @@ inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_r
     return true;
 }
 
-inline bool collide(const SoARay &ray, const SoATriangle &triangle,bool4 mask = SSE_MASK_TRUE)
+inline bool collide(const SoARay &ray, const SoATriangle &triangle, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -668,8 +675,6 @@ inline bool collide(const SoARay &ray, const SoATriangle &triangle,bool4 mask = 
     }
     return true;
 }
-
-
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box

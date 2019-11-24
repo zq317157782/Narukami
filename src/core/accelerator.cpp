@@ -286,6 +286,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
     node_stack.push({&_nodes[0], 0.0f});
     float closest_hit_t = INFINITE;
     bool has_hit_event = false;
+    Point2f uv;
     HitPrimitiveEvent hit_primitive_event;
     while (!node_stack.empty())
     {
@@ -316,7 +317,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
                     auto num = leaf_num(node->childrens[index]);
                     for (size_t j = offset; j < offset + num; ++j)
                     {
-                        Point2f uv;
+                        
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &hit_primitive_event.triangle_offset);
                         if (is_hit)
                         {
@@ -345,8 +346,12 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
 
     if (has_hit_event)
     {
-        interaction->p = ray.o + ray.d * closest_hit_t;
-        interaction->n = get_normalized_normal(_soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset]);
+        //terrible finite precision of float.
+        //interaction->p = ray.o + ray.d * closest_hit_t;
+        //"Realtime Ray Tracing Gems" chapter 6
+        auto triangle = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset];
+        interaction->p = barycentric_interpolate_position(triangle,uv);
+        interaction->n = get_normalized_normal(triangle);
         auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset + hit_primitive_event.triangle_offset;
         interaction->primitive = &_primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;
