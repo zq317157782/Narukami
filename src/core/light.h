@@ -28,36 +28,42 @@ SOFTWARE.
 #include "core/spectrum.h"
 #include "core/interaction.h"
 NARUKAMI_BEGIN
-    // _p0 is the start point
-    // _p1 is the end point
-    class VisibilityTester{
-        private:
-            Interaction _p0,_p1;
-        public:
-            VisibilityTester() = default;
-            VisibilityTester(const Interaction& p0,const Interaction& p1):_p0(p0),_p1(p1){}
-            bool unoccluded(const Scene& scene) const;
-    };
+// _p0 is the start point
+// _p1 is the end point
+class VisibilityTester
+{
+private:
+    Interaction _p0, _p1;
 
-    class Light{
-        protected:
-            const Transform _light_to_world;
-            const Transform _world_to_light;
+public:
+    VisibilityTester() = default;
+    VisibilityTester(const Interaction &p0, const Interaction &p1) : _p0(p0), _p1(p1) {}
+    bool unoccluded(const Scene &scene) const;
+};
 
-            const size_t _sample_count;
-        public:
-            Light(const Transform& light_to_world,size_t sample_count):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)),_sample_count(sample_count){}
-            virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) = 0;
-            virtual Spectrum power() const = 0;
-            size_t get_sample_count() const {return _sample_count;}
-    };
+class Light
+{
+protected:
+    const Transform _light_to_world;
+    const Transform _world_to_light;
 
-    class AreaLight:public Light{
-        public:
-            AreaLight(const Transform& light_to_world,size_t sample_count):Light(light_to_world,sample_count){}
-            virtual float area() const = 0; 
-            virtual Spectrum L(const Interaction& interaction,const Vector3f& wi) const = 0; 
-    };
+    const size_t _sample_count;
 
-    
+public:
+    Light(const Transform &light_to_world, size_t sample_count) : _light_to_world(light_to_world), _world_to_light(inverse(light_to_world)), _sample_count(sample_count) {}
+    virtual Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
+    virtual Spectrum power() const = 0;
+    size_t get_sample_count() const { return _sample_count; }
+};
+
+class AreaLight : public Light
+{
+protected:
+    float _area;
+public:
+    AreaLight(const Transform &light_to_world, size_t sample_count) : Light(light_to_world, sample_count) {}
+    float area() const { return _area; }
+    virtual Spectrum L(const Interaction &interaction, const Vector3f &wi) const = 0;
+};
+
 NARUKAMI_END
