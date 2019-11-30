@@ -50,8 +50,8 @@ NARUKAMI_BEGIN
                 auto distance_sqr = sqrlen(unnormalized_wi); 
                 (*wi)=normalize(unnormalized_wi);
                 
-                auto costheta = _world_to_light(*wi).z;
-                if(!_two_side&&costheta>=0.0f)
+                auto costheta = _world_to_light(-(*wi)).z;
+                if(!_two_side&&costheta<=0.0f)
                 {
                     return Spectrum(0.0f,0.0f,0.0f);
                 }
