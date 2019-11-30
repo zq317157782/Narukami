@@ -189,11 +189,6 @@ struct BucketInfo{
 };
 
 
-struct HitPrimitiveEvent{
-    int soa_primitive_info_offset;
-    int triangle_offset;
-};
-
 STAT_COUNTER("count of SoAPrimitiveInfo",SoAPrimitiveInfo_count)
 STAT_COUNTER("count of SoAPrimitiveInfo without four triangle",SoAPrimitiveInfo_notfull_count)
 STAT_MEMORY_COUNTER("memory cost for Primitive array",Primitive_memory_cost)

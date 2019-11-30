@@ -287,7 +287,8 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
     float closest_hit_t = INFINITE;
     bool has_hit_event = false;
     Point2f uv;
-    HitPrimitiveEvent hit_primitive_event;
+    int triangle_offset;
+    int soa_primitive_info_offset;
     while (!node_stack.empty())
     {
 
@@ -318,12 +319,12 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
                     for (size_t j = offset; j < offset + num; ++j)
                     {
                         
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &hit_primitive_event.triangle_offset);
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &triangle_offset);
                         if (is_hit)
                         {
                             soa_ray.t_max = float4(closest_hit_t);
                             has_hit_event = true;
-                            hit_primitive_event.soa_primitive_info_offset = j;
+                            soa_primitive_info_offset = j;
                         }
                     }
                 }
@@ -349,10 +350,10 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         //terrible finite precision of float.
         //interaction->p = ray.o + ray.d * closest_hit_t;
         //"Realtime Ray Tracing Gems" chapter 6
-        auto triangle = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].triangle[hit_primitive_event.triangle_offset];
+        auto triangle = _soa_primitive_infos[soa_primitive_info_offset].triangle[triangle_offset];
         interaction->p = barycentric_interpolate_position(triangle,uv);
         interaction->n = flip_normal(get_normalized_normal(triangle),-ray.d);
-        auto primitive_offset = _soa_primitive_infos[hit_primitive_event.soa_primitive_info_offset].offset + hit_primitive_event.triangle_offset;
+        auto primitive_offset = _soa_primitive_infos[soa_primitive_info_offset].offset + triangle_offset;
         interaction->primitive = &_primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;
     }
