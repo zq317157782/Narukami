@@ -28,9 +28,9 @@ SOFTWARE.
 NARUKAMI_BEGIN
     class PointLight:public Light{
         private:
-            Spectrum _radiance;
+            Spectrum _I;//radiant intensity
         public:
-            PointLight(const Transform& light_to_world,const Spectrum& L):Light(light_to_world,1),_radiance(L){}
+            PointLight(const Transform& light_to_world,const Spectrum& L):Light(light_to_world,1),_I(L){}
             Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) override{
                 auto light_position = _light_to_world(Point3f(0.0f,0.0f,0.0f));
                 (*wi)=normalize(light_position - interaction.p);
@@ -41,7 +41,7 @@ NARUKAMI_BEGIN
                     (*tester) = VisibilityTester(interaction,Interaction(light_position));
                 }
                 
-                return _radiance;
+                return _I/sqrlen(interaction.p-light_position);
             }
     };
 NARUKAMI_END
