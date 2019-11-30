@@ -48,7 +48,7 @@ NARUKAMI_BEGIN
         public:
             Light(const Transform& light_to_world,size_t sample_count):_light_to_world(light_to_world),_world_to_light(inverse(light_to_world)),_sample_count(sample_count){}
             virtual Spectrum sample_Li(const Interaction& interaction,const Point2f& u,Vector3f* wi,float * pdf,VisibilityTester* tester) = 0;
-
+            virtual Spectrum power() const = 0;
             size_t get_sample_count() const {return _sample_count;}
     };
 
