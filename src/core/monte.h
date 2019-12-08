@@ -25,12 +25,25 @@ SOFTWARE.
 #include "core/narukami.h"
 NARUKAMI_BEGIN
 
-    // d_omega = costheta * d_area / distance^2
-    inline float to_solid_angle_measure_pdf(const float area_pdf,const float distance_sqr,const float costheta){
-        return area_pdf * distance_sqr * rcp(costheta);
-    }
+// d_omega = costheta * d_area / distance^2
+inline float to_solid_angle_measure_pdf(const float area_pdf, const float distance_sqr, const float costheta)
+{
+    return area_pdf * distance_sqr * rcp(costheta);
+}
 
-    inline float to_area_measure_pdf(const float solid_angle_pdf,const float distance_sqr,const float costheta){
-        return solid_angle_pdf * costheta * rcp(distance_sqr);
-    }
+inline float to_area_measure_pdf(const float solid_angle_pdf, const float distance_sqr, const float costheta)
+{
+    return solid_angle_pdf * costheta * rcp(distance_sqr);
+}
+
+//p(x,y) is a constant 1\PI.
+//p(radius,theta) is p(x,y) mul radius  => (radius\PI).
+//p(radius) is 2*radius.
+//p(theta|radius) is p(radius,theta)/p(radius)  => (1/2PI)
+inline Point2f uniform_sample_disk(const Point2f &u)
+{
+    float radius = sqrt(u.x);
+    float theta = 2.0f * PI * u.y;
+    return Point2f(radius * cos(theta), radius * sin(theta));
+}
 NARUKAMI_END
