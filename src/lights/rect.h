@@ -82,9 +82,9 @@ public:
 
     Spectrum power() const override
     {
-        Spectrum flux = area() * PI * _radiance;
-        flux=_two_side?flux*2.0f:flux;
-        return flux;
+        Spectrum power = area() * PI * _radiance;
+        power=_two_side?power*2.0f:power;
+        return power;
     }
 
     friend std::vector<MeshTriangle> load_mesh(const RectLight &rectlight)
