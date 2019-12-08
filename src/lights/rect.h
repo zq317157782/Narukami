@@ -47,8 +47,8 @@ public:
     Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
 
-        Point3f local_position((u.x - 0.5f) * _width, (u.y - 0.5f) * _height, 0);
-        auto light_position = _light_to_world(local_position);
+        Point3f local_light_position((u.x - 0.5f) * _width, (u.y - 0.5f) * _height, 0);
+        auto light_position = _light_to_world(local_light_position);
         auto unnormalized_wi = light_position - interaction.p;
         auto distance_sqr = sqrlen(unnormalized_wi);
         (*wi) = normalize(unnormalized_wi);
