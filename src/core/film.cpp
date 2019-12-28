@@ -75,7 +75,27 @@ void Film::write_to_file(const char *file_name) const
     write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
 }
 
-void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
+void Film::write_visual_normal_to_file(const char* file_name) const
+{
+    std::vector<float> data;
+    for (int y = _cropped_pixel_bounds[0].y; y < _cropped_pixel_bounds[1].y; ++y)
+    {
+        for (int x = _cropped_pixel_bounds[0].x; x < _cropped_pixel_bounds[1].x; ++x)
+        {
+            const Pixel &pixel = get_pixel(Point2i(x, y));
+            float inv_w = rcp(pixel.weight);
+            if(EXPECT_NOT_TAKEN(pixel.weight==0.0f)){
+                inv_w=1.0f;
+            }
+            data.push_back((pixel.normal[0] *0.5f + 0.5f) * inv_w);
+            data.push_back((pixel.normal[1] *0.5f + 0.5f) * inv_w);
+            data.push_back((pixel.normal[2] *0.5f + 0.5f) * inv_w);
+        }
+    }
+    write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
+}
+
+void Film::add_sample(const Point2f &pos, const Spectrum &l,const Normal3f& n,const float weight) const
 {
 
     //calculate bounds
@@ -92,9 +112,16 @@ void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight)
             int idx_y=min((int)floor(abs(y-dp.y)*_inv_filter_radius*FILTER_LUT_WIDTH),FILTER_LUT_WIDTH-1);
             float filter_weight = _filter_lut[idx_y]*filter_weight_x;
             Pixel &pixel = get_pixel( Point2i(x,y));
-            pixel.rgb[0] += l.r * weight*filter_weight;
-            pixel.rgb[1] += l.g * weight*filter_weight;
-            pixel.rgb[2] += l.b * weight*filter_weight;
+            {
+                pixel.rgb[0] += l.r * weight*filter_weight;
+                pixel.rgb[1] += l.g * weight*filter_weight;
+                pixel.rgb[2] += l.b * weight*filter_weight;
+            }
+            {
+                pixel.normal[0] += n.x * weight*filter_weight;
+                pixel.normal[1] += n.y * weight*filter_weight;
+                pixel.normal[2] += n.z * weight*filter_weight;
+            }
             pixel.weight += filter_weight;
         }
     }

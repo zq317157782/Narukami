@@ -26,17 +26,19 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/spectrum.h"
 #include "core/geometry.h"
+#include "core/affine.h"
 NARUKAMI_BEGIN
 
-//16bytes
 struct Pixel
 {
    Spectrum rgb;
+   Normal3f normal;
    float weight;
 
    Pixel(){
        rgb=Spectrum();
        weight=0.0f;
+       normal = Normal3f();
    }
 };
 
@@ -68,7 +70,8 @@ class Film{
             return Bounds2i(Bounds2f(min_point,max_point));
         }
         void write_to_file(const char* file_name) const;
-        void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
+        void write_visual_normal_to_file(const char* file_name) const;
+        void add_sample(const Point2f& pos,const Spectrum& l,const Normal3f& n,const float weight) const;
 
         friend inline  std::ostream &operator<<(std::ostream &out, const Film &film) {
             out<<"[resolution:"<<film.resolution<<" cropped pixel bounds:"<<film._cropped_pixel_bounds<<"]";

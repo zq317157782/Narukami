@@ -23,7 +23,7 @@ int main(){
                 Ray ray;
                 camera.generate_normalized_ray(cameraSample,&ray);
                 if(collide(ray.o,Vector3f(1.0f/ray.d.x,1.0f/ray.d.y,1.0f/ray.d.z),0,1,isPositive,bound2)){
-                    film->add_sample(cameraSample.pFilm,Spectrum(1,1,1),1);
+                    film->add_sample(cameraSample.pFilm,Spectrum(1,1,1),Normal3f(0,0,0),1);
                 }
              }while(sampler.start_next_sample());
             

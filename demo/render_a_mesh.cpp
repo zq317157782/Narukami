@@ -76,6 +76,7 @@ int main(){
 
     
     film->write_to_file("demo_mesh.png");
+    film->write_visual_normal_to_file("demo_mesh_normal.png");
 
 }
 

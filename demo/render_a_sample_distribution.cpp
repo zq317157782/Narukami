@@ -23,7 +23,7 @@ int main(){
          clone_sampler->start_pixel(Point2i(0,0));
          do{
                auto sample_0 = clone_sampler->get_2D();
-               film->add_sample(sample_0*512.0f,Spectrum(1,1,1),1);
+               film->add_sample(sample_0*512.0f,Spectrum(1,1,1),Normal3f(0,0,0),1);
          }while(clone_sampler->start_next_sample());
          film->write_to_file(names[i]);
     }

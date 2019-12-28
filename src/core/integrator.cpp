@@ -64,14 +64,12 @@ void Integrator::render(const Scene &scene)
                         }
                     }
 
-                    film->add_sample(camera_sample.pFilm, L, w);
-                //    auto nn = surface_interaction.n * 0.5f + 0.5f;
-                //     film->add_sample(camera_sample.pFilm,Spectrum(nn.x,nn.y,nn.z), w);
+                    film->add_sample(camera_sample.pFilm, L,interaction.n,w);
                 }
             }
             else
             {
-                film->add_sample(camera_sample.pFilm, {0, 0, 0}, w);
+                film->add_sample(camera_sample.pFilm,{0, 0, 0},{0, 0, 0}, w);
             }
 
         } while (clone_sampler->start_next_sample());
