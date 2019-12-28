@@ -61,6 +61,7 @@ lightweight PBRT-style path tracer
  - [ ] Light Source
      - [x] point light
      - [x] rect light
+     - [x] disk light
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
