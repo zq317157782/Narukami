@@ -19,10 +19,10 @@
 using namespace narukami;
 int main(){
 
-    auto sampler = std::make_shared<Sampler>(1);
+    auto sampler = std::make_shared<Sampler>(128);
     auto film = std::make_shared<Film>(Point2i(1920,1080),Bounds2f(Point2f(0,0),Point2f(1,1)));
     float aspect = 16.0f/9.0f;
-    auto camera = std::make_shared<PerspectiveCamera>(Transform(),Bounds2f{{-2*aspect,-2},{2*aspect,2}},60,film);
+    auto camera = std::make_shared<PerspectiveCamera>(Transform(),Bounds2f{{-2*aspect,-2},{2*aspect,2}},45,film);
     
     // //create mesh
     auto transform = translate(Vector3f(0, 0, 1.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
@@ -52,7 +52,7 @@ int main(){
     // auto point_light = std::make_shared<PointLight>(light_transform2,Spectrum(10,10,10));
     // lights.push_back(point_light);
 
-    auto light_transform3 = translate(Vector3f(0.0f, 0.0f, 1.0f))*rotate(100,0,1,0);
+    auto light_transform3 = translate(Vector3f(0.0f, 0.5f, 1.0f))*rotate(90,1,0,0);
     auto disk_light = std::make_shared<DiskLight>(light_transform3,Spectrum(10,10,10),false,0.2);
     auto disklight_triangles = load_mesh(*disk_light);
     lights.push_back(disk_light);
