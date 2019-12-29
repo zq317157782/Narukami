@@ -32,14 +32,19 @@ NARUKAMI_BEGIN
 struct Pixel
 {
    Spectrum rgb;
-   Normal3f normal;
+   Normal3f remapped_normal;
    float weight;
 
    Pixel(){
        rgb=Spectrum();
        weight=0.0f;
-       normal = Normal3f();
+       remapped_normal = Normal3f(0.0f,0.0f,0.0f);
    }
+
+   const Normal3f& normal() const
+   {
+       return remapped_normal * 2.0f - 1.0f;
+   }  
 };
 
 
