@@ -58,6 +58,8 @@ struct bool4
 
 inline std::ostream &operator<<(std::ostream &out, const bool4 &b){out << '(' << ((b.x!=0)?"true":"false")<< ',' << ((b.y!=0)?"true":"false") << ',' << ((b.z!=0)?"true":"false") << ',' << ((b.w!=0)?"true":"false") << ')';return out;}
 
+inline bool4 operator==(const bool4 &a, const bool4 &b){return bool4(_mm_castsi128_ps(_mm_cmpeq_epi32(_mm_castps_si128(a.xyzw), _mm_castps_si128(b.xyzw)))); }
+
 inline bool4 operator!(const bool4 &a){ return _mm_xor_ps(a,bool4(true));}
 inline bool4 operator&(const bool4 &a,const bool4 &b){ return _mm_and_ps(a.xyzw,b.xyzw);}
 inline bool4 operator|(const bool4 &a,const bool4 &b){ return _mm_or_ps (a.xyzw,b.xyzw);}
@@ -166,6 +168,7 @@ inline float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+
 inline float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }
 
 inline float4 select(const bool4& mask,const float4 &a,const float4 &b){ return _mm_blendv_ps(b,a,mask); }
+inline bool4 select(const bool4& mask,const bool4 &a,const bool4 &b){ return _mm_blendv_ps(b,a,mask); }
 inline void store(const float4 &x,float* data){ _mm_store_ps(data,x.xyzw);}
 
 NARUKAMI_END

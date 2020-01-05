@@ -442,6 +442,14 @@ TEST(float4,select){
 }
 
 
+TEST(bool4,select){
+    bool4 a(true);
+    bool4 b(false);
+    bool4 c=select(bool4(true,false,true,false),a,b);
+    EXPECT_TRUE(all(c==bool4(true,false,true,false)));
+}
+
+
 TEST(float4,positive_and_negative){
      float4 a(1,1,1,1);
      EXPECT_TRUE(all(-a==float4(-1,-1,-1,-1)));
