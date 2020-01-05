@@ -64,12 +64,12 @@ void Integrator::render(const Scene &scene)
                         }
                     }
 
-                    film->add_sample(camera_sample.pFilm, L,interaction.n,w);
+                    film->add_sample(camera_sample.pFilm, L,w);
                 }
             }
             else
             {
-                film->add_sample(camera_sample.pFilm,{0, 0, 0},{0, 0, 0}, w);
+                film->add_sample(camera_sample.pFilm,{0, 0, 0}, w);
             }
 
         } while (clone_sampler->start_next_sample());

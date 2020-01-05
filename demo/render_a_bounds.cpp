@@ -13,7 +13,7 @@ int main(){
     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
     OrthographicCamera camera(Transform(),{{0,0},{1,1}},film);
     SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
-    Bounds3f bound2(Point3f(0.1,0.1,0.1),Point3f(0.9,0.9,0.9));
+    Bounds3f bound2(Point3f(0.1f,0.1f,0.1f),Point3f(0.9f,0.9f,0.9f));
     int isPositive[3]={1,1,1};
     for(int y=0;y<128;++y){
          for(int x=0;x<128;++x){
@@ -23,7 +23,7 @@ int main(){
                 Ray ray;
                 camera.generate_normalized_ray(cameraSample,&ray);
                 if(collide(ray.o,Vector3f(1.0f/ray.d.x,1.0f/ray.d.y,1.0f/ray.d.z),0,1,isPositive,bound2)){
-                    film->add_sample(cameraSample.pFilm,Spectrum(1,1,1),Normal3f(0,0,0),1);
+                    film->add_sample(cameraSample.pFilm,Spectrum(1,1,1),1);
                 }
              }while(sampler.start_next_sample());
             

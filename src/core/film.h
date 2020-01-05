@@ -31,22 +31,14 @@ NARUKAMI_BEGIN
 
 struct Pixel
 {
-   Spectrum rgb;
-   Normal3f remapped_normal;
+   Spectrum intensity;
    float weight;
 
    Pixel(){
-       rgb=Spectrum();
+       intensity=Spectrum();
        weight=0.0f;
-       remapped_normal = Normal3f(0.0f,0.0f,0.0f);
    }
-
-   const Normal3f& normal() const
-   {
-       return remapped_normal * 2.0f - 1.0f;
-   }  
 };
-
 
 class Film{
     public:
@@ -75,8 +67,7 @@ class Film{
             return Bounds2i(Bounds2f(min_point,max_point));
         }
         void write_to_file(const char* file_name) const;
-        void write_visual_normal_to_file(const char* file_name) const;
-        void add_sample(const Point2f& pos,const Spectrum& l,const Normal3f& n,const float weight) const;
+        void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
 
         friend inline  std::ostream &operator<<(std::ostream &out, const Film &film) {
             out<<"[resolution:"<<film.resolution<<" cropped pixel bounds:"<<film._cropped_pixel_bounds<<"]";

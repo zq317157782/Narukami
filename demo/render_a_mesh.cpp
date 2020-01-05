@@ -19,7 +19,7 @@
 using namespace narukami;
 int main(){
 
-    auto sampler = std::make_shared<Sampler>(128);
+    auto sampler = std::make_shared<Sampler>(2);
     auto film = std::make_shared<Film>(Point2i(1920,1080),Bounds2f(Point2f(0,0),Point2f(1,1)));
     float aspect = 16.0f/9.0f;
     auto camera = std::make_shared<PerspectiveCamera>(Transform(),Bounds2f{{-2*aspect,-2},{2*aspect,2}},45,film);
@@ -76,7 +76,5 @@ int main(){
 
     
     film->write_to_file("demo_mesh.png");
-    film->write_visual_normal_to_file("demo_mesh_normal.png");
-
 }
 

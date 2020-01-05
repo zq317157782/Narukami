@@ -68,36 +68,17 @@ void Film::write_to_file(const char *file_name) const
             {
                 inv_w = 1.0f;
             }
-            data.push_back(pixel.rgb[0] * inv_w);
-            data.push_back(pixel.rgb[1] * inv_w);
-            data.push_back(pixel.rgb[2] * inv_w);
+            data.push_back(pixel.intensity[0] * inv_w);
+            data.push_back(pixel.intensity[1] * inv_w);
+            data.push_back(pixel.intensity[2] * inv_w);
         }
     }
     write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
 }
 
-void Film::write_visual_normal_to_file(const char *file_name) const
-{
-    std::vector<float> data;
-    for (int y = _cropped_pixel_bounds[0].y; y < _cropped_pixel_bounds[1].y; ++y)
-    {
-        for (int x = _cropped_pixel_bounds[0].x; x < _cropped_pixel_bounds[1].x; ++x)
-        {
-            const Pixel &pixel = get_pixel(Point2i(x, y));
-            float inv_w = rcp(pixel.weight);
-            if (EXPECT_NOT_TAKEN(pixel.weight == 0.0f))
-            {
-                inv_w = 1.0f;
-            }
-            data.push_back((pixel.remapped_normal[0]) * inv_w);
-            data.push_back((pixel.remapped_normal[1]) * inv_w);
-            data.push_back((pixel.remapped_normal[2]) * inv_w);
-        }
-    }
-    write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
-}
 
-void Film::add_sample(const Point2f &pos, const Spectrum &l, const Normal3f &n, const float weight) const
+
+void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
 {
 
     //calculate bounds
@@ -117,15 +98,9 @@ void Film::add_sample(const Point2f &pos, const Spectrum &l, const Normal3f &n, 
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             Pixel &pixel = get_pixel(Point2i(x, y));
             {
-                pixel.rgb[0] += l.r * weight * filter_weight;
-                pixel.rgb[1] += l.g * weight * filter_weight;
-                pixel.rgb[2] += l.b * weight * filter_weight;
-            }
-            {
-                Normal3f remapped_normal = n * 0.5f + 0.5f;
-                pixel.remapped_normal[0] += remapped_normal.x * weight * filter_weight;
-                pixel.remapped_normal[1] += remapped_normal.y * weight * filter_weight;
-                pixel.remapped_normal[2] += remapped_normal.z * weight * filter_weight;
+                pixel.intensity[0] += l.r * weight * filter_weight;
+                pixel.intensity[1] += l.g * weight * filter_weight;
+                pixel.intensity[2] += l.b * weight * filter_weight;
             }
             pixel.weight += filter_weight;
         }
