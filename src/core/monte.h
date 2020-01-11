@@ -36,6 +36,11 @@ inline float to_area_measure_pdf(const float solid_angle_pdf, const float distan
     return solid_angle_pdf * costheta * rcp(distance_sqr);
 }
 
+Point2f polar_to_cartesian(const float radius,const float theta)
+{
+    return Point2f(radius * cos(theta), radius * sin(theta));
+}
+
 //p(x,y) is a constant 1\PI.
 //p(radius,theta) is p(x,y) mul radius  => (radius\PI).
 //p(radius) is 2*radius.
@@ -44,6 +49,30 @@ inline Point2f uniform_sample_disk(const Point2f &u)
 {
     float radius = sqrt(u.x);
     float theta = 2.0f * PI * u.y;
-    return Point2f(radius * cos(theta), radius * sin(theta));
+    return polar_to_cartesian(radius,theta);
+}
+
+
+//"A low distortion map between disk and square"
+inline Point2f concentric_sample_disk(const Point2f &u)
+{
+    auto u_offset = u * 2.0f - 1.0f;
+    if(u_offset.x == 0 && u_offset.y == 0)
+    {
+        return Point2f(0.0f,0.0f);
+    }
+
+    float radius,theta;
+    if(abs(u_offset.x) > abs(u_offset.y))
+    {
+        radius = u_offset.x;
+        theta = (u_offset.y/u_offset.x) * PI_OVER_FOUR;
+    }
+    else
+    {
+        radius = u_offset.y;
+        theta = PI_OVER_TWO - (u_offset.x/u_offset.y) * PI_OVER_FOUR;
+    }
+    return polar_to_cartesian(radius,theta);
 }
 NARUKAMI_END

@@ -46,7 +46,7 @@ public:
     Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
 
-        auto sample = uniform_sample_disk(u);
+        auto sample = concentric_sample_disk(u);
 
         Point3f local_position(sample.x * _radius, sample.y * _radius, 0);
         auto light_position = _light_to_world(local_position);
