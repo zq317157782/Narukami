@@ -1746,7 +1746,7 @@ inline Point3f mul(const Matrix4x4 &M, const Point3f &v)
 }
 
 //general
-inline Point3f mulh(const Matrix4x4 &M, const Point3f &v)
+inline Point3f mul_h(const Matrix4x4 &M, const Point3f &v)
 {
     float4 r = M.col[0] * v.x;
     r += M.col[1] * v.y;

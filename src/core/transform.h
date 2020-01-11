@@ -63,7 +63,7 @@ struct SSE_ALIGNAS Transform
 
 inline Point3f transform_h(const Transform &t,const Point3f &p)
 {
-    return mulh(t.mat,p);
+    return mul_h(t.mat,p);
 }
 
 inline Transform inverse(const Transform &transform)
