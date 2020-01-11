@@ -36,7 +36,7 @@ inline float to_area_measure_pdf(const float solid_angle_pdf, const float distan
     return solid_angle_pdf * costheta * rcp(distance_sqr);
 }
 
-Point2f polar_to_cartesian(const float radius,const float theta)
+inline Point2f polar_to_cartesian(const float radius,const float theta)
 {
     return Point2f(radius * cos(theta), radius * sin(theta));
 }
@@ -74,5 +74,12 @@ inline Point2f concentric_sample_disk(const Point2f &u)
         theta = PI_OVER_TWO - (u_offset.x/u_offset.y) * PI_OVER_FOUR;
     }
     return polar_to_cartesian(radius,theta);
+}
+
+//Malley’s Method. 
+inline Vector3f cosine_sample_hemisphere(const Point2f &u)
+{
+    float z = sqrt(max(0.0f,1.0f - u.x *u.x + u.y * u.y));
+    return Vector3f(u.x,u.y,z);
 }
 NARUKAMI_END

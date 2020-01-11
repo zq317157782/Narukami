@@ -45,6 +45,8 @@ NARUKAMI_BEGIN
     };
 
     inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.triangle.get_world_bounds();}
+    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.triangle.object_to_world();}
+    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.triangle.world_to_object();}
     //inline Spectrum Le(const Primitive& primitive){ ()}
 
     std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light = nullptr);

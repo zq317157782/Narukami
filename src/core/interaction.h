@@ -42,6 +42,16 @@ public:
     Interaction(const Point3f& p,const Normal3f& n):p(p),n(n){}
 };
 
+inline const Transform& get_object_to_world(const Interaction& interaction)
+{
+    return get_object_to_world(*interaction.primitive);
+}
+
+inline const Transform& get_world_to_object(const Interaction& interaction)
+{
+    return get_world_to_object(*interaction.primitive);
+}
+
 FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;
 }
