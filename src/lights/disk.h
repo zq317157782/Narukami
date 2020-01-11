@@ -38,9 +38,9 @@ private:
     float _radius;
 
 public:
-    DiskLight(const Transform &light_to_world, const Spectrum &L, bool two_side, const float radius, const size_t sample_count = 4) : AreaLight(light_to_world, sample_count), _radiance(L), _two_side(two_side), _radius(radius)
+    DiskLight(const Transform &light_to_world, const Spectrum &L, bool two_side, const float radius, const size_t sample_count = 4) : AreaLight(light_to_world, sample_count,2.0f * PI * radius * radius), _radiance(L), _two_side(two_side), _radius(radius)
     {
-        _area = 2.0f * PI * _radius * _radius;
+
     }
 
     Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override

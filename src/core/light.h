@@ -58,10 +58,10 @@ public:
 
 class AreaLight : public Light
 {
-protected:
+private:
     float _area;
 public:
-    AreaLight(const Transform &light_to_world, size_t sample_count) : Light(light_to_world, sample_count) {}
+    AreaLight(const Transform &light_to_world, size_t sample_count,const float area) : Light(light_to_world, sample_count),_area(area) {}
     float area() const { return _area; }
     virtual Spectrum L(const Interaction &interaction, const Vector3f &wi) const = 0;
 };
