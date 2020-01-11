@@ -79,7 +79,8 @@ inline Point2f concentric_sample_disk(const Point2f &u)
 //Malley’s Method. 
 inline Vector3f cosine_sample_hemisphere(const Point2f &u)
 {
-    float z = sqrt(max(0.0f,1.0f - u.x *u.x + u.y * u.y));
-    return Vector3f(u.x,u.y,z);
+    Point2f d = concentric_sample_disk(u);
+    float z = sqrt(max(0.0f,1.0f - d.x *d.x - d.y * d.y));
+    return Vector3f(d.x,d.y,z);
 }
 NARUKAMI_END
