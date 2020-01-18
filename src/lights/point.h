@@ -31,10 +31,10 @@ class PointLight : public Light
 private:
     Spectrum _I; //radiant intensity
 public:
-    PointLight(const Transform &light_to_world, const Spectrum &L) : Light(light_to_world, 1), _I(L) {}
+    PointLight(const Transform *light_to_world,const Transform *world_to_light, const Spectrum &L) : Light(light_to_world,world_to_light,1), _I(L) {}
     Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
-        auto light_position = _light_to_world(Point3f(0.0f, 0.0f, 0.0f));
+        auto light_position = (*_light_to_world)(Point3f(0.0f, 0.0f, 0.0f));
         (*wi) = normalize(light_position - interaction.p);
         if (pdf)
         {

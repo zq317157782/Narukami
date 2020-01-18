@@ -40,19 +40,19 @@ private:
     float _width, _height;
 
 public:
-    RectLight(const Transform &light_to_world, const Spectrum &L, bool two_side, const float w, const float h, const size_t sample_count = 4) : AreaLight(light_to_world, sample_count,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
+    RectLight(const Transform *light_to_world,const Transform *world_to_light,const Spectrum &L, bool two_side, const float w, const float h, const size_t sample_count = 4) : AreaLight(light_to_world,world_to_light,sample_count,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
     }
 
     Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
 
         Point3f local_light_position((u.x - 0.5f) * _width, (u.y - 0.5f) * _height, 0);
-        auto light_position = _light_to_world(local_light_position);
+        auto light_position = (*_light_to_world)(local_light_position);
         auto unnormalized_wi = light_position - interaction.p;
         auto distance_sqr = sqrlen(unnormalized_wi);
         (*wi) = normalize(unnormalized_wi);
 
-        auto costheta = _world_to_light(-(*wi)).z;
+        auto costheta = (*_world_to_light)(-(*wi)).z;
         if (!_two_side && costheta <= 0.0f)
         {
             return Spectrum(0.0f, 0.0f, 0.0f);
@@ -72,7 +72,7 @@ public:
 
     Spectrum L(const Interaction &interaction, const Vector3f &wi) const override
     {
-        if (!_two_side && _world_to_light(wi).z >= 0)
+        if (!_two_side && (*_world_to_light)(wi).z >= 0)
         {
             return Spectrum(0.0f, 0.0f, 0.0f);
         }
@@ -96,7 +96,7 @@ public:
         std::vector<Point2f> uvs = {Point2f(0, 1), Point2f(0, 0), Point2f(1, 0), Point2f(1, 1)};
         std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
 
-        return create_mesh_triangles(&rectlight._light_to_world, &rectlight._world_to_light, indices, vertices, normals, uvs);
+        return create_mesh_triangles(rectlight._light_to_world, rectlight._world_to_light, indices, vertices, normals, uvs);
     }
 };
 

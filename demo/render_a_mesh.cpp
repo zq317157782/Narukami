@@ -53,7 +53,8 @@ int main(){
     // lights.push_back(point_light);
 
     auto light_transform3 = translate(Vector3f(0.0f, 0.5f, 1.0f))*rotate(90,1,0,0);
-    auto disk_light = std::make_shared<DiskLight>(light_transform3,Spectrum(10,10,10),false,0.2);
+    auto inv_light_transform3 = inverse(light_transform3);
+    auto disk_light = std::make_shared<DiskLight>(&light_transform3,&inv_light_transform3,Spectrum(10,10,10),false,0.2);
     auto disklight_triangles = load_mesh(*disk_light);
     lights.push_back(disk_light);
 

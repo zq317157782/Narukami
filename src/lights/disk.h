@@ -38,7 +38,7 @@ private:
     float _radius;
 
 public:
-    DiskLight(const Transform &light_to_world, const Spectrum &L, bool two_side, const float radius, const size_t sample_count = 4) : AreaLight(light_to_world, sample_count,2.0f * PI * radius * radius), _radiance(L), _two_side(two_side), _radius(radius)
+    DiskLight(const Transform *light_to_world,const Transform *world_to_light, const Spectrum &L, bool two_side, const float radius, const size_t sample_count = 4) : AreaLight(light_to_world,world_to_light,sample_count,2.0f * PI * radius * radius), _radiance(L), _two_side(two_side), _radius(radius)
     {
 
     }
@@ -49,12 +49,12 @@ public:
         auto sample = concentric_sample_disk(u);
 
         Point3f local_position(sample.x * _radius, sample.y * _radius, 0);
-        auto light_position = _light_to_world(local_position);
+        auto light_position = (*_light_to_world)(local_position);
         auto unnormalized_wi = light_position - interaction.p;
         auto distance_sqr = sqrlen(unnormalized_wi);
         (*wi) = normalize(unnormalized_wi);
 
-        auto costheta = _world_to_light(-(*wi)).z;
+        auto costheta = (*_world_to_light)(-(*wi)).z;
         if (!_two_side && costheta <= 0.0f)
         {
             return Spectrum(0.0f, 0.0f, 0.0f);
@@ -74,7 +74,7 @@ public:
 
     Spectrum L(const Interaction &interaction, const Vector3f &wi) const override
     {
-        if (!_two_side && _world_to_light(wi).z >= 0)
+        if (!_two_side && (*_world_to_light)(wi).z >= 0)
         {
             return Spectrum(0.0f, 0.0f, 0.0f);
         }
@@ -117,7 +117,7 @@ public:
         indices.push_back(0);
         indices.push_back(1);
 
-        return create_mesh_triangles(&disklight._light_to_world, &disklight._world_to_light, indices, vertices, normals, uvs);
+        return create_mesh_triangles(disklight._light_to_world, disklight._world_to_light, indices, vertices, normals, uvs);
     }
 };
 
