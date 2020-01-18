@@ -66,6 +66,11 @@ inline T *alloc_aligned(size_t size){
 	return reinterpret_cast<T*>(alloc_aligned(size * sizeof(T)));
 }
 
+template<typename T,int LINE_SIZE>
+inline T *alloc_aligned(size_t size){
+	return reinterpret_cast<T*>(alloc_aligned<LINE_SIZE>(size * sizeof(T)));
+}
+
 inline void free_aligned(void * ptr){
 	if(!ptr){
 		return;

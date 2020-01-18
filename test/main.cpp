@@ -883,6 +883,9 @@ TEST(SoAbound3f,intersect){
 
 TEST(memory,alloc_aligned){
     auto alloced_area=alloc_aligned<128>(1000);
+    EXPECT_EQ(long(alloced_area)%128,0);
+    auto alloced_area2=alloc_aligned<float,256>(1000);
+    EXPECT_EQ(long(alloced_area2)%256,0);
 }
 
 TEST(memory,STACK_ALLOC){
