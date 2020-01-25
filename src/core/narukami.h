@@ -38,6 +38,8 @@ narukami.h
     #define NARUKAMI_DEBUG
 #endif
 
+#define NARUKAMI_STAT_ENABLED 1
+
 #include <assert.h>
 #include <ostream>
 #include <iostream>

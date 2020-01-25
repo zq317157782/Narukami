@@ -116,6 +116,7 @@ public:
     }
 };
 
+#ifdef NARUKAMI_STAT_ENABLED
 //#### class  ####
 #define STAT_COUNTER(name,var)\
 static thread_local uint64_t var;\
@@ -154,6 +155,15 @@ if(condition){\
 
 #define STAT_INCREASE_MEMORY_COUNTER(var,count)\
 var+=count;\
+
+#else
+#define STAT_COUNTER(name,var)
+#define STAT_MEMORY_COUNTER(name,var)
+#define STAT_PERCENT(name,num,denom)
+#define STAT_INCREASE_COUNTER(var,count)
+#define STAT_INCREASE_COUNTER_CONDITION(var,count,condition)
+#define STAT_INCREASE_MEMORY_COUNTER(var,count)
+#endif
 
 //print statistics infos into ostream
 void print_statistics(std::ostream&);
