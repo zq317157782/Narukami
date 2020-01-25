@@ -157,19 +157,31 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
 
 void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
 {
-    STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_notfull_count, 1, (node->num % 4) != 0)
+
     if (is_leaf(node))
     {
         auto primitive_infos = cast_to_SoA_structure(_primitives, node->offset, node->num);
         node->num = primitive_infos.size();
         node->offset = _soa_primitive_infos.size();
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
+        
         STAT_INCREASE_COUNTER(SoAPrimitiveInfo_count, primitive_infos.size())
+        
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_1_4, primitive_infos.size())
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_2_4, primitive_infos.size())
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_3_4, primitive_infos.size())
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_4_4, primitive_infos.size())
+        
+        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_1_4, 1, (node->num % 4) == 1)
+        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_2_4, 1, (node->num % 4) == 2)
+        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_3_4, 1, (node->num % 4) == 3)
+        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_4_4, node->num, (node->num % 4) == 0)
+        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_4_4, node->num-1, (node->num % 4) != 0)
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
     {
-        build_soa_primitive_info(node->childrens[0]); 
+        build_soa_primitive_info(node->childrens[0]);
         build_soa_primitive_info(node->childrens[1]);
     }
 }
@@ -318,7 +330,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
                     auto num = leaf_num(node->childrens[index]);
                     for (size_t j = offset; j < offset + num; ++j)
                     {
-                        
+
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &triangle_offset);
                         if (is_hit)
                         {
@@ -351,8 +363,8 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         //interaction->p = ray.o + ray.d * closest_hit_t;
         //"Realtime Ray Tracing Gems" chapter 6
         auto triangle = _soa_primitive_infos[soa_primitive_info_offset].triangle[triangle_offset];
-        interaction->p = barycentric_interpolate_position(triangle,uv);
-        interaction->n = flip_normal(get_normalized_normal(triangle),-ray.d);
+        interaction->p = barycentric_interpolate_position(triangle, uv);
+        interaction->n = flip_normal(get_normalized_normal(triangle), -ray.d);
         auto primitive_offset = _soa_primitive_infos[soa_primitive_info_offset].offset + triangle_offset;
         interaction->primitive = &_primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;

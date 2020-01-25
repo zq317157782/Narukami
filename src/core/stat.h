@@ -33,6 +33,7 @@ class StatsAccumulator
 private:
     std::map<std::string, uint64_t> _counters;
     std::map<std::string, uint64_t> _memory_counters;
+    std::map<std::string, std::pair<uint64_t,uint64_t>> _percents;
 
 public:
     void report_counter(const std::string &name, const uint64_t count)
@@ -44,6 +45,12 @@ public:
     void report_memory_counter(const std::string &name, const uint64_t count)
     {
         _memory_counters[name] += count;
+    }
+
+     void report_percent(const std::string &name, const uint64_t num,const uint64_t denom)
+    {
+        _percents[name].first += num;
+        _percents[name].second += denom;
     }
 
 
@@ -69,6 +76,13 @@ public:
             } else{
                 out<<i.first<<" : "<<i.second/(1024.0f*1024.0f*1024.0f)<<sy_gb<<std::endl;
             }
+        }
+
+        for(const auto &i : _percents)
+        {
+            uint64_t num = i.second.first;
+            uint64_t denom = i.second.second;
+            out<<i.first<<" : "<<static_cast<float>(num)/static_cast<float>(denom)*100<<'%'<<std::endl;
         }
     }
 };
@@ -101,6 +115,8 @@ public:
         }
     }
 };
+
+//#### class  ####
 #define STAT_COUNTER(name,var)\
 static thread_local uint64_t var;\
 static void stat_func_##var(StatsAccumulator& stats_acc){\
@@ -109,15 +125,6 @@ static void stat_func_##var(StatsAccumulator& stats_acc){\
 }\
 static StatRegisterer stat_reg_##var(stat_func_##var);\
 
-#define STAT_INCREASE_COUNTER(var,count)\
-var+=count;\
-
-#define STAT_INCREASE_COUNTER_CONDITION(var,count,condition)\
-if(condition){\
-    var+=count;\
-}\
-
-
 #define STAT_MEMORY_COUNTER(name,var)\
 static thread_local uint64_t var;\
 static void stat_func_##var(StatsAccumulator& stats_acc){\
@@ -125,6 +132,25 @@ static void stat_func_##var(StatsAccumulator& stats_acc){\
     var=0;\
 }\
 static StatRegisterer stat_reg_##var(stat_func_##var);\
+
+#define STAT_PERCENT(name,num,denom)\
+static thread_local uint64_t num;\
+static thread_local uint64_t denom;\
+static void stat_func_##num##_##denom##(StatsAccumulator& stats_acc){\
+    stats_acc.report_percent(name,num,denom);\
+    num=0;\
+    denom=0;\
+}\
+static StatRegisterer stat_reg_##num##_##denom##(stat_func_##num##_##denom##);\
+
+//#### utils ####
+#define STAT_INCREASE_COUNTER(var,count)\
+var+=count;\
+
+#define STAT_INCREASE_COUNTER_CONDITION(var,count,condition)\
+if(condition){\
+    var+=count;\
+}\
 
 #define STAT_INCREASE_MEMORY_COUNTER(var,count)\
 var+=count;\
