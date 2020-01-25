@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "core/integrator.h"
 #include "core/affine.h"
+#include "core/monte.h"
 NARUKAMI_BEGIN
 
 void Integrator::render(const Scene &scene)
@@ -33,45 +34,65 @@ void Integrator::render(const Scene &scene)
     auto cropped_pixel_bounds = film->cropped_pixel_bounds();
     for (auto &&pixel : cropped_pixel_bounds)
     {
-        auto clone_sampler = _sampler->clone(pixel.x+pixel.y*width(cropped_pixel_bounds));
+        auto clone_sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));
         clone_sampler->start_pixel(pixel);
         do
         {
-           // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
+            STAT_INCREASE_COUNTER(miss_intersection_denom, 1)
+            // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
             auto camera_sample = clone_sampler->get_camera_sample(pixel);
             Ray ray;
             float w = _camera->generate_normalized_ray(camera_sample, &ray);
             Interaction interaction;
-
-            if (scene.intersect(arena, ray, &interaction))
+            constexpr int bounce_count = 5;
+            Spectrum L(0.0f, 0.0f, 0.0f);
+            float throughout = 1.0f;
+            
+            int bounce = 0;
+            for (; bounce <= bounce_count; ++bounce)
             {
-                if (is_surface_interaction(interaction))
+
+                if (scene.intersect(arena, ray, &interaction))
                 {
-                    SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
-                    Spectrum L(0.0f, 0.0f, 0.0f);
 
-                    L = L + Le(surface_interaction,ray.d);
-
-                    for (auto &light : scene.lights)
+                    if (is_surface_interaction(interaction))
                     {
-                        Vector3f wi;
-                        float pdf;
-                        VisibilityTester tester;
-                        auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
-                        if (pdf > 0 && !is_black(Li)  && tester.unoccluded(scene))
+                        SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
+
+                        L = L + Le(surface_interaction, ray.d);
+
+                        for (auto &light : scene.lights)
                         {
-                            L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * Li * rcp(pdf);
+                            Vector3f wi;
+                            float pdf;
+                            VisibilityTester tester;
+                            auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
+                            if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
+                            {
+                                L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
+                            }
                         }
                     }
 
-                    film->add_sample(camera_sample.pFilm, L,w);
+                    if (bounce < bounce_count)
+                    {
+                        auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
+                        auto object_to_world = get_object_to_world(interaction);
+                        auto direction_world = normalize(object_to_world(direction_object));
+                        ray = Ray(interaction.p, direction_world);
+                        ray = offset_ray(ray, interaction.n);
+
+                        throughout *= INV_PI * abs(direction_object.z);
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
-            else
-            {
-                film->add_sample(camera_sample.pFilm,{0, 0, 0}, w);
-            }
-
+            STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
+            film->add_sample(camera_sample.pFilm, L, w);
+            break;
         } while (clone_sampler->start_next_sample());
         arena.reset();
     }

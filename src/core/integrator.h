@@ -28,7 +28,10 @@ SOFTWARE.
 #include "core/scene.h"
 #include "core/sampler.h"
 #include "core/interaction.h"
+#include "core/stat.h"
 NARUKAMI_BEGIN
+
+STAT_PERCENT("miss intersection's ratio",miss_intersection_num,miss_intersection_denom)
 class Integrator{
     private:
         std::shared_ptr<const Camera> _camera;
