@@ -26,10 +26,10 @@ SOFTWARE.
 #include "core/imageio.h"
 NARUKAMI_BEGIN
 
-Film::Film(const Point2i &resolution, const Bounds2f &cropped_pixel_bounds, float const filter_radius, const float gaussian_alpha) : resolution(resolution), _filter_radius(filter_radius), _inv_filter_radius(1.0f / filter_radius), _gaussian_alpha(gaussian_alpha), _gaussian_exp(exp(-gaussian_alpha * filter_radius * filter_radius))
+Film::Film(const Point2i &resolution, const Bounds2f &cropped_rect, float const filter_radius, const float gaussian_alpha) : resolution(resolution), _filter_radius(filter_radius), _inv_filter_radius(1.0f / filter_radius), _gaussian_alpha(gaussian_alpha), _gaussian_exp(exp(-gaussian_alpha * filter_radius * filter_radius))
 {
-    Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.min_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.min_point.y));
-    Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_pixel_bounds.max_point.x), (int)ceil(resolution.y * cropped_pixel_bounds.max_point.y));
+    Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_rect.min_point.x), (int)ceil(resolution.y * cropped_rect.min_point.y));
+    Point2i bounds_max_p = Point2i((int)ceil(resolution.x * cropped_rect.max_point.x), (int)ceil(resolution.y * cropped_rect.max_point.y));
     this->_cropped_pixel_bounds = Bounds2i(bounds_min_p, bounds_max_p);
     _pixels = std::unique_ptr<Pixel[]>(new Pixel[area(_cropped_pixel_bounds)]);
 

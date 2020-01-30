@@ -57,7 +57,7 @@ class Film{
         const float _filter_radius;
         const float _inv_filter_radius;
     public:
-        Film(const Point2i& resolution,const Bounds2f& cropped_pixel_bounds,float const filter_radius=1.0f, float gaussian_alpha=1.0f);
+        Film(const Point2i& resolution,const Bounds2f& cropped_rect,float const filter_radius=1.0f, float gaussian_alpha=1.0f);
         inline  Bounds2i cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
         }
