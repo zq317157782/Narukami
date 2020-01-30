@@ -31,7 +31,7 @@ SOFTWARE.
 #include "core/stat.h"
 NARUKAMI_BEGIN
 
-STAT_PERCENT("miss intersection's ratio",miss_intersection_num,miss_intersection_denom)
+STAT_PERCENT("Miss Intersection's ratio",miss_intersection_num,miss_intersection_denom)
 class Integrator{
     private:
         std::shared_ptr<const Camera> _camera;

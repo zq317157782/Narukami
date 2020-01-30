@@ -322,8 +322,10 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         for (size_t i = 0; i < 4; ++i)
         {
             uint32_t index = orders[i];
+            STAT_INCREASE_COUNTER(ordered_traversal_denom,1)
             if (box_hits[index] && box_t[index] < closest_hit_t)
             {
+                STAT_INCREASE_COUNTER(ordered_traversal_num,1)
                 if (is_leaf(node->childrens[index]))
                 {
                     auto offset = leaf_offset(node->childrens[index]);
