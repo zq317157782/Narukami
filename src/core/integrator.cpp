@@ -31,7 +31,7 @@ void Integrator::render(const Scene &scene)
 {
     MemoryArena arena;
     auto film = _camera->get_film();
-    auto cropped_pixel_bounds = film->cropped_pixel_bounds();
+    auto cropped_pixel_bounds = film->get_cropped_pixel_bounds();
     for (auto &&pixel : cropped_pixel_bounds)
     {
         auto clone_sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));

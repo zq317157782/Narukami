@@ -58,10 +58,10 @@ class Film{
         const float _inv_filter_radius;
     public:
         Film(const Point2i& resolution,const Bounds2f& cropped_rect,float const filter_radius=1.0f, float gaussian_alpha=1.0f);
-        inline  Bounds2i cropped_pixel_bounds() const{
+        inline  Bounds2i get_cropped_pixel_bounds() const{
             return _cropped_pixel_bounds;
         }
-        inline  Bounds2i sample_pxiel_bounds() const{
+        inline  Bounds2i get_sample_pxiel_bounds() const{
             Point2f min_point = floor(Point2f(_cropped_pixel_bounds.min_point)+Vector2f(0.5f,0.5f)-_filter_radius);
             Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+_filter_radius);
             return Bounds2i(Bounds2f(min_point,max_point));
