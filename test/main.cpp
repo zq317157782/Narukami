@@ -1124,7 +1124,7 @@ TEST(Bounds2i,area){
 #include "core/film.h"
 TEST(Film,sample_bounds){
     Film film(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    auto bounds=film.get_sample_pixel_bounds();
+    auto bounds=film.get_sample_bounds();
     EXPECT_EQ(bounds.min_point,Point2i(-1,-1));
     EXPECT_EQ(bounds.max_point,Point2i(129,129));
 }
