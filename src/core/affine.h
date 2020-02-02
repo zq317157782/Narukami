@@ -1131,7 +1131,7 @@ public:
         assert(!isnan(b));
     }
     template <typename U>
-    inline Point2(const Point2<U> &p) : x((T)p.x), y((T)p.y) {}
+    inline explicit Point2(const Point2<U> &p) : x((T)p.x), y((T)p.y) {}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     inline Point2(const Point2 &v1)
