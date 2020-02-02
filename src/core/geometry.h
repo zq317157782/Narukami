@@ -209,6 +209,13 @@ inline bool inside_exclusive(const Point2<T> &p, const Bounds2<T> &bounds)
     bool cond_y = p.y >= bounds.min_point.y && p.y < bounds.max_point.y;
     return (cond_x && cond_y);
 }
+
+template <typename T>
+inline Bounds2<T> intersect(const Bounds2<T> &b0,const Bounds2<T> &b1) 
+{ 
+    return Bounds2<T>(max(b0.min_point,b1.min_point),min(b0.max_point,b1.max_point));
+}
+
 template <typename T>
 inline T width(const Bounds2<T> &bounds) { return bounds.max_point.x - bounds.min_point.x; }
 template <typename T>
@@ -342,6 +349,12 @@ template <typename T>
 inline Bounds3<T> _union(const Bounds3<T> &b0, const Bounds3<T> &b1)
 {
     return _union(min(b0.min_point, b1.min_point), max(b0.max_point, b1.max_point));
+}
+
+template <typename T>
+inline Bounds3<T> intersect(const Bounds3<T> &b0,const Bounds3<T> &b1) 
+{ 
+    return Bounds3<T>(max(b0.min_point,b1.min_point),min(b0.max_point,b1.max_point));
 }
 
 template <typename T>

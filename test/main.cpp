@@ -1297,6 +1297,19 @@ TEST(Bounds3f,_union){
     EXPECT_EQ(b0,b3);
 }
 
+TEST(Bounds3f,intersect){
+    Point3f p0(0,0,0);
+    Point3f p1(2,2,2);
+    Bounds3f b0=_union(p0,p1);
+    Point3f p2(1,1,1);
+    Point3f p3(3,3,3);
+    Bounds3f b1=_union(p2,p3);
+
+    Bounds3f b2 = intersect(b0,b1);
+    Bounds3f b3 = Bounds3f(p2,p1);
+    EXPECT_EQ(b2,b3);
+}
+
 TEST(Bounds3f,max_extent){
     Point3f p0(0,0,0);
     Point3f p1(1,2,3);
