@@ -26,6 +26,50 @@ SOFTWARE.
 #include "core/imageio.h"
 NARUKAMI_BEGIN
 
+FilmTile::FilmTile( const Bounds2i& pixel_bounds,const float* filter_lut,const float filter_radius):_pixel_bounds(pixel_bounds),_filter_lut(filter_lut),_filter_radius(filter_radius),_inv_filter_radius(1.0f/filter_radius)
+{
+    _tile_pixels = std::unique_ptr<TilePixel[]>(new TilePixel[area(_pixel_bounds)]);
+}
+
+void FilmTile::add_sample(const Point2f& pos,const Spectrum& l,const float weight) const
+{
+    
+     //calculate bounds
+    auto dp = pos - Vector2f(0.5f, 0.5f);
+    Point2i p0 = static_cast<Point2i>(ceil(dp - _filter_radius));
+    Point2i p1 = static_cast<Point2i>(floor(dp + _filter_radius)) + Point2i(1, 1);
+
+    p0 = max(p0, _pixel_bounds.min_point);
+    p1 = min(p1, _pixel_bounds.max_point);
+    for (int x = p0.x; x < p1.x; ++x)
+    {
+        int idx_x = min((int)floor(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+        float filter_weight_x = _filter_lut[idx_x];
+        for (int y = p0.y; y < p1.y; ++y)
+        {
+            int idx_y = min((int)floor(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+            float filter_weight = _filter_lut[idx_y] * filter_weight_x;
+            TilePixel &pixel = get_tile_pixel(Point2i(x, y));
+            {
+                pixel.intensity[0] += l.r * weight * filter_weight;
+                pixel.intensity[1] += l.g * weight * filter_weight;
+                pixel.intensity[2] += l.b * weight * filter_weight;
+            }
+            pixel.weight += filter_weight;
+        }
+    }
+}
+
+TilePixel& FilmTile::get_tile_pixel(const Point2i& p) const
+{
+    assert(inside_exclusive(p, _pixel_bounds));
+    auto width = _pixel_bounds[1].x - _pixel_bounds[0].x;
+    auto x = p.x - _pixel_bounds[0].x;
+    auto y = p.y - _pixel_bounds[0].y;
+    return _tile_pixels[y * width + x];
+}
+
+
 Film::Film(const Point2i &resolution, const Bounds2f &cropped_rect, float const filter_radius, const float gaussian_alpha) : resolution(resolution), _filter_radius(filter_radius), _inv_filter_radius(1.0f / filter_radius), _gaussian_alpha(gaussian_alpha), _gaussian_exp(exp(-gaussian_alpha * filter_radius * filter_radius))
 {
     Point2i bounds_min_p = Point2i((int)ceil(resolution.x * cropped_rect.min_point.x), (int)ceil(resolution.y * cropped_rect.min_point.y));
@@ -34,9 +78,9 @@ Film::Film(const Point2i &resolution, const Bounds2f &cropped_rect, float const 
     _pixels = std::unique_ptr<Pixel[]>(new Pixel[area(_cropped_pixel_bounds)]);
 
     //init filter LUT
-    for (int i = 0; i < FILTER_LUT_WIDTH; ++i)
+    for (int i = 0; i < NARUKAMI_FILM_FILTER_LUT_WIDTH; ++i)
     {
-        float x = (i + 0.5f) / FILTER_LUT_WIDTH;
+        float x = (i + 0.5f) / NARUKAMI_FILM_FILTER_LUT_WIDTH;
         _filter_lut[i] = gaussian_1D(x);
     }
 }
@@ -90,11 +134,11 @@ void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight)
     p1 = min(p1, _cropped_pixel_bounds.max_point);
     for (int x = p0.x; x < p1.x; ++x)
     {
-        int idx_x = min((int)floor(abs(x - dp.x) * _inv_filter_radius * FILTER_LUT_WIDTH), FILTER_LUT_WIDTH - 1);
+        int idx_x = min((int)floor(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
         float filter_weight_x = _filter_lut[idx_x];
         for (int y = p0.y; y < p1.y; ++y)
         {
-            int idx_y = min((int)floor(abs(y - dp.y) * _inv_filter_radius * FILTER_LUT_WIDTH), FILTER_LUT_WIDTH - 1);
+            int idx_y = min((int)floor(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             Pixel &pixel = get_pixel(Point2i(x, y));
             {
@@ -104,6 +148,30 @@ void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight)
             }
             pixel.weight += filter_weight;
         }
+    }
+}
+
+std::unique_ptr<FilmTile> Film::get_film_tile(const Bounds2i& sample_bounds) const
+{
+    const Vector2f half_bounds(0.5f,0.5f);
+    auto float_bounds = static_cast<Bounds2f>(sample_bounds);
+    Point2i p0 = static_cast<Point2i>(ceil(float_bounds.min_point - half_bounds - _filter_radius));
+    Point2i p1 = static_cast<Point2i>(floor(float_bounds.max_point - half_bounds + _filter_radius))+Point2i(1, 1);
+    auto pixel_bound = intersect(Bounds2i(p0,p1),_cropped_pixel_bounds);
+    return std::make_unique<FilmTile>(pixel_bound,_filter_lut,_filter_radius);
+}
+
+void Film::merge_film_tile(std::unique_ptr<FilmTile> tile)
+{
+    //lock for thread
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    for(auto p:tile->_pixel_bounds)
+    {
+        const auto tile_pixel = tile->get_tile_pixel(p);
+        Pixel & merge_pixel = get_pixel(p);
+        merge_pixel.intensity = merge_pixel.intensity + tile_pixel.intensity;
+        merge_pixel.weight = merge_pixel.weight +  tile_pixel.weight;
     }
 }
 

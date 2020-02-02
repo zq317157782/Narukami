@@ -32,6 +32,8 @@ void Integrator::render(const Scene &scene)
     MemoryArena arena;
     auto film = _camera->get_film();
     auto cropped_pixel_bounds = film->get_cropped_pixel_bounds();
+    auto film_tile = film->get_film_tile(cropped_pixel_bounds);
+
     for (auto &&pixel : cropped_pixel_bounds)
     {
         auto clone_sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));
@@ -91,11 +93,13 @@ void Integrator::render(const Scene &scene)
                 }
             }
             STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
-            film->add_sample(camera_sample.pFilm, L, w);
+            film_tile->add_sample(camera_sample.pFilm, L, w);
             break;
         } while (clone_sampler->start_next_sample());
-        arena.reset();
     }
+
+    film->merge_film_tile(std::move(film_tile));
+    arena.reset();
 }
 
 NARUKAMI_END
