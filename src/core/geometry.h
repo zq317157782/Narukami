@@ -202,6 +202,16 @@ inline T area(const Bounds2<T> &bounds)
     T h = bounds.max_point.y - bounds.min_point.y;
     return w * h;
 }
+
+template <typename T>
+inline Vector2<T> diagonal(const Bounds2<T> &bounds)
+{
+    T w = bounds.max_point.x - bounds.min_point.x;
+    T h = bounds.max_point.y - bounds.min_point.y;
+    return Vector2<T>(w,h);
+}
+
+
 template <typename T>
 inline bool inside_exclusive(const Point2<T> &p, const Bounds2<T> &bounds)
 {
