@@ -1209,6 +1209,21 @@ inline bool operator!=(const Point2<T> &v1, const Point2<T> &v2)
     return false;
 }
 
+template <typename T>
+inline bool operator<(const Point2<T> &v1, const Point2<T> &v2)
+{
+    if (v1.x < v2.x)
+    {
+        return true;
+    }
+    else if((v1.x == v2.x)&&(v1.y < v2.y))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 //operator+  =>  just for affine interpolation
 template <typename T>
 inline Point2<T> operator+(const Point2<T> &v1, const Point2<T> &v2)
