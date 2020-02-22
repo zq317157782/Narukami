@@ -26,6 +26,7 @@ SOFTWARE.
 #include "core/affine.h"
 #include "core/monte.h"
 #include "core/parallel.h"
+#include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
 void Integrator::render(const Scene &scene)
@@ -38,7 +39,7 @@ void Integrator::render(const Scene &scene)
     const auto tile_count_x = (sample_extent.x + (tile_size - 1)) / tile_size;
     const auto tile_count_y = (sample_extent.y + (tile_size - 1)) / tile_size;
     const Point2i tile_count(tile_count_x, tile_count_y);
-
+    ProgressReporter rendering_reporter(tile_count_x * tile_count_y,"rendering");
     parallel_for_2D(
         [&](Point2i tile_index) {
             MemoryArena arena;
@@ -64,6 +65,7 @@ void Integrator::render(const Scene &scene)
                     auto camera_sample = clone_sampler->get_camera_sample(pixel);
                     Ray ray;
                     float w = _camera->generate_normalized_ray(camera_sample, &ray);
+                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count,1)
                     Interaction interaction;
                     constexpr int bounce_count = 5;
                     Spectrum L(0.0f, 0.0f, 0.0f);
@@ -102,6 +104,7 @@ void Integrator::render(const Scene &scene)
                                 auto direction_world = normalize(object_to_world(direction_object));
                                 ray = Ray(interaction.p, direction_world);
                                 ray = offset_ray(ray, interaction.n);
+                                STAT_INCREASE_MEMORY_COUNTER(total_ray_count,1)
 
                                 throughout *= INV_PI * abs(direction_object.z);
                             }
@@ -117,9 +120,10 @@ void Integrator::render(const Scene &scene)
                 } while (clone_sampler->switch_to_next_sample());   
             }
             film->merge_film_tile(std::move(film_tile));
-            
+            rendering_reporter.update(1);
         },
         tile_count);
+        rendering_reporter.done();
 }
 
 NARUKAMI_END

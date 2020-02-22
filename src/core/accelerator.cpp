@@ -22,10 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "core/accelerator.h"
+#include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
 Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::move(primitives))
 {
+    
+
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
     for (size_t i = 0; i < _primitives.size(); ++i)
     {
@@ -37,23 +40,30 @@ Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::m
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
-    auto build_root = build(arena, 0, primitive_infos.size(), primitive_infos, _ordered_primitives, &total_build_node_num);
+    ProgressReporter building_reporter(_primitives.size(),"building");
+    auto build_root = build(arena, 0, primitive_infos.size(), primitive_infos, _ordered_primitives, &total_build_node_num,&building_reporter);
+    building_reporter.done();
+
     _primitives = _ordered_primitives;
     auto collapse_root = collapse(arena, build_root, &total_collapse_node_num);
+
     _nodes.resize(total_collapse_node_num);
     build_soa_primitive_info(build_root);
     uint32_t offset = 0;
+
     flatten(collapse_root, &offset);
+
 
     STAT_INCREASE_MEMORY_COUNTER(Primitive_memory_cost, sizeof(Primitive) * _primitives.size())
     STAT_INCREASE_MEMORY_COUNTER(SoAPrimitiveInfo_memory_cost, sizeof(SoAPrimitiveInfo) * _soa_primitive_infos.size())
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total)
+BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
+    reporter->update(1);
     Bounds3f max_bounds;
     for (size_t i = start; i < end; i++)
     {
@@ -84,13 +94,13 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
             //degenerate
             auto mid = (start + end) / 2;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
         }
         else if (num <= 2 * ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
         {
             auto mid = start + ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
         }
         //else{
         //     auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
@@ -149,7 +159,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
                 return bucket_index <= min_cost_bucket_index;
             });
             auto mid = static_cast<uint32_t>(mid_ptr - &primitive_infos[0]);
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
         }
     }
     return node;

@@ -199,6 +199,7 @@ STAT_PERCENT("SoAPrimitiveInfo(3/4)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimiti
 STAT_PERCENT("SoAPrimitiveInfo(4/4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
 STAT_PERCENT("Ordered Traversal's ratio",ordered_traversal_num,ordered_traversal_denom)
 
+class ProgressReporter;
 
 class Accelerator
 {
@@ -207,7 +208,7 @@ private:
     std::vector<SoAPrimitiveInfo> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
 
-    BVHBuildNode *build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total);
+    BVHBuildNode *build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter);
     void build_soa_primitive_info(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
