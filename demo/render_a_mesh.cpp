@@ -13,13 +13,14 @@
 #include "core/scene.h"
 #include "core/stat.h"
 #include "core/light.h"
+#include "core/parallel.h"
 #include "lights/point.h"
 #include "lights/rect.h"
 #include "lights/disk.h"
 using namespace narukami;
 int main(){
 
-    auto sampler = std::make_shared<Sampler>(2);
+    auto sampler = std::make_shared<Sampler>(1);
     auto film = std::make_shared<Film>(Point2i(1920,1080),Bounds2f(Point2f(0,0),Point2f(1,1)));
     float aspect = 16.0f/9.0f;
     auto camera = std::make_shared<PerspectiveCamera>(Transform(),Bounds2f{{-2*aspect,-2},{2*aspect,2}},45,film);
@@ -72,6 +73,7 @@ int main(){
     Scene scene(primitives,lights);
     Integrator integrator(camera,sampler);
     integrator.render(scene);
+    parallel_for_clean();
     report_thread_statistics();
     print_statistics(std::cout);
 

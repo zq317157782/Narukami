@@ -28,6 +28,7 @@ SOFTWARE.
 #include "core/lowdiscrepancy.h"
 #include "core/memory.h"
 #include <vector>
+#include <map>
 NARUKAMI_BEGIN
 struct CameraSample
 {
@@ -36,31 +37,46 @@ struct CameraSample
     float time;
 };
 
+struct SamplerState
+{
+    uint32_t current_sample_index;
+    std::vector<uint32_t> sample_1d_offsets;
+    std::vector<uint32_t> sample_2d_offsets;
+    std::vector<uint32_t> scramble_1d;
+    std::vector<uint32_t> scramble_2d;
+    Point2i pixel;
+};
+
 class Sampler
 {
 private:
-    uint32_t _current_sample_index;
     uint32_t _spp;
     const uint32_t _max_dim;
-    uint32_t _sample_1d_offset;
-    uint32_t _sample_2d_offset;
-    std::vector<uint32_t> _scramble_1d;
-    std::vector<uint32_t> _scramble_2d;
-
-    Point2i _current_pixel;
     RNG _rng;
-    uint64_t _rng_seed;
-
+    std::map<Point2i,SamplerState> _states;
+    SamplerState* _current_state;
 public:
     Sampler(const uint32_t spp, const uint32_t max_dim = 5);
-    void start_pixel(const Point2i &p);
-    bool start_next_sample();
+
+    void switch_pixel(const Point2i &p);
+    
+
+    void switch_sample(const uint32_t sample_index)
+    {
+        assert(sample_index<_spp);
+        _current_state->current_sample_index = sample_index;
+    }
+
+    bool switch_to_next_sample();
+
+    bool is_completed() const;
+
     Point2f get_2D();
     float get_1D();
     CameraSample get_camera_sample(const Point2i &raster);
     inline void set_sample_index(const uint32_t idx)
     {
-        _current_sample_index = idx;
+        _current_state->current_sample_index = idx;
     }
     inline uint32_t get_spp() const
     {

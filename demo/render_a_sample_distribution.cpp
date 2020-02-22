@@ -20,11 +20,12 @@ int main(){
     for(int i=0;i<4;++i){
          auto film =std::make_shared<Film>(Point2i(512,512),Bounds2f(Point2f(0,0),Point2f(1,1)));
          auto clone_sampler = sampler.clone(i*1024);
-         clone_sampler->start_pixel(Point2i(0,0));
+         clone_sampler->switch_pixel(Point2i(0,0));
+        clone_sampler->switch_sample(0);
          do{
                auto sample_0 = clone_sampler->get_2D();
                film->add_sample(sample_0*512.0f,Spectrum(1,1,1),1);
-         }while(clone_sampler->start_next_sample());
+         }while(clone_sampler->switch_to_next_sample());
          film->write_to_file(names[i]);
     }
 

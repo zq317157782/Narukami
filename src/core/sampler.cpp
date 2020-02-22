@@ -26,67 +26,86 @@ SOFTWARE.
 #include "core/sampler.h"
 
 NARUKAMI_BEGIN
-Sampler::Sampler(const uint32_t spp, const uint32_t max_dim) : _spp(spp), _max_dim(max_dim)
+Sampler::Sampler(const uint32_t spp, const uint32_t max_dim) : _spp(spp), _max_dim(max_dim), _current_state(nullptr)
 {
-    _scramble_1d = std::vector<uint32_t>(_max_dim);
-    _scramble_2d = std::vector<uint32_t>(_max_dim * 2);
 }
 
-void Sampler::start_pixel(const Point2i &p)
+void Sampler::switch_pixel(const Point2i &p)
 {
-    _current_pixel = p;
-    _current_sample_index = 0;
-    _sample_1d_offset = 0;
-    _sample_2d_offset = 0;
-
-    _rng.set_seed(_rng_seed);
-    //generate all scramble number
-    for (size_t i = 0; i < _max_dim; i++)
+    auto ret = _states.find(p);
+    if (ret == _states.end())
     {
-        _scramble_1d[i] = _rng.next_uint32();
-        _scramble_2d[i * 2] = _rng.next_uint32();
-        _scramble_2d[i * 2 + 1] = _rng.next_uint32();
+        SamplerState state;
+        state.current_sample_index = 0;
+        state.sample_1d_offsets = std::vector<uint32_t>(_spp);
+        state.sample_2d_offsets = std::vector<uint32_t>(_spp);
+
+        state.scramble_1d = std::vector<uint32_t>(_max_dim);
+        state.scramble_2d = std::vector<uint32_t>(_max_dim * 2);
+        //generate all scramble number
+        for (size_t i = 0; i < _max_dim; i++)
+        {
+            state.scramble_1d[i] = _rng.next_uint32();
+            state.scramble_2d[i * 2] = _rng.next_uint32();
+            state.scramble_2d[i * 2 + 1] = _rng.next_uint32();
+        }
+        state.pixel = p;
+
+        _states[p] = state;
     }
+
+    _current_state = &_states[p];
 }
 
-bool Sampler::start_next_sample()
+bool Sampler::switch_to_next_sample()
 {
-    _current_sample_index++;
-    if (EXPECT_NOT_TAKEN(_current_sample_index >= _spp))
+    if (is_completed())
     {
         return false;
     }
-    _sample_1d_offset = 0;
-    _sample_2d_offset = 0;
+    _current_state->current_sample_index++;
     return true;
+}
+
+bool Sampler::is_completed() const
+{
+    if (_current_state->current_sample_index >= _spp)
+    {
+        return true;
+    }
+    return false;
 }
 
 Point2f Sampler::get_2D()
 {
-    if (EXPECT_TAKEN(_sample_2d_offset < _max_dim))
+    auto c = _current_state;
+    auto index = c->current_sample_index;
+    if (EXPECT_TAKEN(c->sample_2d_offsets[index] < _max_dim))
     {
-        auto sample = sample_scrambled_gray_code_sobol02(_current_sample_index, &_scramble_2d[_sample_2d_offset * 2], &_scramble_2d[_sample_2d_offset * 2 + 1]);
-        _sample_2d_offset++;
+        auto sample = sample_scrambled_gray_code_sobol02(c->current_sample_index, &c->scramble_2d[c->sample_2d_offsets[index] * 2], &c->scramble_2d[c->sample_2d_offsets[index] * 2 + 1]);
+        c->sample_2d_offsets[index]++;
         return sample;
     }
     else
     {
         auto sample = Point2f(_rng.next_float(), _rng.next_float());
-        _sample_2d_offset++;
+        c->sample_2d_offsets[index]++;
         return sample;
     }
 }
 float Sampler::get_1D()
 {
-    if (EXPECT_TAKEN(_sample_1d_offset < _max_dim))
+    auto c = _current_state;
+    auto index = c->current_sample_index;
+    if (EXPECT_TAKEN(c->sample_1d_offsets[index] < _max_dim))
     {
-        auto sample = sample_scrambled_gray_code_van_der_corput(_current_sample_index, &_scramble_1d[_sample_1d_offset]);
-        _sample_1d_offset++;
+        auto sample = sample_scrambled_gray_code_van_der_corput(c->current_sample_index, &c->scramble_1d[c->sample_1d_offsets[index]]);
+        c->sample_1d_offsets[index]++;
         return sample;
     }
     else
     {
-        _sample_1d_offset++;
+        c->sample_1d_offsets[index]++;
         return _rng.next_float();
     }
 }
@@ -101,7 +120,7 @@ CameraSample Sampler::get_camera_sample(const Point2i &raster)
 std::unique_ptr<Sampler> Sampler::clone(const uint64_t seed) const
 {
     auto sampler = narukami::make_unique<Sampler>(*this);
-    sampler->_rng_seed = seed;
+    sampler->_rng.set_seed(seed);
     return sampler;
 }
 NARUKAMI_END

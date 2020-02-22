@@ -1229,9 +1229,9 @@ TEST(sampler,clone){
     auto sampler3=sampler.clone(0);
     auto sampler4=sampler.clone(1);
 
-    sampler2->start_pixel(Point2i(0,0));
-    sampler3->start_pixel(Point2i(0,0));
-    sampler4->start_pixel(Point2i(0,0));
+    sampler2->switch_pixel(Point2i(0,0));
+    sampler3->switch_pixel(Point2i(0,0));
+    sampler4->switch_pixel(Point2i(0,0));
 
     EXPECT_EQ(sampler2->get_2D(),sampler3->get_2D());
     EXPECT_EQ(sampler2->get_spp(),sampler4->get_spp());

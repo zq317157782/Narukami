@@ -890,7 +890,7 @@ BENCHMARK(BM_generate_sobol02_sample)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 static void BM_sampler_get_2D(benchmark::State &state)
 {    
     narukami::Sampler s(32,(size_t)state.range(0));
-    s.start_pixel(Point2i(0,0));
+    s.switch_pixel(Point2i(0,0));
     for (auto _ : state)
     {   
         for(size_t i = 0; i < state.range(0); i++)

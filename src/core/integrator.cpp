@@ -25,81 +25,101 @@ SOFTWARE.
 #include "core/integrator.h"
 #include "core/affine.h"
 #include "core/monte.h"
+#include "core/parallel.h"
 NARUKAMI_BEGIN
 
 void Integrator::render(const Scene &scene)
 {
-    MemoryArena arena;
+
     auto film = _camera->get_film();
-    auto cropped_pixel_bounds = film->get_cropped_pixel_bounds();
-    auto film_tile = film->get_film_tile(cropped_pixel_bounds);
+    auto sample_bounds = film->get_sample_bounds();
+    auto sample_extent = diagonal(sample_bounds);
+    const int tile_size = 64;
+    const auto tile_count_x = (sample_extent.x + (tile_size - 1)) / tile_size;
+    const auto tile_count_y = (sample_extent.y + (tile_size - 1)) / tile_size;
+    const Point2i tile_count(tile_count_x, tile_count_y);
 
-    for (auto &&pixel : cropped_pixel_bounds)
-    {
-        auto clone_sampler = _sampler->clone(pixel.x + pixel.y * width(cropped_pixel_bounds));
-        clone_sampler->start_pixel(pixel);
-        do
-        {
-            STAT_INCREASE_COUNTER(miss_intersection_denom, 1)
-            // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
-            auto camera_sample = clone_sampler->get_camera_sample(pixel);
-            Ray ray;
-            float w = _camera->generate_normalized_ray(camera_sample, &ray);
-            Interaction interaction;
-            constexpr int bounce_count = 5;
-            Spectrum L(0.0f, 0.0f, 0.0f);
-            float throughout = 1.0f;
-            
-            int bounce = 0;
-            for (; bounce <= bounce_count; ++bounce)
+    parallel_for_2D(
+        [&](Point2i tile_index) {
+            MemoryArena arena;
+            int seed = tile_index.y * tile_count.x + tile_index.x;
+            auto clone_sampler = _sampler->clone(seed);
+
+            auto tile_bounds_min_x = sample_bounds.min_point.x + tile_index.x * tile_size;
+            auto tile_bounds_min_y = sample_bounds.min_point.y + tile_index.y * tile_size;
+            auto tile_bounds_max_x = min(tile_bounds_min_x + tile_size, sample_bounds.max_point.x);
+            auto tile_bounds_max_y = min(tile_bounds_min_y + tile_size, sample_bounds.max_point.y);
+            Bounds2i tile_bounds(Point2i(tile_bounds_min_x, tile_bounds_min_y), Point2i(tile_bounds_max_x, tile_bounds_max_y));
+
+            auto film_tile = film->get_film_tile(tile_bounds);
+
+            for (auto &&pixel : tile_bounds)
             {
-
-                if (scene.intersect(arena, ray, &interaction))
+                clone_sampler->switch_pixel(pixel);
+                clone_sampler->switch_sample(0);
+                do
                 {
+                    STAT_INCREASE_COUNTER(miss_intersection_denom, 1)
+                    // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
+                    auto camera_sample = clone_sampler->get_camera_sample(pixel);
+                    Ray ray;
+                    float w = _camera->generate_normalized_ray(camera_sample, &ray);
+                    Interaction interaction;
+                    constexpr int bounce_count = 5;
+                    Spectrum L(0.0f, 0.0f, 0.0f);
+                    float throughout = 1.0f;
 
-                    if (is_surface_interaction(interaction))
+                    int bounce = 0;
+                    for (; bounce <= bounce_count; ++bounce)
                     {
-                        SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
 
-                        L = L + Le(surface_interaction, ray.d);
-
-                        for (auto &light : scene.lights)
+                        if (scene.intersect(arena, ray, &interaction))
                         {
-                            Vector3f wi;
-                            float pdf;
-                            VisibilityTester tester;
-                            auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
-                            if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
+
+                            if (is_surface_interaction(interaction))
                             {
-                                L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
+                                SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
+
+                                L = L + Le(surface_interaction, ray.d);
+
+                                for (auto &light : scene.lights)
+                                {
+                                    Vector3f wi;
+                                    float pdf;
+                                    VisibilityTester tester;
+                                    auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
+                                    if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
+                                    {
+                                        L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
+                                    }
+                                }
+                            }
+
+                            if (bounce < bounce_count)
+                            {
+                                auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
+                                auto object_to_world = get_object_to_world(interaction);
+                                auto direction_world = normalize(object_to_world(direction_object));
+                                ray = Ray(interaction.p, direction_world);
+                                ray = offset_ray(ray, interaction.n);
+
+                                throughout *= INV_PI * abs(direction_object.z);
                             }
                         }
+                        else
+                        {
+                            break;
+                        }
                     }
-
-                    if (bounce < bounce_count)
-                    {
-                        auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
-                        auto object_to_world = get_object_to_world(interaction);
-                        auto direction_world = normalize(object_to_world(direction_object));
-                        ray = Ray(interaction.p, direction_world);
-                        ray = offset_ray(ray, interaction.n);
-
-                        throughout *= INV_PI * abs(direction_object.z);
-                    }
-                }
-                else
-                {
-                    break;
-                }
+                    STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
+                    film_tile->add_sample(camera_sample.pFilm, L, w);
+                    arena.reset();
+                } while (clone_sampler->switch_to_next_sample());   
             }
-            STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
-            film_tile->add_sample(camera_sample.pFilm, L, w);
-            break;
-        } while (clone_sampler->start_next_sample());
-    }
-
-    film->merge_film_tile(std::move(film_tile));
-    arena.reset();
+            film->merge_film_tile(std::move(film_tile));
+            
+        },
+        tile_count);
 }
 
 NARUKAMI_END
