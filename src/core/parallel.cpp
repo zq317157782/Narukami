@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "parallel.h"
+#include "core/stat.h"
 #include <vector>
 NARUKAMI_BEGIN
 
@@ -113,6 +114,8 @@ void thread_worker_func(int index)
             }
         }
     }
+    //push thread data into stat
+    report_thread_statistics();
 }
 
 void setup_threads(int num_core)
