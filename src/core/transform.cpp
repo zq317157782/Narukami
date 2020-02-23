@@ -24,5 +24,4 @@ SOFTWARE.
 
 #include "core/transform.h"
 NARUKAMI_BEGIN
-SSEAllocator<Transform> alloc_transform;
 NARUKAMI_END

@@ -221,6 +221,5 @@ inline Transform perspective(float fov,float n, float f)
     float inv_tan_fov = 1.0f/std::tan(deg2rad(fov/2));
     return scale(inv_tan_fov,inv_tan_fov,1.0f) * Transform(m);
 }
-extern SSEAllocator<Transform> alloc_transform;
 
 NARUKAMI_END

@@ -98,21 +98,6 @@ std::unique_ptr<T> make_unique(Args&&... args)
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-template <class T>
-struct SSEAllocator {
-  using value_type = T;
-  SSEAllocator() noexcept{};
-  template <class U> SSEAllocator (const SSEAllocator<U>&) noexcept{};
-  T* allocate (std::size_t n){return reinterpret_cast<T*>(alloc_aligned<SSE_LINE_SIZE>(n*sizeof(T)));}
-  void deallocate (T* p, std::size_t n){free_aligned(p);}
-};
-
-// template <class T, class U>
-// constexpr bool operator== (const SSEAllocator<T>&, const SSEAllocator<U>&) noexcept{return true;}
-
-// template <class T, class U>
-// constexpr bool operator!= (const SSEAllocator<T>&, const SSEAllocator<U>&) noexcept{return false;}
-
 //memory arena from pbrt
 #define ARENA_ALLOC(arena, Type) new ((arena).alloc(sizeof(Type))) Type
 class MemoryArena{
