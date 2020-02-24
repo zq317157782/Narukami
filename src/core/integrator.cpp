@@ -39,7 +39,7 @@ void Integrator::render(const Scene &scene)
     const auto tile_count_x = (sample_extent.x + (tile_size - 1)) / tile_size;
     const auto tile_count_y = (sample_extent.y + (tile_size - 1)) / tile_size;
     const Point2i tile_count(tile_count_x, tile_count_y);
-    ProgressReporter rendering_reporter(tile_count_x * tile_count_y,"rendering");
+    ProgressReporter rendering_reporter(tile_count_x * tile_count_y, "rendering");
     parallel_for_2D(
         [&](Point2i tile_index) {
             MemoryArena arena;
@@ -65,7 +65,7 @@ void Integrator::render(const Scene &scene)
                     auto camera_sample = clone_sampler->get_camera_sample(pixel);
                     Ray ray;
                     float w = _camera->generate_normalized_ray(camera_sample, &ray);
-                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count,1)
+                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count, 1)
                     Interaction interaction;
                     constexpr int bounce_count = 5;
                     Spectrum L(0.0f, 0.0f, 0.0f);
@@ -95,18 +95,18 @@ void Integrator::render(const Scene &scene)
                                         L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
                                     }
                                 }
-                            }
 
-                            if (bounce < bounce_count)
-                            {
-                                auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
-                                auto object_to_world = get_object_to_world(interaction);
-                                auto direction_world = normalize(object_to_world(direction_object));
-                                ray = Ray(interaction.p, direction_world);
-                                ray = offset_ray(ray, interaction.n);
-                                STAT_INCREASE_MEMORY_COUNTER(total_ray_count,1)
+                                if (bounce < bounce_count)
+                                {
+                                    auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
+                                    auto object_to_world = get_object_to_world(surface_interaction);
+                                    auto direction_world = normalize(object_to_world(direction_object));
+                                    ray = Ray(interaction.p, direction_world);
+                                    ray = offset_ray(ray, interaction.n);
+                                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count, 1)
 
-                                throughout *= INV_PI * abs(direction_object.z);
+                                    throughout *= INV_PI * abs(direction_object.z);
+                                }
                             }
                         }
                         else
@@ -117,13 +117,13 @@ void Integrator::render(const Scene &scene)
                     STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
                     film_tile->add_sample(camera_sample.pFilm, L, w);
                     arena.reset();
-                } while (clone_sampler->switch_to_next_sample());   
+                } while (clone_sampler->switch_to_next_sample());
             }
             film->merge_film_tile(std::move(film_tile));
             rendering_reporter.update(1);
         },
         tile_count);
-        rendering_reporter.done();
+    rendering_reporter.done();
 }
 
 NARUKAMI_END
