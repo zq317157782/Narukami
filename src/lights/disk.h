@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #pragma once
 #include "core/light.h"
-#include "core/monte.h"
+#include "core/sampling.h"
 
 /*
 disk light local space

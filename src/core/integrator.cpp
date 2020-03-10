@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include "core/integrator.h"
 #include "core/affine.h"
-#include "core/monte.h"
+#include "core/sampling.h"
 #include "core/parallel.h"
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN

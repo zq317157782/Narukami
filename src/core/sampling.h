@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #pragma once
 #include "core/narukami.h"
+#include "core/geometry.h"
 NARUKAMI_BEGIN
 
 // d_omega = costheta * d_area / distance^2
@@ -51,7 +52,6 @@ inline Point2f uniform_sample_disk(const Point2f &u)
     float theta = 2.0f * PI * u.y;
     return polar_to_cartesian(radius,theta);
 }
-
 
 //"A low distortion map between disk and square"
 inline Point2f concentric_sample_disk(const Point2f &u)
@@ -83,4 +83,18 @@ inline Vector3f cosine_sample_hemisphere(const Point2f &u)
     float z = sqrt(max(0.0f,1.0f - d.x *d.x - d.y * d.y));
     return Vector3f(d.x,d.y,z);
 }
+
+//from PBRT
+// pdf(u,v) is constant for triangle barycentric
+inline Point2f uniform_sample_triangle_barycentric(const Point2f &u)
+{
+    float  su0 = sqrt(u[0]);
+    return Point2f(1 - su0, u[1] * su0);
+} 
+
+inline Point3f uniform_sample_triangle(const Triangle& tri, const Point2f &u)
+{
+    return barycentric_interpolate_position(tri,uniform_sample_triangle_barycentric(u));
+}
+
 NARUKAMI_END
