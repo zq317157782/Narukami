@@ -31,7 +31,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
 inline int num_system_core()
 {
+#ifdef NARUKAMI_DEBUG
+    return 1;
+#else
     return max<int32_t>(1, std::thread::hardware_concurrency());
+#endif
 }
 
 
