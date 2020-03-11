@@ -59,11 +59,12 @@ void Sampler::switch_pixel(const Point2i &p)
 
 bool Sampler::switch_to_next_sample()
 {
+    _current_state->current_sample_index++;
     if (is_completed())
     {
         return false;
     }
-    _current_state->current_sample_index++;
+    
     return true;
 }
 
