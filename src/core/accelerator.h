@@ -144,7 +144,16 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     {
         bounds[1] = Bounds3f();
     }
-    bounds[2] = cn->data[2]->bounds;
+
+    if (cn->data[2] != nullptr)
+    {
+        bounds[2] = cn->data[2]->bounds;
+    }
+    else
+    {
+        bounds[2] = Bounds3f();
+    }
+
     if (cn->data[3] != nullptr)
     {
         bounds[3] = cn->data[3]->bounds;
@@ -168,7 +177,11 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     {
         node->childrens[1] = leaf(cn->data[1]->offset, cn->data[1]->num);
     }
-    if (is_leaf(cn->data[2]))
+    if (cn->data[2] == nullptr)
+    {
+        node->childrens[2] = empty_leaf();
+    }
+    else if (is_leaf(cn->data[2]))
     {
         node->childrens[2] = leaf(cn->data[2]->offset, cn->data[2]->num);
     }

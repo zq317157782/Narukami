@@ -27,8 +27,6 @@ NARUKAMI_BEGIN
 
 Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::move(primitives))
 {
-    
-
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
     for (size_t i = 0; i < _primitives.size(); ++i)
     {
@@ -70,7 +68,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
         max_bounds = _union(max_bounds, primitive_infos[i].bounds);
     }
     uint32_t num = end - start;
-    if (num <= ACCELERATOR_TIRANGLE_NUM_PER_LEAF && (*total) > 1)
+    if (num <= ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
     {
         auto offset = ordered.size();
         for (size_t i = start; i < end; i++)
@@ -204,6 +202,18 @@ QBVHCollapseNode *Accelerator::collapse(MemoryArena &arena, const BVHBuildNode *
     node->childrens[1] = nullptr;
     node->childrens[2] = nullptr;
     node->childrens[3] = nullptr;
+    if(is_leaf(subtree_root))
+    {
+        node->data[0] = subtree_root;
+        node->data[1] = nullptr;
+        node->data[2] = nullptr;
+        node->data[3] = nullptr;
+        node->axis0 = 0;
+        node->axis1 = 0;
+        node->axis2 = 0;
+        return node;
+    }
+
     if (is_leaf(subtree_root->childrens[0]))
     {
         node->data[0] = subtree_root->childrens[0];
