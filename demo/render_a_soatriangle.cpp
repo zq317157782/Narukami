@@ -15,7 +15,7 @@ int main(){
 		narukami::Point2f uv;
 		float t;
         narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
-        bool b=intersect(ray,triangle,&t,&uv);
+        bool b=intersect(ray,triangle,&t,&uv,nullptr);
 		
 		float rgb[3];
 		if (b){

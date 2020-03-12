@@ -599,7 +599,7 @@ inline bool4 intersect(const SoARay &ray, const SoATriangle &triangle, float4 *t
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_result = nullptr, Point2f *uv = nullptr, int *index = nullptr, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -681,7 +681,7 @@ inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_r
     return true;
 }
 
-inline bool collide(const SoARay &ray, const SoATriangle &triangle, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const SoARay &ray, const SoATriangle &triangle, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;

@@ -230,6 +230,6 @@ public:
     Accelerator() = default;
     Accelerator(std::vector<Primitive> primitives);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
-    bool collide(const Ray &ray) const;
+    bool intersect(const Ray &ray) const;
 };
 NARUKAMI_END

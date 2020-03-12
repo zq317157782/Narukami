@@ -395,7 +395,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
     return has_hit_event;
 }
 
-bool Accelerator::collide(const Ray &ray) const
+bool Accelerator::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -431,7 +431,7 @@ bool Accelerator::collide(const Ray &ray) const
                     auto num = leaf_num(node->childrens[index]);
                     for (size_t j = offset; j < offset + num; ++j)
                     {
-                        auto is_hit = narukami::collide(soa_ray, _soa_primitive_infos[j].triangle);
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle);
                         if (is_hit)
                         {
                             return true;
