@@ -17,58 +17,78 @@
 #include "lights/point.h"
 #include "lights/rect.h"
 #include "lights/disk.h"
+#include "materials/lights/diffuse.h"
 using namespace narukami;
-int main(){
-
-    auto sampler = std::make_shared<Sampler>(128);
+int main()
+{
+    auto camera_transform = translate(0,0,-4);
+    auto sampler = std::make_shared<Sampler>(1);
     auto film = std::make_shared<Film>(Point2i(1920,1080),Bounds2f(Point2f(0,0),Point2f(1,1)));
     float aspect = 16.0f/9.0f;
-    auto camera = std::make_shared<PerspectiveCamera>(Transform(),Bounds2f{{-2*aspect,-2},{2*aspect,2}},75,film);
+    auto camera = std::make_shared<PerspectiveCamera>(camera_transform,Bounds2f{{-1*aspect,-1},{1*aspect,1}},45,film);
     
     std::vector<narukami::MeshTriangle> triangles;
 
     {
-        auto transform = translate(Vector3f(0, 0, 1.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
+        auto transform = translate(Vector3f(0, 0, 0.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
         auto inv_transform = inverse(transform);// translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
-        triangles = _union(triangles,load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj","."));
-    }
-
-    {
-        auto transform = translate(Vector3f(0.5f,0, 1.0f))*scale(0.2f,0.2f,0.2f);
-        auto inv_transform = inverse(transform);
         triangles = _union(triangles,load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj","."));
     }
 
     {
         auto transform = translate(0,-1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,10,10));
+        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,5));
     }
 
     {
         auto transform = translate(0,1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,10,10));
+        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,5));
     }
 
     {
-        auto transform = translate(0,0,2);
+        auto transform = translate(0,0,2.5f);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,10,10));
+        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
+    }
+
+    {
+        auto transform = translate(2.5f,0,0)*rotate(90,0,1,0);
+        auto inv_transform = inverse(transform);
+        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
+    }
+
+    {
+        auto transform = translate(-2.5f,0,0)*rotate(90,0,1,0);
+        auto inv_transform = inverse(transform);
+        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
     }
 
     auto primitives = create_primitives(triangles);
     
-    //create light 
-    std::vector<std::shared_ptr<Light>> lights;
+    std::vector<narukami::MeshTriangle> light_triangles;
     {
-        auto transform = translate(Vector3f(0.0f, 0.99f, 1.0f))*rotate(90,1,0,0);
+        auto transform = translate(0,0.99f,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        auto rect_light = std::make_shared<RectLight>(&transform,&inv_transform,Spectrum(10,10,10),false,1,1);
-        auto rect_light_triangles = load_mesh(*rect_light);
-        lights.push_back(rect_light);
-        primitives = _union(primitives,create_primitives(rect_light_triangles,rect_light.get()));
+        light_triangles = _union(light_triangles,create_plane(&transform,&inv_transform,1,1));
     }
+    DiffuseLightMaterial diffuse(Spectrum(1,0,0));
+    auto light_primitives = create_primitives(light_triangles,&diffuse);
+    
+    primitives = _union(primitives,light_primitives);
+    // //create light 
+    // std::vector<std::shared_ptr<Light>> lights;
+    // {
+    //     auto transform = translate(Vector3f(0.0f, 0.99f, 1.0f))*rotate(90,1,0,0);
+    //     auto inv_transform = inverse(transform);
+    //     auto rect_light = std::make_shared<RectLight>(&transform,&inv_transform,Spectrum(10,10,10),false,1,1);
+    //     auto rect_light_triangles = load_mesh(*rect_light);
+    //     lights.push_back(rect_light);
+    //     primitives = _union(primitives,create_primitives(rect_light_triangles,rect_light.get()));
+    // }
+
+
     // {
     //     auto transform = translate(Vector3f(0.0f, 1.0f, 1.0f))*rotate(90,1,0,0);
     //     auto inv_transform = inverse(transform);
@@ -79,7 +99,7 @@ int main(){
     // }
    
         
-    Scene scene(primitives,lights);
+    Scene scene(primitives);
     Integrator integrator(camera,sampler);
     integrator.render(scene);
     parallel_for_clean();

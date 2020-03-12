@@ -33,15 +33,16 @@ NARUKAMI_BEGIN
         public:
         MeshTriangle triangle;
         const AreaLight* area_light;
-
+        const LightMaterial* light_material;
         Primitive() = default;
         Primitive(const Primitive&) = default;
         Primitive(Primitive&&) = default;
         Primitive& operator=(const Primitive&) = default;
         Primitive& operator=(Primitive&&) = default;
         ~Primitive()=default;
-        Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)),area_light(nullptr){}
-        Primitive(MeshTriangle _triangle,const AreaLight*area_light):triangle(std::move(_triangle)),area_light(area_light){}
+        Primitive(MeshTriangle _triangle):triangle(std::move(_triangle)),area_light(nullptr),light_material(nullptr){}
+        Primitive(MeshTriangle _triangle,const AreaLight*area_light):triangle(std::move(_triangle)),area_light(area_light),light_material(nullptr){}
+        Primitive(MeshTriangle _triangle,const LightMaterial*light_material):triangle(std::move(_triangle)),light_material(light_material),area_light(nullptr){}
     };
 
     inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.triangle.get_world_bounds();}
@@ -49,7 +50,9 @@ NARUKAMI_BEGIN
     inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.triangle.world_to_object();}
     //inline Spectrum Le(const Primitive& primitive){ ()}
 
-    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light = nullptr);
+    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles);
+    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light);
+    std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const LightMaterial* light_material);
     std::vector<Primitive> _union(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
 
     struct SoAPrimitiveInfo{

@@ -21,24 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include "materials/lights/diffuse.h"
+#include "core/spectrum.h"
 
-#include "core/interaction.h"
-#include "core/light.h"
-#include "core/material.h"
 NARUKAMI_BEGIN
-Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
-{
-    if(interaction.primitive->area_light!=nullptr)
+    DiffuseLightMaterial::DiffuseLightMaterial(const Spectrum &L):_radiance(L)
     {
-        return interaction.primitive->area_light->L(interaction,wi);
     }
-    else if(interaction.primitive->light_material!=nullptr)
+
+    Spectrum DiffuseLightMaterial::Li(const Point3f& p) const
     {
-        return interaction.primitive->light_material->Li(interaction.p);
+        return _radiance;
     }
-    else
-    {
-        return Spectrum(0.0f,0.0f,0.0f);
-    }
-}
 NARUKAMI_END

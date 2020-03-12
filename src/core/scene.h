@@ -28,25 +28,28 @@ SOFTWARE.
 #include "core/accelerator.h"
 #include "core/primitive.h"
 #include "core/interaction.h"
-#include "core/light.h"
 #include <vector>
 NARUKAMI_BEGIN
 class Scene{
     private:
         Accelerator _accelerator;
     public:
-        const std::vector<std::shared_ptr<Light>> lights;
+        std::vector<Primitive> lights;
     public:
-        Scene(const std::vector<MeshTriangle>& triangles,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
         Scene(const std::vector<MeshTriangle>& triangles){
            std::vector<Primitive> primitives=create_primitives(triangles);
            _accelerator=Accelerator(primitives);
         }
-        Scene(const std::vector<Primitive>& primitives,const std::vector<std::shared_ptr<Light>>& lights):lights(lights){
+       
+        Scene(const std::vector<Primitive>& primitives){
              _accelerator=Accelerator(primitives);
+             for(auto& p: primitives)
+             {
+                 if(p.light_material!=nullptr)
+                 {
+                     lights.push_back(p);
+                 }
+             }
         }
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{

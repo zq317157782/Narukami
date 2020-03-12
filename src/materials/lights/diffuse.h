@@ -22,23 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "core/interaction.h"
-#include "core/light.h"
+#pragma once
+#include "core/narukami.h"
 #include "core/material.h"
 NARUKAMI_BEGIN
-Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
+
+class DiffuseLightMaterial:public LightMaterial
 {
-    if(interaction.primitive->area_light!=nullptr)
-    {
-        return interaction.primitive->area_light->L(interaction,wi);
-    }
-    else if(interaction.primitive->light_material!=nullptr)
-    {
-        return interaction.primitive->light_material->Li(interaction.p);
-    }
-    else
-    {
-        return Spectrum(0.0f,0.0f,0.0f);
-    }
-}
+    private:
+        Spectrum _radiance;
+    public:
+        DiffuseLightMaterial(const Spectrum &L);
+        virtual Spectrum Li(const Point3f& p) const override;
+};
+
 NARUKAMI_END

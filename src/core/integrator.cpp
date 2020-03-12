@@ -25,7 +25,9 @@ SOFTWARE.
 #include "core/integrator.h"
 #include "core/affine.h"
 #include "core/sampling.h"
+#include "core/material.h"
 #include "core/parallel.h"
+#include "core/interaction.h"
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
@@ -83,18 +85,44 @@ void Integrator::render(const Scene &scene)
                                 SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
 
                                 L = L + Le(surface_interaction, ray.d);
+                                
+                                for(auto &light : scene.lights)
+                                {   
+                                    auto triangle = light.triangle.triangle();
+                                    if(is_degraded(triangle))
+                                    {
+                                        continue;
+                                    }
 
-                                for (auto &light : scene.lights)
-                                {
-                                    Vector3f wi;
-                                    float pdf;
-                                    VisibilityTester tester;
-                                    auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
+                                    auto light_position = uniform_sample_triangle(triangle,clone_sampler->get_2D());
+                                    Vector3f wi = light_position - surface_interaction.p;
+                                    auto distance_sqr = sqrlen(wi);
+                                    wi = normalize(wi);
+                                    float light_costheta = light.triangle.object_to_world()(-wi).z;
+                                    float pdf = to_solid_angle_measure_pdf(rcp(area(triangle)), sqrlen(wi),abs(light_costheta));
+                                    
+                                    VisibilityTester tester(surface_interaction, Interaction(light_position));
+                                    auto Li = light.light_material->Li(light_position);
+                                    
+                                   
                                     if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
                                     {
-                                        L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
+                                        
+                                        L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li / pdf;
                                     }
                                 }
+
+                                // for (auto &light : scene.lights)
+                                // {
+                                //     Vector3f wi;
+                                //     float pdf;
+                                //     VisibilityTester tester;
+                                //     auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
+                                //     if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
+                                //     {
+                                //         L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
+                                //     }
+                                // }
 
                                 if (bounce < bounce_count)
                                 {

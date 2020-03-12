@@ -63,6 +63,13 @@ NARUKAMI_BEGIN
         inline  Bounds3f get_world_bounds() const{return _union(_union(_mesh->vertices[_index[0]],_mesh->vertices[_index[1]]),_mesh->vertices[_index[2]]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
+        inline  Triangle triangle() const {
+            Triangle triangle;
+            triangle.v0 = (*this)[0];
+            triangle.e1 = (*this)[1] - triangle.v0;
+            triangle.e2 = (*this)[2] - triangle.v0;
+            return triangle;
+        }
         friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->vertices[v._index[0]] << ',' << v._mesh->vertices[v._index[1]] << ',' << v._mesh->vertices[v._index[2]] << ')'; return out; }
     };
 

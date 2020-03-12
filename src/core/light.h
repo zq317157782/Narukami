@@ -28,19 +28,6 @@ SOFTWARE.
 #include "core/spectrum.h"
 #include "core/interaction.h"
 NARUKAMI_BEGIN
-// _p0 is the start point
-// _p1 is the end point
-class VisibilityTester
-{
-private:
-    Interaction _p0, _p1;
-
-public:
-    VisibilityTester() = default;
-    VisibilityTester(const Interaction &p0, const Interaction &p1) : _p0(p0), _p1(p1) {}
-    bool unoccluded(const Scene &scene) const;
-};
-
 class Light
 {
 protected:

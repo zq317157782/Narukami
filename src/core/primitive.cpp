@@ -23,11 +23,33 @@ SOFTWARE.
 */
 #include "core/primitive.h"
 NARUKAMI_BEGIN
+
+
+std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles){
+    std::vector<Primitive> primitives(triangles.size());
+    for (size_t i = 0; i < triangles.size(); ++i)
+    {
+        primitives[i]=Primitive(triangles[i]);
+    }
+    
+    return primitives;
+}
+
 std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light){
     std::vector<Primitive> primitives(triangles.size());
     for (size_t i = 0; i < triangles.size(); ++i)
     {
         primitives[i]=Primitive(triangles[i],area_light);
+    }
+    
+    return primitives;
+}
+
+std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const LightMaterial* light_material){
+    std::vector<Primitive> primitives(triangles.size());
+    for (size_t i = 0; i < triangles.size(); ++i)
+    {
+        primitives[i]=Primitive(triangles[i],light_material);
     }
     
     return primitives;

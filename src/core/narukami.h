@@ -51,6 +51,8 @@ NARUKAMI_BEGIN
 class Scene;
 class Light;
 class AreaLight;
+class LightMaterial;
+class VisibilityTester;
 
 inline int count_trailing_zero(uint32_t v){
 #if defined(__GNUC__) || defined(__clang__)

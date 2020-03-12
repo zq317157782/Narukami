@@ -17,10 +17,12 @@ include_directories(external/benchmark/include/benchmark)
 include_directories(external/lodepng)
 include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
-
-
+ 
+ 
 aux_source_directory(src/core SRC_CORE)
 aux_source_directory(src/cameras SRC_CAMERAS)
+aux_source_directory(src/materials SRC_MATERIALS)
+aux_source_directory(src/materials/lights SRC_MATERIALS_LIGHTS)
 aux_source_directory(external/lodepng EXT_LODEPNG)
 #add gtest
 set(gtest_force_shared_crt ON)
@@ -64,7 +66,7 @@ target_link_libraries(narukami_benchmark benchmark)
 
 #demos
 add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} ${SRC_MATERIALS_LIGHTS})
 target_link_libraries(narukami_demo_render_a_mesh tinyobjloader)
 add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
@@ -73,6 +75,7 @@ add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp ${
 add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
+add_executable(narukami_demo_test_parallel_for demo/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 
  
 if(MSVC)

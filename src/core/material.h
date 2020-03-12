@@ -25,57 +25,12 @@ SOFTWARE.
 
 #include "core/narukami.h"
 #include "core/affine.h"
-#include "core/primitive.h"
 #include "core/spectrum.h"
+
 NARUKAMI_BEGIN
-
-//basic interaction
-class Interaction{
-public:
-    Point3f p;
-    Normal3f n;
-    float hit_t;
-    const Primitive * primitive;
-public:
-    Interaction() = default;
-    Interaction(const Point3f& p):p(p){}
-    Interaction(const Point3f& p,const Normal3f& n):p(p),n(n){}
-};
-
-FINLINE bool is_surface_interaction(const Interaction& interaction){
-     return dot(interaction.n,interaction.n)!=0;
-}
-
-class SurfaceInteraction:public Interaction{
-public:
-     
-};
-
-inline const Transform& get_object_to_world(const SurfaceInteraction& interaction)
+class LightMaterial
 {
-    return get_object_to_world(*interaction.primitive);
-}
-
-inline const Transform& get_world_to_object(const SurfaceInteraction& interaction)
-{
-    return get_world_to_object(*interaction.primitive);
-}
-
-Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi);
-
-
-// _p0 is the start point
-// _p1 is the end point
-class VisibilityTester
-{
-private:
-    Interaction _p0, _p1;
-
-public:
-    VisibilityTester() = default;
-    VisibilityTester(const Interaction &p0, const Interaction &p1) : _p0(p0), _p1(p1) {}
-    bool unoccluded(const Scene &scene) const;
+    public:
+      virtual Spectrum Li(const Point3f& p) const = 0;
 };
-
-
 NARUKAMI_END
