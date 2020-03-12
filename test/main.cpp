@@ -850,17 +850,17 @@ TEST(geometry,size_of_soatriangle){
     EXPECT_EQ(sizeof(SoATriangle),144);
 }
 
-TEST(SoAbound3f,collide){
+TEST(SoAbound3f,intersect0){
     
     SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
     int p[3]={1,1,1};
-    auto a=collide(ray.o,SoAVector3f(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
+    auto a=intersect(ray.o,SoAVector3f(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
     EXPECT_EQ(any(a),true);
 }
 
 
-TEST(SoAbound3f,intersect){
+TEST(SoAbound3f,intersect1){
     
     SoABounds3f bound(SoAPoint3f(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),SoAPoint3f(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
@@ -1105,10 +1105,10 @@ TEST(lua,init){
 }
 
 
-TEST(Bounds3f,collide){
+TEST(Bounds3f,intersect){
     Bounds3f bounds(Point3f(0,0,0),Point3f(1,1,1));
     int isPositive[3]={1,1,1};
-    bool isHit=collide(Point3f(0,0,0),Vector3f(INFINITE,INFINITE,1),0,1,isPositive,bounds);
+    bool isHit=intersect(Point3f(0,0,0),Vector3f(INFINITE,INFINITE,1),0,1,isPositive,bounds);
     EXPECT_TRUE(isHit);
 }
 
@@ -1297,7 +1297,7 @@ TEST(Bounds3f,_union){
     EXPECT_EQ(b0,b3);
 }
 
-TEST(Bounds3f,intersect){
+TEST(Bounds3f,intersect1){
     Point3f p0(0,0,0);
     Point3f p1(2,2,2);
     Bounds3f b0=_union(p0,p1);

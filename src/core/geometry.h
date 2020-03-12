@@ -736,7 +736,7 @@ inline bool collide(const SoARay &ray, const SoATriangle &triangle, bool4 mask =
 
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
-inline bool collide(const Point3f &o, const Vector3f &inv_d, float t_min, float t_max, const int isPositive[3], const Bounds3f &box)
+inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, float t_max, const int isPositive[3], const Bounds3f &box)
 {
     //x
     t_min = max((box[1 - isPositive[0]].x - o.x) * inv_d.x, t_min);
@@ -751,7 +751,7 @@ inline bool collide(const Point3f &o, const Vector3f &inv_d, float t_min, float 
     return t_min <= t_max;
 }
 
-inline bool4 collide(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box)
+inline bool4 intersect(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box)
 {
     // x
     t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
@@ -788,22 +788,4 @@ inline bool4 intersect(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_m
     //check
     return t_min <= t_max;
 }
-
-// inline int collide(const SoAPoint3f& o,const SoAVector3f& inv_d,float4 t_min,float4 t_max,const float4 isPositive[3],const SoABox& box){
-//     // x
-//     t_min = max(t_min,(select(isPositive[0],box[0].xxxx,box[1].xxxx)-o.xxxx)*inv_d.xxxx);
-//     t_max = min(t_max,(select(isPositive[0],box[1].xxxx,box[0].xxxx)-o.xxxx)*inv_d.xxxx);
-
-//     //y
-//     t_min = max(t_min,(select(isPositive[1],box[0].yyyy,box[1].yyyy)-o.yyyy)*inv_d.yyyy);
-//     t_max = min(t_max,(select(isPositive[1],box[1].yyyy,box[0].yyyy)-o.yyyy)*inv_d.yyyy);
-
-//     //z
-//     t_min = max(t_min,(select(isPositive[2],box[0].zzzz,box[1].zzzz)-o.yyyy)*inv_d.zzzz);
-//     t_max = min(t_max,(select(isPositive[2],box[1].zzzz,box[0].zzzz)-o.yyyy)*inv_d.zzzz);
-
-//     //check
-//     return movemask(t_min<=t_max);
-// }
-
 NARUKAMI_END
