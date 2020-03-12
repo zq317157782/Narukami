@@ -121,6 +121,23 @@ inline Point3f barycentric_interpolate_position(const Triangle &tri, const Point
     return tri.v0 + tri.e1 * uv.x + tri.e2 * uv.y;
 }
 
+
+inline bool is_degraded(const Triangle &tri)
+{
+    float inner_product = dot(tri.e1,tri.e2);
+    //TODO can simper?
+    if(inner_product==0||inner_product==1||inner_product==-1)
+    {
+        return true;
+    }
+    return false;
+}
+
+inline float area(const Triangle &tri)
+{
+    return length(cross(tri.e1,tri.e2))/2;
+}
+
 inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";
