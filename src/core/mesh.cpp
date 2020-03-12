@@ -146,4 +146,36 @@ std::vector<MeshTriangle> create_plane(const Transform *object2wrold, const Tran
     return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
 }
 
+std::vector<MeshTriangle> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density)
+{
+        assert(radius > 0);
+        std::vector<std::vector<MeshTriangle>> triangles;
+        std::vector<Point3f> vertices = {Point3f(0, 0, 0)};
+        std::vector<Normal3f> normals = {Normal3f(0, 0, 1)};
+        std::vector<Point2f> uvs = {Point2f(0, 0)};
+        std::vector<uint32_t> indices;
+        float theta_step = 2.0f * PI / vertex_density;
+        float theta = 0;
+        for (size_t i = 1; i <= vertex_density; i++)
+        {
+            Point3f v(cos(theta) * radius, sin(theta) * radius, 0);
+            vertices.push_back(v);
+            uvs.push_back(Point2f(0, 0));
+            if (i > 1)
+            {
+                indices.push_back(i-1);
+                indices.push_back(0);
+                indices.push_back(i);
+            }
+            theta += theta_step;
+        }
+
+        //last piece
+        indices.push_back(vertex_density);
+        indices.push_back(0);
+        indices.push_back(1);
+
+        return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+    }
+
 NARUKAMI_END

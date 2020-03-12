@@ -90,5 +90,6 @@ NARUKAMI_BEGIN
     std::vector<MeshTriangle> _union(std::vector<MeshTriangle>& a,std::vector<MeshTriangle>& b);
     
     std::vector<MeshTriangle> create_plane(const Transform* object2wrold,const Transform* world2object,const float width,const float height);
+    std::vector<MeshTriangle> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density = 32);
 NARUKAMI_END
 
