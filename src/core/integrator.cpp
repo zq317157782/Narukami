@@ -67,7 +67,7 @@ void Integrator::render(const Scene &scene)
                     auto camera_sample = clone_sampler->get_camera_sample(pixel);
                     Ray ray;
                     float w = _camera->generate_normalized_ray(camera_sample, &ray);
-                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count, 1)
+                    STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
                     Interaction interaction;
                     constexpr int bounce_count = 5;
                     Spectrum L(0.0f, 0.0f, 0.0f);
@@ -107,7 +107,7 @@ void Integrator::render(const Scene &scene)
                                    
                                     if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
                                     {
-                                        
+                                         STAT_INCREASE_MEMORY_COUNTER(shadow_ray_count, 1)
                                         L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li / pdf;
                                     }
                                 }
@@ -131,7 +131,7 @@ void Integrator::render(const Scene &scene)
                                     auto direction_world = normalize(object_to_world(direction_object));
                                     ray = Ray(interaction.p, direction_world);
                                     ray = offset_ray(ray, interaction.n);
-                                    STAT_INCREASE_MEMORY_COUNTER(total_ray_count, 1)
+                                    STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
 
                                     throughout *= INV_PI * abs(direction_object.z);
                                 }

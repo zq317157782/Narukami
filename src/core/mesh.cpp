@@ -68,6 +68,7 @@ const MeshData& MeshTriangle::mesh() const{return _mm->get_mesh_data_ref(_mesh_d
 
  MeshData& MeshManager::add_get_mesh_data_ref(uint32_t& index)
  {
+     STAT_INCREASE_COUNTER(MeshData_count,1)
      index=_mesh_datas.size();
     _mesh_datas.emplace_back();
     return _mesh_datas.back();
@@ -75,6 +76,7 @@ const MeshData& MeshTriangle::mesh() const{return _mm->get_mesh_data_ref(_mesh_d
 
  MeshTriangle& MeshManager::add_get_mesh_triangle_ref(uint32_t& index)
  {
+    STAT_INCREASE_COUNTER(MeshTriangle_count,1)
     index=_mesh_triangles.size();
     _mesh_triangles.emplace_back();
     return _mesh_triangles.back();

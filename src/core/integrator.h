@@ -32,7 +32,8 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 STAT_PERCENT("integrator/miss intersection's ratio",miss_intersection_num,miss_intersection_denom)
-STAT_COUNTER("integrator/total ray's count",total_ray_count)
+STAT_COUNTER("integrator/common ray's count",ray_count)
+STAT_COUNTER("integrator/shadow ray's count",shadow_ray_count)
 class Integrator{
     private:
         std::shared_ptr<const Camera> _camera;

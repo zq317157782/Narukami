@@ -25,6 +25,7 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/affine.h"
 #include "core/transform.h"
+#include "core/stat.h"
 #include <vector>
 NARUKAMI_BEGIN
     class MeshData{
@@ -86,7 +87,8 @@ NARUKAMI_BEGIN
         auto e2 = triangle[2]-v0;
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
-
+    STAT_COUNTER("mesh/MeshData's count",MeshData_count)
+    STAT_COUNTER("mesh/MeshTriangle's count",MeshTriangle_count)
     class MeshManager
     {
     private:
