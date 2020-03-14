@@ -28,22 +28,27 @@ SOFTWARE.
 #include <vector>
 NARUKAMI_BEGIN
     class MeshData{
+        private:
+            std::vector<Point3f> _vertices;
+            std::vector<Normal3f> _normals;
+            std::vector<Point2f> _uvs;
+            std::vector<uint32_t> _indices;
         public:
-            std::vector<Point3f> vertices;
-            std::vector<Normal3f> normals;
-            std::vector<Point2f> uvs;
-            std::vector<uint32_t> indices;
-        
-        MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);
-        MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices);
-        MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals);
-        MeshData(const Transform& object2wrold,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Point2f>&uvs);
+            MeshData& add_vertices(const std::vector<Point3f> &vertices);
+            MeshData& add_normals( const std::vector<Normal3f> &normals);
+            MeshData& add_uvs(const std::vector<Point2f> &uvs);
+            MeshData& add_indices(const std::vector<uint32_t> &indices);
+
+            MeshData& add_transform_vertices(const Transform &trans,const std::vector<Point3f> &vertices);
+            MeshData& add_transform_normals(const Transform &trans,const std::vector<Normal3f> &normals);
+        public:
+            friend class MeshTriangle;
     };
 
     class MeshTriangle{
         private:
             const Transform * _object2world,*_world2object;
-            std::shared_ptr<MeshData> _mesh;
+            const MeshData* _mesh;
             uint32_t _index[3];
         public:
         MeshTriangle() = default;
@@ -52,15 +57,20 @@ NARUKAMI_BEGIN
         MeshTriangle& operator=(const MeshTriangle&) = default;
         MeshTriangle& operator=(MeshTriangle&&) = default;
         ~MeshTriangle()=default;
-        MeshTriangle(const Transform* object2world,const Transform* world2object,std::shared_ptr<MeshData> mesh,const uint32_t  idx[3]):_object2world(object2world),_world2object(world2object),_mesh(std::move(mesh)){
+
+        void init(const Transform* object2world,const Transform* world2object,const MeshData* mesh,const uint32_t idx[3])
+        {
+            _object2world = object2world;
+            _world2object = world2object;
+            _mesh = mesh;
             memcpy(_index,idx,sizeof(uint32_t)*3);
-        } 
+        }
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return _mesh->vertices[_index[i]]; }
-        inline const Point3f& operator[](const int i)const { assert(i>=0&&i<=2); return _mesh->vertices[_index[i]];}
-        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<=2); if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[i]]; } return Point2f(0);}
-        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->uvs.size()>0){ return _mesh->uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->uvs[_index[1]]*u.x+_mesh->uvs[_index[2]]*u.y; } return Point2f(0); }
-        inline  Bounds3f get_world_bounds() const{return _union(_union(_mesh->vertices[_index[0]],_mesh->vertices[_index[1]]),_mesh->vertices[_index[2]]);}
+        inline const Point3f& operator[](const int i)const { assert(i>=0&&i<=2); return _mesh->_vertices[_index[i]];}
+        inline  Point2f get_vertex_uv(const int i) const{ assert(i>=0&&i<=2); if(_mesh->_uvs.size()>0){ return _mesh->_uvs[_index[i]]; } return Point2f(0);}
+        inline  Point2f sample_uv(const Point2f& u) const{ if(_mesh->_uvs.size()>0){ return _mesh->_uvs[_index[0]]*(1.0f-u.x-u.y)+_mesh->_uvs[_index[1]]*u.x+_mesh->_uvs[_index[2]]*u.y; } return Point2f(0); }
+        inline  Bounds3f get_world_bounds() const{return _union(_union(_mesh->_vertices[_index[0]],_mesh->_vertices[_index[1]]),_mesh->_vertices[_index[2]]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
         inline  Triangle triangle() const {
@@ -70,12 +80,9 @@ NARUKAMI_BEGIN
             triangle.e2 = (*this)[2] - triangle.v0;
             return triangle;
         }
-        friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->vertices[v._index[0]] << ',' << v._mesh->vertices[v._index[1]] << ',' << v._mesh->vertices[v._index[2]] << ')'; return out; }
+        friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v._mesh->_vertices[v._index[0]] << ',' << v._mesh->_vertices[v._index[1]] << ',' << v._mesh->_vertices[v._index[2]] << ')'; return out; }
     };
-
-
     
-
     inline bool intersect(const Ray& ray,const MeshTriangle& triangle,float* t,Point2f* uv){
         auto v0 = triangle[0];
         auto e1 = triangle[1]-v0;
@@ -83,13 +90,25 @@ NARUKAMI_BEGIN
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
 
-    std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle>& triangles,uint32_t start,uint32_t count);
+    class MeshManager
+    {
+    private:
+        std::vector<MeshData> _mesh_datas;
+        std::vector<MeshTriangle> _mesh_triangles;
+    public:
+        MeshData& add_get_mesh_data_ref();
+        MeshTriangle& add_get_mesh_triangle_ref();
 
-    std::vector<MeshTriangle> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);
+        size_t mesh_data_size(){return _mesh_datas.size();}
+        size_t mesh_triange_size(){return _mesh_triangles.size();}
 
-    std::vector<MeshTriangle> _union(std::vector<MeshTriangle>& a,std::vector<MeshTriangle>& b);
-    
-    std::vector<MeshTriangle> create_plane(const Transform* object2wrold,const Transform* world2object,const float width,const float height);
-    std::vector<MeshTriangle> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density = 32);
+        const MeshTriangle& get_mesh_triangle_ref(size_t index) const {return _mesh_triangles[index];}
+    };
+
+    std::vector<SoATriangle> SoA_pack(const MeshManager&,const std::pair<size_t,size_t>& range);
+
+    std::pair<size_t,size_t> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs,MeshManager&);    
+    std::pair<size_t,size_t> create_plane(const Transform* object2wrold,const Transform* world2object,const float width,const float height,MeshManager&);
+    std::pair<size_t,size_t> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density,MeshManager&);
 NARUKAMI_END
 

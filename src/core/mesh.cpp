@@ -4,75 +4,77 @@
 
 NARUKAMI_BEGIN
 
-MeshData::MeshData(const Transform &object2wrold, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
+MeshData& MeshData::add_vertices(const std::vector<Point3f> &vertices)
 {
-    for (auto &&i : indices)
-    {
-        this->indices.push_back(i);
-    }
     for (auto &&i : vertices)
     {
-        this->vertices.push_back(object2wrold(i));
+        this->_vertices.push_back(i);
     }
+    return (*this);
+}
+MeshData& MeshData::add_normals( const std::vector<Normal3f> &normals)
+{
     for (auto &&i : normals)
     {
-        this->normals.push_back(object2wrold(i));
+        this->_normals.push_back(i);
     }
+    return (*this);
+}
+MeshData& MeshData::add_uvs(const std::vector<Point2f> &uvs)
+{
     for (auto &&i : uvs)
     {
-        this->uvs.push_back(i);
+        this->_uvs.push_back(i);
     }
+    return (*this);
 }
-
-MeshData::MeshData(const Transform &object2wrold, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices)
+MeshData& MeshData::add_indices(const std::vector<uint32_t> &indices)
 {
     for (auto &&i : indices)
     {
-        this->indices.push_back(i);
+        this->_indices.push_back(i);
     }
-    for (auto &&i : vertices)
-    {
-        this->vertices.push_back(object2wrold(i));
-    }
+    return (*this);
 }
 
-MeshData::MeshData(const Transform &object2wrold, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices, const std::vector<Normal3f> &normals)
+MeshData& MeshData::add_transform_vertices(const Transform &trans,const std::vector<Point3f> &vertices)
 {
-    for (auto &&i : indices)
-    {
-        this->indices.push_back(i);
-    }
     for (auto &&i : vertices)
     {
-        this->vertices.push_back(object2wrold(i));
+        this->_vertices.push_back(trans(i));
     }
+    return (*this);
+}
+
+MeshData& MeshData::add_transform_normals(const Transform &trans,const std::vector<Normal3f> &normals)
+{
     for (auto &&i : normals)
     {
-        this->normals.push_back(object2wrold(i));
+        this->_normals.push_back(trans(i));
     }
+    return (*this);
 }
 
-MeshData::MeshData(const Transform &object2wrold, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices, const std::vector<Point2f> &uvs)
-{
-    for (auto &&i : indices)
-    {
-        this->indices.push_back(i);
-    }
-    for (auto &&i : vertices)
-    {
-        this->vertices.push_back(object2wrold(i));
-    }
-    for (auto &&i : uvs)
-    {
-        this->uvs.push_back(i);
-    }
-}
+ MeshData& MeshManager::add_get_mesh_data_ref()
+ {
+    _mesh_datas.emplace_back();
+    return _mesh_datas.back();
+ }
+
+ MeshTriangle& MeshManager::add_get_mesh_triangle_ref()
+ {
+    _mesh_triangles.emplace_back();
+    return _mesh_triangles.back();
+ }
 
 //TODO SSE alignas
-std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &triangles, uint32_t start, uint32_t count)
+std::vector<SoATriangle> SoA_pack(const MeshManager& manager,const std::pair<size_t,size_t>& range)
 {
+    size_t start = range.first;
+    size_t end = range.second;
+    size_t count = end - start;
     assert(count > 0);
-    assert((start + count) <= triangles.size());
+    assert((start + count) <= manager.mesh_triange_size());
 
     size_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
 
@@ -84,9 +86,9 @@ std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &
     {
         if (i < count)
         {
-            auto v0 = triangles[start + i][0];
-            auto e1 = triangles[start + i][1] - v0;
-            auto e2 = triangles[start + i][2] - v0;
+            auto v0 = manager.get_mesh_triangle_ref(start + i)[0];
+            auto e1 = manager.get_mesh_triangle_ref(start + i)[1] - v0;
+            auto e2 = manager.get_mesh_triangle_ref(start + i)[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);
@@ -113,27 +115,29 @@ std::vector<SoATriangle> cast_to_SoA_structure(const std::vector<MeshTriangle> &
     return soa_triangles;
 }
 
-std::vector<MeshTriangle> create_mesh_triangles(const Transform *object2wrold, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
+std::pair<size_t,size_t> create_mesh_triangles(const Transform *object2wrold, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &vertices, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs,MeshManager& manager)
 {
-    std::shared_ptr<MeshData> mesh_data = std::make_shared<MeshData>(*object2wrold, indices, vertices, normals, uvs);
-    std::vector<MeshTriangle> triangles;
+    
+    auto mesh_data = manager.add_get_mesh_data_ref();
+    mesh_data.add_transform_vertices(*object2wrold,vertices)
+             .add_indices(indices)
+             .add_transform_normals(*object2wrold,normals)
+             .add_uvs(uvs);
+
     auto triangle_num = indices.size() / 3;
+    size_t start_index = manager.mesh_triange_size();
     for (size_t i = 0; i < triangle_num; ++i)
     {
-        triangles.push_back(MeshTriangle(object2wrold, world2object, mesh_data, &indices[3 * i]));
+        auto mesh_triangle = manager.add_get_mesh_triangle_ref();
+        mesh_triangle.init(object2wrold, world2object, &mesh_data, &indices[3 * i]);
     }
-    return triangles;
+    size_t end_index = manager.mesh_triange_size();
+    return std::pair<size_t,size_t>(start_index,end_index);
 }
 
-std::vector<MeshTriangle> _union(std::vector<MeshTriangle> &a, std::vector<MeshTriangle> &b)
-{
-    std::vector<MeshTriangle> c;
-    c.insert(c.end(), a.begin(), a.end());
-    c.insert(c.end(), b.begin(), b.end());
-    return c;
-}
 
-std::vector<MeshTriangle> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
+
+std::pair<size_t,size_t>  create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height,MeshManager& manager)
 {
     std::vector<std::vector<MeshTriangle>> triangles;
     float hw = width * 0.5f;
@@ -143,10 +147,10 @@ std::vector<MeshTriangle> create_plane(const Transform *object2wrold, const Tran
     std::vector<Point2f> uvs = {Point2f(0, 1), Point2f(0, 0), Point2f(1, 0), Point2f(1, 1)};
     std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
 
-    return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+    return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs,manager);
 }
 
-std::vector<MeshTriangle> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density)
+std::pair<size_t,size_t> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density,MeshManager& manager)
 {
         assert(radius > 0);
         std::vector<std::vector<MeshTriangle>> triangles;
@@ -175,7 +179,7 @@ std::vector<MeshTriangle> create_disk(const Transform *object2wrold, const Trans
         indices.push_back(0);
         indices.push_back(1);
 
-        return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+        return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs,manager);
     }
 
 NARUKAMI_END

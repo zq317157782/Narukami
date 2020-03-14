@@ -36,11 +36,6 @@ class Scene{
     public:
         std::vector<Primitive> lights;
     public:
-        Scene(const std::vector<MeshTriangle>& triangles){
-           std::vector<Primitive> primitives=create_primitives(triangles);
-           _accelerator=Accelerator(primitives);
-        }
-       
         Scene(const std::vector<Primitive>& primitives){
              _accelerator=Accelerator(primitives);
              for(auto& p: primitives)

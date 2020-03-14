@@ -84,11 +84,11 @@ inline void free_aligned(void * ptr){
 #endif
 }
 
-
+#if defined(NARUKAMI_IS_WIN)
 inline void * memcpy(void* const dst,const void* const src,size_t size){
 	return std::memcpy(dst,src,size);
 }
-
+#endif
 
 #define STACK_ALLOC(T,count) (T*)alloca(count*sizeof(T))
 
@@ -177,5 +177,5 @@ class MemoryArena{
 
 NARUKAMI_END
 
-void* operator new(size_t sz);
-void operator delete(void* ptr);
+// void* operator new(size_t sz);
+// void operator delete(void* ptr);

@@ -27,54 +27,56 @@ int main()
     float aspect = 16.0f/9.0f;
     auto camera = std::make_shared<PerspectiveCamera>(camera_transform,Bounds2f{{-1*aspect,-1},{1*aspect,1}},45,film);
     
-    std::vector<narukami::MeshTriangle> triangles;
-
+    MeshManager mm;
     {
         auto transform = translate(Vector3f(0, 0, 0.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
         auto inv_transform = inverse(transform);// translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
-        triangles = _union(triangles,load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj","."));
+        load_mesh_triangles_from_obj(mm,&transform,&inv_transform,"bunny.obj",".");
     }
 
     {
         auto transform = translate(0,-1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,5));
+        create_plane(&transform,&inv_transform,5,5,mm);
     }
 
     {
         auto transform = translate(0,1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,5));
+        create_plane(&transform,&inv_transform,5,5,mm);
     }
 
     {
         auto transform = translate(0,0,2.5f);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
+        create_plane(&transform,&inv_transform,5,2,mm);
     }
 
     {
         auto transform = translate(2.5f,0,0)*rotate(90,0,1,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
+        create_plane(&transform,&inv_transform,5,2,mm);
     }
 
     {
         auto transform = translate(-2.5f,0,0)*rotate(90,0,1,0);
         auto inv_transform = inverse(transform);
-        triangles = _union(triangles,create_plane(&transform,&inv_transform,5,2));
+        create_plane(&transform,&inv_transform,5,2,mm);
     }
-
-    auto primitives = create_primitives(triangles);
+    size_t start = 0;
+    size_t end = mm.mesh_triange_size();
+    auto primitives = create_primitives(mm,start,end);
     
+    start = end;
     std::vector<narukami::MeshTriangle> light_triangles;
     {
         auto transform = translate(0,0.99f,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        light_triangles = _union(light_triangles,create_plane(&transform,&inv_transform,1,1));
+        create_plane(&transform,&inv_transform,1,1,mm);
     }
+    end = mm.mesh_triange_size();
     DiffuseLightMaterial diffuse(Spectrum(1,0,0));
-    auto light_primitives = create_primitives(light_triangles,&diffuse);
+    auto light_primitives = create_primitives(mm,start,end,&diffuse);
     
     primitives = _union(primitives,light_primitives);
     // //create light 

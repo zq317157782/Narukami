@@ -51,8 +51,8 @@ inline bool operator==(const Vertex& v0,const Vertex& v1){
 
 //load mesh from obj file
 //use syoyo's tinyobjloader
-std::vector<std::vector<MeshTriangle>> load_mesh_triangles_list_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
-   std::vector<std::vector<MeshTriangle>>  triangles;
+std::vector<std::pair<size_t,size_t>> load_mesh_triangles_list_from_obj(MeshManager& m,const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr){
+    std::vector<std::pair<size_t,size_t>>  ranges;
     
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -64,17 +64,17 @@ std::vector<std::vector<MeshTriangle>> load_mesh_triangles_list_from_obj(const T
     bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, obj_file_name,base_path,true);
     if (!warn.empty()) {
         std::cout << warn << std::endl;
-        return triangles;
+        return ranges;
     }
 
     if (!err.empty()) {
         std::cerr << err << std::endl;
-        return triangles;
+        return ranges;
     }
 
     if (!ret) {
         std::cerr << "fail to load \"" << obj_file_name <<"\"" << std::endl;
-        return triangles;
+        return ranges;
     }
 
     // Loop over shapes
@@ -138,21 +138,22 @@ for (size_t s = 0; s < shapes.size(); s++) {
       normal_array.push_back(v.normal);
       uv_array.push_back(v.uv);
   }
-  triangles.push_back(create_mesh_triangles(object2wrold,world2object,indices,vertex_array,normal_array,uv_array));
+  ranges.push_back(create_mesh_triangles(object2wrold,world2object,indices,vertex_array,normal_array,uv_array,m));
 }
 
-   return triangles;
+   return ranges;
 }
 
-std::vector<MeshTriangle> load_mesh_triangles_from_obj(const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr)
+std::pair<size_t,size_t> load_mesh_triangles_from_obj(MeshManager& m,const Transform* object2wrold,const Transform* world2object,const char* obj_file_name,const char* base_path = nullptr)
 {
-    auto list = load_mesh_triangles_list_from_obj(object2wrold,world2object,obj_file_name,base_path);
-    std::vector<MeshTriangle> all_triangles;
-     for(size_t i=0;i<list.size();++i)
-     {
-         all_triangles.insert(all_triangles.end(),list[i].begin(),list[i].end());
-     }
-     return all_triangles;
+    auto list = load_mesh_triangles_list_from_obj(m,object2wrold,world2object,obj_file_name,base_path);
+    std::pair<size_t,size_t> range;
+    for(size_t i=0;i<list.size();++i)
+    {
+        range.first = min(range.first,list[i].first);
+        range.second = max(range.second,list[i].second);
+    }
+    return range;
 }
 
 //  std::vector<MeshTriangle> _union(std::vector<std::vector<MeshTriangle>>& triangles)

@@ -168,7 +168,7 @@ void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
 
     if (is_leaf(node))
     {
-        auto primitive_infos = cast_to_SoA_structure(_primitives, node->offset, node->num);
+        auto primitive_infos = SoA_pack(_primitives, node->offset, node->num);
         node->num = primitive_infos.size();
         node->offset = _soa_primitive_infos.size();
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());

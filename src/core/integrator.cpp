@@ -88,7 +88,7 @@ void Integrator::render(const Scene &scene)
                                 
                                 for(auto &light : scene.lights)
                                 {   
-                                    auto triangle = light.triangle.triangle();
+                                    auto triangle = light.triangle->triangle();
                                     if(is_degraded(triangle))
                                     {
                                         continue;
@@ -98,7 +98,7 @@ void Integrator::render(const Scene &scene)
                                     Vector3f wi = light_position - surface_interaction.p;
                                     auto distance_sqr = sqrlen(wi);
                                     wi = normalize(wi);
-                                    float light_costheta = light.triangle.object_to_world()(-wi).z;
+                                    float light_costheta = light.triangle->object_to_world()(-wi).z;
                                     float pdf = to_solid_angle_measure_pdf(rcp(area(triangle)), sqrlen(wi),abs(light_costheta));
                                     
                                     VisibilityTester tester(surface_interaction, Interaction(light_position));

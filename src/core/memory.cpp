@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
 #include "core/memory.h"
 
-void* operator new(size_t sz){
-    return narukami::alloc_aligned<SSE_LINE_SIZE>(sz);
-}
-void operator delete(void* ptr){
-    narukami::free_aligned(ptr);
-}
+// void* operator new(size_t sz){
+//     return narukami::alloc_aligned<SSE_LINE_SIZE>(sz);
+// }
+// void operator delete(void* ptr){
+//     narukami::free_aligned(ptr);
+// }

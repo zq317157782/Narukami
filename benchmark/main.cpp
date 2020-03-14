@@ -610,7 +610,8 @@ static void BM_meshdata_intersect(benchmark::State &state)
      std::vector<uint32_t> indices={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
+     MeshManager manager;
+     auto range=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs,manager);
      float t;
      Point2f uv;
     for (auto _ : state)
@@ -618,9 +619,9 @@ static void BM_meshdata_intersect(benchmark::State &state)
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            for(size_t j=0;j<triangles.size();++j){
+            for(size_t j=range.first;j<range.second;++j){
                 Ray ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
-                benchmark::DoNotOptimize(intersect(ray,triangles[j],&t,&uv));
+                benchmark::DoNotOptimize(intersect(ray,manager.get_mesh_triangle_ref(j),&t,&uv));
             }
         }
         
@@ -638,8 +639,9 @@ static void BM_meshdata_intersect_sse(benchmark::State &state)
      std::vector<uint32_t> indices={0,1,3,1,2,3};
      auto transform = translate(Vector3f(0,0,0));
      auto transform2 = translate(Vector3f(0,0,0));
-     auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
-     auto soa_triangles=cast_to_SoA_structure(triangles,0,2);
+     MeshManager manager;
+     auto range=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs,manager);
+     auto soa_triangles=SoA_pack(manager,range);
      float t;
      Point2f uv;
     for (auto _ : state)

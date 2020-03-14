@@ -25,38 +25,38 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 
-std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles){
-    std::vector<Primitive> primitives(triangles.size());
-    for (size_t i = 0; i < triangles.size(); ++i)
+std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end){
+    std::vector<Primitive> primitives;
+    for (size_t i = start; i < end; ++i)
     {
-        primitives[i]=Primitive(triangles[i]);
+        primitives.emplace_back(&mm.get_mesh_triangle_ref(i));
     }
     
     return primitives;
 }
 
-std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const AreaLight* area_light){
-    std::vector<Primitive> primitives(triangles.size());
-    for (size_t i = 0; i < triangles.size(); ++i)
+std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end,const AreaLight* area_light){
+    std::vector<Primitive> primitives;
+    for (size_t i = start; i < end; ++i)
     {
-        primitives[i]=Primitive(triangles[i],area_light);
+        primitives.emplace_back(&mm.get_mesh_triangle_ref(i),area_light);
     }
     
     return primitives;
 }
 
-std::vector<Primitive> create_primitives(const std::vector<MeshTriangle>& triangles,const LightMaterial* light_material){
-    std::vector<Primitive> primitives(triangles.size());
-    for (size_t i = 0; i < triangles.size(); ++i)
+std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end,const LightMaterial* light_material){
+   std::vector<Primitive> primitives;
+    for (size_t i = start; i < end; ++i)
     {
-        primitives[i]=Primitive(triangles[i],light_material);
+        primitives.emplace_back(&mm.get_mesh_triangle_ref(i),light_material);
     }
     
     return primitives;
 }
 
 
-std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
+std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -71,9 +71,9 @@ std::vector<SoAPrimitiveInfo> cast_to_SoA_structure(const std::vector<Primitive>
     {
         if (i < count)
         {
-            auto v0 = triangles[start + i].triangle[0];
-            auto e1 = triangles[start + i].triangle[1] - v0;
-            auto e2 = triangles[start + i].triangle[2] - v0;
+            auto v0 = (*triangles[start + i].triangle)[0];
+            auto e1 = (*triangles[start + i].triangle)[1] - v0;
+            auto e2 = (*triangles[start + i].triangle)[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);
