@@ -228,7 +228,7 @@ private:
     void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;
 public:
     Accelerator() = default;
-    Accelerator(std::vector<Primitive> primitives);
+    Accelerator(const std::vector<Primitive>& primitives);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
     bool intersect(const Ray &ray) const;
 };

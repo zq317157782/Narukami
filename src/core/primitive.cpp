@@ -29,7 +29,7 @@ std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size
     std::vector<Primitive> primitives;
     for (size_t i = start; i < end; ++i)
     {
-        primitives.emplace_back(&mm.get_mesh_triangle_ref(i));
+        primitives.emplace_back(&mm,i);
     }
     
     return primitives;
@@ -39,7 +39,7 @@ std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size
     std::vector<Primitive> primitives;
     for (size_t i = start; i < end; ++i)
     {
-        primitives.emplace_back(&mm.get_mesh_triangle_ref(i),area_light);
+        primitives.emplace_back(&mm,i,area_light);
     }
     
     return primitives;
@@ -49,7 +49,7 @@ std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size
    std::vector<Primitive> primitives;
     for (size_t i = start; i < end; ++i)
     {
-        primitives.emplace_back(&mm.get_mesh_triangle_ref(i),light_material);
+        primitives.emplace_back(&mm,i,light_material);
     }
     
     return primitives;
@@ -71,9 +71,9 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     {
         if (i < count)
         {
-            auto v0 = (*triangles[start + i].triangle)[0];
-            auto e1 = (*triangles[start + i].triangle)[1] - v0;
-            auto e2 = (*triangles[start + i].triangle)[2] - v0;
+            auto v0 = triangles[start + i].triangle()[0];
+            auto e1 = triangles[start + i].triangle()[1] - v0;
+            auto e2 = triangles[start + i].triangle()[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);

@@ -25,7 +25,7 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
-Accelerator::Accelerator(std::vector<Primitive> primitives) : _primitives(std::move(primitives))
+Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives(primitives)
 {
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
     for (size_t i = 0; i < _primitives.size(); ++i)
