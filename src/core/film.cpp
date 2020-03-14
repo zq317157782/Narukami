@@ -158,7 +158,7 @@ std::unique_ptr<FilmTile> Film::get_film_tile(const Bounds2i& sample_bounds) con
     Point2i p0 = static_cast<Point2i>(ceil(float_bounds.min_point - half_bounds - _filter_radius));
     Point2i p1 = static_cast<Point2i>(floor(float_bounds.max_point - half_bounds + _filter_radius))+Point2i(1, 1);
     auto pixel_bound = intersect(Bounds2i(p0,p1),_cropped_pixel_bounds);
-    return std::make_unique<FilmTile>(pixel_bound,_filter_lut,_filter_radius);
+    return make_unique<FilmTile>(pixel_bound,_filter_lut,_filter_radius);
 }
 
 void Film::merge_film_tile(std::unique_ptr<FilmTile> tile)

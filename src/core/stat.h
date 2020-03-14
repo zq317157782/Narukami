@@ -133,32 +133,32 @@ public:
 //#### class  ####
 #define STAT_COUNTER(name, var)                              \
     static thread_local uint64_t var;                        \
-    static void stat_func_##var(StatsAccumulator &stats_acc) \
+    static void stat_func_##var (StatsAccumulator &stats_acc) \
     {                                                        \
-        stats_acc.report_counter(name, var);                 \
+        stats_acc.report_counter (name, var);                 \
         var = 0;                                             \
     }                                                        \
-    static StatRegisterer stat_reg_##var(stat_func_##var);
+    static StatRegisterer stat_reg_##var (stat_func_##var);
 
 #define STAT_MEMORY_COUNTER(name, var)                       \
     static thread_local uint64_t var;                        \
-    static void stat_func_##var(StatsAccumulator &stats_acc) \
+    static void stat_func_##var (StatsAccumulator &stats_acc) \
     {                                                        \
-        stats_acc.report_memory_counter(name, var);          \
+        stats_acc.report_memory_counter (name, var);          \
         var = 0;                                             \
     }                                                        \
-    static StatRegisterer stat_reg_##var(stat_func_##var);
+    static StatRegisterer stat_reg_##var (stat_func_##var);
 
 #define STAT_PERCENT(name, num, denom)                                    \
     static thread_local uint64_t num;                                     \
     static thread_local uint64_t denom;                                   \
-    static void stat_func_##num##_##denom##(StatsAccumulator & stats_acc) \
+    static void stat_func_##num##_##denom (StatsAccumulator & stats_acc) \
     {                                                                     \
         stats_acc.report_percent(name, num, denom);                       \
         num = 0;                                                          \
         denom = 0;                                                        \
     }                                                                     \
-    static StatRegisterer stat_reg_##num##_##denom##(stat_func_##num##_##denom##);
+    static StatRegisterer stat_reg_##num##_##denom (stat_func_##num##_##denom);
 
 //#### utils ####
 #define STAT_INCREASE_COUNTER(var, count) \
