@@ -33,14 +33,14 @@ NARUKAMI_BEGIN
         private:
             const MeshManager* _mm;
         public:
-        const MeshTriangle& triangle() const{return _mm->get_mesh_triangle_ref(triangle_index);}
-        size_t triangle_index;
+        const MeshTriangle& triangle() const{return _mm->get_mesh_triangle_ref(triangle_id);}
+        size_t triangle_id;
         const AreaLight* area_light;
         const LightMaterial* light_material;
         Primitive()=default;
-        Primitive(const MeshManager* mm,const size_t triangle):_mm(mm),triangle_index(triangle),area_light(nullptr),light_material(nullptr){}
-        Primitive(const MeshManager* mm,const size_t triangle,const AreaLight*area_light):_mm(mm),triangle_index(triangle),area_light(area_light),light_material(nullptr){}
-        Primitive(const MeshManager* mm,const size_t triangle,const LightMaterial*light_material):_mm(mm),triangle_index(triangle),light_material(light_material),area_light(nullptr){}
+        Primitive(const MeshManager* mm,const size_t triangle_id):_mm(mm),triangle_id(triangle_id),area_light(nullptr),light_material(nullptr){}
+        Primitive(const MeshManager* mm,const size_t triangle_id,const AreaLight*area_light):_mm(mm),triangle_id(triangle_id),area_light(area_light),light_material(nullptr){}
+        Primitive(const MeshManager* mm,const size_t triangle_id,const LightMaterial*light_material):_mm(mm),triangle_id(triangle_id),light_material(light_material),area_light(nullptr){}
     };
 
     inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.triangle().get_world_bounds();}

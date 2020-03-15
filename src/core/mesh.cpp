@@ -55,16 +55,16 @@ MeshData& MeshData::add_transform_normals(const Transform &trans,const std::vect
     return (*this);
 }
 
-void MeshTriangle::init(const Transform* object2world,const Transform* world2object,const MeshManager* mm,uint32_t mesh_data,const uint32_t idx[3])
+void MeshTriangle::init(const Transform* object2world,const Transform* world2object,const MeshManager* mm,uint32_t mesh_data_id,const uint32_t idx[3])
 {
     _object2world = object2world;
     _world2object = world2object;
     _mm = mm;
-    _mesh_data_index = mesh_data;
+    _mesh_data_id = mesh_data_id;
     memcpy(_index,idx,sizeof(uint32_t)*3);
 }
 
-const MeshData& MeshTriangle::mesh() const{return _mm->get_mesh_data_ref(_mesh_data_index);}
+const MeshData& MeshTriangle::mesh() const{return _mm->get_mesh_data_ref(_mesh_data_id);}
 
  MeshData& MeshManager::add_get_mesh_data_ref(uint32_t& index)
  {

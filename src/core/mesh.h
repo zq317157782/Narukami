@@ -50,7 +50,7 @@ NARUKAMI_BEGIN
         private:
             const Transform * _object2world,*_world2object;
             const MeshManager* _mm;
-            uint32_t _mesh_data_index;
+            uint32_t _mesh_data_id;
             uint32_t _index[3];
         const MeshData& mesh() const;
         public:
