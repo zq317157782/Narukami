@@ -35,27 +35,6 @@ std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size
     return primitives;
 }
 
-std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end,const AreaLight* area_light){
-    std::vector<Primitive> primitives;
-    for (size_t i = start; i < end; ++i)
-    {
-        primitives.emplace_back(&mm,i,area_light);
-    }
-    
-    return primitives;
-}
-
-std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end,const LightMaterial* light_material){
-   std::vector<Primitive> primitives;
-    for (size_t i = start; i < end; ++i)
-    {
-        primitives.emplace_back(&mm,i,light_material);
-    }
-    
-    return primitives;
-}
-
-
 std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);

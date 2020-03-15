@@ -49,8 +49,6 @@ NARUKAMI_BEGIN
     //inline Spectrum Le(const Primitive& primitive){ ()}
 
     std::vector<Primitive> create_primitives(const MeshManager&,size_t start,size_t end);
-    std::vector<Primitive> create_primitives(const MeshManager&,size_t start,size_t end,const AreaLight* area_light);
-    std::vector<Primitive> create_primitives(const MeshManager&,size_t start,size_t end,const LightMaterial* light_material);
     std::vector<Primitive> _union(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
 
     struct SoAPrimitiveInfo{

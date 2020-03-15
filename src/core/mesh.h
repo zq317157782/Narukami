@@ -26,6 +26,7 @@ SOFTWARE.
 #include "core/affine.h"
 #include "core/transform.h"
 #include "core/stat.h"
+#include "core/geometry.h"
 #include <vector>
 NARUKAMI_BEGIN
     class MeshData{
@@ -71,13 +72,15 @@ NARUKAMI_BEGIN
         inline  Bounds3f get_world_bounds() const{return _union(_union(mesh().vertices[_index[0]],mesh().vertices[_index[1]]),mesh().vertices[_index[2]]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
-        inline  Triangle triangle() const {
+        inline  Triangle geom_tri() const 
+        {
             Triangle triangle;
             triangle.v0 = (*this)[0];
             triangle.e1 = (*this)[1] - triangle.v0;
-            triangle.e2 = (*this)[2] - triangle.v0;
+            triangle.e2 = (*this)[2] - triangle.v0; 
             return triangle;
         }
+       
         friend inline  std::ostream &operator<<(std::ostream &out, const MeshTriangle &v) { out << '(' << v.mesh().vertices[v._index[0]] << ',' << v.mesh().vertices[v._index[1]] << ',' << v.mesh().vertices[v._index[2]] << ')'; return out; }
     };
     
