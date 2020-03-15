@@ -33,14 +33,10 @@ class Light
 protected:
     const Transform *_light_to_world;
     const Transform *_world_to_light;
-
-    const size_t _sample_count;
-
 public:
-    Light(const Transform *light_to_world,const Transform *world_to_light, size_t sample_count) : _light_to_world(light_to_world), _world_to_light(world_to_light), _sample_count(sample_count) {}
+    Light(const Transform *light_to_world,const Transform *world_to_light) : _light_to_world(light_to_world), _world_to_light(world_to_light) {}
     virtual Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
     virtual Spectrum power() const = 0;
-    size_t get_sample_count() const { return _sample_count; }
 };
 
 class AreaLight : public Light
@@ -48,7 +44,7 @@ class AreaLight : public Light
 private:
     float _area;
 public:
-    AreaLight(const Transform *light_to_world,const Transform *world_to_light, size_t sample_count,const float area) : Light(light_to_world,world_to_light,sample_count),_area(area) {}
+    AreaLight(const Transform *light_to_world,const Transform *world_to_light,const float area) : Light(light_to_world,world_to_light),_area(area) {}
     float area() const { return _area; }
     virtual Spectrum L(const Interaction &interaction, const Vector3f &wi) const = 0;
 };

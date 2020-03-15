@@ -30,7 +30,8 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 //basic interaction
-class Interaction{
+class Interaction
+{
 public:
     Point3f p;
     Normal3f n;

@@ -36,10 +36,10 @@ STAT_COUNTER("integrator/scene ray's count",ray_count)
 STAT_COUNTER("integrator/shadow ray's count",shadow_ray_count)
 class Integrator{
     private:
-        const Camera* _camera;
+        Camera* _camera;
         Sampler* _sampler;
     public:
-        Integrator(const Camera* camera,Sampler* sampler):_camera(camera),_sampler(sampler){}
+        Integrator(Camera* camera,Sampler* sampler):_camera(camera),_sampler(sampler){}
         void render(const Scene& scene);
 };
 NARUKAMI_END

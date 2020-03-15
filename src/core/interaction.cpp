@@ -32,10 +32,6 @@ Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
     {
         return interaction.primitive->area_light->L(interaction,wi);
     }
-    else if(interaction.primitive->light_material!=nullptr)
-    {
-        return interaction.primitive->light_material->Li(interaction.p);
-    }
     else
     {
         return Spectrum(0.0f,0.0f,0.0f);

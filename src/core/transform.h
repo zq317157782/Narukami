@@ -61,6 +61,12 @@ struct SSE_ALIGNAS Transform
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
 };
 
+inline std::ostream &operator<<(std::ostream &out, const Transform &t)
+{
+    out << t.mat;
+    return out;
+}
+
 inline Point3f transform_h(const Transform &t,const Point3f &p)
 {
     return mul_h(t.mat,p);

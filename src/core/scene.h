@@ -34,17 +34,10 @@ class Scene{
     private:
         Accelerator _accelerator;
     public:
-        std::vector<Primitive> lights;
+        std::vector<Light*> lights;
     public:
-        Scene(const std::vector<Primitive>& primitives){
+        Scene(const std::vector<Primitive>& primitives,const std::vector<Light*> &lights):lights(lights){
              _accelerator=Accelerator(primitives);
-             for(auto& p: primitives)
-             {
-                 if(p.light_material!=nullptr)
-                 {
-                     lights.push_back(p);
-                 }
-             }
         }
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
