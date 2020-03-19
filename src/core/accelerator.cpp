@@ -28,7 +28,7 @@ NARUKAMI_BEGIN
 Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives(primitives)
 {
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
-    for (size_t i = 0; i < _primitives.size(); ++i)
+    for (uint32_t i = 0; i < _primitives.size(); ++i)
     {
         primitive_infos[i] = BVHPrimitiveInfo(_primitives[i], i);
     }
@@ -39,7 +39,7 @@ Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives
     uint32_t total_collapse_node_num = 0;
 
     ProgressReporter building_reporter(_primitives.size(),"building");
-    auto build_root = build(arena, 0, primitive_infos.size(), primitive_infos, _ordered_primitives, &total_build_node_num,&building_reporter);
+    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_infos.size()), primitive_infos, _ordered_primitives, &total_build_node_num,&building_reporter);
     building_reporter.done();
 
     _primitives = _ordered_primitives;
@@ -57,21 +57,21 @@ Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter)
+BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
     reporter->update(1);
     Bounds3f max_bounds;
-    for (size_t i = start; i < end; i++)
+    for (uint32_t i = start; i < end; i++)
     {
         max_bounds = _union(max_bounds, primitive_infos[i].bounds);
     }
     uint32_t num = end - start;
     if (num <= ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
     {
-        auto offset = ordered.size();
-        for (size_t i = start; i < end; i++)
+		uint32_t offset = static_cast<uint32_t>(ordered.size());
+        for (uint32_t i = start; i < end; i++)
         {
             ordered.push_back(_primitives[primitive_infos[i].prim_index]);
         }
@@ -80,7 +80,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
     else
     {
         Bounds3f centroid_bounds;
-        for (size_t i = start; i < end; i++)
+        for (uint32_t i = start; i < end; i++)
         {
             centroid_bounds = _union(centroid_bounds, primitive_infos[i].centroid);
         }
@@ -110,7 +110,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
             //SAH
             BucketInfo bucket_infos[ACCELERATOR_SAH_BUCKET_NUM];
 
-            for (size_t i = start; i < num; ++i)
+            for (uint32_t i = start; i < num; ++i)
             {
                 auto bucket_index = static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM * offset(centroid_bounds, primitive_infos[i].centroid)[dim]);
                 bucket_index = min(bucket_index, ACCELERATOR_SAH_BUCKET_NUM - 1);
@@ -120,16 +120,16 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
 
             //compute cost function
             float costs[ACCELERATOR_SAH_BUCKET_NUM - 1];
-            for (size_t i = 0; i < ACCELERATOR_SAH_BUCKET_NUM - 1; i++)
+            for (uint32_t i = 0; i < ACCELERATOR_SAH_BUCKET_NUM - 1; i++)
             {
                 Bounds3f b0, b1;
                 uint32_t count0 = 0, count1 = 0;
-                for (size_t j = 0; j <= i; j++)
+                for (uint32_t j = 0; j <= i; j++)
                 {
                     b0 = _union(b0, bucket_infos[j].bounds);
                     count0 += bucket_infos[j].count;
                 }
-                for (size_t j = i + 1; j < ACCELERATOR_SAH_BUCKET_NUM; j++)
+                for (uint32_t j = i + 1; j < ACCELERATOR_SAH_BUCKET_NUM; j++)
                 {
                     b1 = _union(b1, bucket_infos[j].bounds);
                     count1 += bucket_infos[j].count;
@@ -140,7 +140,7 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, size_t start, size_t end, s
 
             float min_cost = costs[0];
             int min_cost_bucket_index = 0;
-            for (size_t i = 1; i < ACCELERATOR_SAH_BUCKET_NUM - 1; i++)
+            for (uint32_t i = 1; i < ACCELERATOR_SAH_BUCKET_NUM - 1; i++)
             {
                 if (costs[i] < min_cost)
                 {
@@ -169,16 +169,16 @@ void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
     if (is_leaf(node))
     {
         auto primitive_infos = SoA_pack(_primitives, node->offset, node->num);
-        node->num = primitive_infos.size();
-        node->offset = _soa_primitive_infos.size();
+        node->num = static_cast<uint32_t>(primitive_infos.size());
+        node->offset = static_cast<uint32_t>(_soa_primitive_infos.size());
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
         
         STAT_INCREASE_COUNTER(SoAPrimitiveInfo_count, primitive_infos.size())
         
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_1_4, primitive_infos.size())
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_2_4, primitive_infos.size())
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_3_4, primitive_infos.size())
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_4_4, primitive_infos.size())
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_1_4, static_cast<uint32_t>(primitive_infos.size()))
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_2_4, static_cast<uint32_t>(primitive_infos.size()))
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_3_4, static_cast<uint32_t>(primitive_infos.size()))
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_4_4, static_cast<uint32_t>(primitive_infos.size()))
         
         STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_1_4, 1, (node->num % 4) == 1)
         STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_2_4, 1, (node->num % 4) == 2)
@@ -339,7 +339,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         uint32_t orders[4];
         get_traversal_orders((*node), ray.d, orders);
 
-        for (size_t i = 0; i < 4; ++i)
+        for (uint32_t i = 0; i < 4; ++i)
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom,1)
@@ -350,7 +350,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
                 {
                     auto offset = leaf_offset(node->childrens[index]);
                     auto num = leaf_num(node->childrens[index]);
-                    for (size_t j = offset; j < offset + num; ++j)
+                    for (uint32_t j = offset; j < offset + num; ++j)
                     {
 
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &triangle_offset);
@@ -369,7 +369,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
             }
         }
 
-        for (size_t i = 0; i < 4; i++)
+        for (uint32_t i = 0; i < 4; i++)
         {
             uint32_t index = orders[i];
             if (push_child[index])
@@ -420,7 +420,7 @@ bool Accelerator::intersect(const Ray &ray) const
         uint32_t orders[4];
         get_traversal_orders((*node), ray.d, orders);
 
-        for (size_t i = 0; i < 4; ++i)
+        for (uint32_t i = 0; i < 4; ++i)
         {
             uint32_t index = orders[i];
             if (box_hits[index] && box_t[index] < closest_hit_t)
@@ -429,7 +429,7 @@ bool Accelerator::intersect(const Ray &ray) const
                 {
                     auto offset = leaf_offset(node->childrens[index]);
                     auto num = leaf_num(node->childrens[index]);
-                    for (size_t j = offset; j < offset + num; ++j)
+                    for (uint32_t j = offset; j < offset + num; ++j)
                     {
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle);
                         if (is_hit)
@@ -445,7 +445,7 @@ bool Accelerator::intersect(const Ray &ray) const
             }
         }
 
-        for (size_t i = 0; i < 4; i++)
+        for (uint32_t i = 0; i < 4; i++)
         {
             uint32_t index = orders[i];
             if (push_child[index])
