@@ -25,11 +25,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 
-std::vector<Primitive> create_primitives(const MeshManager& mm,size_t start,size_t end){
+std::vector<Primitive> create_primitives(const std::vector<TriangleMesh>& meshs){
     std::vector<Primitive> primitives;
-    for (size_t i = start; i < end; ++i)
+    for (uint32_t i = 0; i < meshs.size(); ++i)
     {
-        primitives.emplace_back(&mm,i);
+        primitives.emplace_back(meshs[i]);
     }
     
     return primitives;
@@ -40,19 +40,19 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    size_t soa_count = (uint32_t)(count-1)/ SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count-1)/ SSE_FLOAT_COUNT + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;
     std::vector<Vector3f> e2_array;
 
-    for (size_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
+    for (uint32_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
     {
         if (i < count)
         {
-            auto v0 = triangles[start + i].triangle()[0];
-            auto e1 = triangles[start + i].triangle()[1] - v0;
-            auto e2 = triangles[start + i].triangle()[2] - v0;
+            auto v0 = triangles[start + i].mesh[0];
+            auto e1 = triangles[start + i].mesh[1] - v0;
+            auto e2 = triangles[start + i].mesh[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);
@@ -67,7 +67,7 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     }
     std::vector<SoAPrimitiveInfo> soa_primitives;
 
-    for (size_t i = 0; i < soa_count; ++i)
+    for (uint32_t i = 0; i < soa_count; ++i)
     {
         SoAPrimitiveInfo primitive;
         primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
@@ -80,7 +80,7 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     return soa_primitives;
 }
 
-std::vector<Primitive> _union(const std::vector<Primitive>& a,const std::vector<Primitive>& b)
+std::vector<Primitive> concat(const std::vector<Primitive>& a,const std::vector<Primitive>& b)
 {
     std::vector<Primitive> c;
     c.insert(c.end(),a.begin(),a.end());

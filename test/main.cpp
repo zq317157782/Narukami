@@ -1048,19 +1048,7 @@ TEST(transform,perspective){
 
 
 #include "core/mesh.h"
-TEST(mesh,meshdata){
-    auto transform = translate(Vector3f(1,0,0));
-    std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
-    std::vector<Normal3f> normals;
-    std::vector<Point2f> uvs;
-    std::vector<uint32_t> indices={0,1,2,1,2,3};
-    MeshData data;
-    data.add_indices(indices);
-    data.add_transform_vertices(transform,vertices);
-    data.add_transform_normals(transform,normals);
-    data.add_uvs(uvs);
-    //EXPECT_EQ(data.indices[5],3); 
-}
+
 
 TEST(mesh,create_mesh_triangles){
      std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
@@ -1069,10 +1057,9 @@ TEST(mesh,create_mesh_triangles){
      std::vector<uint32_t> indices={0,1,2,1,2,3};
      auto transform = translate(Vector3f(1,0,0));
      auto transform2 = translate(Vector3f(-1,0,0));
-     MeshManager mm;
-     auto range=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs,mm);
-     EXPECT_EQ(range.second-range.first,2);
-     auto triange = mm.get_mesh_triangle_ref(0);
+     auto meshs=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
+     EXPECT_EQ(meshs.size(),2);
+     auto triange = meshs[0];
      auto p = triange[1];
      EXPECT_EQ(p,Point3f(1,0,0));
 }
@@ -1084,10 +1071,9 @@ TEST(mesh,get_world_bounds){
      std::vector<uint32_t> indices={0,1,2,1,2,3};
      auto transform = translate(Vector3f(1,0,0));
      auto transform2 = translate(Vector3f(-1,0,0));
-     MeshManager mm;
-     auto range=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs,mm);
+     auto meshs=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
 
-     auto triangle_bounds=mm.get_mesh_triangle_ref(0).get_world_bounds();
+     auto triangle_bounds=meshs[0].get_world_bounds();
      Bounds3f b0{{1,0,0},{2,1,0}};
      EXPECT_EQ(triangle_bounds,b0);
 }

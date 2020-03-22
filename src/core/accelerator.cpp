@@ -27,6 +27,8 @@ NARUKAMI_BEGIN
 
 Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives(primitives)
 {
+    
+    STAT_INCREASE_COUNTER(PrimitiveInfo_count, _primitives.size())
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
     for (uint32_t i = 0; i < _primitives.size(); ++i)
     {

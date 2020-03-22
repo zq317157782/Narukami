@@ -29,27 +29,25 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-    class Primitive{
-        private:
-            const MeshManager* _mm;
-        public:
-        const MeshTriangle& triangle() const{return _mm->get_mesh_triangle_ref(triangle_id);}
-        size_t triangle_id;
+    class Primitive
+    {
+    public:
+        TriangleMesh mesh;
         const AreaLight* area_light;
         const LightMaterial* light_material;
-        Primitive()=default;
-        Primitive(const MeshManager* mm,const size_t triangle_id):_mm(mm),triangle_id(triangle_id),area_light(nullptr),light_material(nullptr){}
-        Primitive(const MeshManager* mm,const size_t triangle_id,const AreaLight*area_light):_mm(mm),triangle_id(triangle_id),area_light(area_light),light_material(nullptr){}
-        Primitive(const MeshManager* mm,const size_t triangle_id,const LightMaterial*light_material):_mm(mm),triangle_id(triangle_id),light_material(light_material),area_light(nullptr){}
+        Primitive() = default;
+        Primitive(const TriangleMesh& mesh):mesh(mesh),area_light(nullptr),light_material(nullptr){}
+        Primitive(const TriangleMesh& mesh,const AreaLight*area_light):mesh(mesh),area_light(area_light),light_material(nullptr){}
+        Primitive(const TriangleMesh& mesh,const LightMaterial*light_material):mesh(mesh),light_material(light_material),area_light(nullptr){}
     };
 
-    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.triangle().get_world_bounds();}
-    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.triangle().object_to_world();}
-    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.triangle().world_to_object();}
-    //inline Spectrum Le(const Primitive& primitive){ ()}
+    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh.get_world_bounds();}
+    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.mesh.object_to_world();}
+    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh.world_to_object();}
+   
 
-    std::vector<Primitive> create_primitives(const MeshManager&,size_t start,size_t end);
-    std::vector<Primitive> _union(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
+    std::vector<Primitive> create_primitives(const std::vector<TriangleMesh>&);
+    std::vector<Primitive> concat(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
 
     struct SoAPrimitiveInfo{
         SoATriangle triangle;

@@ -202,10 +202,11 @@ struct BucketInfo{
 };
 
 
+STAT_COUNTER("accelerator/Primitive's instance",PrimitiveInfo_count)
 STAT_COUNTER("accelerator/SoAPrimitiveInfo's instance",SoAPrimitiveInfo_count)
-STAT_MEMORY_COUNTER("accelerator/Primitive's instance",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/SoAPrimitiveInfo's instance",SoAPrimitiveInfo_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/QBVH node's instance",QBVH_node_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/Primitive's memory",Primitive_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/SoAPrimitiveInfo's memory",SoAPrimitiveInfo_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/QBVH node's memory",QBVH_node_memory_cost)
 STAT_PERCENT("accelerator/SoAPrimitiveInfo(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
 STAT_PERCENT("accelerator/SoAPrimitiveInfo(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
 STAT_PERCENT("accelerator/SoAPrimitiveInfo(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)

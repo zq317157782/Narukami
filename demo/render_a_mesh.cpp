@@ -27,45 +27,44 @@ int main()
     float aspect = 16.0f/9.0f;
     auto camera = PerspectiveCamera(camera_transform,Bounds2f{{-1*aspect,-1},{1*aspect,1}},45,film);
     
-    MeshManager mm;
+    std::vector<TriangleMesh> meshs;
     {
         auto transform = translate(Vector3f(0, 0, 0.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
         auto inv_transform = inverse(transform);// translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
-        load_mesh_triangles_from_obj(mm,&transform,&inv_transform,"bunny.obj",".");
+        append(meshs,load_mesh_triangles_from_obj(&transform,&inv_transform,"bunny.obj","."));
     }
 
     {
         auto transform = translate(0,-1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        create_plane(&transform,&inv_transform,5,5,mm);
+        append(meshs,create_plane(&transform,&inv_transform,5,5));
     }
 
     {
         auto transform = translate(0,1,0)*rotate(90,1,0,0);
         auto inv_transform = inverse(transform);
-        create_plane(&transform,&inv_transform,5,5,mm);
+        append(meshs,create_plane(&transform,&inv_transform,5,5));
     }
 
     {
         auto transform = translate(0,0,2.5f);
         auto inv_transform = inverse(transform);
-        create_plane(&transform,&inv_transform,5,2,mm);
+        append(meshs,create_plane(&transform,&inv_transform,5,2));
     }
 
     {
         auto transform = translate(2.5f,0,0)*rotate(90,0,1,0);
         auto inv_transform = inverse(transform);
-        create_plane(&transform,&inv_transform,5,2,mm);
+        append(meshs,create_plane(&transform,&inv_transform,5,2));
     }
 
     {
         auto transform = translate(-2.5f,0,0)*rotate(90,0,1,0);
         auto inv_transform = inverse(transform);
-        create_plane(&transform,&inv_transform,5,2,mm);
+        append(meshs,create_plane(&transform,&inv_transform,5,2));
     }
-    size_t start = 0;
-    size_t end = mm.mesh_triange_size();
-    auto primitives = create_primitives(mm,start,end);
+
+    auto primitives = create_primitives(meshs);
     // //create light 
     std::vector<Light*> lights;
     {
