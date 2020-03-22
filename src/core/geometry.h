@@ -514,7 +514,7 @@ FINLINE int check(const bool4 &mask, const float4 &t_results, const float4 &u_re
     float min_t = INFINITE;
     auto valid_mask = movemask(mask);
     int idx = -1;
-    for (size_t x = valid_mask, i = 0; x != 0; x >>= 1, ++i)
+    for (int x = valid_mask, i = 0; x != 0; x >>= 1, ++i)
     {
         if ((x & 0x1) && min_t > t_results[i])
         {
@@ -655,7 +655,7 @@ inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_r
         float min_t = INFINITE;
         auto valid_mask = movemask(mask);
         int idx = -1;
-        for (size_t x = valid_mask, i = 0; x != 0; x >>= 1, ++i)
+        for (int x = valid_mask, i = 0; x != 0; x >>= 1, ++i)
         {
             if ((x & 0x1) && min_t > t[i])
             {
