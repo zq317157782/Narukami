@@ -28,6 +28,7 @@ SOFTWARE.
 #include "sse.h"
 #include "math.h"
 #include <list>
+#include <vector>
 
 NARUKAMI_BEGIN
 
@@ -173,6 +174,63 @@ class MemoryArena{
 			
 		}
 
+};
+
+template<typename T>
+class MemoryPool
+{
+	private:
+		struct Node
+		{
+			Node * next;
+		};
+		Node* _head = nullptr;
+		std::vector<T*> _chuncks;
+		const int32_t _chunck_element_num;
+	public:
+	
+	MemoryPool(int32_t chunck_element_num = 20):_chunck_element_num(chunck_element_num){assert(sizeof(T)>=sizeof(Node));}
+	~MemoryPool()
+	{
+		empty();
+	}
+	T* alloc()
+	{
+		if(_head == nullptr)
+		{
+			//no free node
+			T* chunck = alloc_aligned<T>(_chunck_element_num);
+			_chuncks.push_back(chunck);
+
+			//insert from tail to head
+			for(int32_t i= (_chunck_element_num - 1);i >= 0; --i)
+			{
+				Node* next = _head;
+				_head = reinterpret_cast<Node*>(&chunck[i]);
+				_head->next = next;
+			}
+		}
+
+		T* ret = reinterpret_cast<T*>(_head);
+		_head = _head->next;
+		return ret;
+	}
+
+	void dealloc(T* ptr)
+	{
+		Node* next = _head;
+		_head = reinterpret_cast<Node*>(ptr);
+		_head->next = next;
+	}
+
+	void empty()
+	{
+		for(uint32_t i = 0;i<_chuncks.size();++i)
+		{
+			free_aligned(_chuncks[i]);
+		}
+		_chuncks.empty();
+	}
 };
 
 NARUKAMI_END

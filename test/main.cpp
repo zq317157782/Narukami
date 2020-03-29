@@ -1077,6 +1077,8 @@ TEST(mesh,get_world_bounds){
      Bounds3f b0{{1,0,0},{2,1,0}};
      EXPECT_EQ(triangle_bounds,b0);
 }
+
+
 #include "core/primitive.h"
 TEST(primitive,create_primitives){
     //  std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
@@ -1241,6 +1243,18 @@ TEST(memory,make_unique){
    auto a= make_unique<int>(1);
    EXPECT_EQ(*a,1);
 }
+
+
+TEST(memory,memory_pool){
+   MemoryPool<Point3f> mp;
+   Point3f * p0 = mp.alloc();
+   Point3f * p1 = mp.alloc();
+   EXPECT_EQ(p1-p0,4);
+   mp.dealloc(p0);
+   mp.dealloc(p1);
+}
+
+
 
 // TEST(integrator,integrator){
 //     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
