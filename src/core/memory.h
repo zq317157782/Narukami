@@ -29,6 +29,7 @@ SOFTWARE.
 #include "math.h"
 #include <list>
 #include <vector>
+#include "stat.h"
 
 NARUKAMI_BEGIN
 
@@ -176,6 +177,7 @@ class MemoryArena{
 
 };
 
+STAT_MEMORY_COUNTER("memory/total memory pool cost",memory_pool_cost)
 template<typename T>
 class MemoryPool
 {
@@ -199,6 +201,7 @@ class MemoryPool
 		if(_head == nullptr)
 		{
 			//no free node
+			STAT_INCREASE_MEMORY_COUNTER(memory_pool_cost, _chunck_element_num)
 			T* chunck = alloc_aligned<T>(_chunck_element_num);
 			_chuncks.push_back(chunck);
 
