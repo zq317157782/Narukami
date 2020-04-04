@@ -27,35 +27,34 @@ SOFTWARE.
 #include "core/transform.h"
 #include "core/stat.h"
 #include "core/geometry.h"
+#include "core/memory.h"
 #include <vector>
 NARUKAMI_BEGIN
-    struct TriangleMeshAttributes
+   
+    struct VertexData
     {
-        Point3f vertices[3];
-        Normal3f normals[3];
-        Point2f uvs[3];
+        std::vector<Point3f>  positions;
+        std::vector<Normal3f> normals;
+        std::vector<Point2f>  uvs;
+
+        void * operator new(size_t size);
+        void  operator delete(void * ptr);
     };
 
     class TriangleMesh
     {
         private:
             const Transform * _object2world,*_world2object;
-            TriangleMeshAttributes _attributes;
+            std::shared_ptr<VertexData> _vertex_data;
+            uint32_t _index[3];
         public:
-        TriangleMesh() = default;
-        TriangleMesh(const Transform* object2world, const Transform* world2object,const TriangleMeshAttributes& attributes):_object2world(object2world), _world2object(world2object),_attributes(attributes){}
-        TriangleMesh(const TriangleMesh&) = default;
-        TriangleMesh(TriangleMesh&&) = default;
-        TriangleMesh& operator=(const TriangleMesh&) = default;
-        TriangleMesh& operator=(TriangleMesh&&) = default;
-        ~TriangleMesh()=default;
-
+        TriangleMesh(const Transform* object2world, const Transform* world2object,const std::shared_ptr<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh().vertices[_index[i]]; }
-        inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _attributes.vertices[i];}
-        inline  Point2f get_uv(const int i) const{ assert(i>=0&&i<=2);return _attributes.uvs[i];}
-        inline  Point2f sample_uv(const Point2f& u) const { return _attributes.uvs[0]*(1.0f-u.x-u.y)+_attributes.uvs[1]*u.x + _attributes.uvs[2] * u.y;}
-        inline  Bounds3f get_world_bounds() const{return _union(_union(_attributes.vertices[0],_attributes.vertices[1]),_attributes.vertices[2]);}
+        inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
+        inline  Point2f get_uv(const int i) const{ assert(i>=0&&i<=2);return _vertex_data->uvs[_index[i]];}
+        inline  Point2f sample_uv(const Point2f& u) const { return _vertex_data->uvs[_index[0]]*(1.0f-u.x-u.y)+_vertex_data->uvs[_index[1]]*u.x + _vertex_data->uvs[_index[2]] * u.y;}
+        inline  Bounds3f get_world_bounds() const{return _union(_union((*this)[0],(*this)[1]),(*this)[2]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
         inline  Triangle geom_tri() const 
@@ -66,8 +65,9 @@ NARUKAMI_BEGIN
             triangle.e2 = (*this)[2] - triangle.v0; 
             return triangle;
         }
-       
-        friend inline  std::ostream &operator<<(std::ostream &out, const TriangleMesh &v) { out << '(' << v._attributes.vertices[0] << ',' << v._attributes.vertices[1] << ',' << v._attributes.vertices[2] << ')'; return out; }
+        void * operator new(size_t size);
+        void  operator delete(void * ptr);
+        friend inline  std::ostream &operator<<(std::ostream &out, const TriangleMesh &v) { out << '(' << v[0] << ',' << v[1] << ',' << v[2] << ')'; return out; }
     };
     
     inline bool intersect(const Ray& ray,const TriangleMesh& triangle,float* t,Point2f* uv){
@@ -77,13 +77,15 @@ NARUKAMI_BEGIN
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
 
-    void append(std::vector<TriangleMesh>& A,const std::vector<TriangleMesh>& B);
-    std::vector<TriangleMesh> concat(const std::vector<TriangleMesh>& A,const std::vector<TriangleMesh>& B);
+    void append(std::vector<std::shared_ptr<TriangleMesh>>& A,const std::vector<std::shared_ptr<TriangleMesh>>& B);
+    std::vector<std::shared_ptr<TriangleMesh>> concat(const std::vector<std::shared_ptr<TriangleMesh>>& A,const std::vector<std::shared_ptr<TriangleMesh>>& B);
 
-    std::vector<TriangleMesh> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);    
-    std::vector<TriangleMesh> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
-    std::vector<TriangleMesh> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
+    std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);    
+    std::vector<std::shared_ptr<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
+    std::vector<std::shared_ptr<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
 
-    std::vector<SoATriangle> SoA_pack(const std::vector<TriangleMesh>&);
+    std::vector<SoATriangle> SoA_pack(const std::vector<std::shared_ptr<TriangleMesh>>&);
+
+    
 NARUKAMI_END
 

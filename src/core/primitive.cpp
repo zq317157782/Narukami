@@ -25,7 +25,7 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 
-std::vector<Primitive> create_primitives(const std::vector<TriangleMesh>& meshs){
+std::vector<Primitive> create_primitives(const std::vector<std::shared_ptr<TriangleMesh>>& meshs){
     std::vector<Primitive> primitives;
     for (uint32_t i = 0; i < meshs.size(); ++i)
     {
@@ -50,9 +50,10 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     {
         if (i < count)
         {
-            auto v0 = triangles[start + i].mesh[0];
-            auto e1 = triangles[start + i].mesh[1] - v0;
-            auto e2 = triangles[start + i].mesh[2] - v0;
+            auto m = triangles[start + i].mesh;
+            auto v0 = (*m)[0];
+            auto e1 = (*m)[1] - v0;
+            auto e2 = (*m)[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);

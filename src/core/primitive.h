@@ -32,21 +32,21 @@ NARUKAMI_BEGIN
     class Primitive
     {
     public:
-        TriangleMesh mesh;
+        std::shared_ptr<TriangleMesh> mesh;
         const AreaLight* area_light;
         const LightMaterial* light_material;
         Primitive() = default;
-        Primitive(const TriangleMesh& mesh):mesh(mesh),area_light(nullptr),light_material(nullptr){}
-        Primitive(const TriangleMesh& mesh,const AreaLight*area_light):mesh(mesh),area_light(area_light),light_material(nullptr){}
-        Primitive(const TriangleMesh& mesh,const LightMaterial*light_material):mesh(mesh),light_material(light_material),area_light(nullptr){}
+        Primitive(const std::shared_ptr<TriangleMesh>& mesh):mesh(mesh),area_light(nullptr),light_material(nullptr){}
+        Primitive(const std::shared_ptr<TriangleMesh>& mesh,const AreaLight*area_light):mesh(mesh),area_light(area_light),light_material(nullptr){}
+        Primitive(const std::shared_ptr<TriangleMesh>& mesh,const LightMaterial*light_material):mesh(mesh),light_material(light_material),area_light(nullptr){}
     };
 
-    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh.get_world_bounds();}
-    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.mesh.object_to_world();}
-    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh.world_to_object();}
+    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh->get_world_bounds();}
+    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.mesh->object_to_world();}
+    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh->world_to_object();}
    
 
-    std::vector<Primitive> create_primitives(const std::vector<TriangleMesh>&);
+    std::vector<Primitive> create_primitives(const std::vector<std::shared_ptr<TriangleMesh>>&);
     std::vector<Primitive> concat(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
 
     struct SoAPrimitiveInfo{

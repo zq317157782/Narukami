@@ -27,7 +27,7 @@ int main()
     float aspect = 16.0f/9.0f;
     auto camera = PerspectiveCamera(camera_transform,Bounds2f{{-1*aspect,-1},{1*aspect,1}},45,film);
     
-    std::vector<TriangleMesh> meshs;
+    std::vector<std::shared_ptr<TriangleMesh>> meshs;
     {
         auto transform = translate(Vector3f(0, 0, 0.0f))*scale(0.2f,0.2f,0.2f)*rotate(90,Vector3f(0,1,0));
         auto inv_transform = inverse(transform);// translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));

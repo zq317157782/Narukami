@@ -4,21 +4,44 @@
 
 NARUKAMI_BEGIN
 
-void append(std::vector<TriangleMesh>& A,const std::vector<TriangleMesh>& B)
+MemoryPool<VertexData>   g_vertex_data_pool(256);
+MemoryPool<TriangleMesh> g_triangle_mesh_pool(4095);
+
+void * VertexData::operator new(size_t size)
 {
-    A.insert( A.end(), B.begin(), B.end());
+    return g_vertex_data_pool.alloc();
 }
 
-std::vector<TriangleMesh> concat(const std::vector<TriangleMesh>& A,const std::vector<TriangleMesh>& B)
+void  VertexData::operator delete(void * ptr)
 {
-    std::vector<TriangleMesh> C;
-    C.insert( C.end(), A.begin(), A.end() );
-    C.insert( C.end(), B.begin(), B.end() );
+    g_vertex_data_pool.dealloc(reinterpret_cast<VertexData*>(ptr));
+}
+
+void * TriangleMesh::operator new(size_t size)
+{
+    return g_triangle_mesh_pool.alloc();
+}
+
+void  TriangleMesh::operator delete(void * ptr)
+{
+    g_triangle_mesh_pool.dealloc(reinterpret_cast<TriangleMesh*>(ptr));
+}
+
+void append(std::vector<std::shared_ptr<TriangleMesh>> &A, const std::vector<std::shared_ptr<TriangleMesh>> &B)
+{
+    A.insert(A.end(), B.begin(), B.end());
+}
+
+std::vector<std::shared_ptr<TriangleMesh>> concat(const std::vector<std::shared_ptr<TriangleMesh>> &A, const std::vector<std::shared_ptr<TriangleMesh>> &B)
+{
+    std::vector<std::shared_ptr<TriangleMesh>> C;
+    C.insert(C.end(), A.begin(), A.end());
+    C.insert(C.end(), B.begin(), B.end());
     return C;
 }
 
 //TODO SSE alignas
-std::vector<SoATriangle> SoA_pack(const std::vector<TriangleMesh>& meshs)
+std::vector<SoATriangle> SoA_pack(const std::vector<std::shared_ptr<TriangleMesh>> &meshs)
 {
     uint32_t start = 0;
     uint32_t end = meshs.size();
@@ -35,9 +58,10 @@ std::vector<SoATriangle> SoA_pack(const std::vector<TriangleMesh>& meshs)
     {
         if (i < count)
         {
-            auto v0 = meshs[i][0];
-            auto e1 = meshs[i][1] - v0;
-            auto e2 = meshs[i][2] - v0;
+            auto m = meshs[i];
+            auto v0 = (*m)[0];
+            auto e1 = (*m)[1] - v0;
+            auto e2 = (*m)[2] - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);
@@ -64,33 +88,36 @@ std::vector<SoATriangle> SoA_pack(const std::vector<TriangleMesh>& meshs)
     return soa_triangles;
 }
 
-std::vector<TriangleMesh> create_mesh_triangles(const Transform* object2world,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs)
+std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform *object2world, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
 {
-
-    uint32_t mesh_size = indices.size()/3;
-
-    std::vector<TriangleMesh> meshs(mesh_size);
-
-    for(uint32_t m = 0; m < mesh_size;++m)
+    auto vertex_data = std::shared_ptr<VertexData>(new VertexData());
+    for(uint32_t i = 0;i<positions.size();++i)
     {
-        TriangleMeshAttributes attributes;
-        for(uint32_t i = 0;i < 3; ++i)
-        {
-            attributes.vertices[i] =  (*object2world)(vertices[indices[m * 3 + i]]);
-            attributes.normals[i]  =  (*object2world)(normals[indices[m * 3 + i]]);
-            attributes.uvs[i] = uvs[indices[m * 3 + i]];
-        }
-
-        TriangleMesh mesh(object2world, world2object,attributes);
-        meshs[m] = mesh;
+        vertex_data->positions.push_back((*object2world)(positions[i]));
+    }
+    for(uint32_t i = 0;i<normals.size();++i)
+    {
+        vertex_data->normals.push_back((*object2world)(normals[i]));
     }
 
+    vertex_data->uvs = uvs;
+    
+    std::vector<std::shared_ptr<TriangleMesh>> meshs;
+   
+    uint32_t mesh_size = indices.size() / 3;
+    for (uint32_t m = 0; m < mesh_size; ++m)
+    {
+        uint32_t index[3];
+        index[0] = indices[m * 3];
+        index[1] = indices[m * 3 + 1];
+        index[2] = indices[m * 3 + 2];
+        auto triangle_mesh = std::shared_ptr<TriangleMesh>(new TriangleMesh(object2world,world2object,vertex_data,index));
+        meshs.push_back(triangle_mesh);
+    }
     return meshs;
 }
 
-
-
-std::vector<TriangleMesh> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
+std::vector<std::shared_ptr<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
 {
     float hw = width * 0.5f;
     float hh = height * 0.5f;
@@ -102,35 +129,35 @@ std::vector<TriangleMesh> create_plane(const Transform *object2wrold, const Tran
     return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
 }
 
-std::vector<TriangleMesh> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density)
+std::vector<std::shared_ptr<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object, float radius, const uint32_t vertex_density)
 {
-        assert(radius > 0);
-        std::vector<Point3f> vertices = {Point3f(0, 0, 0)};
-        std::vector<Normal3f> normals = {Normal3f(0, 0, 1)};
-        std::vector<Point2f> uvs = {Point2f(0, 0)};
-        std::vector<uint32_t> indices;
-        float theta_step = 2.0f * PI / vertex_density;
-        float theta = 0;
-        for (uint32_t i = 1; i <= vertex_density; i++)
+    assert(radius > 0);
+    std::vector<Point3f> vertices = {Point3f(0, 0, 0)};
+    std::vector<Normal3f> normals = {Normal3f(0, 0, 1)};
+    std::vector<Point2f> uvs = {Point2f(0, 0)};
+    std::vector<uint32_t> indices;
+    float theta_step = 2.0f * PI / vertex_density;
+    float theta = 0;
+    for (uint32_t i = 1; i <= vertex_density; i++)
+    {
+        Point3f v(cos(theta) * radius, sin(theta) * radius, 0);
+        vertices.push_back(v);
+        uvs.push_back(Point2f(0, 0));
+        if (i > 1)
         {
-            Point3f v(cos(theta) * radius, sin(theta) * radius, 0);
-            vertices.push_back(v);
-            uvs.push_back(Point2f(0, 0));
-            if (i > 1)
-            {
-                indices.push_back(i-1);
-                indices.push_back(0);
-                indices.push_back(i);
-            }
-            theta += theta_step;
+            indices.push_back(i - 1);
+            indices.push_back(0);
+            indices.push_back(i);
         }
-
-        //last piece
-        indices.push_back(vertex_density);
-        indices.push_back(0);
-        indices.push_back(1);
-
-        return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+        theta += theta_step;
     }
+
+    //last piece
+    indices.push_back(vertex_density);
+    indices.push_back(0);
+    indices.push_back(1);
+
+    return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
+}
 
 NARUKAMI_END
