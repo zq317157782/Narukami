@@ -44,7 +44,7 @@ NARUKAMI_BEGIN
         void  operator delete(void * ptr);
     };
 
-    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh->get_world_bounds();}
+    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh->world_bounds();}
     inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.mesh->object_to_world();}
     inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh->world_to_object();}
    
