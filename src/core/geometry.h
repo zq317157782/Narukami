@@ -28,29 +28,6 @@ SOFTWARE.
 #include <vector>
 NARUKAMI_BEGIN
 
-// template <typename T>
-// struct DataBuffer
-// {
-//     int size;
-//     std::shared_ptr<T[]> buffer;
-//     DataBuffer(const int size):size(size){
-//         assert(size>0);
-//         buffer = std::shared_ptr<T[]>(new T[size]);
-//     }
-
-//     DataBuffer(const int size,void* data):DataBuffer(size){
-//         memcpy(buffer.get(),data,sizeof(T)*size);
-//     }
-
-//     inline T& operator[](const int idx){ assert(idx>=0&&idx<size); return buffer[idx]; }
-//     inline T& operator[](const int idx) const{ assert(idx>=0&&idx<size); return buffer[idx]; }
-// };
-
-// template <typename T>
-// void load(DataBuffer<T>& vb,void* data,const  int size,const int offset=0){
-//     memcpy(vb.buffer.get()+offset,data,sizeof(T)*size);
-// }
-
 struct Ray
 {
     Point3f o;

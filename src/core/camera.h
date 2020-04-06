@@ -31,12 +31,12 @@ SOFTWARE.
 NARUKAMI_BEGIN
     class Camera{
         protected:
-            std::shared_ptr<Film> film;
+            ref<Film> film;
         public:
             const Transform camera_to_world;
-            inline Camera(const Transform&  camera_to_world,std::shared_ptr<Film> film):camera_to_world(camera_to_world),film(std::move(film)){}
+            inline Camera(const Transform&  camera_to_world,ref<Film> film):camera_to_world(camera_to_world),film(std::move(film)){}
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
-            inline std::shared_ptr<Film> get_film() const {return film;}
+            inline ref<Film> get_film() const {return film;}
     };
 
 
@@ -47,7 +47,7 @@ NARUKAMI_BEGIN
             Transform _raster_to_screen;
             Transform _raster_to_camera;
          public:
-            ProjectiveCamera(const Transform&  camera_to_world,const Transform&  _camera_to_screen,const Bounds2f& screen_windows,std::shared_ptr<Film> film):Camera(camera_to_world,film),_camera_to_screen(_camera_to_screen){ 
+            ProjectiveCamera(const Transform&  camera_to_world,const Transform&  _camera_to_screen,const Bounds2f& screen_windows,ref<Film> film):Camera(camera_to_world,film),_camera_to_screen(_camera_to_screen){ 
                 _screen_to_raster = scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f));
                 _raster_to_screen = inverse(_screen_to_raster);
                 _raster_to_camera=inverse(_camera_to_screen)/*screen2camera*/*_raster_to_screen;

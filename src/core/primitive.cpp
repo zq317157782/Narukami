@@ -25,7 +25,7 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 
-std::vector<Primitive> create_primitives(const std::vector<std::shared_ptr<TriangleMesh>>& meshs){
+std::vector<Primitive> create_primitives(const std::vector<ref<TriangleMesh>>& meshs){
     std::vector<Primitive> primitives;
     for (uint32_t i = 0; i < meshs.size(); ++i)
     {

@@ -45,10 +45,10 @@ NARUKAMI_BEGIN
     {
         private:
             const Transform * _object2world,*_world2object;
-            std::shared_ptr<VertexData> _vertex_data;
+            ref<VertexData> _vertex_data;
             uint32_t _index[3];
         public:
-        TriangleMesh(const Transform* object2world, const Transform* world2object,const std::shared_ptr<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
+        TriangleMesh(const Transform* object2world, const Transform* world2object,const ref<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh().vertices[_index[i]]; }
         inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
@@ -77,14 +77,14 @@ NARUKAMI_BEGIN
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
 
-    void append(std::vector<std::shared_ptr<TriangleMesh>>& A,const std::vector<std::shared_ptr<TriangleMesh>>& B);
-    std::vector<std::shared_ptr<TriangleMesh>> concat(const std::vector<std::shared_ptr<TriangleMesh>>& A,const std::vector<std::shared_ptr<TriangleMesh>>& B);
+    void append(std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
+    std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
 
-    std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);    
-    std::vector<std::shared_ptr<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
-    std::vector<std::shared_ptr<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
+    std::vector<ref<TriangleMesh>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);    
+    std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
+    std::vector<ref<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
 
-    std::vector<SoATriangle> SoA_pack(const std::vector<std::shared_ptr<TriangleMesh>>&);
+    std::vector<SoATriangle> SoA_pack(const std::vector<ref<TriangleMesh>>&);
 
     
 NARUKAMI_END

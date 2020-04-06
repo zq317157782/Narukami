@@ -27,21 +27,21 @@ void  TriangleMesh::operator delete(void * ptr)
     g_triangle_mesh_pool.dealloc(reinterpret_cast<TriangleMesh*>(ptr));
 }
 
-void append(std::vector<std::shared_ptr<TriangleMesh>> &A, const std::vector<std::shared_ptr<TriangleMesh>> &B)
+void append(std::vector<ref<TriangleMesh>> &A, const std::vector<ref<TriangleMesh>> &B)
 {
     A.insert(A.end(), B.begin(), B.end());
 }
 
-std::vector<std::shared_ptr<TriangleMesh>> concat(const std::vector<std::shared_ptr<TriangleMesh>> &A, const std::vector<std::shared_ptr<TriangleMesh>> &B)
+std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>> &A, const std::vector<ref<TriangleMesh>> &B)
 {
-    std::vector<std::shared_ptr<TriangleMesh>> C;
+    std::vector<ref<TriangleMesh>> C;
     C.insert(C.end(), A.begin(), A.end());
     C.insert(C.end(), B.begin(), B.end());
     return C;
 }
 
 //TODO SSE alignas
-std::vector<SoATriangle> SoA_pack(const std::vector<std::shared_ptr<TriangleMesh>> &meshs)
+std::vector<SoATriangle> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
 {
     uint32_t start = 0;
     uint32_t end = meshs.size();
@@ -88,9 +88,9 @@ std::vector<SoATriangle> SoA_pack(const std::vector<std::shared_ptr<TriangleMesh
     return soa_triangles;
 }
 
-std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform *object2world, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
+std::vector<ref<TriangleMesh>> create_mesh_triangles(const Transform *object2world, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
 {
-    auto vertex_data = std::shared_ptr<VertexData>(new VertexData());
+    auto vertex_data = ref<VertexData>(new VertexData());
     for(uint32_t i = 0;i<positions.size();++i)
     {
         vertex_data->positions.push_back((*object2world)(positions[i]));
@@ -102,7 +102,7 @@ std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform
 
     vertex_data->uvs = uvs;
     
-    std::vector<std::shared_ptr<TriangleMesh>> meshs;
+    std::vector<ref<TriangleMesh>> meshs;
    
     uint32_t mesh_size = indices.size() / 3;
     for (uint32_t m = 0; m < mesh_size; ++m)
@@ -111,13 +111,13 @@ std::vector<std::shared_ptr<TriangleMesh>> create_mesh_triangles(const Transform
         index[0] = indices[m * 3];
         index[1] = indices[m * 3 + 1];
         index[2] = indices[m * 3 + 2];
-        auto triangle_mesh = std::shared_ptr<TriangleMesh>(new TriangleMesh(object2world,world2object,vertex_data,index));
+        auto triangle_mesh = ref<TriangleMesh>(new TriangleMesh(object2world,world2object,vertex_data,index));
         meshs.push_back(triangle_mesh);
     }
     return meshs;
 }
 
-std::vector<std::shared_ptr<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
+std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
 {
     float hw = width * 0.5f;
     float hh = height * 0.5f;
@@ -129,7 +129,7 @@ std::vector<std::shared_ptr<TriangleMesh>> create_plane(const Transform *object2
     return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
 }
 
-std::vector<std::shared_ptr<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object, float radius, const uint32_t vertex_density)
+std::vector<ref<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object, float radius, const uint32_t vertex_density)
 {
     assert(radius > 0);
     std::vector<Point3f> vertices = {Point3f(0, 0, 0)};
