@@ -43,7 +43,7 @@ struct BVHPrimitiveInfo
     Bounds3f bounds;
     Point3f centroid;
     BVHPrimitiveInfo() = default;
-    BVHPrimitiveInfo(const Primitive &p, uint32_t index) : prim_index(index), bounds(get_world_bounds(p)), centroid((get_world_bounds(p).min_point + get_world_bounds(p).max_point) * 0.5f) {}
+    BVHPrimitiveInfo(const ref<Primitive> &p, uint32_t index) : prim_index(index), bounds(get_world_bounds(*p)), centroid((get_world_bounds(*p).min_point + get_world_bounds(*p).max_point) * 0.5f) {}
 };
 
 struct BVHBuildNode
@@ -218,18 +218,18 @@ class ProgressReporter;
 class Accelerator
 {
 private:
-    std::vector<Primitive> _primitives;
+    std::vector<ref<Primitive>> _primitives;
     std::vector<SoAPrimitiveInfo> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter);
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<Primitive>> &ordered, uint32_t *total,ProgressReporter* reporter);
     void build_soa_primitive_info(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
     void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;
 public:
     Accelerator() = default;
-    Accelerator(const std::vector<Primitive>& primitives);
+    Accelerator(const std::vector<ref<Primitive>>& primitives);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
     bool intersect(const Ray &ray) const;
 };

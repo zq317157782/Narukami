@@ -22,20 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "core/primitive.h"
+#include "core/memory.h"
 NARUKAMI_BEGIN
 
+MemoryPool<Primitive> g_primitive_mesh_pool(4096);
 
-std::vector<Primitive> create_primitives(const std::vector<ref<TriangleMesh>>& meshs){
-    std::vector<Primitive> primitives;
+void * Primitive::operator new(size_t size)
+{
+    return g_primitive_mesh_pool.alloc();
+}
+
+void  Primitive::operator delete(void * ptr)
+{
+    g_primitive_mesh_pool.dealloc(reinterpret_cast<Primitive*>(ptr));
+}
+
+std::vector<ref<Primitive>> create_primitives(const std::vector<ref<TriangleMesh>>& meshs){
+    std::vector<ref<Primitive>> primitives;
     for (uint32_t i = 0; i < meshs.size(); ++i)
     {
-        primitives.emplace_back(meshs[i]);
+        primitives.push_back(ref<Primitive>(new Primitive(meshs[i])));
     }
     
     return primitives;
 }
 
-std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count)
+std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<ref<Primitive>> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -50,7 +62,7 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     {
         if (i < count)
         {
-            auto m = triangles[start + i].mesh;
+            auto m = triangles[start + i]->mesh;
             auto v0 = (*m)[0];
             auto e1 = (*m)[1] - v0;
             auto e2 = (*m)[2] - v0;
@@ -81,9 +93,9 @@ std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, 
     return soa_primitives;
 }
 
-std::vector<Primitive> concat(const std::vector<Primitive>& a,const std::vector<Primitive>& b)
+std::vector<ref<Primitive>> concat(const std::vector<ref<Primitive>>& a,const std::vector<ref<Primitive>>& b)
 {
-    std::vector<Primitive> c;
+    std::vector<ref<Primitive>> c;
     c.insert(c.end(),a.begin(),a.end());
     c.insert(c.end(),b.begin(),b.end());
     return c;

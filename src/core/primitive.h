@@ -39,6 +39,9 @@ NARUKAMI_BEGIN
         Primitive(const ref<TriangleMesh>& mesh):mesh(mesh),area_light(nullptr),light_material(nullptr){}
         Primitive(const ref<TriangleMesh>& mesh,const AreaLight*area_light):mesh(mesh),area_light(area_light),light_material(nullptr){}
         Primitive(const ref<TriangleMesh>& mesh,const LightMaterial*light_material):mesh(mesh),light_material(light_material),area_light(nullptr){}
+
+        void * operator new(size_t size);
+        void  operator delete(void * ptr);
     };
 
     inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh->get_world_bounds();}
@@ -46,8 +49,8 @@ NARUKAMI_BEGIN
     inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh->world_to_object();}
    
 
-    std::vector<Primitive> create_primitives(const std::vector<ref<TriangleMesh>>&);
-    std::vector<Primitive> concat(const std::vector<Primitive>& a,const std::vector<Primitive>& b);
+    std::vector<ref<Primitive>> create_primitives(const std::vector<ref<TriangleMesh>>&);
+    std::vector<ref<Primitive>> concat(const std::vector<ref<Primitive>>& a,const std::vector<ref<Primitive>>& b);
 
     struct SoAPrimitiveInfo{
         SoATriangle triangle;
@@ -58,5 +61,5 @@ NARUKAMI_BEGIN
         //***
     };
 
-    std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<Primitive> &triangles, uint32_t start, uint32_t count);
+    std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<ref<Primitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

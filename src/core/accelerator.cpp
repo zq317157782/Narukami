@@ -25,7 +25,7 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
-Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives(primitives)
+Accelerator::Accelerator(const std::vector<ref<Primitive>>& primitives) : _primitives(primitives)
 {
     
     STAT_INCREASE_COUNTER(PrimitiveInfo_count, _primitives.size())
@@ -36,7 +36,7 @@ Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives
     }
 
     MemoryArena arena;
-    std::vector<Primitive> _ordered_primitives;
+    std::vector<ref<Primitive>> _ordered_primitives;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
@@ -59,7 +59,7 @@ Accelerator::Accelerator(const std::vector<Primitive>& primitives) : _primitives
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<Primitive> &ordered, uint32_t *total,ProgressReporter* reporter)
+BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<Primitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -390,7 +390,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
         interaction->p = barycentric_interpolate_position(triangle, uv);
         interaction->n = flip_normal(get_normalized_normal(triangle), -ray.d);
         auto primitive_offset = _soa_primitive_infos[soa_primitive_info_offset].offset + triangle_offset;
-        interaction->primitive = &_primitives[primitive_offset];
+        interaction->primitive = _primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;
     }
 

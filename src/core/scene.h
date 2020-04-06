@@ -36,7 +36,7 @@ class Scene{
     public:
         std::vector<Light*> lights;
     public:
-        Scene(const std::vector<Primitive>& primitives,const std::vector<Light*> &lights):lights(lights){
+        Scene(const std::vector<ref<Primitive>>& primitives,const std::vector<Light*> &lights):lights(lights){
              _accelerator=Accelerator(primitives);
         }
 

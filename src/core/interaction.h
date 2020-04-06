@@ -36,7 +36,7 @@ public:
     Point3f p;
     Normal3f n;
     float hit_t;
-    const Primitive * primitive;
+    ref<Primitive> primitive;
 public:
     Interaction() = default;
     Interaction(const Point3f& p):p(p){}
