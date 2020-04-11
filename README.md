@@ -50,18 +50,22 @@ lightweight PBRT-style path tracer
  - [ ] basic SPD
  - [ ] basic Camera
     - [x] orthographic camera
-    - [ ] perspective camera
+    - [x] perspective camera
  - [ ] memory
     - [x] SSE algins global memory alloc and delloc
     - [x] memory arena from PBRT
- - [ ] MBVH
-     - [x] build binary BVH with SAH
-     - [x] collapse into MBVH 
-     - [x] precompute travel orders
+    - [x] simple memory pool
+ - [ ] accelator
+    - [ ] MBVH
+        - [x] build binary BVH with SAH
+        - [x] collapse into MBVH 
+        - [x] precompute travel orders
+    - [ ] BLAS and TLAS struct
  - [ ] Light Source
-     - [x] point light
-     - [x] rect light
-     - [x] disk light
+     - ~~[x] point light~~
+     - ~~[x] rect light~~
+     - ~~[x] disk light~~
+     - [ ] mesh based area light
  
 # Reference
 [Physically Based Rendering](https://www.pbrt.org/)
