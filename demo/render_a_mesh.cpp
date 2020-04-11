@@ -83,9 +83,13 @@ int main()
     //     lights.push_back(disk_light);
     //     primitives = _union(primitives,create_primitives(disklight_triangles,disk_light.get()));
     // }
-   
+    
+    Transform blas_to_wrold = rotate(30,0,1,0);
+    Transform world_to_blas = inverse(blas_to_wrold);
+    auto blas = ref<BLAS>(new BLAS(primitives));
+    auto tlas = ref<TLAS>(new TLAS(&blas_to_wrold,&world_to_blas,blas));
         
-    Scene scene(primitives,lights);
+    Scene scene(tlas,lights);
     Integrator integrator(&camera,&sampler);
     integrator.render(scene);
     parallel_for_clean();

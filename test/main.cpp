@@ -1073,7 +1073,7 @@ TEST(mesh,get_world_bounds){
      auto transform2 = translate(Vector3f(-1,0,0));
      auto meshs=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
 
-     auto triangle_bounds=meshs[0]->world_bounds();
+     auto triangle_bounds=meshs[0]->bounds();
      Bounds3f b0{{1,0,0},{2,1,0}};
      EXPECT_EQ(triangle_bounds,b0);
 }
@@ -1092,7 +1092,7 @@ TEST(primitive,create_mesh_primitives){
      EXPECT_EQ(primitives.size(),2);
 
     Bounds3f b0{{1,0,0},{2,1,0}};
-    EXPECT_EQ(primitives[0]->world_bounds(),b0);
+    EXPECT_EQ(primitives[0]->bounds(),b0);
     //TODO mesh
 }
 

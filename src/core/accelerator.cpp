@@ -25,7 +25,17 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
-Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_primitives(primitives)
+Bounds3f  get_max_bounds(std::vector<BVHMeshPrimitiveInfo> &primitive_infos,uint32_t start,uint32_t end)
+{
+    Bounds3f max_bounds;
+    for (uint32_t i = start; i < end; i++)
+    {
+        max_bounds = _union(max_bounds, primitive_infos[i].bounds);
+    }
+    return max_bounds;
+}
+
+BLAS::BLAS(const std::vector<ref<MeshPrimitive>>& primitives):_primitives(primitives)
 {
     STAT_INCREASE_COUNTER(PrimitiveInfo_count, _primitives.size())
     std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
@@ -34,14 +44,15 @@ Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_pri
         primitive_infos[i] = BVHMeshPrimitiveInfo(_primitives[i], i);
     }
 
+    //获取所有MeshPrimitive的Bounds
+    _bounds = get_max_bounds(primitive_infos,0,primitive_infos.size());
+
     MemoryArena arena;
     std::vector<ref<MeshPrimitive>> _ordered_primitives;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
-    ProgressReporter building_reporter(_primitives.size(),"building");
-    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_infos.size()), primitive_infos, _ordered_primitives, &total_build_node_num,&building_reporter);
-    building_reporter.done();
+    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_infos.size()), primitive_infos, _ordered_primitives, &total_build_node_num);
 
     _primitives = _ordered_primitives;
     auto collapse_root = collapse(arena, build_root, &total_collapse_node_num);
@@ -58,16 +69,12 @@ Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_pri
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
+BVHBuildNode *BLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
-    reporter->update(1);
-    Bounds3f max_bounds;
-    for (uint32_t i = start; i < end; i++)
-    {
-        max_bounds = _union(max_bounds, primitive_infos[i].bounds);
-    }
+    Bounds3f max_bounds = get_max_bounds(primitive_infos,start,end);
+   
     uint32_t num = end - start;
     if (num <= ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
     {
@@ -93,13 +100,13 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t en
             //degenerate
             auto mid = (start + end) / 2;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
         else if (num <= 2 * ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
         {
             auto mid = start + ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
         //else{
         //     auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
@@ -158,13 +165,13 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t en
                 return bucket_index <= min_cost_bucket_index;
             });
             auto mid = static_cast<uint32_t>(mid_ptr - &primitive_infos[0]);
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
+            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
     }
     return node;
 }
 
-void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
+void BLAS::build_soa_primitive_info(BVHBuildNode *node)
 {
 
     if (is_leaf(node))
@@ -195,7 +202,7 @@ void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
     }
 }
 
-QBVHCollapseNode *Accelerator::collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total)
+QBVHCollapseNode *BLAS::collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total)
 {
     auto node = arena.alloc<QBVHCollapseNode>(1);
     (*total)++;
@@ -258,7 +265,7 @@ QBVHCollapseNode *Accelerator::collapse(MemoryArena &arena, const BVHBuildNode *
     return node;
 }
 
-uint32_t Accelerator::flatten(const QBVHCollapseNode *c_node, uint32_t *offset)
+uint32_t BLAS::flatten(const QBVHCollapseNode *c_node, uint32_t *offset)
 {
     auto cur_offset = (*offset);
     (*offset)++;
@@ -289,7 +296,7 @@ uint32_t Accelerator::flatten(const QBVHCollapseNode *c_node, uint32_t *offset)
     return cur_offset;
 }
 
-void Accelerator::get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t orders[4]) const
+void BLAS::get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t orders[4]) const
 {
     orders[0] = 0;
     orders[1] = 1;
@@ -311,7 +318,7 @@ void Accelerator::get_traversal_orders(const QBVHNode &node, const Vector3f &dir
     }
 }
 
-bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -396,7 +403,7 @@ bool Accelerator::intersect(MemoryArena &arena, const Ray &ray, Interaction *int
     return has_hit_event;
 }
 
-bool Accelerator::intersect(const Ray &ray) const
+bool BLAS::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);

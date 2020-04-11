@@ -32,20 +32,18 @@ SOFTWARE.
 NARUKAMI_BEGIN
 class Scene{
     private:
-        Accelerator _accelerator;
+        ref<TLAS> _accelerator;
     public:
         std::vector<Light*> lights;
     public:
-        Scene(const std::vector<ref<MeshPrimitive>>& primitives,const std::vector<Light*> &lights):lights(lights){
-             _accelerator=Accelerator(primitives);
-        }
+        Scene(ref<TLAS>& accelerator,const std::vector<Light*> &lights):_accelerator(accelerator),lights(lights){}
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator.intersect(arena,ray,interaction);
+            return _accelerator->intersect(arena,ray,interaction);
         }
 
         inline bool intersect(const Ray& ray) const{
-             return _accelerator.intersect(ray);
+             return _accelerator->intersect(ray);
         }
 };
 NARUKAMI_END

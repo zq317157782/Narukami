@@ -41,7 +41,7 @@ NARUKAMI_BEGIN
        
         Primitive(const PrimitiveType& type):_type(type){};
         PrimitiveType type() const {return _type;}
-        virtual Bounds3f world_bounds() const = 0;
+        virtual Bounds3f bounds() const = 0;
         virtual const Transform& object_to_world() const = 0;
         virtual const Transform& world_to_object() const = 0;
     };
@@ -54,7 +54,7 @@ NARUKAMI_BEGIN
             ref<TriangleMesh> _mesh;
         public:
             MeshPrimitive(const ref<TriangleMesh>& mesh):Primitive(PrimitiveType::MESH),_mesh(mesh){}
-            virtual Bounds3f world_bounds() const override {return _mesh->world_bounds();}
+            virtual Bounds3f bounds() const override {return _mesh->bounds();}
             virtual const Transform& object_to_world() const override {return _mesh->object_to_world();}
             virtual const Transform& world_to_object() const override {return _mesh->world_to_object();}
 

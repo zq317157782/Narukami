@@ -43,7 +43,7 @@ struct BVHMeshPrimitiveInfo
     Bounds3f bounds;
     Point3f centroid;
     BVHMeshPrimitiveInfo() = default;
-    BVHMeshPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->world_bounds()), centroid((p->world_bounds().min_point + p->world_bounds().max_point) * 0.5f) {}
+    BVHMeshPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
 };
 
 struct BVHBuildNode
@@ -202,35 +202,62 @@ struct BucketInfo{
 };
 
 
-STAT_COUNTER("accelerator/Primitive's instance",PrimitiveInfo_count)
-STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's instance",SoAPrimitiveInfo_count)
-STAT_MEMORY_COUNTER("accelerator/Primitive's memory",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/MeshPrimitiveInfo4p's memory",SoAPrimitiveInfo_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/QBVH node's memory",QBVH_node_memory_cost)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
-STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ",ordered_traversal_num,ordered_traversal_denom)
+STAT_COUNTER("BLAS/MeshPrimitive's num",PrimitiveInfo_count)
+STAT_COUNTER("BLAS/MeshPrimitiveInfo4p's num",SoAPrimitiveInfo_count)
+STAT_MEMORY_COUNTER("BLAS/MeshPrimitive's memory",Primitive_memory_cost)
+STAT_MEMORY_COUNTER("BLAS/MeshPrimitiveInfo4p's memory",SoAPrimitiveInfo_memory_cost)
+STAT_MEMORY_COUNTER("BLAS/QBVH node's memory",QBVH_node_memory_cost)
+STAT_PERCENT("BLAS/MeshPrimitiveInfo4p(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
+STAT_PERCENT("BLAS/MeshPrimitiveInfo4p(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
+STAT_PERCENT("BLAS/MeshPrimitiveInfo4p(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)
+STAT_PERCENT("BLAS/MeshPrimitiveInfo4p(4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
+STAT_PERCENT("BLAS/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ",ordered_traversal_num,ordered_traversal_denom)
 
 class ProgressReporter;
 
-class Accelerator
+class BLAS
 {
 private:
     std::vector<ref<MeshPrimitive>> _primitives;
     std::vector<MeshPrimitiveInfo4p> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter);
+    Bounds3f _bounds;
+
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
     void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;
 public:
-    Accelerator() = default;
-    Accelerator(const std::vector<ref<MeshPrimitive>>& primitives);
+    BLAS(const std::vector<ref<MeshPrimitive>>& primitives);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
     bool intersect(const Ray &ray) const;
+
+    Bounds3f bounds() const {return _bounds;}
 };
+
+
+class TLAS
+{
+private:
+    ref<BLAS> _blas;
+    const Transform* _world_to_blas;
+    const Transform* _blas_to_world;
+    Bounds3f _bounds;
+public:
+    TLAS(const Transform* blas_to_world,const Transform* world_to_blas,const ref<BLAS>& blas):_blas_to_world(blas_to_world),_world_to_blas(world_to_blas),_blas(blas){_bounds = (*_blas_to_world)(_blas->bounds());};
+    bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const 
+    {
+        auto blas_ray = (*_world_to_blas)(ray);
+        return _blas->intersect(arena,blas_ray,interaction);
+    }
+    bool intersect(const Ray &ray) const
+    {
+         auto blas_ray = (*_world_to_blas)(ray);
+        return _blas->intersect(blas_ray);
+    }
+    Bounds3f bounds() const {return _bounds;}
+};
+
 NARUKAMI_END

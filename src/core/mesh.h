@@ -54,7 +54,7 @@ NARUKAMI_BEGIN
         inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
         inline  Point2f get_uv(const int i) const{ assert(i>=0&&i<=2);return _vertex_data->uvs[_index[i]];}
         inline  Point2f sample_uv(const Point2f& u) const { return _vertex_data->uvs[_index[0]]*(1.0f-u.x-u.y)+_vertex_data->uvs[_index[1]]*u.x + _vertex_data->uvs[_index[2]] * u.y;}
-        inline  Bounds3f world_bounds() const{return _union(_union((*this)[0],(*this)[1]),(*this)[2]);}
+        inline  Bounds3f bounds() const{return _union(_union((*this)[0],(*this)[1]),(*this)[2]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
         inline  Triangle geom_tri() const 

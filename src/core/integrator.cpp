@@ -72,7 +72,19 @@ void Integrator::render(const Scene &scene)
                     constexpr int bounce_count = 5;
                     Spectrum L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
-
+#if 1 //Normal Debug
+                     if (scene.intersect(arena, ray, &interaction))
+                     {
+                         if (is_surface_interaction(interaction))
+                         {
+                             SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
+                             float r = surface_interaction.n.x * 0.5f + 0.5f;
+                             float g = surface_interaction.n.y * 0.5f + 0.5f;
+                             float b = surface_interaction.n.z * 0.5f + 0.5f;
+                             L = Spectrum(r,g,b); 
+                         }
+                     }
+#else
                     int bounce = 0;
                     for (; bounce <= bounce_count; ++bounce)
                     {
@@ -84,8 +96,7 @@ void Integrator::render(const Scene &scene)
                                 SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
 
                                 L = L + Le(surface_interaction, ray.d);
-                                
-                               
+
                                 for (auto light : scene.lights)
                                 {
                                     Vector3f wi;
@@ -117,6 +128,7 @@ void Integrator::render(const Scene &scene)
                         }
                     }
                     STAT_INCREASE_COUNTER_CONDITION(miss_intersection_num, 1, bounce == 0)
+#endif
                     film_tile->add_sample(camera_sample.pFilm, L, w);
                     arena.reset();
                 } while (clone_sampler->switch_to_next_sample());

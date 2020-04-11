@@ -58,6 +58,17 @@ struct SSE_ALIGNAS Transform
         r.d = (*this)(ray.d);
         return r;
     }
+    inline Bounds3f operator()(const Bounds3f &b) const 
+    {
+        auto b0 = _union((*this)(end_point0(b)),(*this)(end_point1(b)));
+             b0 = _union(b0                    ,(*this)(end_point2(b)));
+             b0 = _union(b0                    ,(*this)(end_point3(b)));
+             b0 = _union(b0                    ,(*this)(end_point4(b)));
+             b0 = _union(b0                    ,(*this)(end_point5(b)));
+             b0 = _union(b0                    ,(*this)(end_point6(b)));
+             b0 = _union(b0                    ,(*this)(end_point7(b)));
+        return b0;
+    }
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
 };
 
@@ -70,6 +81,11 @@ inline std::ostream &operator<<(std::ostream &out, const Transform &t)
 inline Point3f transform_h(const Transform &t,const Point3f &p)
 {
     return mul_h(t.mat,p);
+}
+
+inline Transform identity()
+{
+    return Transform();
 }
 
 inline Transform inverse(const Transform &transform)

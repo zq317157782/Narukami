@@ -394,6 +394,69 @@ inline T surface_area(const Bounds3<T> &bounds)
 
     return (w * h + w * d + d * h) * 2;
 }
+template <typename T>
+inline const Point3<T> end_point0(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m0.x,m0.y,m0.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point1(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m1.x,m0.y,m0.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point2(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m1.x,m1.y,m0.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point3(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m0.x,m1.y,m0.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point4(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m0.x,m0.y,m1.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point5(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m1.x,m0.y,m1.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point6(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m1.x,m1.y,m1.z);
+}
+
+template <typename T>
+inline const Point3<T> end_point7(const Bounds3<T> &b)
+{
+    auto& m0 = b.min_point;
+    auto& m1 = b.max_point;
+    return  Point3f(m0.x,m1.y,m1.z);
+}
 
 struct SSE_ALIGNAS SoABounds3f
 {
