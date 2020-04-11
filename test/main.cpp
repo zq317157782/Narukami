@@ -852,7 +852,7 @@ TEST(geometry,size_of_soatriangle){
 
 TEST(SoAbound3f,intersect0){
     
-    SoABounds3f bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    Bounds3f4p bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
     int p[3]={1,1,1};
     auto a=intersect(ray.o,Vector3f4p(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
@@ -862,7 +862,7 @@ TEST(SoAbound3f,intersect0){
 
 TEST(SoAbound3f,intersect1){
     
-    SoABounds3f bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    Bounds3f4p bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
     int p[3]={1,1,1};
     float4 tHit;

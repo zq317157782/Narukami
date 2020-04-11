@@ -90,7 +90,7 @@ struct QBVHCollapseNode
 //128 bytes
 struct  SSE_ALIGNAS QBVHNode
 {
-    SoABounds3f bounds;
+    Bounds3f4p bounds;
     uint32_t childrens[4];
     uint32_t axis0, axis1, axis2;
     uint32_t fill;
@@ -163,7 +163,7 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
         bounds[3] = Bounds3f();
     }
 
-    node->bounds = SoABounds3f(bounds);
+    node->bounds = Bounds3f4p(bounds);
 
     if (is_leaf(cn->data[0]))
     {

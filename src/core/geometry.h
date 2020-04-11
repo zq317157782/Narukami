@@ -458,7 +458,7 @@ inline const Point3<T> end_point7(const Bounds3<T> &b)
     return  Point3f(m0.x,m1.y,m1.z);
 }
 
-struct SSE_ALIGNAS SoABounds3f
+struct SSE_ALIGNAS Bounds3f4p
 {
     Point3f4p min_point;
     Point3f4p max_point;
@@ -469,26 +469,26 @@ struct SSE_ALIGNAS SoABounds3f
         return (&min_point)[idx];
     }
 
-    inline SoABounds3f()
+    inline Bounds3f4p()
     {
         min_point = Point3f4p(MAX, MAX, MAX);
         max_point = Point3f4p(LOWEST, LOWEST, LOWEST);
     }
 
-    inline SoABounds3f(const Point3f4p &p0, const Point3f4p &p1)
+    inline Bounds3f4p(const Point3f4p &p0, const Point3f4p &p1)
     {
         min_point = min(p0, p1);
         max_point = max(p0, p1);
     }
 
-    inline SoABounds3f(const Bounds3f bounds[4])
+    inline Bounds3f4p(const Bounds3f bounds[4])
     {
         min_point = Point3f4p(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
         max_point = Point3f4p(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const SoABounds3f &box)
+inline std::ostream &operator<<(std::ostream &out, const Bounds3f4p &box)
 {
     out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
     return out;
@@ -791,7 +791,7 @@ inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, floa
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box)
+inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box)
 {
     // x
     t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
@@ -809,7 +809,7 @@ inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box, float4 *t)
+inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box, float4 *t)
 {
     // x
     t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
