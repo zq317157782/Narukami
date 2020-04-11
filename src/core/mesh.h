@@ -84,7 +84,7 @@ NARUKAMI_BEGIN
     std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
     std::vector<ref<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
 
-    std::vector<SoATriangle> SoA_pack(const std::vector<ref<TriangleMesh>>&);
+    std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>>&);
 
     
 NARUKAMI_END

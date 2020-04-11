@@ -47,7 +47,7 @@ std::vector<ref<MeshPrimitive>> create_mesh_primitives(const std::vector<ref<Tri
     return primitives;
 }
 
-std::vector<SoAPrimitiveInfo> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
+std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -78,11 +78,11 @@ std::vector<SoAPrimitiveInfo> pack_mesh_primitives(const std::vector<ref<MeshPri
             e2_array.push_back(Vector3f());
         }
     }
-    std::vector<SoAPrimitiveInfo> soa_primitives;
+    std::vector<MeshPrimitiveInfo4p> soa_primitives;
 
     for (uint32_t i = 0; i < soa_count; ++i)
     {
-        SoAPrimitiveInfo primitive;
+        MeshPrimitiveInfo4p primitive;
         primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);

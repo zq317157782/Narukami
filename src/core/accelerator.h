@@ -37,13 +37,13 @@ NARUKAMI_BEGIN
 constexpr uint32_t ACCELERATOR_TIRANGLE_NUM_PER_LEAF=64;
 constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
 
-struct BVHPrimitiveInfo
+struct BVHMeshPrimitiveInfo
 {
 	uint32_t prim_index;
     Bounds3f bounds;
     Point3f centroid;
-    BVHPrimitiveInfo() = default;
-    BVHPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->world_bounds()), centroid((p->world_bounds().min_point + p->world_bounds().max_point) * 0.5f) {}
+    BVHMeshPrimitiveInfo() = default;
+    BVHMeshPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->world_bounds()), centroid((p->world_bounds().min_point + p->world_bounds().max_point) * 0.5f) {}
 };
 
 struct BVHBuildNode
@@ -203,14 +203,14 @@ struct BucketInfo{
 
 
 STAT_COUNTER("accelerator/Primitive's instance",PrimitiveInfo_count)
-STAT_COUNTER("accelerator/SoAPrimitiveInfo's instance",SoAPrimitiveInfo_count)
+STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's instance",SoAPrimitiveInfo_count)
 STAT_MEMORY_COUNTER("accelerator/Primitive's memory",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/SoAPrimitiveInfo's memory",SoAPrimitiveInfo_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/MeshPrimitiveInfo4p's memory",SoAPrimitiveInfo_memory_cost)
 STAT_MEMORY_COUNTER("accelerator/QBVH node's memory",QBVH_node_memory_cost)
-STAT_PERCENT("accelerator/SoAPrimitiveInfo(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
-STAT_PERCENT("accelerator/SoAPrimitiveInfo(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
-STAT_PERCENT("accelerator/SoAPrimitiveInfo(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)
-STAT_PERCENT("accelerator/SoAPrimitiveInfo(4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
 STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ",ordered_traversal_num,ordered_traversal_denom)
 
 class ProgressReporter;
@@ -219,10 +219,10 @@ class Accelerator
 {
 private:
     std::vector<ref<MeshPrimitive>> _primitives;
-    std::vector<SoAPrimitiveInfo> _soa_primitive_infos;
+    std::vector<MeshPrimitiveInfo4p> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter);
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter);
     void build_soa_primitive_info(BVHBuildNode *node);
     QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total);
     uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);

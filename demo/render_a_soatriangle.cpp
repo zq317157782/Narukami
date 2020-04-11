@@ -3,10 +3,10 @@
 #include "lodepng.h"
 #include "core/geometry.h"
 int main(){
-    narukami::SoATriangle triangle;
-    triangle.v0 = narukami::SoAPoint3f(0,0,0);
-    triangle.e1 = narukami::SoAVector3f(1,0,0);
-    triangle.e2 = narukami::SoAVector3f(0,1,0);
+    narukami::Triangle4p triangle;
+    triangle.v0 = narukami::Point3f4p(0,0,0);
+    triangle.e1 = narukami::Vector3f4p(1,0,0);
+    triangle.e2 = narukami::Vector3f4p(0,1,0);
 
     
 

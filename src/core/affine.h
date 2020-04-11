@@ -386,7 +386,7 @@ inline SSEVector3f sqrt(const SSEVector3f &v) { return sqrt(v.xyzw); }
 inline SSEVector3f rsqrt(const SSEVector3f &v) { return rsqrt(v.xyzw); }
 
 //SoA struct vector3f
-struct SSE_ALIGNAS SoAVector3f
+struct SSE_ALIGNAS Vector3f4p
 {
     union {
         float4 xxxx;
@@ -414,18 +414,18 @@ struct SSE_ALIGNAS SoAVector3f
 
     typedef float Scalar;
 
-    inline SoAVector3f() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
-    inline explicit SoAVector3f(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
-    inline SoAVector3f(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
-    inline explicit SoAVector3f(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
-    inline SoAVector3f(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
-    inline SoAVector3f(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Vector3f4p() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
+    inline explicit Vector3f4p(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
+    inline Vector3f4p(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
+    inline explicit Vector3f4p(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
+    inline Vector3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Vector3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
 
-    inline SoAVector3f(const SoAVector3f &) = default;
-    inline SoAVector3f(SoAVector3f &&) = default;
-    inline SoAVector3f &operator=(const SoAVector3f &) = default;
-    inline SoAVector3f &operator=(SoAVector3f &&) = default;
-    inline ~SoAVector3f() = default;
+    inline Vector3f4p(const Vector3f4p &) = default;
+    inline Vector3f4p(Vector3f4p &&) = default;
+    inline Vector3f4p &operator=(const Vector3f4p &) = default;
+    inline Vector3f4p &operator=(Vector3f4p &&) = default;
+    inline ~Vector3f4p() = default;
 
     inline Vector3f operator[](const int idx) const
     {
@@ -434,7 +434,7 @@ struct SSE_ALIGNAS SoAVector3f
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const SoAVector3f &v)
+inline std::ostream &operator<<(std::ostream &out, const Vector3f4p &v)
 {
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
@@ -443,7 +443,7 @@ inline std::ostream &operator<<(std::ostream &out, const SoAVector3f &v)
     return out;
 }
 
-inline int operator==(const SoAVector3f &v0, const SoAVector3f &v1)
+inline int operator==(const Vector3f4p &v0, const Vector3f4p &v1)
 {
 
     bool4 mask_xxxx = (v0.xxxx == v1.xxxx);
@@ -452,7 +452,7 @@ inline int operator==(const SoAVector3f &v0, const SoAVector3f &v1)
 
     return movemask((mask_xxxx & mask_yyyy) & mask_zzzz);
 }
-inline int operator!=(const SoAVector3f &v0, const SoAVector3f &v1)
+inline int operator!=(const Vector3f4p &v0, const Vector3f4p &v1)
 {
     bool4 mask_xxxx = (v0.xxxx != v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy != v1.yyyy);
@@ -460,42 +460,42 @@ inline int operator!=(const SoAVector3f &v0, const SoAVector3f &v1)
     return movemask((mask_xxxx | mask_yyyy) | mask_zzzz);
 }
 
-inline float4 dot(const SoAVector3f &v0, const SoAVector3f &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
+inline float4 dot(const Vector3f4p &v0, const Vector3f4p &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
 
-inline SoAVector3f cross(const SoAVector3f &v0, const SoAVector3f &v1)
+inline Vector3f4p cross(const Vector3f4p &v0, const Vector3f4p &v1)
 {
     float4 xxxx = v0.yyyy * v1.zzzz - v0.zzzz * v1.yyyy;
     float4 yyyy = v0.zzzz * v1.xxxx - v0.xxxx * v1.zzzz;
     float4 zzzz = v0.xxxx * v1.yyyy - v0.yyyy * v1.xxxx;
-    return SoAVector3f(xxxx, yyyy, zzzz);
+    return Vector3f4p(xxxx, yyyy, zzzz);
 }
 
-inline SoAVector3f rcp(const SoAVector3f &v)
+inline Vector3f4p rcp(const Vector3f4p &v)
 {
-    SoAVector3f vv;
+    Vector3f4p vv;
     vv.xxxx = rcp(v.xxxx);
     vv.yyyy = rcp(v.yyyy);
     vv.zzzz = rcp(v.zzzz);
     return vv;
 }
-inline SoAVector3f safe_rcp(const SoAVector3f &v)
+inline Vector3f4p safe_rcp(const Vector3f4p &v)
 {
-    SoAVector3f vv;
+    Vector3f4p vv;
     vv.xxxx = safe_rcp(v.xxxx);
     vv.yyyy = safe_rcp(v.yyyy);
     vv.zzzz = safe_rcp(v.zzzz);
     return vv;
 }
-inline SoAVector3f robust_rcp(const SoAVector3f &v)
+inline Vector3f4p robust_rcp(const Vector3f4p &v)
 {
-    SoAVector3f vv;
+    Vector3f4p vv;
     auto one = float4(1.0f);
     vv.xxxx = one / v.xxxx;
     vv.yyyy = one / v.yyyy;
     vv.zzzz = one / v.zzzz;
     return vv;
 }
-inline SoAVector3f load(const Vector3f *vector_array) { return SoAVector3f(vector_array[0], vector_array[1], vector_array[2], vector_array[3]); }
+inline Vector3f4p load(const Vector3f *vector_array) { return Vector3f4p(vector_array[0], vector_array[1], vector_array[2], vector_array[3]); }
 //---VECTOR3 END---
 
 //---VECTOR2 BEGIN---
@@ -871,7 +871,7 @@ inline SSEPoint3f sqrt(const SSEPoint3f &v) { return sqrt(v.xyzw); }
 inline SSEPoint3f rsqrt(const SSEPoint3f &v) { return rsqrt(v.xyzw); }
 
 //TODO : need to refactor
-struct SSE_ALIGNAS SoAPoint3f
+struct SSE_ALIGNAS Point3f4p
 {
     union {
         float4 xxxx;
@@ -899,17 +899,17 @@ struct SSE_ALIGNAS SoAPoint3f
 
     typedef float Scalar;
 
-    inline SoAPoint3f() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
-    inline explicit SoAPoint3f(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
-    inline SoAPoint3f(const Point3f &v0, const Point3f &v1, const Point3f &v2, const Point3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
-    inline explicit SoAPoint3f(const Point3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
-    inline SoAPoint3f(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
-    inline SoAPoint3f(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Point3f4p() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
+    inline explicit Point3f4p(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
+    inline Point3f4p(const Point3f &v0, const Point3f &v1, const Point3f &v2, const Point3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
+    inline explicit Point3f4p(const Point3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
+    inline Point3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Point3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
 
-    inline SoAPoint3f(const SoAPoint3f &) = default;
-    inline SoAPoint3f(SoAPoint3f &&) = default;
-    inline SoAPoint3f &operator=(const SoAPoint3f &) = default;
-    inline SoAPoint3f &operator=(SoAPoint3f &&) = default;
+    inline Point3f4p(const Point3f4p &) = default;
+    inline Point3f4p(Point3f4p &&) = default;
+    inline Point3f4p &operator=(const Point3f4p &) = default;
+    inline Point3f4p &operator=(Point3f4p &&) = default;
 
     inline Point3f operator[](const int idx) const
     {
@@ -918,7 +918,7 @@ struct SSE_ALIGNAS SoAPoint3f
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v)
+inline std::ostream &operator<<(std::ostream &out, const Point3f4p &v)
 {
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
@@ -927,7 +927,7 @@ inline std::ostream &operator<<(std::ostream &out, const SoAPoint3f &v)
     return out;
 }
 
-inline int operator==(const SoAPoint3f &v0, const SoAPoint3f &v1)
+inline int operator==(const Point3f4p &v0, const Point3f4p &v1)
 {
 
     bool4 mask_xxxx = (v0.xxxx == v1.xxxx);
@@ -936,7 +936,7 @@ inline int operator==(const SoAPoint3f &v0, const SoAPoint3f &v1)
 
     return movemask((mask_xxxx & mask_yyyy) & mask_zzzz);
 }
-inline int operator!=(const SoAPoint3f &v0, const SoAPoint3f &v1)
+inline int operator!=(const Point3f4p &v0, const Point3f4p &v1)
 {
     bool4 mask_xxxx = (v0.xxxx != v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy != v1.yyyy);
@@ -944,19 +944,19 @@ inline int operator!=(const SoAPoint3f &v0, const SoAPoint3f &v1)
     return movemask((mask_xxxx | mask_yyyy) | mask_zzzz);
 }
 
-inline SoAPoint3f min(const SoAPoint3f &p0, const SoAPoint3f &p1)
+inline Point3f4p min(const Point3f4p &p0, const Point3f4p &p1)
 {
-    return SoAPoint3f(min(p0.xxxx, p1.xxxx), min(p0.yyyy, p1.yyyy), min(p0.zzzz, p1.zzzz));
+    return Point3f4p(min(p0.xxxx, p1.xxxx), min(p0.yyyy, p1.yyyy), min(p0.zzzz, p1.zzzz));
 }
 
-inline SoAPoint3f max(const SoAPoint3f &p0, const SoAPoint3f &p1)
+inline Point3f4p max(const Point3f4p &p0, const Point3f4p &p1)
 {
-    return SoAPoint3f(max(p0.xxxx, p1.xxxx), max(p0.yyyy, p1.yyyy), max(p0.zzzz, p1.zzzz));
+    return Point3f4p(max(p0.xxxx, p1.xxxx), max(p0.yyyy, p1.yyyy), max(p0.zzzz, p1.zzzz));
 }
 
-inline SoAPoint3f load(const Point3f *point_array)
+inline Point3f4p load(const Point3f *point_array)
 {
-    return SoAPoint3f(point_array[0], point_array[1], point_array[2], point_array[3]);
+    return Point3f4p(point_array[0], point_array[1], point_array[2], point_array[3]);
 }
 //---POINT3 END---
 
@@ -1796,7 +1796,7 @@ inline SSEPoint3f operator*(const Matrix4x4 &M, const SSEPoint3f &v)
     return SSEPoint3f(r.xyzw);
 }
 
-inline SoAVector3f operator*(const Matrix4x4 &M, const SoAVector3f &v)
+inline Vector3f4p operator*(const Matrix4x4 &M, const Vector3f4p &v)
 {
     float4 r_xxxx = swizzle<0, 0, 0, 0>(M.col[0]) /*m00*/ * v.xxxx;
     r_xxxx = r_xxxx + swizzle<0, 0, 0, 0>(M.col[1]) /*m10*/ * v.yyyy;
@@ -1810,10 +1810,10 @@ inline SoAVector3f operator*(const Matrix4x4 &M, const SoAVector3f &v)
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[1]) /*m12*/ * v.yyyy;
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[2]) /*m22*/ * v.zzzz;
 
-    return SoAVector3f(r_xxxx, r_yyyy, r_zzzz);
+    return Vector3f4p(r_xxxx, r_yyyy, r_zzzz);
 }
 
-inline SoAPoint3f operator*(const Matrix4x4 &M, const SoAPoint3f &v)
+inline Point3f4p operator*(const Matrix4x4 &M, const Point3f4p &v)
 {
     float4 r_xxxx = swizzle<0, 0, 0, 0>(M.col[0]) /*m00*/ * v.xxxx;
     r_xxxx = r_xxxx + swizzle<0, 0, 0, 0>(M.col[1]) /*m10*/ * v.yyyy;
@@ -1830,15 +1830,15 @@ inline SoAPoint3f operator*(const Matrix4x4 &M, const SoAPoint3f &v)
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[2]) /*m22*/ * v.zzzz;
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[3]);
 
-    return SoAPoint3f(r_xxxx, r_yyyy, r_zzzz);
+    return Point3f4p(r_xxxx, r_yyyy, r_zzzz);
 }
 
-inline SoAVector3f operator-(const SoAPoint3f &p0, const SoAPoint3f &p1)
+inline Vector3f4p operator-(const Point3f4p &p0, const Point3f4p &p1)
 {
     auto xxxx = p0.xxxx - p1.xxxx;
     auto yyyy = p0.yyyy - p1.yyyy;
     auto zzzz = p0.zzzz - p1.zzzz;
-    return SoAVector3f(xxxx, yyyy, zzzz);
+    return Vector3f4p(xxxx, yyyy, zzzz);
 }
 inline Normal3f flip_normal(const Normal3f &n, const Vector3f &wo)
 {

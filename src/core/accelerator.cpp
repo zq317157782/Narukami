@@ -28,10 +28,10 @@ NARUKAMI_BEGIN
 Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_primitives(primitives)
 {
     STAT_INCREASE_COUNTER(PrimitiveInfo_count, _primitives.size())
-    std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
+    std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
     for (uint32_t i = 0; i < _primitives.size(); ++i)
     {
-        primitive_infos[i] = BVHPrimitiveInfo(_primitives[i], i);
+        primitive_infos[i] = BVHMeshPrimitiveInfo(_primitives[i], i);
     }
 
     MemoryArena arena;
@@ -54,11 +54,11 @@ Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_pri
 
 
     STAT_INCREASE_MEMORY_COUNTER(Primitive_memory_cost, sizeof(Primitive) * _primitives.size())
-    STAT_INCREASE_MEMORY_COUNTER(SoAPrimitiveInfo_memory_cost, sizeof(SoAPrimitiveInfo) * _soa_primitive_infos.size())
+    STAT_INCREASE_MEMORY_COUNTER(SoAPrimitiveInfo_memory_cost, sizeof(MeshPrimitiveInfo4p) * _soa_primitive_infos.size())
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
+BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -92,18 +92,18 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t en
         {
             //degenerate
             auto mid = (start + end) / 2;
-            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
         }
         else if (num <= 2 * ACCELERATOR_TIRANGLE_NUM_PER_LEAF)
         {
             auto mid = start + ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
-            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total,reporter), build(arena, mid, end, primitive_infos, ordered, total,reporter), dim);
         }
         //else{
         //     auto mid = start+2*ACCELERATOR_TIRANGLE_NUM_PER_LEAF;
-        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHPrimitiveInfo &p0, const BVHPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
         //     init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         // }
         else
@@ -151,8 +151,8 @@ BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t en
             }
 
             // auto mid_point = (centroid_bounds.max_point[dim] + centroid_bounds.min_point[dim]) / 2;
-            // auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
-            auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [=](const BVHPrimitiveInfo &pi) {
+            // auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHMeshPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
+            auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [=](const BVHMeshPrimitiveInfo &pi) {
                 auto bucket_index = static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM * offset(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
                 bucket_index = min(bucket_index, ACCELERATOR_SAH_BUCKET_NUM - 1);
                 return bucket_index <= min_cost_bucket_index;

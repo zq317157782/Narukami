@@ -67,8 +67,8 @@ NARUKAMI_BEGIN
     std::vector<ref<MeshPrimitive>> create_mesh_primitives(const std::vector<ref<TriangleMesh>>&);
 
 
-    struct SoAPrimitiveInfo{
-        SoATriangle triangle;
+    struct MeshPrimitiveInfo4p{
+        Triangle4p triangle;
         
         //*** 128 bit
         uint32_t offset;
@@ -76,5 +76,5 @@ NARUKAMI_BEGIN
         //***
     };
 
-    std::vector<SoAPrimitiveInfo> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
+    std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

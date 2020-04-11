@@ -41,7 +41,7 @@ std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>> &A, c
 }
 
 //TODO SSE alignas
-std::vector<SoATriangle> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
+std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
 {
     uint32_t start = 0;
     uint32_t end = meshs.size();
@@ -74,11 +74,11 @@ std::vector<SoATriangle> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
             e2_array.push_back(Vector3f(0, 0, 0));
         }
     }
-    std::vector<SoATriangle> soa_triangles;
+    std::vector<Triangle4p> soa_triangles;
 
     for (uint32_t i = 0; i < soa_count; ++i)
     {
-        SoATriangle triangle;
+        Triangle4p triangle;
         triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
         triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
         triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);

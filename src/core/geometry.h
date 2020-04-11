@@ -63,11 +63,11 @@ inline Ray offset_ray(const Ray &ray, const Normal3f &n)
 
 struct SSE_ALIGNAS SoARay
 {
-    SoAPoint3f o;
-    SoAVector3f d;
+    Point3f4p o;
+    Vector3f4p d;
     mutable float4 t_max;
 
-    inline SoARay(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(SoAPoint3f(o)), d(SoAVector3f(d)), t_max(t_max) {}
+    inline SoARay(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(Point3f4p(o)), d(Vector3f4p(d)), t_max(t_max) {}
     inline explicit SoARay(const Ray &ray) : o(ray.o), d(ray.d), t_max(ray.t_max) {}
 };
 inline std::ostream &operator<<(std::ostream &out, const SoARay &ray)
@@ -122,11 +122,11 @@ inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
 }
 
 //v0(128*3)+e1(128*3)+e2(128*3)
-struct SSE_ALIGNAS SoATriangle
+struct SSE_ALIGNAS Triangle4p
 {
-    SoAPoint3f v0;
-    SoAVector3f e1;
-    SoAVector3f e2;
+    Point3f4p v0;
+    Vector3f4p e1;
+    Vector3f4p e2;
 
     Triangle operator[](const uint32_t idx) const
     {
@@ -139,7 +139,7 @@ struct SSE_ALIGNAS SoATriangle
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const SoATriangle &triangle)
+inline std::ostream &operator<<(std::ostream &out, const Triangle4p &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";
     return out;
@@ -397,10 +397,10 @@ inline T surface_area(const Bounds3<T> &bounds)
 
 struct SSE_ALIGNAS SoABounds3f
 {
-    SoAPoint3f min_point;
-    SoAPoint3f max_point;
+    Point3f4p min_point;
+    Point3f4p max_point;
 
-    inline const SoAPoint3f &operator[](const int idx) const
+    inline const Point3f4p &operator[](const int idx) const
     {
         assert(idx >= 0 && idx < 2);
         return (&min_point)[idx];
@@ -408,11 +408,11 @@ struct SSE_ALIGNAS SoABounds3f
 
     inline SoABounds3f()
     {
-        min_point = SoAPoint3f(MAX, MAX, MAX);
-        max_point = SoAPoint3f(LOWEST, LOWEST, LOWEST);
+        min_point = Point3f4p(MAX, MAX, MAX);
+        max_point = Point3f4p(LOWEST, LOWEST, LOWEST);
     }
 
-    inline SoABounds3f(const SoAPoint3f &p0, const SoAPoint3f &p1)
+    inline SoABounds3f(const Point3f4p &p0, const Point3f4p &p1)
     {
         min_point = min(p0, p1);
         max_point = max(p0, p1);
@@ -420,8 +420,8 @@ struct SSE_ALIGNAS SoABounds3f
 
     inline SoABounds3f(const Bounds3f bounds[4])
     {
-        min_point = SoAPoint3f(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
-        max_point = SoAPoint3f(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
+        min_point = Point3f4p(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
+        max_point = Point3f4p(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
     }
 };
 
@@ -510,7 +510,7 @@ FINLINE int check(const bool4 &mask, const float4 &t_results, const float4 &u_re
     return idx;
 }
 
-inline bool4 intersect(const SoARay &ray, const SoATriangle &triangle, float4 *t_results, float4 *u_results, float4 *v_results, bool4 mask = SSE_MASK_TRUE)
+inline bool4 intersect(const SoARay &ray, const Triangle4p &triangle, float4 *t_results, float4 *u_results, float4 *v_results, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -576,7 +576,7 @@ inline bool4 intersect(const SoARay &ray, const SoATriangle &triangle, float4 *t
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const SoARay &ray, const Triangle4p &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -658,7 +658,7 @@ inline bool intersect(const SoARay &ray, const SoATriangle &triangle, float *t_r
     return true;
 }
 
-inline bool intersect(const SoARay &ray, const SoATriangle &triangle, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const SoARay &ray, const Triangle4p &triangle, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -728,7 +728,7 @@ inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, floa
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box)
+inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box)
 {
     // x
     t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
@@ -746,7 +746,7 @@ inline bool4 intersect(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_m
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const SoAPoint3f &o, const SoAVector3f &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box, float4 *t)
+inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const SoABounds3f &box, float4 *t)
 {
     // x
     t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);

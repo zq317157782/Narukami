@@ -47,9 +47,9 @@ struct SSE_ALIGNAS Transform
     inline ~Transform() = default;
 
     inline Point3f operator()(const Point3f &p) const { return mat * p; }
-    inline SoAPoint3f operator()(const SoAPoint3f &p) const { return mat * p; }
+    inline Point3f4p operator()(const Point3f4p &p) const { return mat * p; }
     inline Vector3f operator()(const Vector3f &v) const { return mat * v; }
-    inline SoAVector3f operator()(const SoAVector3f &v) const { return mat * v; }
+    inline Vector3f4p operator()(const Vector3f4p &v) const { return mat * v; }
     inline Normal3f operator()(const Normal3f &n) const { return transpose(inv_mat) * Vector3f(n); }
     inline Ray operator()(const Ray &ray) const
     {
