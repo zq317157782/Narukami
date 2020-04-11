@@ -79,7 +79,6 @@ void Integrator::render(const Scene &scene)
 
                         if (scene.intersect(arena, ray, &interaction))
                         {
-
                             if (is_surface_interaction(interaction))
                             {
                                 SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);

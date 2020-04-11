@@ -28,11 +28,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
 Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
 {
-    if(interaction.primitive->area_light!=nullptr)
-    {
-        return interaction.primitive->area_light->L(interaction,wi);
-    }
-    else
+    // if(interaction.primitive->area_light!=nullptr)
+    // {
+    //     return interaction.primitive->area_light->L(interaction,wi);
+    // }
+    // else
     {
         return Spectrum(0.0f,0.0f,0.0f);
     }

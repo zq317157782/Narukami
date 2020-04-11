@@ -64,7 +64,7 @@ int main()
         append(meshs,create_plane(&transform,&inv_transform,5,2));
     }
 
-    auto primitives = create_primitives(meshs);
+    auto primitives = create_mesh_primitives(meshs);
     // //create light 
     std::vector<Light*> lights;
     {

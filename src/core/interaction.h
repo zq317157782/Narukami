@@ -54,12 +54,12 @@ public:
 
 inline const Transform& get_object_to_world(const SurfaceInteraction& interaction)
 {
-    return get_object_to_world(*interaction.primitive);
+    return interaction.primitive->object_to_world();
 }
 
 inline const Transform& get_world_to_object(const SurfaceInteraction& interaction)
 {
-    return get_world_to_object(*interaction.primitive);
+    return interaction.primitive->world_to_object();
 }
 
 Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi);

@@ -29,28 +29,43 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
+    enum class PrimitiveType
+    {
+        MESH
+    };
     class Primitive
     {
+    private:
+        PrimitiveType _type;
     public:
-        ref<TriangleMesh> mesh;
-        const AreaLight* area_light;
-        const LightMaterial* light_material;
-        Primitive() = default;
-        Primitive(const ref<TriangleMesh>& mesh):mesh(mesh),area_light(nullptr),light_material(nullptr){}
-        Primitive(const ref<TriangleMesh>& mesh,const AreaLight*area_light):mesh(mesh),area_light(area_light),light_material(nullptr){}
-        Primitive(const ref<TriangleMesh>& mesh,const LightMaterial*light_material):mesh(mesh),light_material(light_material),area_light(nullptr){}
-
-        void * operator new(size_t size);
-        void  operator delete(void * ptr);
+       
+        Primitive(const PrimitiveType& type):_type(type){};
+        PrimitiveType type() const {return _type;}
+        virtual Bounds3f world_bounds() const = 0;
+        virtual const Transform& object_to_world() const = 0;
+        virtual const Transform& world_to_object() const = 0;
     };
 
-    inline Bounds3f get_world_bounds(const Primitive& primitive) {return primitive.mesh->world_bounds();}
-    inline const Transform& get_object_to_world(const Primitive& primitive){return primitive.mesh->object_to_world();}
-    inline const Transform& get_world_to_object(const Primitive& primitive){return primitive.mesh->world_to_object();}
-   
-
-    std::vector<ref<Primitive>> create_primitives(const std::vector<ref<TriangleMesh>>&);
     std::vector<ref<Primitive>> concat(const std::vector<ref<Primitive>>& a,const std::vector<ref<Primitive>>& b);
+
+    class MeshPrimitive:public Primitive
+    {
+        private:
+            ref<TriangleMesh> _mesh;
+        public:
+            MeshPrimitive(const ref<TriangleMesh>& mesh):Primitive(PrimitiveType::MESH),_mesh(mesh){}
+            virtual Bounds3f world_bounds() const override {return _mesh->world_bounds();}
+            virtual const Transform& object_to_world() const override {return _mesh->object_to_world();}
+            virtual const Transform& world_to_object() const override {return _mesh->world_to_object();}
+
+            const ref<TriangleMesh> mesh() const {return _mesh;}
+
+            void * operator new(size_t size);
+            void  operator delete(void * ptr);
+    };
+    
+    std::vector<ref<MeshPrimitive>> create_mesh_primitives(const std::vector<ref<TriangleMesh>>&);
+
 
     struct SoAPrimitiveInfo{
         SoATriangle triangle;
@@ -61,5 +76,5 @@ NARUKAMI_BEGIN
         //***
     };
 
-    std::vector<SoAPrimitiveInfo> SoA_pack(const std::vector<ref<Primitive>> &triangles, uint32_t start, uint32_t count);
+    std::vector<SoAPrimitiveInfo> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

@@ -25,9 +25,8 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
-Accelerator::Accelerator(const std::vector<ref<Primitive>>& primitives) : _primitives(primitives)
+Accelerator::Accelerator(const std::vector<ref<MeshPrimitive>>& primitives):_primitives(primitives)
 {
-    
     STAT_INCREASE_COUNTER(PrimitiveInfo_count, _primitives.size())
     std::vector<BVHPrimitiveInfo> primitive_infos(_primitives.size());
     for (uint32_t i = 0; i < _primitives.size(); ++i)
@@ -36,7 +35,7 @@ Accelerator::Accelerator(const std::vector<ref<Primitive>>& primitives) : _primi
     }
 
     MemoryArena arena;
-    std::vector<ref<Primitive>> _ordered_primitives;
+    std::vector<ref<MeshPrimitive>> _ordered_primitives;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
@@ -59,7 +58,7 @@ Accelerator::Accelerator(const std::vector<ref<Primitive>>& primitives) : _primi
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<Primitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
+BVHBuildNode *Accelerator::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total,ProgressReporter* reporter)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -170,7 +169,7 @@ void Accelerator::build_soa_primitive_info(BVHBuildNode *node)
 
     if (is_leaf(node))
     {
-        auto primitive_infos = SoA_pack(_primitives, node->offset, node->num);
+        auto primitive_infos = pack_mesh_primitives(_primitives, node->offset, node->num);
         node->num = static_cast<uint32_t>(primitive_infos.size());
         node->offset = static_cast<uint32_t>(_soa_primitive_infos.size());
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());

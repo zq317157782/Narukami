@@ -1080,16 +1080,19 @@ TEST(mesh,get_world_bounds){
 
 
 #include "core/primitive.h"
-TEST(primitive,create_primitives){
-    //  std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
-    //  std::vector<Normal3f> normals;
-    //  std::vector<Point2f> uvs;
-    //  std::vector<uint32_t> indices={0,1,2,1,2,3};
-    //  auto transform = translate(Vector3f(1,0,0));
-    //  auto transform2 = translate(Vector3f(-1,0,0));
-    //  auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
-    //  auto primitives=create_primitives(triangles);
-    //  EXPECT_EQ(primitives.size(),2);
+TEST(primitive,create_mesh_primitives){
+     std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
+     std::vector<Normal3f> normals;
+     std::vector<Point2f> uvs;
+     std::vector<uint32_t> indices={0,1,2,1,2,3};
+     auto transform = translate(Vector3f(1,0,0));
+     auto transform2 = translate(Vector3f(-1,0,0));
+     auto triangles=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
+     auto primitives=create_mesh_primitives(triangles);
+     EXPECT_EQ(primitives.size(),2);
+
+    Bounds3f b0{{1,0,0},{2,1,0}};
+    EXPECT_EQ(primitives[0]->world_bounds(),b0);
     //TODO mesh
 }
 
