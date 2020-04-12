@@ -250,7 +250,13 @@ public:
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const 
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        return _blas->intersect(arena,blas_ray,interaction);
+        bool ret = _blas->intersect(arena,blas_ray,interaction);
+        //从BLAS空间，转换到世界空间
+        if(ret)
+        {
+            (*interaction) = (*_blas_to_world)(*interaction);
+        }
+        return ret;
     }
     bool intersect(const Ray &ray) const
     {

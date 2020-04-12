@@ -52,6 +52,7 @@ NARUKAMI_BEGIN
 template <typename T>
 using ref = std::shared_ptr<T>;
 
+class Interaction;
 class Scene;
 class Light;
 class AreaLight;

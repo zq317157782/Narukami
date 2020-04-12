@@ -72,7 +72,7 @@ void Integrator::render(const Scene &scene)
                     constexpr int bounce_count = 5;
                     Spectrum L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
-#if 1 //Normal Debug
+#if 0 //Normal Debug
                      if (scene.intersect(arena, ray, &interaction))
                      {
                          if (is_surface_interaction(interaction))
