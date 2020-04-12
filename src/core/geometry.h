@@ -494,6 +494,11 @@ inline std::ostream &operator<<(std::ostream &out, const Bounds3f4p &box)
     return out;
 }
 
+inline Bounds3f4p load(const Bounds3f *bound_array)
+{
+    return Bounds3f4p(bound_array);
+}
+
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 FINLINE bool intersect(const Point3f &ray_o, const Vector3f &ray_d, const float ray_t_max, const Point3f &v0, const Vector3f &e1, const Vector3f &e2, float *tt = nullptr, Point2f *uv = nullptr)
 {
@@ -827,5 +832,42 @@ inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min
 
     //check
     return t_min <= t_max;
+}
+
+
+//TODO need to test
+inline bool intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box, float *t_result,int* index)
+{
+    float4 t;
+    auto mask = intersect(o,inv_d,t_min,t_max,isPositive,box,&t);
+    if(EXPECT_TAKEN(none(mask)))
+    {
+        return false;
+    }
+
+    if (EXPECT_TAKEN(t_result))
+    {
+        float min_t = INFINITE;
+        auto valid_mask = movemask(mask);
+        int idx = -1;
+        for (int x = valid_mask, i = 0; x != 0; x >>= 1, ++i)
+        {
+            if ((x & 0x1) && min_t > t[i])
+            {
+                min_t = t[i];
+                idx = i;
+            }
+        }
+        if (EXPECT_NOT_TAKEN(idx != -1))
+        {
+            (*t_result) = min_t;
+            if (EXPECT_TAKEN(index))
+            {
+                (*index) = idx;
+            }
+        }
+    }
+    return true;
+
 }
 NARUKAMI_END

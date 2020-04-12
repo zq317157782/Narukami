@@ -60,7 +60,8 @@ lightweight PBRT-style path tracer
         - [x] build binary BVH with SAH
         - [x] collapse into MBVH 
         - [x] precompute travel orders
-    - [ ] BLAS and TLAS struct
+    - [ ] BLAS and BLASInstance struct
+    - [ ] TLAS struct
  - [ ] Light Source
      - ~~[x] point light~~
      - ~~[x] rect light~~
