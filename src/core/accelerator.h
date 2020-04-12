@@ -245,7 +245,7 @@ private:
 public:
     BLAS(const std::vector<ref<MeshPrimitive>>& primitives);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
-    bool intersect(const Ray &ray) const;
+    bool intersect_anyhit(const Ray &ray) const;
 
     Bounds3f bounds() const {return _bounds;}
 };
@@ -272,10 +272,15 @@ public:
         }
         return ret;
     }
-    bool intersect(const Ray &ray) const
+    bool intersect_anyhit(const Ray &ray) const
     {
-         auto blas_ray = (*_world_to_blas)(ray);
-        return _blas->intersect(blas_ray);
+        auto blas_ray = (*_world_to_blas)(ray);
+        bool ret =  _blas->intersect_anyhit(blas_ray);
+        if(ret)
+        {
+            ray.t_max = blas_ray.t_max;
+        }
+        return ret;
     }
     Bounds3f bounds() const {return _bounds;}
 };
@@ -308,7 +313,7 @@ private:
 public:
     TLAS(const std::vector<ref<BLASInstance>>& instance);
     bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
-    bool intersect(const Ray &ray) const;
+    bool intersect_anyhit(const Ray &ray) const;
 };
 
 NARUKAMI_END

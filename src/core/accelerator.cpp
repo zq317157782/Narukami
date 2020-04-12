@@ -378,7 +378,8 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
 
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &triangle_offset);
                         if (is_hit)
-                        {
+                        {   
+                            ray.t_max = closest_hit_t;
                             soa_ray.t_max = float4(closest_hit_t);
                             has_hit_event = true;
                             soa_primitive_info_offset = j;
@@ -413,28 +414,19 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
         auto primitive_offset = _soa_primitive_infos[soa_primitive_info_offset].offset + triangle_offset;
         interaction->primitive = _primitives[primitive_offset];
         interaction->hit_t = closest_hit_t;
-        ray.t_max = closest_hit_t;
     }
 
     return has_hit_event;
 }
 
-bool BLAS::intersect(const Ray &ray) const
+bool BLAS::intersect_anyhit(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-    float closest_hit_t = INFINITE;
     while (!node_stack.empty())
     {
-
-        if (node_stack.top().second > closest_hit_t)
-        {
-            node_stack.pop();
-            continue;
-        }
-
         auto node = node_stack.top().first;
         node_stack.pop();
         float4 box_t;
@@ -448,7 +440,7 @@ bool BLAS::intersect(const Ray &ray) const
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < closest_hit_t)
+            if (box_hits[index])
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -725,13 +717,13 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
                             {
                                   auto instance_offset = _soa_instance_infos[j].offset + k;
                                   auto blas_instance = _instances[instance_offset];
-                                  ray.t_max = closest_hit_t;
+                                  
                                   bool is_hit = blas_instance->intersect(arena,ray,interaction);
                                   if(is_hit)
                                   {
                                       if(ray.t_max<closest_hit_t)
                                       {
-                                        closest_hit_t = ray.t_max;
+                                        closest_hit_t = interaction->hit_t;
                                         soa_ray.t_max = float4(closest_hit_t);
                                         has_hit_event = true;
                                       }
@@ -757,38 +749,18 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
             }
         }
     }
-
-    // if (has_hit_event)
-    // {
-    //     //求交BLAS
-    //     auto final_instance_offset = _soa_instance_infos[soa_instance_info_offset].offset + instance_offset;
-    //     auto blas_instance = _instances[final_instance_offset];
-    //     return blas_instance->intersect(arena,ray,interaction);
-    // }
-
     return has_hit_event;
 }
 
-bool TLAS::intersect(const Ray &ray) const
+bool TLAS::intersect_anyhit(const Ray &ray) const
 {
-    std::stack<std::pair<const QBVHNode *, float>> node_stack;
+   std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-    float closest_hit_t = INFINITE;
-    bool has_hit_event = false;
     Point2f uv;
-    int instance_offset;
-    int soa_instance_info_offset;
     while (!node_stack.empty())
     {
-
-        if (node_stack.top().second > closest_hit_t)
-        {
-            node_stack.pop();
-            continue;
-        }
-
         auto node = node_stack.top().first;
         node_stack.pop();
         float4 box_t;
@@ -802,7 +774,7 @@ bool TLAS::intersect(const Ray &ray) const
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < closest_hit_t)
+            if (box_hits[index])
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -811,13 +783,21 @@ bool TLAS::intersect(const Ray &ray) const
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-                        auto is_hit = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds, &closest_hit_t,&instance_offset);
                         
-                        if (is_hit)
+                        auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds);
+
+                        for (uint32_t k = 0; k < 4; k++)
                         {
-                            soa_ray.t_max = float4(closest_hit_t);
-                            has_hit_event = true;
-                            soa_instance_info_offset = j;
+                            if(leaf_box_hits[k])
+                            {
+                                  auto instance_offset = _soa_instance_infos[j].offset + k;
+                                  auto blas_instance = _instances[instance_offset];
+                                  bool is_hit = blas_instance->intersect_anyhit(ray);
+                                  if(is_hit)
+                                  {
+                                     return true;
+                                  }
+                            }
                         }
                     }
                 }
@@ -837,16 +817,7 @@ bool TLAS::intersect(const Ray &ray) const
             }
         }
     }
-
-    if (has_hit_event)
-    {
-        //求交BLAS
-        auto final_instance_offset = _soa_instance_infos[soa_instance_info_offset].offset + instance_offset;
-        auto blas_instance = _instances[final_instance_offset];
-        return blas_instance->intersect(ray);
-    }
-
-    return has_hit_event;
+    return false;
 }
 
 NARUKAMI_END
