@@ -333,7 +333,7 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool BLAS::closet_hit(MemoryArena &arena, const Ray &ray,Payload * payload) const
+bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray.o,ray.d,payload->closest_hit_t);
@@ -418,7 +418,7 @@ bool BLAS::closet_hit(MemoryArena &arena, const Ray &ray,Payload * payload) cons
     return has_hit;
 }
 
-void BLAS::fill_interaction(const Payload* payload,Interaction* interaction) const
+void BLAS::setup_interaction(const Payload* payload,Interaction* interaction) const
 {
     //terrible finite precision of float.
     //interaction->p = ray.o + ray.d * closest_hit_t;
@@ -433,7 +433,7 @@ void BLAS::fill_interaction(const Payload* payload,Interaction* interaction) con
 
 
 
-bool BLAS::anyhit(const Ray &ray) const
+bool BLAS::trace_ray(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -682,7 +682,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 }
 
 
-bool TLAS::closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     Payload payload;
@@ -732,7 +732,7 @@ bool TLAS::closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interacti
                                   auto instance_offset = _soa_instance_infos[j].offset + k;
                                   auto blas_instance = _instances[instance_offset];
                                   
-                                  bool has_hit = blas_instance->closet_hit(arena,ray,&payload);
+                                  bool has_hit = blas_instance->trace_ray(arena,ray,&payload);
 
                                   if(has_hit)
                                   {
@@ -763,12 +763,12 @@ bool TLAS::closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interacti
     if(payload.is_hit)
     {
         ray.t_max = payload.closest_hit_t;//更新射线的t_max
-       _instances[payload.instance_index]->fill_interaction(&payload,interaction);
+       _instances[payload.instance_index]->setup_interaction(&payload,interaction);
     }
     return payload.is_hit;
 }
 
-bool TLAS::anyhit(const Ray &ray) const
+bool TLAS::trace_ray(const Ray &ray) const
 {
    std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -808,7 +808,7 @@ bool TLAS::anyhit(const Ray &ray) const
                             {
                                   auto instance_offset = _soa_instance_infos[j].offset + k;
                                   auto blas_instance = _instances[instance_offset];
-                                  bool is_hit = blas_instance->anyhit(ray);
+                                  bool is_hit = blas_instance->trace_ray(ray);
                                   if(is_hit)
                                   {
                                      return true;

@@ -39,11 +39,11 @@ class Scene{
         Scene(ref<TLAS>& accelerator,const std::vector<Light*> &lights):_accelerator(accelerator),lights(lights){}
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator->closet_hit(arena,ray,interaction);
+            return _accelerator->trace_ray(arena,ray,interaction);
         }
 
-        inline bool anyhit(const Ray& ray) const{
-             return _accelerator->anyhit(ray);
+        inline bool trace_ray(const Ray& ray) const{
+             return _accelerator->trace_ray(ray);
         }
 };
 NARUKAMI_END

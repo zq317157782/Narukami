@@ -254,9 +254,9 @@ private:
 
 public:
     BLAS(const std::vector<ref<MeshPrimitive>> &primitives);
-    bool closet_hit(MemoryArena &arena, const Ray &ray,Payload* payload) const;
-    void fill_interaction(const Payload* result, Interaction *interaction) const;
-    bool anyhit(const Ray &ray) const;
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Payload* payload) const;
+    void setup_interaction(const Payload* result, Interaction *interaction) const;
+    bool trace_ray(const Ray &ray) const;
 
     Bounds3f bounds() const { return _bounds; }
 };
@@ -272,25 +272,25 @@ private:
 public:
     BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const ref<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
-    bool closet_hit(MemoryArena &arena, const Ray &ray,Payload* payload) const
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Payload* payload) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool has_hit = _blas->closet_hit(arena, blas_ray,payload);
+        bool has_hit = _blas->trace_ray(arena, blas_ray,payload);
         return has_hit;
     }
 
-    void fill_interaction(const Payload* result, Interaction *interaction) const
+    void setup_interaction(const Payload* result, Interaction *interaction) const
     {
-        _blas->fill_interaction(result, interaction);
+        _blas->setup_interaction(result, interaction);
         //从BLAS空间，转换到世界空间
         (*interaction) = (*_blas_to_world)(*interaction);
     }
 
 
-    bool anyhit(const Ray &ray) const
+    bool trace_ray(const Ray &ray) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool ret = _blas->anyhit(blas_ray);
+        bool ret = _blas->trace_ray(blas_ray);
         if (ret)
         {
             ray.t_max = blas_ray.t_max;
@@ -327,8 +327,8 @@ private:
 
 public:
     TLAS(const std::vector<ref<BLASInstance>> &instance);
-    bool closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interaction) const;
-    bool anyhit(const Ray &ray) const;
+    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const;
+    bool trace_ray(const Ray &ray) const;
 };
 
 NARUKAMI_END

@@ -29,7 +29,7 @@ bool VisibilityTester::unoccluded(const Scene &scene) const
     //TODO float percise
     Ray ray(_p0.p, _p1.p - _p0.p, 0.99f);
     ray = offset_ray(ray, _p0.n);
-    return !scene.anyhit(ray);
+    return !scene.trace_ray(ray);
 }
 
 NARUKAMI_END
