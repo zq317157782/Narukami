@@ -419,7 +419,7 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
     return has_hit_event;
 }
 
-bool BLAS::intersect_anyhit(const Ray &ray) const
+bool BLAS::anyhit(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -752,7 +752,7 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
     return has_hit_event;
 }
 
-bool TLAS::intersect_anyhit(const Ray &ray) const
+bool TLAS::anyhit(const Ray &ray) const
 {
    std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -792,7 +792,7 @@ bool TLAS::intersect_anyhit(const Ray &ray) const
                             {
                                   auto instance_offset = _soa_instance_infos[j].offset + k;
                                   auto blas_instance = _instances[instance_offset];
-                                  bool is_hit = blas_instance->intersect_anyhit(ray);
+                                  bool is_hit = blas_instance->anyhit(ray);
                                   if(is_hit)
                                   {
                                      return true;

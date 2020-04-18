@@ -42,8 +42,8 @@ class Scene{
             return _accelerator->intersect(arena,ray,interaction);
         }
 
-        inline bool intersect_anyhit(const Ray& ray) const{
-             return _accelerator->intersect_anyhit(ray);
+        inline bool anyhit(const Ray& ray) const{
+             return _accelerator->anyhit(ray);
         }
 };
 NARUKAMI_END
