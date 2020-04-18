@@ -22,7 +22,7 @@ using namespace narukami;
 int main()
 {
     auto camera_transform = translate(0, 0, -4);
-    auto sampler = Sampler(128);
+    auto sampler = Sampler(16);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
     auto camera = PerspectiveCamera(camera_transform, Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);

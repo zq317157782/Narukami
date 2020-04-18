@@ -333,21 +333,19 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool BLAS::closet_hit(MemoryArena &arena, const Ray &ray,Payload * payload) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray);
+    SoARay soa_ray(ray.o,ray.d,payload->closest_hit_t);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-    float closest_hit_t = INFINITE;
-    bool has_hit_event = false;
-    Point2f uv;
-    int triangle_offset;
-    int soa_primitive_info_offset;
+    
+    bool has_hit = false;
+
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > closest_hit_t)
+        if (node_stack.top().second > payload->closest_hit_t)
         {
             node_stack.pop();
             continue;
@@ -366,7 +364,7 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < closest_hit_t)
+            if (box_hits[index] && box_t[index] < payload->closest_hit_t)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -375,14 +373,27 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &closest_hit_t, &uv, &triangle_offset);
-                        if (is_hit)
+                        float hit_t = INFINITE;
+                        Point2f uv;
+                        int triangle_index;
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &uv, &triangle_index);
+                        if (is_hit&&payload->is_closer(hit_t))
                         {   
-                            ray.t_max = closest_hit_t;
-                            soa_ray.t_max = float4(closest_hit_t);
-                            has_hit_event = true;
-                            soa_primitive_info_offset = j;
+                            {
+                                has_hit = true;
+                            }
+                            //更新射线的t_max
+                            {
+                                soa_ray.t_max = float4(hit_t);
+                            }
+                            //更新payload
+                            {
+                               payload->is_hit = true;
+                               payload->closest_hit_t = hit_t;
+                               payload->triangle_index = triangle_index;
+                               payload->triangle_uv = uv;
+                               payload->primitive_index = j;
+                            }
                         }
                     }
                 }
@@ -403,21 +414,24 @@ bool BLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
         }
     }
 
-    if (has_hit_event)
-    {
-        //terrible finite precision of float.
-        //interaction->p = ray.o + ray.d * closest_hit_t;
-        //"Realtime Ray Tracing Gems" chapter 6
-        auto triangle = _soa_primitive_infos[soa_primitive_info_offset].triangle[triangle_offset];
-        interaction->p = barycentric_interpolate_position(triangle, uv);
-        interaction->n = flip_normal(get_normalized_normal(triangle), -ray.d);
-        auto primitive_offset = _soa_primitive_infos[soa_primitive_info_offset].offset + triangle_offset;
-        interaction->primitive = _primitives[primitive_offset];
-        interaction->hit_t = closest_hit_t;
-    }
-
-    return has_hit_event;
+    payload->blas_ray_direction = ray.d;
+    return has_hit;
 }
+
+void BLAS::fill_interaction(const Payload* payload,Interaction* interaction) const
+{
+    //terrible finite precision of float.
+    //interaction->p = ray.o + ray.d * closest_hit_t;
+    //"Realtime Ray Tracing Gems" chapter 6
+    auto triangle = _soa_primitive_infos[payload->primitive_index].triangle[payload->triangle_index];
+    interaction->p = barycentric_interpolate_position(triangle, payload->triangle_uv);
+    interaction->n = flip_normal(get_normalized_normal(triangle), -payload->blas_ray_direction);
+    auto primitive_offset = _soa_primitive_infos[payload->primitive_index].offset + payload->triangle_index;
+    interaction->primitive = _primitives[primitive_offset];
+    interaction->hit_t = payload->closest_hit_t;
+}
+
+
 
 bool BLAS::anyhit(const Ray &ray) const
 {
@@ -668,19 +682,19 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 }
 
 
-bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool TLAS::closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray);
+    Payload payload;
+    SoARay soa_ray(ray.o,ray.d,payload.closest_hit_t);
+   
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-    float closest_hit_t = INFINITE;
-    bool has_hit_event = false;
-    Point2f uv;
+   
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > closest_hit_t)
+        if (node_stack.top().second > payload.closest_hit_t)
         {
             node_stack.pop();
             continue;
@@ -699,7 +713,7 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < closest_hit_t)
+            if (box_hits[index] && box_t[index] < payload.closest_hit_t)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -718,16 +732,12 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
                                   auto instance_offset = _soa_instance_infos[j].offset + k;
                                   auto blas_instance = _instances[instance_offset];
                                   
-                                  bool is_hit = blas_instance->intersect(arena,ray,interaction);
-                                  if(is_hit)
+                                  bool has_hit = blas_instance->closet_hit(arena,ray,&payload);
+
+                                  if(has_hit)
                                   {
-                                      if(ray.t_max<closest_hit_t)
-                                      {
-                                        closest_hit_t = interaction->hit_t;
-                                        soa_ray.t_max = float4(closest_hit_t);
-                                        has_hit_event = true;
-                                      }
-                                     
+                                       payload.instance_index = instance_offset;
+                                       soa_ray.t_max = float4(payload.closest_hit_t);
                                   }
                             }
                         }
@@ -749,7 +759,13 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, Interaction *interactio
             }
         }
     }
-    return has_hit_event;
+
+    if(payload.is_hit)
+    {
+        ray.t_max = payload.closest_hit_t;//更新射线的t_max
+       _instances[payload.instance_index]->fill_interaction(&payload,interaction);
+    }
+    return payload.is_hit;
 }
 
 bool TLAS::anyhit(const Ray &ray) const

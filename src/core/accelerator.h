@@ -34,17 +34,15 @@ SOFTWARE.
 #include <algorithm>
 NARUKAMI_BEGIN
 
-
-
-constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF=64;
+constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int BLAS_SAH_BUCKET_NUM = 12;
 
-constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF=64;
+constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
 
 struct BVHMeshPrimitiveInfo
 {
-	uint32_t prim_index;
+    uint32_t prim_index;
     Bounds3f bounds;
     Point3f centroid;
     BVHMeshPrimitiveInfo() = default;
@@ -93,7 +91,7 @@ struct QBVHCollapseNode
 };
 
 //128 bytes
-struct  SSE_ALIGNAS QBVHNode
+struct SSE_ALIGNAS QBVHNode
 {
     Bounds3f4p bounds;
     uint32_t childrens[4];
@@ -200,34 +198,47 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     }
 }
 
-
-struct BucketInfo{
+struct BucketInfo
+{
     Bounds3f bounds;
-    uint32_t count=0;
+    uint32_t count = 0;
 };
 
 //BLAS ONLY
-STAT_COUNTER("accelerator/MeshPrimitive's num",MeshPrimitiveInfo_count)
-STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's num",MeshPrimitiveInfo4p_count)
-STAT_MEMORY_COUNTER("accelerator/MeshPrimitive's memory",Primitive_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/MeshPrimitiveInfo4p's memory",MeshPrimitiveInfo4p_memory_cost)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio",SoAPrimitiveInfo_num_1_4,SoAPrimitiveInfo_denom_1_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio",SoAPrimitiveInfo_num_2_4,SoAPrimitiveInfo_denom_2_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio",SoAPrimitiveInfo_num_3_4,SoAPrimitiveInfo_denom_3_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio",SoAPrimitiveInfo_num_4_4,SoAPrimitiveInfo_denom_4_4)
+STAT_COUNTER("accelerator/MeshPrimitive's num", MeshPrimitiveInfo_count)
+STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's num", MeshPrimitiveInfo4p_count)
+STAT_MEMORY_COUNTER("accelerator/MeshPrimitive's memory", Primitive_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/MeshPrimitiveInfo4p's memory", MeshPrimitiveInfo4p_memory_cost)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio", SoAPrimitiveInfo_num_1_4, SoAPrimitiveInfo_denom_1_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio", SoAPrimitiveInfo_num_2_4, SoAPrimitiveInfo_denom_2_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio", SoAPrimitiveInfo_num_3_4, SoAPrimitiveInfo_denom_3_4)
+STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio", SoAPrimitiveInfo_num_4_4, SoAPrimitiveInfo_denom_4_4)
 //TLAS ONLY
-STAT_COUNTER("accelerator/BLASInstance's num",BLASInstance_count)
-STAT_COUNTER("accelerator/BLASInstanceInfo4p's num",BLASInstanceInfo4p_count)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(1)'s ratio",BLASInstanceInfo4p_num_1_4,BLASInstanceInfo4p_denom_1_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(2)'s ratio",BLASInstanceInfo4p_num_2_4,BLASInstanceInfo4p_denom_2_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(3)'s ratio",BLASInstanceInfo4p_num_3_4,BLASInstanceInfo4p_denom_3_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(4)'s ratio",BLASInstanceInfo4p_num_4_4,BLASInstanceInfo4p_denom_4_4)
+STAT_COUNTER("accelerator/BLASInstance's num", BLASInstance_count)
+STAT_COUNTER("accelerator/BLASInstanceInfo4p's num", BLASInstanceInfo4p_count)
+STAT_PERCENT("accelerator/BLASInstanceInfo4p(1)'s ratio", BLASInstanceInfo4p_num_1_4, BLASInstanceInfo4p_denom_1_4)
+STAT_PERCENT("accelerator/BLASInstanceInfo4p(2)'s ratio", BLASInstanceInfo4p_num_2_4, BLASInstanceInfo4p_denom_2_4)
+STAT_PERCENT("accelerator/BLASInstanceInfo4p(3)'s ratio", BLASInstanceInfo4p_num_3_4, BLASInstanceInfo4p_denom_3_4)
+STAT_PERCENT("accelerator/BLASInstanceInfo4p(4)'s ratio", BLASInstanceInfo4p_num_4_4, BLASInstanceInfo4p_denom_4_4)
 
 // GENERL
-STAT_MEMORY_COUNTER("accelerator/QBVH node's memory",QBVH_node_memory_cost)
-STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ",ordered_traversal_num,ordered_traversal_denom)
+STAT_MEMORY_COUNTER("accelerator/QBVH node's memory", QBVH_node_memory_cost)
+STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ", ordered_traversal_num, ordered_traversal_denom)
 
 class ProgressReporter;
+
+struct Payload
+{
+    bool is_hit;
+    float closest_hit_t;
+    int instance_index;
+    int primitive_index;
+    int triangle_index;
+    Point2f triangle_uv;
+    Vector3f blas_ray_direction;
+    Payload() : is_hit(false), closest_hit_t(INFINITE),instance_index(0),primitive_index(0), triangle_index(0), triangle_uv(Point2f(0.0f)), blas_ray_direction(Vector3f(0.0f)) {}
+    bool is_closer(float t) {return t < closest_hit_t;}
+};
 
 class BLAS
 {
@@ -240,60 +251,63 @@ private:
 
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
-    //uint32_t flatten(const QBVHCollapseNode *c_node, uint32_t *offset);
-    //void get_traversal_orders(const QBVHNode& node,const Vector3f& dir,uint32_t orders[4]) const;
+
 public:
-    BLAS(const std::vector<ref<MeshPrimitive>>& primitives);
-    bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
+    BLAS(const std::vector<ref<MeshPrimitive>> &primitives);
+    bool closet_hit(MemoryArena &arena, const Ray &ray,Payload* payload) const;
+    void fill_interaction(const Payload* result, Interaction *interaction) const;
     bool anyhit(const Ray &ray) const;
 
-    Bounds3f bounds() const {return _bounds;}
+    Bounds3f bounds() const { return _bounds; }
 };
-
 
 class BLASInstance
 {
 private:
     ref<BLAS> _blas;
-    const Transform* _world_to_blas;
-    const Transform* _blas_to_world;
+    const Transform *_world_to_blas;
+    const Transform *_blas_to_world;
     Bounds3f _bounds;
+
 public:
-    BLASInstance(const Transform* blas_to_world,const Transform* world_to_blas,const ref<BLAS>& blas):_blas_to_world(blas_to_world),_world_to_blas(world_to_blas),_blas(blas){_bounds = (*_blas_to_world)(_blas->bounds());};
-    bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const 
+    BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const ref<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
+
+    bool closet_hit(MemoryArena &arena, const Ray &ray,Payload* payload) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool ret = _blas->intersect(arena,blas_ray,interaction);
-        //从BLAS空间，转换到世界空间
-        if(ret)
-        {
-            ray.t_max = blas_ray.t_max;
-            (*interaction) = (*_blas_to_world)(*interaction);
-        }
-        return ret;
+        bool has_hit = _blas->closet_hit(arena, blas_ray,payload);
+        return has_hit;
     }
+
+    void fill_interaction(const Payload* result, Interaction *interaction) const
+    {
+        _blas->fill_interaction(result, interaction);
+        //从BLAS空间，转换到世界空间
+        (*interaction) = (*_blas_to_world)(*interaction);
+    }
+
+
     bool anyhit(const Ray &ray) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool ret =  _blas->anyhit(blas_ray);
-        if(ret)
+        bool ret = _blas->anyhit(blas_ray);
+        if (ret)
         {
             ray.t_max = blas_ray.t_max;
         }
         return ret;
     }
-    Bounds3f bounds() const {return _bounds;}
+    Bounds3f bounds() const { return _bounds; }
 };
 
 struct BLASInstanceInfo
 {
-	uint32_t instance_index;
+    uint32_t instance_index;
     Bounds3f bounds;
     Point3f centroid;
     BLASInstanceInfo() = default;
     BLASInstanceInfo(const ref<BLASInstance> &instance, uint32_t index) : instance_index(index), bounds(instance->bounds()), centroid((instance->bounds().min_point + instance->bounds().max_point) * 0.5f) {}
 };
-
 
 struct BLASInstanceInfo4p
 {
@@ -310,9 +324,10 @@ private:
 
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<ref<BLASInstance>> &ordered, uint32_t *total);
     void build_soa_instance_info(BVHBuildNode *node);
+
 public:
-    TLAS(const std::vector<ref<BLASInstance>>& instance);
-    bool intersect(MemoryArena &arena,const Ray &ray,Interaction* interaction) const;
+    TLAS(const std::vector<ref<BLASInstance>> &instance);
+    bool closet_hit(MemoryArena &arena, const Ray &ray, Interaction *interaction) const;
     bool anyhit(const Ray &ray) const;
 };
 
