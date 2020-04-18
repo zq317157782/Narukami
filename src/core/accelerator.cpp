@@ -377,6 +377,8 @@ bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
                         Point2f uv;
                         int triangle_index;
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &uv, &triangle_index);
+                        STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
+                        
                         if (is_hit&&payload->is_closer(hit_t))
                         {   
                             {

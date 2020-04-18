@@ -213,6 +213,7 @@ STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio", SoAPrimitiveInfo_num_
 STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio", SoAPrimitiveInfo_num_2_4, SoAPrimitiveInfo_denom_2_4)
 STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio", SoAPrimitiveInfo_num_3_4, SoAPrimitiveInfo_denom_3_4)
 STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio", SoAPrimitiveInfo_num_4_4, SoAPrimitiveInfo_denom_4_4)
+STAT_COUNTER("accelerator/ Triangle4p's intersect num", intersect_triangle_num)
 //TLAS ONLY
 STAT_COUNTER("accelerator/BLASInstance's num", BLASInstance_count)
 STAT_COUNTER("accelerator/BLASInstanceInfo4p's num", BLASInstanceInfo4p_count)
