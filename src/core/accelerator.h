@@ -34,12 +34,10 @@ SOFTWARE.
 #include <algorithm>
 NARUKAMI_BEGIN
 
-constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
-constexpr int BLAS_SAH_BUCKET_NUM = 12;
 
-constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;
-constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
-
+/**
+ * 描述每个MeshPrimitive的额外信息
+*/
 struct BVHMeshPrimitiveInfo
 {
     uint32_t prim_index;
@@ -49,6 +47,9 @@ struct BVHMeshPrimitiveInfo
     BVHMeshPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
 };
 
+/**
+ * 构建BVH的中间节点
+*/
 struct BVHBuildNode
 {
     Bounds3f bounds;
@@ -83,6 +84,9 @@ inline bool is_leaf(const BVHBuildNode *node)
     return false;
 }
 
+/**
+ * 记录构建QBVH时候的塌陷信息
+*/
 struct QBVHCollapseNode
 {
     const BVHBuildNode *data[4];
@@ -90,7 +94,11 @@ struct QBVHCollapseNode
     uint32_t axis0, axis1, axis2;
 };
 
-//128 bytes
+/**
+ * QBVH节点
+ * 128 byte
+*/
+
 struct SSE_ALIGNAS QBVHNode
 {
     Bounds3f4p bounds;
@@ -198,6 +206,7 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     }
 }
 
+/*SAH分割策略使用的Bucket信息*/
 struct BucketInfo
 {
     Bounds3f bounds;

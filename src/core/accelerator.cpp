@@ -25,6 +25,12 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
+constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
+constexpr int BLAS_SAH_BUCKET_NUM = 12;
+  
+constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;  
+constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
+
 Bounds3f get_max_bounds(std::vector<BVHMeshPrimitiveInfo> &primitive_infos, uint32_t start, uint32_t end)
 {
     Bounds3f max_bounds;
