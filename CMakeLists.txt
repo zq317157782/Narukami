@@ -40,8 +40,11 @@ add_subdirectory(external/lua)
 #add tinyobjloader
 add_subdirectory(external/tinyobjloader)
 
-#add sdl2
-add_subdirectory(external/sdl2)
+# #add sdl2
+# add_subdirectory(external/sdl2)
+
+add_subdirectory(external/glfw)
+
 
 #add embree3
 # set(EMBREE_ISPC_SUPPORT OFF)
