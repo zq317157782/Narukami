@@ -37,9 +37,11 @@ add_subdirectory(external/glog)
 #add lua
 add_subdirectory(external/lua)
 
-
 #add tinyobjloader
 add_subdirectory(external/tinyobjloader)
+
+#add sdl2
+add_subdirectory(external/sdl2)
 
 #add embree3
 # set(EMBREE_ISPC_SUPPORT OFF)
@@ -77,6 +79,7 @@ add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CO
 target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
 add_executable(narukami_demo_test_parallel_for demo/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 
+#tools
  
 if(MSVC)
   if(${MSVC_VERSION} GREATER_EQUAL 1915)
