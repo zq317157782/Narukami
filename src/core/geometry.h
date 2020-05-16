@@ -292,9 +292,11 @@ struct Bounds3
 {
     Point3<T> min_point;
     Point3<T> max_point;
+    // 0:min point
+    // 1:max point
     inline const Point3<T> &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < 2);
+        assert(idx >= 0 && idx < 3);
         return (&min_point)[idx];
     }
 
@@ -463,12 +465,20 @@ struct SSE_ALIGNAS Bounds3f4p
     Point3f4p min_point;
     Point3f4p max_point;
 
-    inline const Point3f4p &operator[](const int idx) const
+    // 0:min point
+    // 1:max point
+    inline const Point3f4p &column(const int idx) const
     {
         assert(idx >= 0 && idx < 2);
         return (&min_point)[idx];
     }
 
+    inline Bounds3f operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        return Bounds3f(min_point[idx],max_point[idx]);
+    }
+    
     inline Bounds3f4p()
     {
         min_point = Point3f4p(MAX, MAX, MAX);
@@ -486,7 +496,23 @@ struct SSE_ALIGNAS Bounds3f4p
         min_point = Point3f4p(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
         max_point = Point3f4p(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
     }
+
+    
 };
+
+inline void store(const Bounds3f4p& bounds,Bounds3f* array)
+{
+    
+    array[0].min_point = bounds.min_point[0];
+    array[1].min_point = bounds.min_point[1];
+    array[2].min_point = bounds.min_point[2];
+    array[3].min_point = bounds.min_point[3];
+
+    array[0].max_point = bounds.max_point[0];
+    array[1].max_point = bounds.max_point[1];
+    array[2].max_point = bounds.max_point[2];
+    array[3].max_point = bounds.max_point[3];
+}
 
 inline std::ostream &operator<<(std::ostream &out, const Bounds3f4p &box)
 {
@@ -799,16 +825,16 @@ inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, floa
 inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box)
 {
     // x
-    t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
-    t_max = min((box[isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_max);
+    t_min = max((box.column(1 - isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_min);
+    t_max = min((box.column(isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_max);
 
     //y
-    t_min = max((box[1 - isPositive[1]].yyyy - o.yyyy) * inv_d.yyyy, t_min);
-    t_max = min((box[isPositive[1]].yyyy - o.yyyy) * inv_d.yyyy, t_max);
+    t_min = max((box.column(1 - isPositive[1]).yyyy - o.yyyy) * inv_d.yyyy, t_min);
+    t_max = min((box.column(isPositive[1]).yyyy - o.yyyy) * inv_d.yyyy, t_max);
 
     //z
-    t_min = max((box[1 - isPositive[2]].zzzz - o.zzzz) * inv_d.zzzz, t_min);
-    t_max = min((box[isPositive[2]].zzzz - o.zzzz) * inv_d.zzzz, t_max);
+    t_min = max((box.column(1 - isPositive[2]).zzzz - o.zzzz) * inv_d.zzzz, t_min);
+    t_max = min((box.column(isPositive[2]).zzzz - o.zzzz) * inv_d.zzzz, t_max);
 
     //check
     return t_min <= t_max;
@@ -817,16 +843,16 @@ inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min
 inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box, float4 *t)
 {
     // x
-    t_min = max((box[1 - isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_min);
-    t_max = min((box[isPositive[0]].xxxx - o.xxxx) * inv_d.xxxx, t_max);
+    t_min = max((box.column(1 - isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_min);
+    t_max = min((box.column(isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_max);
 
     //y
-    t_min = max((box[1 - isPositive[1]].yyyy - o.yyyy) * inv_d.yyyy, t_min);
-    t_max = min((box[isPositive[1]].yyyy - o.yyyy) * inv_d.yyyy, t_max);
+    t_min = max((box.column(1 - isPositive[1]).yyyy - o.yyyy) * inv_d.yyyy, t_min);
+    t_max = min((box.column(isPositive[1]).yyyy - o.yyyy) * inv_d.yyyy, t_max);
 
     //z
-    t_min = max((box[1 - isPositive[2]].zzzz - o.zzzz) * inv_d.zzzz, t_min);
-    t_max = min((box[isPositive[2]].zzzz - o.zzzz) * inv_d.zzzz, t_max);
+    t_min = max((box.column(1 - isPositive[2]).zzzz - o.zzzz) * inv_d.zzzz, t_min);
+    t_max = min((box.column(isPositive[2]).zzzz - o.zzzz) * inv_d.zzzz, t_max);
 
     (*t) = t_min;
 
