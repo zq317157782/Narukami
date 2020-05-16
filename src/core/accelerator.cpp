@@ -114,27 +114,27 @@ QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root,
     return node;
 }
 
-uint32_t flatten(std::vector<QBVHNode>& nodes,const QBVHCollapseNode *c_node, uint32_t *offset)
+uint32_t flatten(std::vector<QBVHNode>& nodes,uint32_t depth,const QBVHCollapseNode *c_node, uint32_t *offset)
 {
     auto cur_offset = (*offset);
     (*offset)++;
-    init_QBVH_node(&nodes[cur_offset], c_node);
+    init_QBVH_node(&nodes[cur_offset], depth,c_node);
 
     if (c_node->childrens[0] != nullptr)
     {
-        nodes[cur_offset].childrens[0] = flatten(nodes,c_node->childrens[0], offset);
+        nodes[cur_offset].childrens[0] = flatten(nodes,depth+1,c_node->childrens[0], offset);
     }
     if (c_node->childrens[1] != nullptr)
     {
-        nodes[cur_offset].childrens[1] = flatten(nodes,c_node->childrens[1], offset);
+        nodes[cur_offset].childrens[1] = flatten(nodes,depth+1,c_node->childrens[1], offset);
     }
     if (c_node->childrens[2] != nullptr)
     {
-        nodes[cur_offset].childrens[2] = flatten(nodes,c_node->childrens[2], offset);
+        nodes[cur_offset].childrens[2] = flatten(nodes,depth+1,c_node->childrens[2], offset);
     }
     if (c_node->childrens[3] != nullptr)
     {
-        nodes[cur_offset].childrens[3] = flatten(nodes,c_node->childrens[3], offset);
+        nodes[cur_offset].childrens[3] = flatten(nodes,depth+1,c_node->childrens[3], offset);
     }
 
     //set QBVH's split axis
@@ -171,7 +171,7 @@ BLAS::BLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(prim
     build_soa_primitive_info(build_root);
     uint32_t offset = 0;
 
-    flatten(_nodes,collapse_root, &offset);
+    flatten(_nodes,0,collapse_root, &offset);
 
     STAT_INCREASE_MEMORY_COUNTER(Primitive_memory_cost, sizeof(Primitive) * _primitives.size())
     STAT_INCREASE_MEMORY_COUNTER(MeshPrimitiveInfo4p_memory_cost, sizeof(MeshPrimitiveInfo4p) * _soa_primitive_infos.size())
@@ -211,12 +211,12 @@ BVHBuildNode *BLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
             std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
             init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
         }
-        else if (num <= 2 * BLAS_ELEMENT_NUM_PER_LEAF)
-        {
-            auto mid = start + BLAS_ELEMENT_NUM_PER_LEAF;
-            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
-        }
+        // else if (num <= 2 * BLAS_ELEMENT_NUM_PER_LEAF)
+        // {
+        //     auto mid = start + BLAS_ELEMENT_NUM_PER_LEAF;
+        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+        //     init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+        // }
         //else{
         //     auto mid = start+2*BLAS_ELEMENT_NUM_PER_LEAF;
         //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
@@ -227,7 +227,7 @@ BVHBuildNode *BLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
             //SAH
             BucketInfo bucket_infos[BLAS_SAH_BUCKET_NUM];
 
-            for (uint32_t i = start; i < num; ++i)
+            for (uint32_t i = start; i < end; ++i)
             {
                 auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds, primitive_infos[i].centroid)[dim]);
                 bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
@@ -497,6 +497,19 @@ bool BLAS::trace_ray(const Ray &ray) const
     return false;
 }
 
+std::vector<QBVHNode> BLAS::get_nodes_by_depth(uint32_t depth) const
+{
+    std::vector<QBVHNode> ret;
+    for (auto& node:_nodes)
+    {
+        if(node.depth == depth)
+        {
+            ret.push_back(node);
+        }
+    }
+    return ret;
+}
+
 TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) : _instances(instance_list)
 {
     STAT_INCREASE_COUNTER(BLASInstance_count, instance_list.size())
@@ -520,7 +533,7 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) : _instances(ins
     build_soa_instance_info(build_root);
     uint32_t offset = 0;
 
-    flatten(_nodes,collapse_root, &offset);
+    flatten(_nodes,0,collapse_root, &offset);
 
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }

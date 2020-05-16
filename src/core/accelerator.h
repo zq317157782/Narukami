@@ -104,7 +104,7 @@ struct SSE_ALIGNAS QBVHNode
     Bounds3f4p bounds;
     uint32_t childrens[4];
     uint32_t axis0, axis1, axis2;
-    uint32_t fill;
+    uint32_t depth;
 };
 
 inline uint32_t leaf(const uint32_t offset, const uint32_t num)
@@ -142,7 +142,7 @@ inline uint32_t leaf_num(const uint32_t bits)
     return ((bits)&0xF) + 1;
 }
 
-inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
+inline void init_QBVH_node(QBVHNode *node, uint32_t depth,const QBVHCollapseNode *cn)
 {
     Bounds3f bounds[4];
 
@@ -204,6 +204,8 @@ inline void init_QBVH_node(QBVHNode *node, const QBVHCollapseNode *cn)
     {
         node->childrens[3] = leaf(cn->data[3]->offset, cn->data[3]->num);
     }
+
+    node->depth = depth;
 }
 
 /*SAH分割策略使用的Bucket信息*/
@@ -261,7 +263,7 @@ private:
 
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
-
+    
 public:
     BLAS(const std::vector<ref<MeshPrimitive>> &primitives);
     bool trace_ray(MemoryArena &arena, const Ray &ray,Payload* payload) const;
@@ -269,6 +271,11 @@ public:
     bool trace_ray(const Ray &ray) const;
 
     Bounds3f bounds() const { return _bounds; }
+
+//以下函数主要用于可视化
+public:
+    std::vector<QBVHNode> get_nodes_by_depth(uint32_t depth) const;
+    const std::vector<ref<MeshPrimitive>>& get_mesh_primitives() const {return _primitives;} 
 };
 
 class BLASInstance
