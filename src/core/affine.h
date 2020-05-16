@@ -42,15 +42,8 @@ struct Point3;
 template <typename T>
 struct Vector3
 {
-public:
     T x, y, z;
-    typedef T Scalar;
-    enum
-    {
-        N = 3
-    };
 
-public:
     inline Vector3() : x((T)0), y((T)0), z((T)0) {}
     inline explicit Vector3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     inline Vector3(const T &a, const T &b, const T &c) : x(a), y(b), z(c)
@@ -101,21 +94,15 @@ public:
         z = std::move(v1.z);
         return (*this);
     }
-#else
-    inline Vector3(const Vector3 &v1) = default;
-    inline Vector3 &operator=(const Vector3 &v1) = default;
-    inline Vector3(Vector3 &&v1) = default;
-    inline Vector3 &operator=(Vector3 &&v1) = default;
-    inline ~Vector3() = default;
 #endif
     inline const T &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
     inline T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 };
@@ -279,12 +266,6 @@ inline Vector3<T> max(const Vector3<T> &v0, const Vector3<T> &v1) { return Vecto
 //16 bit
 struct SSE_ALIGNAS SSEVector3f
 {
-    typedef float Scalar;
-    enum
-    {
-        N = 3
-    };
-
     union {
         float4 xyzw;
         struct
@@ -299,12 +280,6 @@ struct SSE_ALIGNAS SSEVector3f
     inline explicit SSEVector3f(const float a) : xyzw(float4(a)) {}
     inline explicit SSEVector3f(const Vector3f &v) : xyzw(float4(v.x, v.y, v.z, 0.0f)) {}
 
-    inline SSEVector3f(const SSEVector3f &) = default;
-    inline SSEVector3f(SSEVector3f &&) = default;
-    inline SSEVector3f &operator=(const SSEVector3f &) = default;
-    inline SSEVector3f &operator=(SSEVector3f &&) = default;
-    inline ~SSEVector3f() = default;
-
     inline operator float4 &() { return xyzw; }
     inline operator const float4 &() const { return xyzw; }
 
@@ -318,12 +293,12 @@ struct SSE_ALIGNAS SSEVector3f
 
     inline const float &operator[](int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
     inline float &operator[](int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 };
@@ -412,21 +387,13 @@ struct SSE_ALIGNAS Vector3f4p
         };
     };
 
-    typedef float Scalar;
-
     inline Vector3f4p() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
     inline explicit Vector3f4p(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
     inline Vector3f4p(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
     inline explicit Vector3f4p(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
     inline Vector3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
     inline Vector3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
-
-    inline Vector3f4p(const Vector3f4p &) = default;
-    inline Vector3f4p(Vector3f4p &&) = default;
-    inline Vector3f4p &operator=(const Vector3f4p &) = default;
-    inline Vector3f4p &operator=(Vector3f4p &&) = default;
-    inline ~Vector3f4p() = default;
-
+    
     inline Vector3f operator[](const int idx) const
     {
         assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
@@ -445,7 +412,6 @@ inline std::ostream &operator<<(std::ostream &out, const Vector3f4p &v)
 
 inline int operator==(const Vector3f4p &v0, const Vector3f4p &v1)
 {
-
     bool4 mask_xxxx = (v0.xxxx == v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy == v1.yyyy);
     bool4 mask_zzzz = (v0.zzzz == v1.zzzz);
@@ -502,15 +468,8 @@ inline Vector3f4p load(const Vector3f *vector_array) { return Vector3f4p(vector_
 template <typename T>
 struct Vector2
 {
-public:
     T x, y;
-    typedef T Scalar;
-    enum
-    {
-        N = 2
-    };
 
-public:
     inline Vector2() : x((T)0), y((T)0) {}
     inline explicit Vector2(const float a) : x(a), y(a) { assert(!isnan(a)); }
     inline Vector2(const T &a, const T &b) : x(a), y(b)
@@ -550,21 +509,15 @@ public:
         y = std::move(v1.y);
         return (*this);
     }
-#else
-    inline Vector2(const Vector2 &v1) = default;
-    inline Vector2 &operator=(const Vector2 &v1) = default;
-    inline Vector2(Vector2 &&v1) = default;
-    inline Vector2 &operator=(Vector2 &&v1) = default;
-    inline ~Vector2() = default;
 #endif
     inline const T &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 2);
         return (&x)[idx];
     }
     inline T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 2);
         return (&x)[idx];
     }
 };
@@ -576,15 +529,8 @@ typedef Vector2<int> Vector2i;
 template <typename T>
 struct Point3
 {
-public:
     T x, y, z;
-    typedef T Scalar;
-    enum
-    {
-        N = 3
-    };
 
-public:
     inline Point3() : x((T)0), y((T)0), z((T)0) {}
     inline explicit Point3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
     inline Point3(const T &a, const T &b, const T &c) : x(a), y(b), z(c)
@@ -633,21 +579,15 @@ public:
         z = std::move(v1.z);
         return (*this);
     }
-#else
-    inline Point3(const Point3 &v1) = default;
-    inline Point3 &operator=(const Point3 &v1) = default;
-    inline Point3(Point3 &&v1) = default;
-    inline Point3 &operator=(Point3 &&v1) = default;
-    inline ~Point3() = default;
 #endif
     inline const T &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
     inline T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 };
@@ -778,12 +718,6 @@ inline Point3<T> max(const Point3<T> &p0, const Point3<T> &p1) { return Point3<T
 //16 bit
 struct SSE_ALIGNAS SSEPoint3f
 {
-    typedef float Scalar;
-    enum
-    {
-        N = 3
-    };
-
     union {
         float4 xyzw;
         struct
@@ -798,12 +732,6 @@ struct SSE_ALIGNAS SSEPoint3f
     inline explicit SSEPoint3f(const float a) : xyzw(float4(a)) {}
     inline explicit SSEPoint3f(const Point3f &v) : xyzw(float4(v.x, v.y, v.z, 1.0f)) {}
 
-    inline SSEPoint3f(const SSEPoint3f &) = default;
-    inline SSEPoint3f(SSEPoint3f &&) = default;
-    inline SSEPoint3f &operator=(const SSEPoint3f &) = default;
-    inline SSEPoint3f &operator=(SSEPoint3f &&) = default;
-    inline ~SSEPoint3f() = default;
-
     inline operator float4 &() { return xyzw; }
     inline operator const float4 &() const { return xyzw; }
 
@@ -817,12 +745,12 @@ struct SSE_ALIGNAS SSEPoint3f
 
     inline const float &operator[](int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
     inline float &operator[](int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 };
@@ -906,11 +834,6 @@ struct SSE_ALIGNAS Point3f4p
     inline Point3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
     inline Point3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
 
-    inline Point3f4p(const Point3f4p &) = default;
-    inline Point3f4p(Point3f4p &&) = default;
-    inline Point3f4p &operator=(const Point3f4p &) = default;
-    inline Point3f4p &operator=(Point3f4p &&) = default;
-
     inline Point3f operator[](const int idx) const
     {
         assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
@@ -966,12 +889,6 @@ struct Normal3
 {
 public:
     T x, y, z;
-    typedef T Scalar;
-    enum
-    {
-        N = 3
-    };
-
 public:
     inline Normal3() : x((T)0), y((T)0), z((T)0) {}
     inline explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
@@ -1022,21 +939,15 @@ public:
         z = std::move(v1.z);
         return (*this);
     }
-#else
-    inline Normal3(const Normal3 &v1) = default;
-    inline Normal3 &operator=(const Normal3 &v1) = default;
-    inline Normal3(Normal3 &&v1) = default;
-    inline Normal3 &operator=(Normal3 &&v1) = default;
-    inline ~Normal3() = default;
 #endif
     inline const T &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
     inline T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 3);
         return (&x)[idx];
     }
 };
@@ -1116,12 +1027,6 @@ struct Point2
 {
 public:
     T x, y;
-    typedef T Scalar;
-    enum
-    {
-        N = 2
-    };
-
 public:
     inline Point2() : x((T)0), y((T)0) {}
     inline explicit Point2(const float a) : x(a), y(a) { assert(!isnan(a)); }
@@ -1164,21 +1069,15 @@ public:
         y = std::move(v1.y);
         return (*this);
     }
-#else
-    inline Point2(const Point2 &v1) = default;
-    inline Point2 &operator=(const Point2 &v1) = default;
-    inline Point2(Point2 &&v1) = default;
-    inline Point2 &operator=(Point2 &&v1) = default;
-    inline ~Point2() = default;
 #endif
     inline const T &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 2);
         return (&x)[idx];
     }
     inline T &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 2);
         return (&x)[idx];
     }
 };
@@ -1216,7 +1115,7 @@ inline bool operator<(const Point2<T> &v1, const Point2<T> &v2)
     {
         return true;
     }
-    else if((v1.x == v2.x)&&(v1.y < v2.y))
+    else if ((v1.x == v2.x) && (v1.y < v2.y))
     {
         return true;
     }
@@ -1295,12 +1194,6 @@ public:
         float mn[4][4];
         float4 col[4];
     };
-    typedef float Scalar;
-    enum
-    {
-        N = 16
-    };
-
 public:
     inline Matrix4x4()
     {
@@ -1380,31 +1273,30 @@ public:
         col[3] = col3;
     }
 
-    inline Matrix4x4(const Matrix4x4 &) = default;
-    inline Matrix4x4(Matrix4x4 &&) = default;
-    inline Matrix4x4 &operator=(const Matrix4x4 &) = default;
-    inline Matrix4x4 &operator=(Matrix4x4 &&) = default;
-    inline ~Matrix4x4() = default;
-
     inline const float &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 16);
         return m[idx];
     }
     inline float &operator[](const int idx)
     {
-        assert(idx >= 0 && idx < N);
+        assert(idx >= 0 && idx < 16);
         return m[idx];
     }
 };
 
+inline void store(const Matrix4x4 &m, float *array)
+{
+    memcpy(array, m.m, 16 * sizeof(float));
+}
+
 inline std::ostream &operator<<(std::ostream &out, const Matrix4x4 &v)
 {
     out << '(';
-    for (int i = 0; i < Matrix4x4::N; ++i)
+    for (int i = 0; i < 16; ++i)
     {
         out << v.m[i];
-        out << (((i + 1) == Matrix4x4::N) ? ')' : ',');
+        out << (((i + 1) == 16) ? ')' : ',');
     }
     return out;
 }
