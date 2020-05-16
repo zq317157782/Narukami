@@ -173,6 +173,7 @@ inline Transform rotate(const float theta, const float axis_x, const float axis_
     return rotate(theta, Vector3f(axis_x, axis_y, axis_z));
 }
 
+
 inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f &up)
 {
     auto forward = normalize(target - o);
@@ -200,7 +201,12 @@ inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f
     cam2wrold.m[13] = o.y;
     cam2wrold.m[14] = o.z;
     cam2wrold.m[15] = 1.0f;
-    return Transform(transform_inverse_noscale(cam2wrold), cam2wrold);
+    return Transform(cam2wrold,transform_inverse_noscale(cam2wrold));
+}
+
+inline Transform look_at(float eye_x,float eye_y,float eye_z,float c_x,float c_y,float c_z,float up_x,float up_y,float up_z)
+{
+    return look_at(Point3f(eye_x,eye_y,eye_z),Point3f(c_x,c_y,c_z),Vector3f(up_x,up_y,up_z));
 }
 
 inline bool swap_handedness(const Transform &t)
