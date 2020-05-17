@@ -22,7 +22,7 @@ using namespace narukami;
 int main()
 {
     auto camera_transform = translate(0, 0, -4);
-    auto sampler = Sampler(16);
+    auto sampler = Sampler(1);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
     auto camera = PerspectiveCamera(camera_transform, Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
@@ -42,7 +42,7 @@ int main()
             append(meshs, load_mesh_triangles_from_obj(&transform, &inv_transform, "bunny.obj", "."));
         }
         auto primitives = create_mesh_primitives(meshs);
-        auto blas = ref<BLAS>(new BLAS(primitives));
+        auto blas = ref<MeshBLAS>(new MeshBLAS(primitives));
 
         {
             
@@ -93,7 +93,7 @@ int main()
 
 
 
-        auto blas = ref<BLAS>(new BLAS(primitives));
+        auto blas = ref<MeshBLAS>(new MeshBLAS(primitives));
         {
             auto instance = ref<BLASInstance>(new BLASInstance(&t, &t, blas));
             instance_list.push_back(instance);
@@ -103,7 +103,7 @@ int main()
     // //create light
     std::vector<Light *> lights;
     {
-        auto transform = translate(Vector3f(0.0f, 0.99f, 1.0f)) * rotate(90, 1, 0, 0);
+        auto transform = translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0);
         auto inv_transform = inverse(transform);
         auto point_light = new PointLight(&transform, &inv_transform, Spectrum(10, 10, 10));
         lights.push_back(point_light);

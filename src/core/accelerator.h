@@ -215,7 +215,7 @@ struct BucketInfo
     uint32_t count = 0;
 };
 
-//BLAS ONLY
+//MeshBLAS ONLY
 STAT_COUNTER("accelerator/MeshPrimitive's num", MeshPrimitiveInfo_count)
 STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's num", MeshPrimitiveInfo4p_count)
 STAT_MEMORY_COUNTER("accelerator/MeshPrimitive's memory", Primitive_memory_cost)
@@ -239,24 +239,32 @@ STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subno
 
 class ProgressReporter;
 
-class BLAS
+class Accelerator
+{
+public:
+    virtual bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const = 0;
+    virtual bool trace_ray(const Ray &ray) const = 0;
+    virtual Bounds3f bounds() const = 0;
+};
+
+class BLAS:public Accelerator{};
+
+class MeshBLAS:public BLAS
 {
 private:
     std::vector<ref<MeshPrimitive>> _primitives;
     std::vector<MeshPrimitiveInfo4p> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
-
     Bounds3f _bounds;
 
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
     
 public:
-    BLAS(const std::vector<ref<MeshPrimitive>> &primitives);
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const;
-    bool trace_ray(const Ray &ray) const;
-
-    Bounds3f bounds() const { return _bounds; }
+    MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives);
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
+    bool trace_ray(const Ray &ray) const override;
+    Bounds3f bounds() const override { return _bounds; }
 
 //以下函数主要用于可视化
 public:
@@ -264,7 +272,7 @@ public:
     const std::vector<ref<MeshPrimitive>>& get_mesh_primitives() const {return _primitives;} 
 };
 
-class BLASInstance
+class BLASInstance:public BLAS
 {
 private:
     ref<BLAS> _blas;
@@ -275,7 +283,7 @@ private:
 public:
     BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const ref<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override
     {
         auto blas_ray = (*_world_to_blas)(ray);
         bool has_hit = _blas->trace_ray(arena, blas_ray,interaction);
@@ -284,14 +292,14 @@ public:
         return has_hit;
     }
 
-    bool trace_ray(const Ray &ray) const
+    bool trace_ray(const Ray &ray) const override
     {
         auto blas_ray = (*_world_to_blas)(ray);
         bool has_hit = _blas->trace_ray(blas_ray);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
-    Bounds3f bounds() const { return _bounds; }
+    Bounds3f bounds() const override { return _bounds; }
 };
 
 struct BLASInstanceInfo
@@ -309,7 +317,7 @@ struct BLASInstanceInfo4p
     uint32_t offset;
 };
 
-class TLAS
+class TLAS:public Accelerator
 {
 private:
     std::vector<ref<BLASInstance>> _instances;
@@ -321,8 +329,9 @@ private:
 
 public:
     TLAS(const std::vector<ref<BLASInstance>> &instance);
-    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const;
-    bool trace_ray(const Ray &ray) const;
+    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
+    bool trace_ray(const Ray &ray) const override;
+    Bounds3f bounds() const override { return Bounds3f(); }//TODO
 };
 
 NARUKAMI_END

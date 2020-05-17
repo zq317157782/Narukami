@@ -136,7 +136,7 @@ uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollaps
     return cur_offset;
 }
 
-BLAS::BLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(primitives)
+MeshBLAS::MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(primitives)
 {
     STAT_INCREASE_COUNTER(MeshPrimitiveInfo_count, _primitives.size())
     std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
@@ -169,7 +169,7 @@ BLAS::BLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(prim
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *BLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total)
+BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -271,7 +271,7 @@ BVHBuildNode *BLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
     return node;
 }
 
-void BLAS::build_soa_primitive_info(BVHBuildNode *node)
+void MeshBLAS::build_soa_primitive_info(BVHBuildNode *node)
 {
 
     if (is_leaf(node))
@@ -325,7 +325,7 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray.o, ray.d, interaction->hit_t);
@@ -422,7 +422,7 @@ bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
     return has_hit;
 }
 
-bool BLAS::trace_ray(const Ray &ray) const
+bool MeshBLAS::trace_ray(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -478,7 +478,7 @@ bool BLAS::trace_ray(const Ray &ray) const
     return false;
 }
 
-std::vector<QBVHNode> BLAS::get_nodes_by_depth(uint32_t depth) const
+std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
 {
     std::vector<QBVHNode> ret;
     for (auto &node : _nodes)
