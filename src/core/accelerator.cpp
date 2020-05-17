@@ -584,7 +584,7 @@ BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
             //SAH
             BucketInfo bucket_infos[ACCELERATOR_SAH_BUCKET_NUM];
 
-            for (uint32_t i = start; i < num; ++i)
+            for (uint32_t i = start; i < end; ++i)
             {
                 auto bucket_index = static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM * offset(centroid_bounds, instance_infos[i].centroid)[dim]);
                 bucket_index = min(bucket_index, ACCELERATOR_SAH_BUCKET_NUM - 1);
