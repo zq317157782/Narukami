@@ -31,22 +31,13 @@ constexpr int BLAS_SAH_BUCKET_NUM = 12;
 constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;  
 constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
 
-Bounds3f get_max_bounds(std::vector<BVHMeshPrimitiveInfo> &primitive_infos, uint32_t start, uint32_t end)
+template <typename T>
+Bounds3f get_max_bounds(std::vector<T> &infos, uint32_t start, uint32_t end)
 {
     Bounds3f max_bounds;
     for (uint32_t i = start; i < end; i++)
     {
-        max_bounds = _union(max_bounds, primitive_infos[i].bounds);
-    }
-    return max_bounds;
-}
-
-Bounds3f get_max_bounds(std::vector<BLASInstanceInfo> &instance_infos, uint32_t start, uint32_t end)
-{
-    Bounds3f max_bounds;
-    for (uint32_t i = start; i < end; i++)
-    {
-        max_bounds = _union(max_bounds, instance_infos[i].bounds);
+        max_bounds = _union(max_bounds, infos[i].bounds);
     }
     return max_bounds;
 }
