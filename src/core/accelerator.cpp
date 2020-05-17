@@ -27,8 +27,8 @@ NARUKAMI_BEGIN
 
 constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int BLAS_SAH_BUCKET_NUM = 12;
-  
-constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;  
+
+constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
 
 template <typename T>
@@ -105,27 +105,27 @@ QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root,
     return node;
 }
 
-uint32_t flatten(std::vector<QBVHNode>& nodes,uint32_t depth,const QBVHCollapseNode *c_node, uint32_t *offset)
+uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollapseNode *c_node, uint32_t *offset)
 {
     auto cur_offset = (*offset);
     (*offset)++;
-    init_QBVH_node(&nodes[cur_offset], depth,c_node);
+    init_QBVH_node(&nodes[cur_offset], depth, c_node);
 
     if (c_node->childrens[0] != nullptr)
     {
-        nodes[cur_offset].childrens[0] = flatten(nodes,depth+1,c_node->childrens[0], offset);
+        nodes[cur_offset].childrens[0] = flatten(nodes, depth + 1, c_node->childrens[0], offset);
     }
     if (c_node->childrens[1] != nullptr)
     {
-        nodes[cur_offset].childrens[1] = flatten(nodes,depth+1,c_node->childrens[1], offset);
+        nodes[cur_offset].childrens[1] = flatten(nodes, depth + 1, c_node->childrens[1], offset);
     }
     if (c_node->childrens[2] != nullptr)
     {
-        nodes[cur_offset].childrens[2] = flatten(nodes,depth+1,c_node->childrens[2], offset);
+        nodes[cur_offset].childrens[2] = flatten(nodes, depth + 1, c_node->childrens[2], offset);
     }
     if (c_node->childrens[3] != nullptr)
     {
-        nodes[cur_offset].childrens[3] = flatten(nodes,depth+1,c_node->childrens[3], offset);
+        nodes[cur_offset].childrens[3] = flatten(nodes, depth + 1, c_node->childrens[3], offset);
     }
 
     //set QBVH's split axis
@@ -162,7 +162,7 @@ BLAS::BLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(prim
     build_soa_primitive_info(build_root);
     uint32_t offset = 0;
 
-    flatten(_nodes,0,collapse_root, &offset);
+    flatten(_nodes, 0, collapse_root, &offset);
 
     STAT_INCREASE_MEMORY_COUNTER(Primitive_memory_cost, sizeof(Primitive) * _primitives.size())
     STAT_INCREASE_MEMORY_COUNTER(MeshPrimitiveInfo4p_memory_cost, sizeof(MeshPrimitiveInfo4p) * _soa_primitive_infos.size())
@@ -281,7 +281,6 @@ void BLAS::build_soa_primitive_info(BVHBuildNode *node)
         STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_3_4, 1, (node->num % 4) == 3)
         STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_4_4, 1, (node->num % 4) == 0)
 
-
         auto primitive_infos = pack_mesh_primitives(_primitives, node->offset, node->num);
         node->num = static_cast<uint32_t>(primitive_infos.size());
         node->offset = static_cast<uint32_t>(_soa_primitive_infos.size());
@@ -294,9 +293,7 @@ void BLAS::build_soa_primitive_info(BVHBuildNode *node)
         STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_3_4, static_cast<uint32_t>(primitive_infos.size()))
         STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_4_4, static_cast<uint32_t>(primitive_infos.size()))
 
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_num_4_4, node->num-1)
-
-       
+        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_num_4_4, node->num - 1)
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
@@ -306,9 +303,7 @@ void BLAS::build_soa_primitive_info(BVHBuildNode *node)
     }
 }
 
-
-
-void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t orders[4]) 
+void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t orders[4])
 {
     orders[0] = 0;
     orders[1] = 1;
@@ -330,19 +325,22 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
+bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o,ray.d,payload->closest_hit_t);
+    SoARay soa_ray(ray.o, ray.d, interaction->hit_t);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-    
+
     bool has_hit = false;
+
+    uint32_t mesh_id;
+    uint32_t primitive_id;
 
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > payload->closest_hit_t)
+        if (node_stack.top().second > interaction->hit_t)
         {
             node_stack.pop();
             continue;
@@ -361,7 +359,7 @@ bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < payload->closest_hit_t)
+            if (box_hits[index] && box_t[index] < interaction->hit_t)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -375,23 +373,23 @@ bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
                         int triangle_index;
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &uv, &triangle_index);
                         STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
-                        
-                        if (is_hit&&payload->is_closer(hit_t))
-                        {   
+
+                        if (is_hit && is_closer(*interaction, hit_t))
+                        {
                             {
                                 has_hit = true;
                             }
                             //更新射线的t_max
                             {
                                 soa_ray.t_max = float4(hit_t);
+                                ray.t_max = interaction->hit_t;
                             }
-                            //更新payload
+                            //更新interaction
                             {
-                               payload->is_hit = true;
-                               payload->closest_hit_t = hit_t;
-                               payload->triangle_index = triangle_index;
-                               payload->triangle_uv = uv;
-                               payload->primitive_index = j;
+                                mesh_id = triangle_index;
+                                primitive_id = j;
+                                interaction->hit_t = hit_t;
+                                interaction->uv = uv;
                             }
                         }
                     }
@@ -413,24 +411,16 @@ bool BLAS::trace_ray(MemoryArena &arena, const Ray &ray,Payload * payload) const
         }
     }
 
-    payload->blas_ray_direction = ray.d;
+    if (has_hit)
+    {
+        auto triangle = _soa_primitive_infos[primitive_id].triangle[mesh_id];
+        interaction->p = barycentric_interpolate_position(triangle, interaction->uv);
+        interaction->n = flip_normal(get_normalized_normal(triangle), -ray.d);
+        auto primitive_offset = _soa_primitive_infos[primitive_id].offset + mesh_id;
+        interaction->primitive = _primitives[primitive_offset];
+    }
     return has_hit;
 }
-
-void BLAS::setup_interaction(const Payload* payload,Interaction* interaction) const
-{
-    //terrible finite precision of float.
-    //interaction->p = ray.o + ray.d * closest_hit_t;
-    //"Realtime Ray Tracing Gems" chapter 6
-    auto triangle = _soa_primitive_infos[payload->primitive_index].triangle[payload->triangle_index];
-    interaction->p = barycentric_interpolate_position(triangle, payload->triangle_uv);
-    interaction->n = flip_normal(get_normalized_normal(triangle), -payload->blas_ray_direction);
-    auto primitive_offset = _soa_primitive_infos[payload->primitive_index].offset + payload->triangle_index;
-    interaction->primitive = _primitives[primitive_offset];
-    interaction->hit_t = payload->closest_hit_t;
-}
-
-
 
 bool BLAS::trace_ray(const Ray &ray) const
 {
@@ -491,9 +481,9 @@ bool BLAS::trace_ray(const Ray &ray) const
 std::vector<QBVHNode> BLAS::get_nodes_by_depth(uint32_t depth) const
 {
     std::vector<QBVHNode> ret;
-    for (auto& node:_nodes)
+    for (auto &node : _nodes)
     {
-        if(node.depth == depth)
+        if (node.depth == depth)
         {
             ret.push_back(node);
         }
@@ -524,7 +514,7 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) : _instances(ins
     build_soa_instance_info(build_root);
     uint32_t offset = 0;
 
-    flatten(_nodes,0,collapse_root, &offset);
+    flatten(_nodes, 0, collapse_root, &offset);
 
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
@@ -631,7 +621,7 @@ std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<ref<BLASInstanc
     assert(count > 0);
     assert((start + count) <= instance_list.size());
 
-    uint32_t soa_count = (uint32_t)(count-1)/ SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
 
     std::vector<Bounds3f> bounds_array;
 
@@ -640,7 +630,6 @@ std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<ref<BLASInstanc
         if (i < count)
         {
             bounds_array.push_back(instance_list[start + i]->bounds());
-            
         }
         else
         {
@@ -653,7 +642,7 @@ std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<ref<BLASInstanc
     {
         BLASInstanceInfo4p instance;
         instance.bounds = load(&bounds_array[i * SSE_FLOAT_COUNT]);
-        
+
         instance.offset = start + i * SSE_FLOAT_COUNT;
         soa_instance_info.push_back(instance);
     }
@@ -670,7 +659,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
         STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_2_4, 1, (node->num % 4) == 2)
         STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_3_4, 1, (node->num % 4) == 3)
         STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_4_4, 1, (node->num % 4) == 0)
-        
+
         auto instance_infos = pack_instances(_instances, node->offset, node->num);
         node->num = static_cast<uint32_t>(instance_infos.size());
         node->offset = static_cast<uint32_t>(_soa_instance_infos.size());
@@ -683,7 +672,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
         STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_3_4, static_cast<uint32_t>(instance_infos.size()))
         STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_4_4, static_cast<uint32_t>(instance_infos.size()))
 
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_num_4_4, node->num-1)
+        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_num_4_4, node->num - 1)
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
@@ -693,20 +682,19 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
     }
 }
 
-
 bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    Payload payload;
-    SoARay soa_ray(ray.o,ray.d,payload.closest_hit_t);
-   
+    SoARay soa_ray(ray.o, ray.d, interaction->hit_t);
+
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
-   
+
+    bool tlas_has_hit = false;
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > payload.closest_hit_t)
+        if (node_stack.top().second > interaction->hit_t)
         {
             node_stack.pop();
             continue;
@@ -725,7 +713,7 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < payload.closest_hit_t)
+            if (box_hits[index] && box_t[index] < interaction->hit_t)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -734,23 +722,27 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-                        
+
                         auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds);
 
                         for (uint32_t k = 0; k < 4; k++)
                         {
-                            if(leaf_box_hits[k])
+                            if (leaf_box_hits[k])
                             {
-                                  auto instance_offset = _soa_instance_infos[j].offset + k;
-                                  auto blas_instance = _instances[instance_offset];
-                                  
-                                  bool has_hit = blas_instance->trace_ray(arena,ray,&payload);
+                                auto instance_offset = _soa_instance_infos[j].offset + k;
+                                auto blas_instance = _instances[instance_offset];
 
-                                  if(has_hit)
-                                  {
-                                       payload.instance_index = instance_offset;
-                                       soa_ray.t_max = float4(payload.closest_hit_t);
-                                  }
+                                bool has_hit = blas_instance->trace_ray(arena, ray, interaction);
+
+                                if (has_hit)
+                                {
+                                    {
+                                        tlas_has_hit = true;
+                                    }
+                                    {
+                                        soa_ray.t_max = float4(interaction->hit_t);
+                                    }
+                                }
                             }
                         }
                     }
@@ -772,17 +764,12 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
         }
     }
 
-    if(payload.is_hit)
-    {
-        ray.t_max = payload.closest_hit_t;//更新射线的t_max
-       _instances[payload.instance_index]->setup_interaction(&payload,interaction);
-    }
-    return payload.is_hit;
+    return tlas_has_hit;
 }
 
 bool TLAS::trace_ray(const Ray &ray) const
 {
-   std::stack<std::pair<const QBVHNode *, float>> node_stack;
+    std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
@@ -811,20 +798,20 @@ bool TLAS::trace_ray(const Ray &ray) const
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-                        
+
                         auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds);
 
                         for (uint32_t k = 0; k < 4; k++)
                         {
-                            if(leaf_box_hits[k])
+                            if (leaf_box_hits[k])
                             {
-                                  auto instance_offset = _soa_instance_infos[j].offset + k;
-                                  auto blas_instance = _instances[instance_offset];
-                                  bool is_hit = blas_instance->trace_ray(ray);
-                                  if(is_hit)
-                                  {
-                                     return true;
-                                  }
+                                auto instance_offset = _soa_instance_infos[j].offset + k;
+                                auto blas_instance = _instances[instance_offset];
+                                bool is_hit = blas_instance->trace_ray(ray);
+                                if (is_hit)
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }

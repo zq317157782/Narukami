@@ -239,19 +239,6 @@ STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subno
 
 class ProgressReporter;
 
-struct Payload
-{
-    bool is_hit;
-    float closest_hit_t;
-    int instance_index;
-    int primitive_index;
-    int triangle_index;
-    Point2f triangle_uv;
-    Vector3f blas_ray_direction;
-    Payload() : is_hit(false), closest_hit_t(INFINITE),instance_index(0),primitive_index(0), triangle_index(0), triangle_uv(Point2f(0.0f)), blas_ray_direction(Vector3f(0.0f)) {}
-    bool is_closer(float t) {return t < closest_hit_t;}
-};
-
 class BLAS
 {
 private:
@@ -266,8 +253,7 @@ private:
     
 public:
     BLAS(const std::vector<ref<MeshPrimitive>> &primitives);
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Payload* payload) const;
-    void setup_interaction(const Payload* result, Interaction *interaction) const;
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const;
     bool trace_ray(const Ray &ray) const;
 
     Bounds3f bounds() const { return _bounds; }
@@ -289,30 +275,21 @@ private:
 public:
     BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const ref<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Payload* payload) const
+    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool has_hit = _blas->trace_ray(arena, blas_ray,payload);
+        bool has_hit = _blas->trace_ray(arena, blas_ray,interaction);
+        (*interaction) = (*_blas_to_world)(*interaction);
+        ray.t_max = blas_ray.t_max;
         return has_hit;
     }
-
-    void setup_interaction(const Payload* result, Interaction *interaction) const
-    {
-        _blas->setup_interaction(result, interaction);
-        //从BLAS空间，转换到世界空间
-        (*interaction) = (*_blas_to_world)(*interaction);
-    }
-
 
     bool trace_ray(const Ray &ray) const
     {
         auto blas_ray = (*_world_to_blas)(ray);
-        bool ret = _blas->trace_ray(blas_ray);
-        if (ret)
-        {
-            ray.t_max = blas_ray.t_max;
-        }
-        return ret;
+        bool has_hit = _blas->trace_ray(blas_ray);
+        ray.t_max = blas_ray.t_max;
+        return has_hit;
     }
     Bounds3f bounds() const { return _bounds; }
 };
