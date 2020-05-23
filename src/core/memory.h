@@ -180,7 +180,7 @@ class MemoryArena{
 STAT_COUNTER("memory/total memory pool alloc count",memory_pool_alloc_count)
 STAT_MEMORY_COUNTER("memory/total memory pool alloc",memory_pool_alloc)
 STAT_MEMORY_COUNTER("memory/total memory pool dealloc",memory_pool_dealloc)
-template<typename T>
+template<typename T,int LINE_SIZE = NARUKAMI_L1_CACHE_LINE>
 class MemoryPool
 {
 	private:
@@ -204,7 +204,7 @@ class MemoryPool
 		{
 			//no free node
 			STAT_INCREASE_MEMORY_COUNTER(memory_pool_alloc, _chunck_element_num)
-			T* chunck = alloc_aligned<T>(_chunck_element_num);
+			T* chunck = alloc_aligned<T,LINE_SIZE>(_chunck_element_num);
 			_chuncks.push_back(chunck);
 
 			//insert from tail to head
@@ -224,6 +224,10 @@ class MemoryPool
 
 	void dealloc(T* ptr)
 	{
+		if(ptr == nullptr)
+		{
+			return;
+		}
 		Node* next = _head;
 		_head = reinterpret_cast<Node*>(ptr);
 		_head->next = next;

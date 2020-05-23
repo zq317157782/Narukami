@@ -55,7 +55,7 @@ inline bool operator==(const Vertex &v0, const Vertex &v1)
 
 //load mesh from obj file
 //use syoyo's tinyobjloader
-std::vector<std::vector<ref<TriangleMesh>>> load_mesh_triangles_list_from_obj(const Transform *object2wrold, const Transform *world2object, const char *obj_file_name, const char *base_path = nullptr)
+std::vector<std::vector<ref<TriangleMesh>>> load_mesh_triangles_list_from_obj(const ref<Transform>&object2wrold, const ref<Transform>&world2object, const char *obj_file_name, const char *base_path = nullptr)
 {
     std::vector<std::vector<ref<TriangleMesh>>> meshs_list;
 
@@ -160,7 +160,7 @@ std::vector<std::vector<ref<TriangleMesh>>> load_mesh_triangles_list_from_obj(co
     return meshs_list;
 }
 
-std::vector<ref<TriangleMesh>> load_mesh_triangles_from_obj(const Transform *object2wrold, const Transform *world2object, const char *obj_file_name, const char *base_path = nullptr)
+std::vector<ref<TriangleMesh>> load_mesh_triangles_from_obj(const ref<Transform>& object2wrold, const ref<Transform>& world2object, const char *obj_file_name, const char *base_path = nullptr)
 {
     std::vector<ref<TriangleMesh>> meshs;
     auto list = load_mesh_triangles_list_from_obj(object2wrold, world2object, obj_file_name, base_path);

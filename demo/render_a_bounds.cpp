@@ -11,7 +11,7 @@ using namespace narukami;
 int main(){
     Sampler sampler(1024);
     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
-    OrthographicCamera camera(Transform(),{{0,0},{1,1}},film);
+    OrthographicCamera camera(ref_cast(Transform()),{{0,0},{1,1}},film);
     Bounds3f4p bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
     Bounds3f bound2(Point3f(0.1f,0.1f,0.1f),Point3f(0.9f,0.9f,0.9f));
     int isPositive[3]={1,1,1};

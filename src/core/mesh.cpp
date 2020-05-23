@@ -88,7 +88,7 @@ std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
     return soa_triangles;
 }
 
-std::vector<ref<TriangleMesh>> create_mesh_triangles(const Transform *object2world, const Transform *world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
+std::vector<ref<TriangleMesh>> create_mesh_triangles(const ref<Transform>& object2world, const ref<Transform>& world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs)
 {
     auto vertex_data = ref<VertexData>(new VertexData());
     for(uint32_t i = 0;i<positions.size();++i)
@@ -117,7 +117,7 @@ std::vector<ref<TriangleMesh>> create_mesh_triangles(const Transform *object2wor
     return meshs;
 }
 
-std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height)
+std::vector<ref<TriangleMesh>> create_plane(const ref<Transform>& object2wrold, const ref<Transform>&world2object, const float width, const float height)
 {
     float hw = width * 0.5f;
     float hh = height * 0.5f;
@@ -129,7 +129,7 @@ std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const
     return create_mesh_triangles(object2wrold, world2object, indices, vertices, normals, uvs);
 }
 
-std::vector<ref<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object, float radius, const uint32_t vertex_density)
+std::vector<ref<TriangleMesh>> create_disk(const ref<Transform>&object2wrold, const ref<Transform>&world2object, float radius, const uint32_t vertex_density)
 {
     assert(radius > 0);
     std::vector<Point3f> vertices = {Point3f(0, 0, 0)};

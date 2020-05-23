@@ -25,7 +25,7 @@ int main()
     auto sampler = Sampler(1);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
-    auto camera = PerspectiveCamera(camera_transform, Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
+    auto camera = PerspectiveCamera(ref_cast(camera_transform), Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
 
     std::vector<ref<BLASInstance>> instance_list;
 
@@ -37,9 +37,9 @@ int main()
     {
         std::vector<std::shared_ptr<TriangleMesh>> meshs;
         {
-            auto transform = translate(Vector3f(0, 0, 0.0f)) * scale(0.2f, 0.2f, 0.2f) * rotate(90, Vector3f(0, 1, 0));
-            auto inv_transform = inverse(transform); // translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
-            append(meshs, load_mesh_triangles_from_obj(&transform, &inv_transform, "bunny.obj", "."));
+            auto transform = ref_cast(translate(Vector3f(0, 0, 0.0f)) * scale(0.2f, 0.2f, 0.2f) * rotate(90, Vector3f(0, 1, 0)));
+            auto inv_transform = ref_cast(inverse(*transform)); // translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
+            append(meshs, load_mesh_triangles_from_obj(transform, inv_transform, "bunny.obj", "."));
         }
         auto primitives = create_mesh_primitives(meshs);
         auto blas = ref<MeshBLAS>(new MeshBLAS(primitives));
@@ -62,32 +62,32 @@ int main()
         std::vector<std::shared_ptr<TriangleMesh>> meshs;
         {
 
-            auto transform = translate(0, -1, 0) * rotate(90, 1, 0, 0);
-            auto inv_transform = inverse(transform);
-            append(meshs, create_plane(&transform, &inv_transform, 5, 5));
+            auto transform = ref_cast(translate(0, -1, 0) * rotate(90, 1, 0, 0));
+            auto inv_transform = ref_cast(inverse(*transform));
+            append(meshs, create_plane(transform, inv_transform, 5, 5));
         }
         {
-            auto transform = translate(0, 1, 0) * rotate(90, 1, 0, 0);
-            auto inv_transform = inverse(transform);
-            append(meshs, create_plane(&transform, &inv_transform, 5, 5));
-        }
-
-        {
-            auto transform = translate(0, 0, 2.5f);
-            auto inv_transform = inverse(transform);
-            append(meshs, create_plane(&transform, &inv_transform, 5, 2));
+            auto transform = ref_cast(translate(0, 1, 0) * rotate(90, 1, 0, 0));
+            auto inv_transform = ref_cast(inverse(*transform));
+            append(meshs, create_plane(transform, inv_transform, 5, 5));
         }
 
         {
-            auto transform = translate(2.5f, 0, 0) * rotate(90, 0, 1, 0);
-            auto inv_transform = inverse(transform);
-            append(meshs, create_plane(&transform, &inv_transform, 5, 2));
+            auto transform = ref_cast(translate(0, 0, 2.5f));
+            auto inv_transform = ref_cast(inverse(*transform));
+            append(meshs, create_plane(transform, inv_transform, 5, 2));
         }
 
         {
-            auto transform = translate(-2.5f, 0, 0) * rotate(90, 0, 1, 0);
-            auto inv_transform = inverse(transform);
-            append(meshs, create_plane(&transform, &inv_transform, 5, 2));
+            auto transform = ref_cast(translate(2.5f, 0, 0) * rotate(90, 0, 1, 0));
+            auto inv_transform = ref_cast(inverse(*transform));
+            append(meshs, create_plane(transform, inv_transform, 5, 2));
+        }
+
+        {
+            auto transform = ref_cast(translate(-2.5f, 0, 0) * rotate(90, 0, 1, 0));
+            auto inv_transform = ref_cast(inverse(*transform));
+            append(meshs, create_plane(transform, inv_transform, 5, 2));
         }
         auto primitives = create_mesh_primitives(meshs);
 

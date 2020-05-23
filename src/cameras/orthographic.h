@@ -30,14 +30,14 @@ NARUKAMI_BEGIN
         private:
 
         public:
-            inline OrthographicCamera(const Transform&  camera_to_world,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,orthographic(0.0f,1.0f),screen_windows,std::move(film)){}
+            inline OrthographicCamera(const ref<Transform>&  camera_to_world,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,ref_cast(orthographic(0.0f,1.0f)),screen_windows,std::move(film)){}
             
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override
             {
-                auto pCamera=transform_h(_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
+                auto pCamera=transform_h(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
                 Ray rayCamera(pCamera,Vector3f(0,0,1));
-                (*ray)=camera_to_world(rayCamera);
+                (*ray)=(*camera_to_world)(rayCamera);
                 return 1.0f;
             }  
     };

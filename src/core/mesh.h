@@ -44,11 +44,12 @@ NARUKAMI_BEGIN
     class TriangleMesh
     {
         private:
-            const Transform * _object2world,*_world2object;
+            ref<Transform> _object2world;
+            ref<Transform> _world2object;
             ref<VertexData> _vertex_data;
             uint32_t _index[3];
         public:
-        TriangleMesh(const Transform* object2world, const Transform* world2object,const ref<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
+        TriangleMesh(const ref<Transform>& object2world, const ref<Transform>& world2object,const ref<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh().vertices[_index[i]]; }
         inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
@@ -80,9 +81,9 @@ NARUKAMI_BEGIN
     void append(std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
     std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
 
-    std::vector<ref<TriangleMesh>> create_mesh_triangles(const Transform* object2wrold,const Transform* world2object,const std::vector<uint32_t>& indices,const std::vector<Point3f>& vertices,const std::vector<Normal3f>&normals,const std::vector<Point2f>&uvs);    
-    std::vector<ref<TriangleMesh>> create_plane(const Transform *object2wrold, const Transform *world2object, const float width, const float height);
-    std::vector<ref<TriangleMesh>> create_disk(const Transform *object2wrold, const Transform *world2object,float radius, const uint32_t vertex_density);
+    std::vector<ref<TriangleMesh>> create_mesh_triangles(const ref<Transform>& object2world, const ref<Transform>& world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs);    
+    std::vector<ref<TriangleMesh>> create_plane(const ref<Transform>& object2worldobject2wrold, const ref<Transform>& object2worldworld2object, const float width, const float height);
+    std::vector<ref<TriangleMesh>> create_disk(const ref<Transform>& object2worldobject2wrold,  const ref<Transform>& object2worldworld2object,float radius, const uint32_t vertex_density);
 
     std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>>&);
 

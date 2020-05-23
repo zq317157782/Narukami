@@ -39,7 +39,6 @@ struct SSE_ALIGNAS Transform
     inline Transform(const float *mat) : mat(mat), inv_mat(inverse(this->mat)) {}
     inline Transform(const Matrix4x4 &mat, const Matrix4x4 &inv_mat) : mat(mat), inv_mat(inv_mat) {}
     inline Transform(const float *mat, const float *inv_mat) : mat(mat), inv_mat(inv_mat) {}
-
     inline Point3f operator()(const Point3f &p) const { return mat * p; }
     inline Point3f4p operator()(const Point3f4p &p) const { return mat * p; }
     inline Vector3f operator()(const Vector3f &v) const { return mat * v; }
@@ -49,6 +48,9 @@ struct SSE_ALIGNAS Transform
     Bounds3f operator()(const Bounds3f &b) const;
     Interaction operator()(const Interaction &i) const;
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
+
+    void * operator new(size_t size);
+    void  operator delete(void * ptr);
 };
 
 inline std::ostream &operator<<(std::ostream &out, const Transform &t)
@@ -227,6 +229,12 @@ inline Transform perspective(float fov,float n, float f)
 
     float inv_tan_fov = 1.0f/std::tan(deg2rad(fov/2));
     return scale(inv_tan_fov,inv_tan_fov,1.0f) * Transform(m);
+}
+
+inline ref<Transform> ref_cast(const Transform& t)
+{
+    Transform* ptr = new Transform(t);
+    return ref<Transform>(ptr);
 }
 
 extern const Transform IDENTITY;

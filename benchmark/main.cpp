@@ -608,9 +608,9 @@ static void BM_meshdata_intersect(benchmark::State &state)
      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
      std::vector<Normal3f> normals;
      std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = translate(Vector3f(0,0,0));
-     auto transform2 = translate(Vector3f(0,0,0));
-     auto meshs=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
+     auto transform = ref_cast(translate(Vector3f(0,0,0)));
+     auto transform2 = ref_cast(translate(Vector3f(0,0,0)));
+     auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      float t;
      Point2f uv;
     for (auto _ : state)
@@ -636,9 +636,9 @@ static void BM_meshdata_intersect_sse(benchmark::State &state)
      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
      std::vector<Normal3f> normals;
      std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = translate(Vector3f(0,0,0));
-     auto transform2 = translate(Vector3f(0,0,0));
-     auto meshs=create_mesh_triangles(&transform,&transform2,indices,vertices,normals,uvs);
+     auto transform = ref_cast(translate(Vector3f(0,0,0)));
+     auto transform2 = ref_cast(translate(Vector3f(0,0,0)));
+     auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      auto soa_triangles=SoA_pack(meshs);
      float t;
      Point2f uv;
