@@ -40,12 +40,6 @@ struct SSE_ALIGNAS Transform
     inline Transform(const Matrix4x4 &mat, const Matrix4x4 &inv_mat) : mat(mat), inv_mat(inv_mat) {}
     inline Transform(const float *mat, const float *inv_mat) : mat(mat), inv_mat(inv_mat) {}
 
-    inline Transform(const Transform &) = default;
-    inline Transform(Transform &&) = default;
-    inline Transform &operator=(const Transform &) = default;
-    inline Transform &operator=(Transform &&) = default;
-    inline ~Transform() = default;
-
     inline Point3f operator()(const Point3f &p) const { return mat * p; }
     inline Point3f4p operator()(const Point3f4p &p) const { return mat * p; }
     inline Vector3f operator()(const Vector3f &v) const { return mat * v; }
@@ -234,5 +228,7 @@ inline Transform perspective(float fov,float n, float f)
     float inv_tan_fov = 1.0f/std::tan(deg2rad(fov/2));
     return scale(inv_tan_fov,inv_tan_fov,1.0f) * Transform(m);
 }
+
+extern const Transform IDENTITY;
 
 NARUKAMI_END

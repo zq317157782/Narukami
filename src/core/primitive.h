@@ -29,19 +29,23 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-    enum class PrimitiveType
-    {
-        MESH
-    };
+   
     class Primitive
     {
-    private:
-        PrimitiveType _type;
     public:
-       
-        Primitive(const PrimitiveType& type):_type(type){};
-        PrimitiveType type() const {return _type;}
+        enum class Type
+        {
+            MESH,
+            ACCELERATER,
+        };
+    private:
+        Type _type;
+    public:
+        Primitive(const Type& type):_type(type){};
+        Type type() const {return _type;}
         virtual Bounds3f bounds() const = 0;
+        virtual bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const = 0;
+        virtual bool trace_ray(const Ray &ray) const = 0;
         virtual const Transform& object_to_world() const = 0;
         virtual const Transform& world_to_object() const = 0;
     };
@@ -53,10 +57,13 @@ NARUKAMI_BEGIN
         private:
             ref<TriangleMesh> _mesh;
         public:
-            MeshPrimitive(const ref<TriangleMesh>& mesh):Primitive(PrimitiveType::MESH),_mesh(mesh){}
-            virtual Bounds3f bounds() const override {return _mesh->bounds();}
-            virtual const Transform& object_to_world() const override {return _mesh->object_to_world();}
-            virtual const Transform& world_to_object() const override {return _mesh->world_to_object();}
+            MeshPrimitive(const ref<TriangleMesh>& mesh):Primitive(Type::MESH),_mesh(mesh){}
+            Bounds3f bounds() const override {return _mesh->bounds();}
+            const Transform& object_to_world() const override {return _mesh->object_to_world();}
+            const Transform& world_to_object() const override {return _mesh->world_to_object();}
+            bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
+            bool trace_ray(const Ray &ray) const override;
+            
 
             const ref<TriangleMesh> mesh() const {return _mesh;}
 

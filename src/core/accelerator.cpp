@@ -491,7 +491,7 @@ std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
     return ret;
 }
 
-TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) : _instances(instance_list)
+TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) :Primitive(Type::ACCELERATER),_instances(instance_list)
 {
     STAT_INCREASE_COUNTER(BLASInstance_count, instance_list.size())
     std::vector<BLASInstanceInfo> instance_infos(instance_list.size());
@@ -499,6 +499,8 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) : _instances(ins
     {
         instance_infos[i] = BLASInstanceInfo(instance_list[i], i);
     }
+
+    _bounds = get_max_bounds(instance_infos, 0, instance_infos.size());
 
     MemoryArena arena;
     std::vector<ref<BLASInstance>> _ordered_instance_list;

@@ -55,4 +55,6 @@ Interaction Transform::operator()(const Interaction &i) const
     new_i.hit_t = i.hit_t;
     return new_i;
 };
+
+const Transform IDENTITY = identity();
 NARUKAMI_END

@@ -239,15 +239,11 @@ STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subno
 
 class ProgressReporter;
 
-class Accelerator
+class BLAS:public Primitive
 {
 public:
-    virtual bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const = 0;
-    virtual bool trace_ray(const Ray &ray) const = 0;
-    virtual Bounds3f bounds() const = 0;
+    BLAS():Primitive(Type::ACCELERATER){}
 };
-
-class BLAS:public Accelerator{};
 
 class MeshBLAS:public BLAS
 {
@@ -264,6 +260,8 @@ public:
     MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives);
     bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
     bool trace_ray(const Ray &ray) const override;
+    const Transform& object_to_world() const override {return IDENTITY;}
+    const Transform& world_to_object() const override {return IDENTITY;}
     Bounds3f bounds() const override { return _bounds; }
 
 //以下函数主要用于可视化
@@ -299,6 +297,8 @@ public:
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
+    const Transform& object_to_world() const override {return *_blas_to_world;}
+    const Transform& world_to_object() const override {return *_world_to_blas;}
     Bounds3f bounds() const override { return _bounds; }
 };
 
@@ -317,12 +317,14 @@ struct BLASInstanceInfo4p
     uint32_t offset;
 };
 
-class TLAS:public Accelerator
+class TLAS:public Primitive
 {
 private:
     std::vector<ref<BLASInstance>> _instances;
     std::vector<BLASInstanceInfo4p> _soa_instance_infos;
     std::vector<QBVHNode> _nodes;
+    Bounds3f _bounds;
+    
 
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<ref<BLASInstance>> &ordered, uint32_t *total);
     void build_soa_instance_info(BVHBuildNode *node);
@@ -331,7 +333,9 @@ public:
     TLAS(const std::vector<ref<BLASInstance>> &instance);
     bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
     bool trace_ray(const Ray &ray) const override;
-    Bounds3f bounds() const override { return Bounds3f(); }//TODO
+    Bounds3f bounds() const override { return _bounds; }//TODO
+    const Transform& object_to_world() const override {return IDENTITY;}
+    const Transform& world_to_object() const override {return IDENTITY;}
 };
 
 NARUKAMI_END
