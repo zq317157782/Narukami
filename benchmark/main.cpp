@@ -59,7 +59,7 @@ static void BM_fast_rsqrt(benchmark::State &state)
     for (auto _ : state)
     {
         x++;
-        benchmark::DoNotOptimize(ret += narukami::fast_rsqrt(x));
+        benchmark::DoNotOptimize(ret += narukami::Q_rsqrt(x));
     }
 }
 BENCHMARK(BM_fast_rsqrt);

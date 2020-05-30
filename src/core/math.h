@@ -108,6 +108,7 @@ inline float rcp(const float x)
     return _mm_cvtss_f32(_mm_mul_ss(r, _mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
 }
 
+//速度快但是近似
 inline float rsqrt(const float x)
 {
     const __m128 a = _mm_set_ss(x);
@@ -116,7 +117,7 @@ inline float rsqrt(const float x)
     return _mm_cvtss_f32(c);
 }
 // from QUAKE-III
-inline float fast_rsqrt(float x)
+inline float Q_rsqrt(float x)
 {
     float xhalf = 0.5f * x;
     int i = *(int *)&x;
