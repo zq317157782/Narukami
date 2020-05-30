@@ -17,12 +17,12 @@ include_directories(external/benchmark/include/benchmark)
 include_directories(external/lodepng)
 include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
+include_directories(external/glfw/include)
  
  
 aux_source_directory(src/core SRC_CORE)
 aux_source_directory(src/cameras SRC_CAMERAS)
 aux_source_directory(src/materials SRC_MATERIALS)
-aux_source_directory(src/materials/lights SRC_MATERIALS_LIGHTS)
 aux_source_directory(external/lodepng EXT_LODEPNG)
 #add gtest
 set(gtest_force_shared_crt ON)
@@ -55,11 +55,17 @@ add_subdirectory(external/glfw)
 #add benchmark
 SET(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 add_subdirectory(external/benchmark)
+
+find_package(OPENGL REQUIRED)
  
 #narukami
 add_executable(narukami src/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami glog tinyobjloader)
 # target_link_libraries(narukami embree)
+
+#tools
+add_executable(blas_bvh_view src/tools/blas_bvh_view.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+target_link_libraries(blas_bvh_view glfw tinyobjloader ${OPENGL_LIBRARIES}) 
 
 #narukami_test
 add_executable(narukami_test test/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
@@ -68,6 +74,8 @@ target_link_libraries(narukami_test gtest lua5.3.4)
 #benchmark 
 add_executable(narukami_benchmark benchmark/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 target_link_libraries(narukami_benchmark benchmark)
+
+
 
 #demos
 add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
@@ -82,7 +90,7 @@ add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CO
 target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
 add_executable(narukami_demo_test_parallel_for demo/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 
-#tools
+
  
 if(MSVC)
   if(${MSVC_VERSION} GREATER_EQUAL 1915)

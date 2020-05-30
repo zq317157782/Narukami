@@ -28,9 +28,4 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-class LightMaterial
-{
-    public:
-      virtual Color Li(const Point3f& p) const = 0;
-};
 NARUKAMI_END
