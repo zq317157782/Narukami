@@ -17,7 +17,6 @@
 #include "lights/point.h"
 #include "lights/rect.h"
 #include "lights/disk.h"
-#include "materials/lights/diffuse.h"
 using namespace narukami;
 int main()
 {
