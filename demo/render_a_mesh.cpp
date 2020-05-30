@@ -21,7 +21,7 @@ using namespace narukami;
 int main()
 {
     auto camera_transform = translate(0, 0, -4);
-    auto sampler = Sampler(1);
+    auto sampler = Sampler(8);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
     auto camera = PerspectiveCamera(ref_cast(camera_transform), Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
@@ -102,10 +102,19 @@ int main()
     // //create light
     std::vector<Light *> lights;
     {
-        auto transform = ref_cast(translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0));
-        auto inv_transform = ref_cast(inverse(*transform));
-        auto point_light = new PointLight(transform, inv_transform, Color(10, 10, 10));
-        lights.push_back(point_light);
+        {
+            // auto transform = ref_cast(translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0));
+            // auto inv_transform = ref_cast(inverse(*transform));
+            // auto point_light = new PointLight(transform, inv_transform, Color(10, 10, 10));
+            // lights.push_back(point_light);
+        }
+        {
+            auto transform = ref_cast(translate(Vector3f(0.0f, 1.0f, 1.0f)) * rotate(90, 1, 0, 0));
+            auto inv_transform = ref_cast(inverse(*transform));
+            auto rect_light = new RectLight(transform, inv_transform, Color(10, 10, 10),false,1,1);
+            lights.push_back(rect_light);
+        }
+       
     }
 
     // {
