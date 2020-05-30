@@ -31,7 +31,7 @@ FilmTile::FilmTile( const Bounds2i& pixel_bounds,const float* filter_lut,const f
     _tile_pixels = std::unique_ptr<TilePixel[]>(new TilePixel[area(_pixel_bounds)]);
 }
 
-void FilmTile::add_sample(const Point2f& pos,const Spectrum& l,const float weight) const
+void FilmTile::add_sample(const Point2f& pos,const Color& l,const float weight) const
 {
     
      //calculate bounds
@@ -122,7 +122,7 @@ void Film::write_to_file(const char *file_name) const
 
 
 
-void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
+void Film::add_sample(const Point2f &pos, const Color &l, const float weight) const
 {
 
     //calculate bounds

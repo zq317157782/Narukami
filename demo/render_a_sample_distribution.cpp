@@ -24,7 +24,7 @@ int main(){
         clone_sampler->switch_sample(0);
          do{
                auto sample_0 = clone_sampler->get_2D();
-               film->add_sample(sample_0*512.0f,Spectrum(1,1,1),1);
+               film->add_sample(sample_0*512.0f,Color(1,1,1),1);
          }while(clone_sampler->switch_to_next_sample());
          film->write_to_file(names[i]);
     }
@@ -32,15 +32,15 @@ int main(){
      // sampler.start_pixel(Point2i(0,0));
      // do{
      //      auto sample_0 = sampler.get_2D();
-     //      film_0->add_sample(sample_0*512.0f,Spectrum(1,1,1),1);
+     //      film_0->add_sample(sample_0*512.0f,Color(1,1,1),1);
      //      auto sample_1 = sampler.get_2D();
-     //      film_1->add_sample(sample_1*512.0f,Spectrum(1,1,1),1);
+     //      film_1->add_sample(sample_1*512.0f,Color(1,1,1),1);
      //      auto sample_2 = sampler.get_2D();
-     //      film_2->add_sample(sample_2*512.0f,Spectrum(1,1,1),1);
+     //      film_2->add_sample(sample_2*512.0f,Color(1,1,1),1);
      //      auto sample_3 = sampler.get_2D();
-     //      film_3->add_sample(sample_3*512.0f,Spectrum(1,1,1),1);
+     //      film_3->add_sample(sample_3*512.0f,Color(1,1,1),1);
      //      auto sample_4 = sampler.get_2D();
-     //      film_4->add_sample(sample_4*512.0f,Spectrum(1,1,1),1);
+     //      film_4->add_sample(sample_4*512.0f,Color(1,1,1),1);
      // }while(sampler.start_next_sample());
     
      // film_0->write_to_file("sample_set_0.png");

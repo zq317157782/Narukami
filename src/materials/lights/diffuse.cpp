@@ -25,11 +25,11 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-    DiffuseLightMaterial::DiffuseLightMaterial(const Spectrum &L):_radiance(L)
+    DiffuseLightMaterial::DiffuseLightMaterial(const Color &L):_radiance(L)
     {
     }
 
-    Spectrum DiffuseLightMaterial::Li(const Point3f& p) const
+    Color DiffuseLightMaterial::Li(const Point3f& p) const
     {
         return _radiance;
     }

@@ -29,10 +29,10 @@ NARUKAMI_BEGIN
 class PointLight : public Light
 {
 private:
-    Spectrum _I; //radiant intensity
+    Color _I; //radiant intensity
 public:
-    PointLight(const Transform *light_to_world,const Transform *world_to_light, const Spectrum &L) : Light(light_to_world,world_to_light), _I(L) {}
-    Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
+    PointLight(const Transform *light_to_world,const Transform *world_to_light, const Color &L) : Light(light_to_world,world_to_light), _I(L) {}
+    Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
         auto light_position = (*_light_to_world)(Point3f(0.0f, 0.0f, 0.0f));
         (*wi) = normalize(light_position - interaction.p);
@@ -48,7 +48,7 @@ public:
         return _I / sqrlen(interaction.p - light_position);
     }
 
-    Spectrum power() const override
+    Color power() const override
     {
         return _I * 4.0f * PI;
     }

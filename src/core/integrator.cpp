@@ -70,7 +70,7 @@ void Integrator::render(const Scene &scene)
                     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
                     Interaction interaction;
                     constexpr int bounce_count = 5;
-                    Spectrum L(0.0f, 0.0f, 0.0f);
+                    Color L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
 #if 0 //Normal Debug
                      if (scene.intersect(arena, ray, &interaction))
@@ -81,7 +81,7 @@ void Integrator::render(const Scene &scene)
                              float r = surface_interaction.n.x * 0.5f + 0.5f;
                              float g = surface_interaction.n.y * 0.5f + 0.5f;
                              float b = surface_interaction.n.z * 0.5f + 0.5f;
-                             L = Spectrum(r,g,b); 
+                             L = Color(r,g,b); 
                          }
                      }
 #else

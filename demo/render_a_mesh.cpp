@@ -105,14 +105,14 @@ int main()
     {
         auto transform = translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0);
         auto inv_transform = inverse(transform);
-        auto point_light = new PointLight(&transform, &inv_transform, Spectrum(10, 10, 10));
+        auto point_light = new PointLight(&transform, &inv_transform, Color(10, 10, 10));
         lights.push_back(point_light);
     }
 
     // {
     //     auto transform = translate(Vector3f(0.0f, 1.0f, 1.0f))*rotate(90,1,0,0);
     //     auto inv_transform = inverse(transform);
-    //     auto disk_light = std::make_shared<DiskLight>(&transform,&inv_transform,Spectrum(10,10,10),false,0.2);
+    //     auto disk_light = std::make_shared<DiskLight>(&transform,&inv_transform,Color(10,10,10),false,0.2);
     //     auto disklight_triangles = load_mesh(*disk_light);
     //     lights.push_back(disk_light);
     //     primitives = _union(primitives,create_primitives(disklight_triangles,disk_light.get()));

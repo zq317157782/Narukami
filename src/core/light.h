@@ -35,8 +35,8 @@ protected:
     const Transform *_world_to_light;
 public:
     Light(const Transform *light_to_world,const Transform *world_to_light) : _light_to_world(light_to_world), _world_to_light(world_to_light) {}
-    virtual Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
-    virtual Spectrum power() const = 0;
+    virtual Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
+    virtual Color power() const = 0;
 };
 
 class AreaLight : public Light
@@ -46,7 +46,7 @@ private:
 public:
     AreaLight(const Transform *light_to_world,const Transform *world_to_light,const float area) : Light(light_to_world,world_to_light),_area(area) {}
     float area() const { return _area; }
-    virtual Spectrum L(const Interaction &interaction, const Vector3f &wi) const = 0;
+    virtual Color L(const Interaction &interaction, const Vector3f &wi) const = 0;
 };
 
 NARUKAMI_END

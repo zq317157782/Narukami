@@ -30,10 +30,10 @@ NARUKAMI_BEGIN
 class DiffuseLightMaterial:public LightMaterial
 {
     private:
-        Spectrum _radiance;
+        Color _radiance;
     public:
-        DiffuseLightMaterial(const Spectrum &L);
-        virtual Spectrum Li(const Point3f& p) const override;
+        DiffuseLightMaterial(const Color &L);
+        virtual Color Li(const Point3f& p) const override;
 };
 
 NARUKAMI_END

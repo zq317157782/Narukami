@@ -895,7 +895,7 @@ TEST(memory,STACK_ALLOC){
 
 #include "core/spectrum.h"
 TEST(spectrum,index){
-    Spectrum a(1,1,1);
+    Color a(1,1,1);
     a[2]=2;
     EXPECT_EQ(a.b,2);
 }

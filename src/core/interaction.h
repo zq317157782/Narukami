@@ -65,7 +65,7 @@ inline const Transform& get_world_to_object(const SurfaceInteraction& interactio
     return interaction.primitive->world_to_object();
 }
 
-Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi);
+Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);
 
 
 // _p0 is the start point

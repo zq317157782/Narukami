@@ -28,27 +28,25 @@ SOFTWARE.
 #include "core/constant.h"
 #include "core/math.h"
 NARUKAMI_BEGIN
-    struct Spectrum
+    struct Color
     {
         float r,g,b;
-        typedef float Scalar;
-        enum { N = 3 };
-        inline Spectrum():r(0.0f),g(0.0f),b(0.0f){}
-        inline Spectrum(const float r,const float g,const float b):r(r),g(g),b(b){assert(!isnan(r));assert(!isnan(g));assert(!isnan(b)); }
-        inline float operator[](const int idx) const{ assert(idx>=0&&idx<N); return (&r)[idx]; }
-        inline float& operator[](const int idx){ assert(idx>=0&&idx<N); return (&r)[idx]; }
+        inline Color():r(0.0f),g(0.0f),b(0.0f){}
+        inline Color(const float r,const float g,const float b):r(r),g(g),b(b){assert(!isnan(r));assert(!isnan(g));assert(!isnan(b)); }
+        inline float operator[](const int idx) const{ assert(idx>=0&&idx<3); return (&r)[idx]; }
+        inline float& operator[](const int idx){ assert(idx>=0&&idx<3); return (&r)[idx]; }
     };
-    inline  std::ostream &operator<<(std::ostream &out, const Spectrum &L) { out << '(' << L.r << ',' << L.g << ',' << L.b << ')'; return out; }
-    inline bool operator==(const Spectrum& a,const Spectrum& b){ if((a.r==b.r)&&(a.g==b.g)&&(a.b==b.b)){ return true; } return false; }
-    inline bool operator!=(const Spectrum& a,const Spectrum& b){ if((a.r!=b.r)||(a.g!=b.g)||(a.b!=b.b)){ return true; } return false; }
+    inline  std::ostream &operator<<(std::ostream &out, const Color &L) { out << '(' << L.r << ',' << L.g << ',' << L.b << ')'; return out; }
+    inline bool operator==(const Color& a,const Color& b){ if((a.r==b.r)&&(a.g==b.g)&&(a.b==b.b)){ return true; } return false; }
+    inline bool operator!=(const Color& a,const Color& b){ if((a.r!=b.r)||(a.g!=b.g)||(a.b!=b.b)){ return true; } return false; }
     
-    inline Spectrum operator+(const Spectrum& L1,const Spectrum& L2){ Spectrum L; L.r = L1.r+L2.r; L.g = L1.g+L2.g; L.b = L1.b+L2.b; return L; }
-    inline Spectrum operator*(const Spectrum& L1,const Spectrum& L2){ Spectrum L; L.r = L1.r*L2.r; L.g = L1.g*L2.g; L.b = L1.b*L2.b; return L; }
-    inline Spectrum operator*(const Spectrum& L1,const float f){assert(!isnan(f));Spectrum L; L.r = L1.r*f; L.g = L1.g*f; L.b = L1.b*f; return L; }
-    inline Spectrum operator*(const float f,const Spectrum& L1){return L1 * f;}
-    inline Spectrum operator/(const Spectrum& L1,const float f){assert(!isnan(f));Spectrum L; L.r = L1.r/f; L.g = L1.g/f; L.b = L1.b/f; return L; }
+    inline Color operator+(const Color& L1,const Color& L2){ Color L; L.r = L1.r+L2.r; L.g = L1.g+L2.g; L.b = L1.b+L2.b; return L; }
+    inline Color operator*(const Color& L1,const Color& L2){ Color L; L.r = L1.r*L2.r; L.g = L1.g*L2.g; L.b = L1.b*L2.b; return L; }
+    inline Color operator*(const Color& L1,const float f){assert(!isnan(f));Color L; L.r = L1.r*f; L.g = L1.g*f; L.b = L1.b*f; return L; }
+    inline Color operator*(const float f,const Color& L1){return L1 * f;}
+    inline Color operator/(const Color& L1,const float f){assert(!isnan(f));Color L; L.r = L1.r/f; L.g = L1.g/f; L.b = L1.b/f; return L; }
 
-    inline bool is_black(const Spectrum& L){return L.r==0&&L.g==0&&L.b==0;}
+    inline bool is_black(const Color& L){return L.r==0&&L.g==0&&L.b==0;}
 
 
   

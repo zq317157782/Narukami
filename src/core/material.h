@@ -31,6 +31,6 @@ NARUKAMI_BEGIN
 class LightMaterial
 {
     public:
-      virtual Spectrum Li(const Point3f& p) const = 0;
+      virtual Color Li(const Point3f& p) const = 0;
 };
 NARUKAMI_END
