@@ -1732,7 +1732,10 @@ inline Vector3f4p operator-(const Point3f4p &p0, const Point3f4p &p1)
     auto zzzz = p0.zzzz - p1.zzzz;
     return Vector3f4p(xxxx, yyyy, zzzz);
 }
-inline Normal3f flip_normal(const Normal3f &n, const Vector3f &wo)
+
+
+template<typename T,typename U>
+inline T hemisphere_flip(const T &n, const U &wo)
 {
     return dot(n, wo) > 0 ? n : -n;
 }

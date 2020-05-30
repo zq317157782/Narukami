@@ -113,7 +113,7 @@ void Integrator::render(const Scene &scene)
                                 {
                                     auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
                                     auto object_to_world = get_object_to_world(surface_interaction);
-                                    auto direction_world = normalize(object_to_world(direction_object));
+                                    auto direction_world =  hemisphere_flip(normalize(object_to_world(direction_object)),interaction.n);
                                     ray = Ray(interaction.p, direction_world);
                                     ray = offset_ray(ray, interaction.n);
                                     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)

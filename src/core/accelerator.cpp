@@ -415,7 +415,7 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
     {
         auto triangle = _soa_primitive_infos[primitive_id].triangle[mesh_id];
         interaction->p = barycentric_interpolate_position(triangle, interaction->uv);
-        interaction->n = flip_normal(get_normalized_normal(triangle), -ray.d);
+        interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
         auto primitive_offset = _soa_primitive_infos[primitive_id].offset + mesh_id;
         interaction->primitive = _primitives[primitive_offset];
     }
