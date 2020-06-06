@@ -328,7 +328,9 @@ public:
             }
         }
 
-        *t = translate(trans) * Transform(to_matrix(rotate)) * Transform(scale);
+        Matrix4x4 trans_mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, trans.x, trans.y, trans.z, 1.0f);
+        Matrix4x4 rotate_mat = to_matrix(rotate);
+        *t = Transform(trans_mat*rotate_mat*scale);
     }
 };
 
