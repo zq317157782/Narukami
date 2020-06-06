@@ -95,7 +95,7 @@ inline Transform translate(const Vector3f &delta)
 inline Transform scale(const float x, const float y, const float z)
 {
     Matrix4x4 mat(x, 0.0f, 0.0f, 0.0f, 0.0f, y, 0.0f, 0.0f, 0.0f, 0.0f, z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    Matrix4x4 inv_mat(rcp(x), 0.0f, 0.0f, 0.0f, 0.0f, rcp(y), 0.0f, 0.0f, 0.0f, 0.0f, rcp(z), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    Matrix4x4 inv_mat(1.0f/x, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f/y, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f/z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     return Transform(mat, inv_mat);
 }
 
@@ -227,7 +227,7 @@ inline Transform perspective(float fov, float n, float f)
         0.0f, 0.0f, -f * n / (f - n), 0.0f //col3
     };
 
-    float inv_tan_fov = 1.0f / std::tan(deg2rad(fov / 2));
+    float inv_tan_fov = 1.0f / tan(deg2rad(fov / 2));
     return scale(inv_tan_fov, inv_tan_fov, 1.0f) * Transform(m);
 }
 
@@ -277,9 +277,9 @@ private:
             norm = 0;
             for (int i = 0; i < 3; ++i)
             {
-                float n = std::abs(R.mn[0][i] - Rnext.mn[0][i]) +
-                          std::abs(R.mn[1][i] - Rnext.mn[1][i]) +
-                          std::abs(R.mn[2][i] - Rnext.mn[2][i]);
+                float n = abs(R.mn[0][i] - Rnext.mn[0][i]) +
+                          abs(R.mn[1][i] - Rnext.mn[1][i]) +
+                          abs(R.mn[2][i] - Rnext.mn[2][i]);
                 norm = max(norm, n);
             }
 

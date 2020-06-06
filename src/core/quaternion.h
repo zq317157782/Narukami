@@ -37,17 +37,17 @@ public:
     //from PBRT
     Quaternion(const Matrix4x4 &m)
     {
-        float trace = m.element(0,0) + m.element(1,1) + m.element(2,2);
+        float trace = m.element(0, 0) + m.element(1, 1) + m.element(2, 2);
         if (trace > 0.f)
         {
             // Compute w from matrix trace, then xyz
             // 4w^2 = m[0][0] + m[1][1] + m[2][2] + m[3][3] (but m[3][3] == 1)
             float s = sqrt(trace + 1.0f);
-            w = s / 2.0f;
-            s = 0.5f / s;
-            x = (m.element(2,1) - m.element(1,2)) * s;
-            y = (m.element(0,2) - m.element(2,0)) * s;
-            z = (m.element(1,0) - m.element(0,1)) * s;
+            w = s /2.0f;
+            s = 0.5f/s;
+            x = (m.element(2, 1) - m.element(1, 2)) * s;
+            y = (m.element(0, 2) - m.element(2, 0)) * s;
+            z = (m.element(1, 0) - m.element(0, 1)) * s;
         }
         else
         {
@@ -55,19 +55,25 @@ public:
             const int nxt[3] = {1, 2, 0};
             float q[3];
             int i = 0;
-            if (m.element(1,1) > m.element(0,0))
+            if (m.element(1, 1) > m.element(0, 0))
+            {
                 i = 1;
-            if (m.element(2,2) > m.element(i,i))
+            }
+            if (m.element(2, 2) > m.element(i, i))
+            {
                 i = 2;
+            }
             int j = nxt[i];
             int k = nxt[j];
-            float s = std::sqrt((m.element(i,i) - (m.element(j,j) + m.element(k,k))) + 1.0f);
+            float s = std::sqrt((m.element(i, i) - (m.element(j, j) + m.element(k, k))) + 1.0f);
             q[i] = s * 0.5f;
             if (s != 0.f)
-                s = 0.5f / s;
-            w = (m.element(k,j) - m.element(j,k)) * s;
-            q[j] = (m.element(j,i) + m.element(i,j)) * s;
-            q[k] = (m.element(k,i) + m.element(i,k)) * s;
+            {
+                s = 0.5f/s;
+            }
+            w = (m.element(k, j) - m.element(j, k)) * s;
+            q[j] = (m.element(j, i) + m.element(i, j)) * s;
+            q[k] = (m.element(k, i) + m.element(i, k)) * s;
             x = q[0];
             y = q[1];
             z = q[2];
@@ -84,7 +90,7 @@ inline std::ostream &operator<<(std::ostream &out, const Quaternion &q)
 //--------------------------------------------------------
 inline Quaternion operator-(const Quaternion &q)
 {
-    return Quaternion(-q.x,-q.y,-q.z,-q.w);
+    return Quaternion(-q.x, -q.y, -q.z, -q.w);
 }
 inline Quaternion operator+(const Quaternion &q1, const Quaternion &q2)
 {
@@ -111,7 +117,8 @@ inline Quaternion operator*(float v, const Quaternion &q1)
 inline Quaternion operator/(const Quaternion &q1, float v)
 {
     assert(v != 0.0f);
-    return Quaternion(q1.x / v, q1.y / v, q1.z / v, q1.w / v);
+    float inv_v = 1.0f/v;
+    return Quaternion(q1.x * inv_v, q1.y * inv_v, q1.z * inv_v, q1.w * inv_v);
 }
 //--------------------------------------------------------
 
@@ -139,5 +146,5 @@ inline Matrix4x4 to_matrix(const Quaternion &q)
         0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-Quaternion slerp(const Quaternion &q1, const Quaternion &q2,float t);
+Quaternion slerp(const Quaternion &q1, const Quaternion &q2, float t);
 NARUKAMI_END
