@@ -231,11 +231,6 @@ inline Transform perspective(float fov, float n, float f)
     return scale(inv_tan_fov, inv_tan_fov, 1.0f) * Transform(m);
 }
 
-inline ref<Transform> ref_cast(const Transform &t)
-{
-    Transform *ptr = new Transform(t);
-    return ref<Transform>(ptr);
-}
 
 extern const Transform IDENTITY;
 
@@ -337,11 +332,6 @@ public:
     }
 };
 
-inline ref<AnimatedTransform> ref_cast(const AnimatedTransform &t)
-{
-    AnimatedTransform *ptr = new AnimatedTransform(t);
-    return ref<AnimatedTransform>(ptr);
-}
 
 
 NARUKAMI_END

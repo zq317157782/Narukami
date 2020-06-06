@@ -52,6 +52,13 @@ NARUKAMI_BEGIN
 template <typename T>
 using ref = std::shared_ptr<T>;
 
+template<typename T>
+inline ref<T> ref_cast(const T &t)
+{
+    T *ptr = new T(t);
+    return ref<T>(ptr);
+}
+
 class Interaction;
 class Scene;
 class Light;
