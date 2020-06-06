@@ -30,14 +30,17 @@ NARUKAMI_BEGIN
         private:
 
         public:
-            inline PerspectiveCamera(const ref<Transform>&  camera_to_world,const Bounds2f& screen_windows, const float fov, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,ref_cast(perspective(fov,1e-2f,1000.0f)),screen_windows,std::move(film)){}
+            inline PerspectiveCamera(const ref<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const Bounds2f& screen_windows, const float fov, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,shutter_open,shutter_end,ref_cast(perspective(fov,1e-2f,1000.0f)),screen_windows,std::move(film)){}
             
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{
                 Point3f pFilm(sample.pFilm.x,sample.pFilm.y,0);
                 Point3f pCamera = transform_h(*_raster_to_camera,pFilm);
                 Ray rayCamera(Point3f(0,0,0),normalize(Vector3f(pCamera)));
-                (*ray)=(*camera_to_world)(rayCamera);
+                float dt = shutter_open + sample.time * (shutter_end - shutter_open);
+                Transform c2w;
+                camera_to_world->interpolate(dt,&c2w);
+                (*ray)=c2w(rayCamera);
                 return 1.0f;
             }  
     };

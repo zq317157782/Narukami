@@ -129,6 +129,16 @@ inline Vector3<T> operator-(const Vector3<T> &v1)
 }
 //compenont wise
 template <typename T>
+inline Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    Vector3<T> v;
+    v.x = v1.x + v2.x;
+    v.y = v1.y + v2.y;
+    v.z = v1.z + v2.z;
+    return v;
+}
+
+template <typename T>
 inline Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2)
 {
     Vector3<T> v;
@@ -146,6 +156,13 @@ inline Vector3<T> operator*(const Vector3<T> &v1, const T &f)
     v.z = v1.z * f;
     return v;
 }
+
+template <typename T>
+inline Vector3<T> operator*(const T &f,const Vector3<T> &v1)
+{
+    return v1 * f;
+}
+
 template <typename T>
 inline Vector3<T> operator/(const Vector3<T> &v1, const Vector3<T> &v2)
 {
@@ -1282,6 +1299,11 @@ public:
     {
         assert(idx >= 0 && idx < 16);
         return m[idx];
+    }
+
+    inline float element(int row,int col) const
+    {
+        return mn[col][row];
     }
 };
 

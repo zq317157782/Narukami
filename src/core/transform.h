@@ -27,6 +27,7 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/affine.h"
 #include "core/geometry.h"
+#include "core/quaternion.h"
 #include "core/memory.h"
 NARUKAMI_BEGIN
 
@@ -49,8 +50,8 @@ struct SSE_ALIGNAS Transform
     Interaction operator()(const Interaction &i) const;
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
 
-    void * operator new(size_t size);
-    void  operator delete(void * ptr);
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 inline std::ostream &operator<<(std::ostream &out, const Transform &t)
@@ -59,9 +60,9 @@ inline std::ostream &operator<<(std::ostream &out, const Transform &t)
     return out;
 }
 
-inline Point3f transform_h(const Transform &t,const Point3f &p)
+inline Point3f transform_h(const Transform &t, const Point3f &p)
 {
-    return mul_h(t.mat,p);
+    return mul_h(t.mat, p);
 }
 
 inline Transform identity()
@@ -169,7 +170,6 @@ inline Transform rotate(const float theta, const float axis_x, const float axis_
     return rotate(theta, Vector3f(axis_x, axis_y, axis_z));
 }
 
-
 inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f &up)
 {
     auto forward = normalize(target - o);
@@ -197,12 +197,12 @@ inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f
     cam2wrold.m[13] = o.y;
     cam2wrold.m[14] = o.z;
     cam2wrold.m[15] = 1.0f;
-    return Transform(cam2wrold,transform_inverse_noscale(cam2wrold));
+    return Transform(cam2wrold, transform_inverse_noscale(cam2wrold));
 }
 
-inline Transform look_at(float eye_x,float eye_y,float eye_z,float c_x,float c_y,float c_z,float up_x,float up_y,float up_z)
+inline Transform look_at(float eye_x, float eye_y, float eye_z, float c_x, float c_y, float c_z, float up_x, float up_y, float up_z)
 {
-    return look_at(Point3f(eye_x,eye_y,eye_z),Point3f(c_x,c_y,c_z),Vector3f(up_x,up_y,up_z));
+    return look_at(Point3f(eye_x, eye_y, eye_z), Point3f(c_x, c_y, c_z), Vector3f(up_x, up_y, up_z));
 }
 
 inline bool swap_handedness(const Transform &t)
@@ -218,7 +218,7 @@ inline Transform orthographic(float near, float far)
 }
 
 //fov (angle space)
-inline Transform perspective(float fov,float n, float f)
+inline Transform perspective(float fov, float n, float f)
 {
     Matrix4x4 m = {
         1.0f, 0.0f, 0.0f, 0.0f,            //col0
@@ -227,16 +227,121 @@ inline Transform perspective(float fov,float n, float f)
         0.0f, 0.0f, -f * n / (f - n), 0.0f //col3
     };
 
-    float inv_tan_fov = 1.0f/std::tan(deg2rad(fov/2));
-    return scale(inv_tan_fov,inv_tan_fov,1.0f) * Transform(m);
+    float inv_tan_fov = 1.0f / std::tan(deg2rad(fov / 2));
+    return scale(inv_tan_fov, inv_tan_fov, 1.0f) * Transform(m);
 }
 
-inline ref<Transform> ref_cast(const Transform& t)
+inline ref<Transform> ref_cast(const Transform &t)
 {
-    Transform* ptr = new Transform(t);
+    Transform *ptr = new Transform(t);
     return ref<Transform>(ptr);
 }
 
 extern const Transform IDENTITY;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class AnimatedTransform
+{
+private:
+    float _start_time;
+    float _end_time;
+    ref<Transform> _t1;
+    ref<Transform> _t2;
+    Vector3f T[2];
+    Quaternion R[2];
+    Matrix4x4 S[2];
+
+private:
+    void decompose(const Matrix4x4 &m, Vector3f *T, Quaternion *Q, Matrix4x4 *S)
+    {
+        T->x = m.mn[3][0];
+        T->y = m.mn[3][1];
+        T->z = m.mn[3][2];
+
+        Matrix4x4 M = m;
+        for (int i = 0; i < 3; ++i)
+        {
+            M.mn[3][i] = M.mn[i][3] = 0.f;
+        }
+        M.mn[3][3] = 1.0f;
+        //polar decompose
+        int count = 0;
+        float norm = 0;
+        Matrix4x4 R = M;
+        do
+        {
+            Matrix4x4 Rnext;
+            Matrix4x4 Rit = inverse(transpose(R));
+            for (int i = 0; i < 4; ++i)
+            {
+                for (int j = 0; j < 4; ++j)
+                {
+                    Rnext.mn[i][j] = 0.5f * (R.mn[i][j] + Rit.mn[i][j]);
+                }
+            }
+            norm = 0;
+            for (int i = 0; i < 3; ++i)
+            {
+                float n = std::abs(R.mn[0][i] - Rnext.mn[0][i]) +
+                          std::abs(R.mn[1][i] - Rnext.mn[1][i]) +
+                          std::abs(R.mn[2][i] - Rnext.mn[2][i]);
+                norm = max(norm, n);
+            }
+
+            R = Rnext;
+        } while (++count < 100 && norm > 0.001f);
+
+        *Q = Quaternion(R);
+
+        *S = inverse(R) * M;
+    }
+
+public:
+    AnimatedTransform(const ref<Transform> t1, float start_time, const ref<Transform> t2, float end_time) : _start_time(start_time), _end_time(end_time), _t1(t1), _t2(t2)
+    {
+        decompose(t1->mat, &T[0], &R[0], &S[0]);
+        decompose(t2->mat, &T[1], &R[1], &S[1]);
+        if (dot(R[0], R[1]) < 0.0f)
+        {
+            R[1] = -R[1];
+        }
+    }
+
+    void interpolate(float time, Transform *t)
+    {
+        if (time <= _start_time)
+        {
+            (*t) = (*_t1);
+            return;
+        }
+        else if (time >= _end_time)
+        {
+            (*t) = (*_t2);
+            return;
+        }
+
+        float dt = (time - _start_time) / (_end_time - _start_time);
+
+        Vector3f trans = (1 - dt) * T[0] + dt * T[1];
+        Quaternion rotate = slerp(R[0], R[1],dt);
+        Matrix4x4 scale;
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                scale.mn[i][j] = lerp(S[0].mn[i][j], S[1].mn[i][j],dt);
+            }
+        }
+
+        *t = translate(trans) * Transform(to_matrix(rotate)) * Transform(scale);
+    }
+};
+
+inline ref<AnimatedTransform> ref_cast(const AnimatedTransform &t)
+{
+    AnimatedTransform *ptr = new AnimatedTransform(t);
+    return ref<AnimatedTransform>(ptr);
+}
+
 
 NARUKAMI_END

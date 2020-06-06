@@ -1,4 +1,3 @@
-
 /*
 MIT License
 
@@ -22,27 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#pragma once
-#include "core/narukami.h"
-#include "core/camera.h"
+#include "core/quaternion.h"
 NARUKAMI_BEGIN
-    class OrthographicCamera:public ProjectiveCamera{
-        private:
-
-        public:
-            inline OrthographicCamera(const ref<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const Bounds2f& screen_windows, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,shutter_open,shutter_end,ref_cast(orthographic(0.0f,1.0f)),screen_windows,std::move(film)){}
-            
-            
-            inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override
-            {
-                auto pCamera=transform_h(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
-                Ray rayCamera(pCamera,Vector3f(0,0,1));
-                float dt = shutter_open + sample.time * (shutter_end - shutter_open);
-                Transform c2w;
-                camera_to_world->interpolate(dt,&c2w);
-                (*ray)=c2w(rayCamera);
-                return 1.0f;
-            }  
-    };
+Quaternion slerp(const Quaternion &q1, const Quaternion &q2,float t)
+{
+    float cos_theta = dot(q1, q2);
+    if (EXPECT_NOT_TAKEN(cos_theta > 0.9995f))
+    {
+        return normalize((1.0f - t) * q1 + t * q2);
+    }
+    else
+    {
+        float theta = acos(clamp(cos_theta, -1.0f, 1.0f));
+        float theta_t = theta * t;
+        Quaternion qp = normalize(q2 - cos_theta * q1);
+        return q1 * cos(theta_t) + qp * sin(theta_t);
+    }
+}
 NARUKAMI_END
-

@@ -20,11 +20,15 @@
 using namespace narukami;
 int main()
 {
-    auto camera_transform = translate(0, 0, -4);
-    auto sampler = Sampler(8);
+    auto camera_transform = translate(0, 0, -4)  * rotate(-1.5f,0,0,1);
+    auto camera_transform2 = translate(0, 0, -4) * rotate( 1.5f,0,0,1);
+    auto sampler = Sampler(32);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
-    auto camera = PerspectiveCamera(ref_cast(camera_transform), Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
+
+    
+
+    auto camera = PerspectiveCamera(ref_cast(AnimatedTransform(ref_cast(camera_transform),0,ref_cast(camera_transform2),1)),0,1,Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
 
     std::vector<ref<BLASInstance>> instance_list;
 
