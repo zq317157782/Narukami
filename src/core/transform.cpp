@@ -48,13 +48,13 @@ Ray Transform::operator()(const Ray &ray) const
 
 Bounds3f Transform::operator()(const Bounds3f &b) const
 {
-    auto b0 = _union((*this)(end_point0(b)), (*this)(end_point1(b)));
-    b0 = _union(b0, (*this)(end_point2(b)));
-    b0 = _union(b0, (*this)(end_point3(b)));
-    b0 = _union(b0, (*this)(end_point4(b)));
-    b0 = _union(b0, (*this)(end_point5(b)));
-    b0 = _union(b0, (*this)(end_point6(b)));
-    b0 = _union(b0, (*this)(end_point7(b)));
+    auto b0 = _union((*this)(corner(b,0)), (*this)(corner(b,1)));
+    b0 = _union(b0, (*this)(corner(b,2)));
+    b0 = _union(b0, (*this)(corner(b,3)));
+    b0 = _union(b0, (*this)(corner(b,4)));
+    b0 = _union(b0, (*this)(corner(b,5)));
+    b0 = _union(b0, (*this)(corner(b,6)));
+    b0 = _union(b0, (*this)(corner(b,7)));
     return b0;
 }
 

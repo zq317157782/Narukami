@@ -296,7 +296,7 @@ struct Bounds3
     // 1:max point
     inline const Point3<T> &operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < 3);
+        assert(idx >= 0 && idx < 2);
         return (&min_point)[idx];
     }
 
@@ -396,68 +396,24 @@ inline T surface_area(const Bounds3<T> &bounds)
 
     return (w * h + w * d + d * h) * 2;
 }
-template <typename T>
-inline const Point3<T> end_point0(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m0.x,m0.y,m0.z);
-}
+
+
+// 0 => (0,0,0)
+// 1 => (1,0,0)
+// 2 => (0,1,0)
+// 3 => (1,1,0)
+// 4 => (0,0,1)
+// 5 => (1,0,1)
+// 6 => (0,1,1)
+// 7 => (1,1,1)
 
 template <typename T>
-inline const Point3<T> end_point1(const Bounds3<T> &b)
+inline const Point3<T> corner(const Bounds3<T> &b,int idx)
 {
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m1.x,m0.y,m0.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point2(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m1.x,m1.y,m0.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point3(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m0.x,m1.y,m0.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point4(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m0.x,m0.y,m1.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point5(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m1.x,m0.y,m1.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point6(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m1.x,m1.y,m1.z);
-}
-
-template <typename T>
-inline const Point3<T> end_point7(const Bounds3<T> &b)
-{
-    auto& m0 = b.min_point;
-    auto& m1 = b.max_point;
-    return  Point3f(m0.x,m1.y,m1.z);
+    int x = idx&0x01;
+    int y = (idx>>1)&0x01;
+    int z = (idx>>2)&0x01;
+    return Point3<T>(b[x].x,b[y].y,b[z].z);
 }
 
 struct SSE_ALIGNAS Bounds3f4p
