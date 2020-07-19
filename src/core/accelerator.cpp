@@ -25,6 +25,40 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
+MemoryPool<MeshBLAS> g_mesh_blas_pool(4096);
+
+void * MeshBLAS::operator new(size_t size)
+{
+    return g_mesh_blas_pool.alloc();
+}
+
+void  MeshBLAS::operator delete(void * ptr)
+{
+    g_mesh_blas_pool.dealloc(reinterpret_cast<MeshBLAS*>(ptr));
+}
+
+MemoryPool<BLASInstance> g_blas_instance_pool(4096);
+void * BLASInstance::operator new(size_t size)
+{
+    return g_blas_instance_pool.alloc();
+}
+
+void  BLASInstance::operator delete(void * ptr)
+{
+    g_blas_instance_pool.dealloc(reinterpret_cast<BLASInstance*>(ptr));
+}
+
+MemoryPool<TLAS> g_tlas_pool(1);
+void * TLAS::operator new(size_t size)
+{
+    return g_tlas_pool.alloc();
+}
+
+void  TLAS::operator delete(void * ptr)
+{
+    g_tlas_pool.dealloc(reinterpret_cast<TLAS*>(ptr));
+}
+
 constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int BLAS_SAH_BUCKET_NUM = 12;
 

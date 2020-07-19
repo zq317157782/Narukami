@@ -268,6 +268,9 @@ public:
 public:
     std::vector<QBVHNode> get_nodes_by_depth(uint32_t depth) const;
     const std::vector<ref<MeshPrimitive>>& get_mesh_primitives() const {return _primitives;} 
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 class BLASInstance:public BLAS
@@ -300,6 +303,9 @@ public:
     const Transform& object_to_world() const override {return *_blas_to_world;}
     const Transform& world_to_object() const override {return *_world_to_blas;}
     Bounds3f bounds() const override { return _bounds; }
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 struct BLASInstanceInfo
@@ -333,9 +339,12 @@ public:
     TLAS(const std::vector<ref<BLASInstance>> &instance);
     bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
     bool trace_ray(const Ray &ray) const override;
-    Bounds3f bounds() const override { return _bounds; }//TODO
+    Bounds3f bounds() const override { return _bounds; }
     const Transform& object_to_world() const override {return IDENTITY;}
     const Transform& world_to_object() const override {return IDENTITY;}
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 NARUKAMI_END
