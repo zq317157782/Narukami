@@ -4,9 +4,13 @@ project(narukami VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set(CMAKE_BUILD_TYPE release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+#set(CMAKE_BUILD_TYPE release)
+if(MSVC)
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+endif()
+
 
 
 
