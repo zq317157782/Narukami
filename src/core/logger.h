@@ -23,10 +23,10 @@ SOFTWARE.
 */
 #pragma once
 
-#include "glog/logging.h"
-#include "narukami.h"
+// #include "glog/logging.h"
+// #include "narukami.h"
 
-#define Error LOG(ERROR)
-#define Warning LOG(WARNING)
-#define Info LOG(INFO)
+// #define Error LOG(ERROR)
+// #define Warning LOG(WARNING)
+// #define Info LOG(INFO)
    

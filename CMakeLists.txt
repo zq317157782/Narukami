@@ -6,8 +6,10 @@ enable_testing()
 
 #set(CMAKE_BUILD_TYPE release)
 if(MSVC)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
 endif()
 
@@ -34,9 +36,9 @@ set(BUILD_GMOCK OFF)
 set(BUILD_GTEST ON)
 add_subdirectory(external/googletest)
  
-#add glog
-set(WITH_GFLAGS OFF)
-add_subdirectory(external/glog)
+# #add glog
+# set(WITH_GFLAGS OFF)
+# add_subdirectory(external/glog)
 
 #add lua
 add_subdirectory(external/lua)
@@ -64,7 +66,7 @@ find_package(OPENGL REQUIRED)
  
 #narukami
 add_executable(narukami src/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-target_link_libraries(narukami glog tinyobjloader)
+target_link_libraries(narukami tinyobjloader)
 # target_link_libraries(narukami embree)
 
 #tools
