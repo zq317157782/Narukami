@@ -83,18 +83,18 @@ target_link_libraries(narukami_benchmark benchmark)
 
 
 
-#demos
-add_executable(narukami_demo_render_a_soatriangle demo/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_render_a_mesh demo/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} ${SRC_MATERIALS_LIGHTS})
-target_link_libraries(narukami_demo_render_a_mesh tinyobjloader)
-add_executable(narukami_demo_render_a_texture_space demo/render_a_texture_space.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_render_a_bounds demo/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_output_2d_random_number demo/output_2d_random_number.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_output_sampler_data demo/output_sampler_data.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_render_a_sample_distribution demo/render_a_sample_distribution.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(narukami_demo_accelerator_test demo/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-target_link_libraries(narukami_demo_accelerator_test tinyobjloader)
-add_executable(narukami_demo_test_parallel_for demo/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+#samples
+add_executable(sample_render_a_soatriangle sample/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_render_a_mesh sample/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} ${SRC_MATERIALS_LIGHTS})
+target_link_libraries(sample_render_a_mesh tinyobjloader)
+add_executable(sample_render_a_texture_space sample/render_a_texture_space.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_render_a_bounds sample/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_output_2d_random_number sample/output_2d_random_number.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_output_sampler_data sample/output_sampler_data.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_render_a_sample_distribution sample/render_a_sample_distribution.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_accelerator_test sample/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+target_link_libraries(sample_accelerator_test tinyobjloader)
+add_executable(sample_test_parallel_for sample/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 
 
  
@@ -103,8 +103,8 @@ if(MSVC)
     # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
     # We get this due to using Eigen objects and allocating those objects with make_shared
     target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-    target_compile_definitions( narukami_demo_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-    target_compile_definitions( narukami_demo_accelerator_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+    target_compile_definitions( sample_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
+    target_compile_definitions( sample_accelerator_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
   endif()
 endif()
 
