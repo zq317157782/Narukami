@@ -146,7 +146,7 @@ MeshBLAS::MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primiti
     }
 
     //获取所有MeshPrimitive的Bounds
-    _bounds = get_max_bounds(primitive_infos, 0, primitive_infos.size());
+    _bounds = get_max_bounds(primitive_infos, 0, static_cast<uint32_t>(primitive_infos.size()));
 
     MemoryArena arena;
     std::vector<ref<MeshPrimitive>> _ordered_primitives;
@@ -500,7 +500,7 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) :Primitive(Type:
         instance_infos[i] = BLASInstanceInfo(instance_list[i], i);
     }
 
-    _bounds = get_max_bounds(instance_infos, 0, instance_infos.size());
+    _bounds = get_max_bounds(instance_infos, 0, static_cast<uint32_t>(instance_infos.size()));
 
     MemoryArena arena;
     std::vector<ref<BLASInstance>> _ordered_instance_list;

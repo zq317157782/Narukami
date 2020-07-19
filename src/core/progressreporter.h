@@ -48,7 +48,7 @@ private:
 			//buf2[i]='\b';
 		}
 
-		int title_size=_title.size()+1;
+		int title_size=static_cast<int>(_title.size())+1;
 		snprintf(buf,title_size,"%s",_title.c_str());
 		buf[_title.size()]='[';
 		buf[_title.size()+51]=']';
