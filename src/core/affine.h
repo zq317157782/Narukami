@@ -1596,6 +1596,8 @@ inline Matrix4x4 inverse(const Matrix4x4 &mat)
     return cofactor_mat;
 }
 
+void polar_decompose(const Matrix4x4 &m, Vector3f *T, Quaternion *Q, Matrix4x4 *S);
+
 //---MATRIX4X4 END---
 
 //---GENERAL BEGIN---

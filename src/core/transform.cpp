@@ -26,28 +26,28 @@ SOFTWARE.
 #include "core/interaction.h"
 NARUKAMI_BEGIN
 
-MemoryPool<Transform,SSE_LINE_SIZE> g_transform_pool(256);
+MemoryPool<Transform, SSE_LINE_SIZE> g_transform_pool(256);
 
-void * Transform::operator new(size_t size)
+void *Transform::operator new(size_t size)
 {
     return g_transform_pool.alloc();
 }
 
-void  Transform::operator delete(void * ptr)
+void Transform::operator delete(void *ptr)
 {
-    g_transform_pool.dealloc(reinterpret_cast<Transform*>(ptr));
+    g_transform_pool.dealloc(reinterpret_cast<Transform *>(ptr));
 }
 
 MemoryPool<AnimatedTransform> g_animated_transform_pool(256);
 
-void * AnimatedTransform::operator new(size_t size)
+void *AnimatedTransform::operator new(size_t size)
 {
     return g_animated_transform_pool.alloc();
 }
 
-void  AnimatedTransform::operator delete(void * ptr)
+void AnimatedTransform::operator delete(void *ptr)
 {
-    g_animated_transform_pool.dealloc(reinterpret_cast<AnimatedTransform*>(ptr));
+    g_animated_transform_pool.dealloc(reinterpret_cast<AnimatedTransform *>(ptr));
 }
 
 Ray Transform::operator()(const Ray &ray) const
@@ -60,13 +60,13 @@ Ray Transform::operator()(const Ray &ray) const
 
 Bounds3f Transform::operator()(const Bounds3f &b) const
 {
-    auto b0 = _union((*this)(corner(b,0)), (*this)(corner(b,1)));
-    b0 = _union(b0, (*this)(corner(b,2)));
-    b0 = _union(b0, (*this)(corner(b,3)));
-    b0 = _union(b0, (*this)(corner(b,4)));
-    b0 = _union(b0, (*this)(corner(b,5)));
-    b0 = _union(b0, (*this)(corner(b,6)));
-    b0 = _union(b0, (*this)(corner(b,7)));
+    auto b0 = _union((*this)(corner(b, 0)), (*this)(corner(b, 1)));
+    b0 = _union(b0, (*this)(corner(b, 2)));
+    b0 = _union(b0, (*this)(corner(b, 3)));
+    b0 = _union(b0, (*this)(corner(b, 4)));
+    b0 = _union(b0, (*this)(corner(b, 5)));
+    b0 = _union(b0, (*this)(corner(b, 6)));
+    b0 = _union(b0, (*this)(corner(b, 7)));
     return b0;
 }
 

@@ -59,12 +59,14 @@ inline ref<T> ref_cast(const T &t)
     return ref<T>(ptr);
 }
 
+class Quaternion;
 class Interaction;
 class Scene;
 class Light;
 class AreaLight;
 class LightMaterial;
 class VisibilityTester;
+
 
 inline int count_trailing_zero(uint32_t v){
 #if defined(__GNUC__) || defined(__clang__)
