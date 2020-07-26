@@ -38,6 +38,18 @@ void  Transform::operator delete(void * ptr)
     g_transform_pool.dealloc(reinterpret_cast<Transform*>(ptr));
 }
 
+MemoryPool<AnimatedTransform> g_animated_transform_pool(256);
+
+void * AnimatedTransform::operator new(size_t size)
+{
+    return g_animated_transform_pool.alloc();
+}
+
+void  AnimatedTransform::operator delete(void * ptr)
+{
+    g_animated_transform_pool.dealloc(reinterpret_cast<AnimatedTransform*>(ptr));
+}
+
 Ray Transform::operator()(const Ray &ray) const
 {
     Ray r(ray);

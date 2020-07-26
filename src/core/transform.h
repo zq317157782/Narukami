@@ -60,9 +60,9 @@ inline std::ostream &operator<<(std::ostream &out, const Transform &t)
     return out;
 }
 
-inline Point3f transform_h(const Transform &t, const Point3f &p)
+inline Point3f transform_4x4(const Transform &t, const Point3f &p)
 {
-    return mul_h(t.mat, p);
+    return mul_4x4(t.mat, p);
 }
 
 inline Transform identity()
@@ -332,6 +332,9 @@ public:
         Matrix4x4 rotate_mat = to_matrix(rotate);
         *t = Transform(trans_mat*rotate_mat*scale);
     }
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 

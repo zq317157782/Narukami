@@ -1645,6 +1645,7 @@ inline Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v)
     return rp;
 }
 
+//matrix3x4 
 inline Vector3f operator*(const Matrix4x4 &M, const Vector3f &v)
 {
     // 8ns
@@ -1659,7 +1660,7 @@ inline Vector3f operator*(const Matrix4x4 &M, const Vector3f &v)
     float z = M.m[2] * v.x + M.m[6] * v.y + M.m[10] * v.z;
     return Vector3f(x, y, z);
 }
-
+//matrix3x4 
 inline Point3f operator*(const Matrix4x4 &M, const Point3f &v)
 {
     float4 r = M.col[0] * v.x;
@@ -1669,13 +1670,13 @@ inline Point3f operator*(const Matrix4x4 &M, const Point3f &v)
     return Point3f(r.x, r.y, r.z);
 }
 
-inline Point3f mul(const Matrix4x4 &M, const Point3f &v)
+inline Point3f mul_3x4(const Matrix4x4 &M, const Point3f &v)
 {
     return M * v;
 }
 
 //general
-inline Point3f mul_h(const Matrix4x4 &M, const Point3f &v)
+inline Point3f mul_4x4(const Matrix4x4 &M, const Point3f &v)
 {
     float4 r = M.col[0] * v.x;
     r += M.col[1] * v.y;

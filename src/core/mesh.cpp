@@ -44,7 +44,7 @@ std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>> &A, c
 std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>> &meshs)
 {
     uint32_t start = 0;
-    uint32_t end = meshs.size();
+    uint32_t end = static_cast<uint32_t>(meshs.size());
     uint32_t count = end - start;
     assert(count > 0);
 
@@ -104,7 +104,7 @@ std::vector<ref<TriangleMesh>> create_mesh_triangles(const ref<Transform>& objec
     
     std::vector<ref<TriangleMesh>> meshs;
    
-    uint32_t mesh_size = indices.size() / 3;
+    uint32_t mesh_size = static_cast<uint32_t>(indices.size()) / 3;
     for (uint32_t m = 0; m < mesh_size; ++m)
     {
         uint32_t index[3];

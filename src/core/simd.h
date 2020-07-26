@@ -38,12 +38,6 @@ struct bool4
     
     public:
     inline bool4()=default;
-    inline bool4(const bool4&) = default;
-    inline bool4(bool4&&) = default;
-    inline bool4& operator=(const bool4&) = default;
-    inline bool4& operator=(bool4&&) = default;
-    inline ~bool4() = default;
-    public:
     inline bool4(const __m128 v):xyzw(v){}
     inline explicit bool4(const bool a):xyzw(SSE_MASK(a,a,a,a)){}
     inline explicit bool4(const bool a0,const bool a1,const bool a2,const bool a3):xyzw(SSE_MASK(a0,a1,a2,a3)){}
@@ -78,12 +72,7 @@ struct float4
     typedef float Scalar; 
     enum { size = 4 };
     union { __m128 xyzw; struct { float x, y, z, w; }; };
-  public:
-    inline float4(const float4&) = default;
-    inline float4(float4&&) = default;
-    inline float4& operator=(const float4&) = default;
-    inline float4& operator=(float4&&) = default;
-    inline ~float4() = default;
+
   public:
     inline float4() : xyzw(_mm_setzero_ps()) {}
     inline float4(const __m128 a) : xyzw(a) {}

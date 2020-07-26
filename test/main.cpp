@@ -1042,7 +1042,7 @@ TEST(transform,swap_handedness){
 TEST(transform,perspective){
    auto persp = perspective(120,1,10);
    Point3f a(0,0,10);
-   auto b = transform_h(persp,a);
+   auto b = transform_4x4(persp,a);
    EXPECT_EQ(b,Point3f(0,0,1));
 }
 
@@ -1381,6 +1381,11 @@ TEST(bounds3f,offset){
 STAT_MEMORY_COUNTER("memory_count",memory_count)
 TEST(stat,memory_counter){
     STAT_INCREASE_MEMORY_COUNTER(memory_count,1024);
+}
+
+#include "core/quaternion.h"
+TEST(quaternion,quaternion){
+    Quaternion a;
 }
 
 int main(int argc, char* argv[]) {
