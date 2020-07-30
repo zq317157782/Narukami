@@ -30,7 +30,7 @@ NARUKAMI_BEGIN
         private:
 
         public:
-            inline PerspectiveCamera(const ref<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const Bounds2f& screen_windows, const float fov, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,shutter_open,shutter_end,ref_cast(perspective(fov,1e-2f,1000.0f)),screen_windows,std::move(film)){}
+            inline PerspectiveCamera(const shared<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const Bounds2f& screen_windows, const float fov, std::shared_ptr<Film> film):ProjectiveCamera(camera_to_world,shutter_open,shutter_end,make_shared(perspective(fov,1e-2f,1000.0f)),screen_windows,std::move(film)){}
             
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override{

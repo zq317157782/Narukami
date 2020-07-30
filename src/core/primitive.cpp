@@ -50,17 +50,17 @@ void  MeshPrimitive::operator delete(void * ptr)
     g_mesh_primitive_pool.dealloc(reinterpret_cast<MeshPrimitive*>(ptr));
 }
 
-std::vector<ref<MeshPrimitive>> create_mesh_primitives(const std::vector<ref<TriangleMesh>>& meshs){
-    std::vector<ref<MeshPrimitive>> primitives;
+std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>>& meshs){
+    std::vector<shared<MeshPrimitive>> primitives;
     for (uint32_t i = 0; i < meshs.size(); ++i)
     {
-        primitives.push_back(ref<MeshPrimitive>(new MeshPrimitive(meshs[i])));
+        primitives.push_back(shared<MeshPrimitive>(new MeshPrimitive(meshs[i])));
     }
     
     return primitives;
 }
 
-std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
+std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -106,9 +106,9 @@ std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<ref<Mesh
     return soa_primitives;
 }
 
-std::vector<ref<Primitive>> concat(const std::vector<ref<Primitive>>& a,const std::vector<ref<Primitive>>& b)
+std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>>& a,const std::vector<shared<Primitive>>& b)
 {
-    std::vector<ref<Primitive>> c;
+    std::vector<shared<Primitive>> c;
     c.insert(c.end(),a.begin(),a.end());
     c.insert(c.end(),b.begin(),b.end());
     return c;

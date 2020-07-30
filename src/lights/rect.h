@@ -40,7 +40,7 @@ private:
     float _width, _height;
 
 public:
-    RectLight(const ref<Transform>& light_to_world,const ref<Transform>& world_to_light,const Color &L, bool two_side, const float w, const float h) : AreaLight(light_to_world,world_to_light,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
+    RectLight(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light,const Color &L, bool two_side, const float w, const float h) : AreaLight(light_to_world,world_to_light,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
     }
 
     Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override

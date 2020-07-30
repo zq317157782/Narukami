@@ -608,8 +608,8 @@ static void BM_meshdata_intersect(benchmark::State &state)
      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
      std::vector<Normal3f> normals;
      std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = ref_cast(translate(Vector3f(0,0,0)));
-     auto transform2 = ref_cast(translate(Vector3f(0,0,0)));
+     auto transform = make_shared(translate(Vector3f(0,0,0)));
+     auto transform2 = make_shared(translate(Vector3f(0,0,0)));
      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      float t;
      Point2f uv;
@@ -636,8 +636,8 @@ static void BM_meshdata_intersect_sse(benchmark::State &state)
      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
      std::vector<Normal3f> normals;
      std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = ref_cast(translate(Vector3f(0,0,0)));
-     auto transform2 = ref_cast(translate(Vector3f(0,0,0)));
+     auto transform = make_shared(translate(Vector3f(0,0,0)));
+     auto transform2 = make_shared(translate(Vector3f(0,0,0)));
      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      auto soa_triangles=SoA_pack(meshs);
      float t;
@@ -963,13 +963,14 @@ static void BM_construct_rvalue(benchmark::State &state)
     {
         for(size_t i = 0; i < state.range(0); i++)
         {
-           B b("test");
+           B b("test");  
            benchmark::DoNotOptimize(b=B("asdasdasdsadasdasdasdasdsadasd"));
         }
     }
 
 }
 BENCHMARK(BM_construct_rvalue)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+
 
 
 BENCHMARK_MAIN();

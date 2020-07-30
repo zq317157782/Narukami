@@ -32,28 +32,28 @@ NARUKAMI_BEGIN
     class Camera{
         protected:
            
-            ref<Film> film;
+            shared<Film> film;
         public:
-            const ref<AnimatedTransform> camera_to_world;
+            const shared<AnimatedTransform> camera_to_world;
             const float shutter_open;
             const float shutter_end;
-            inline Camera(const ref<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,ref<Film> film):camera_to_world(camera_to_world),shutter_open(shutter_open),shutter_end(shutter_end),film(std::move(film)){}
+            inline Camera(const shared<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,shared<Film> film):camera_to_world(camera_to_world),shutter_open(shutter_open),shutter_end(shutter_end),film(std::move(film)){}
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
-            inline ref<Film> get_film() const {return film;}
+            inline shared<Film> get_film() const {return film;}
     };
 
 
     class ProjectiveCamera:public Camera{
          protected:
-            ref<Transform> _camera_to_screen;
-            ref<Transform> _screen_to_raster;
-            ref<Transform> _raster_to_screen;
-            ref<Transform> _raster_to_camera;
+            shared<Transform> _camera_to_screen;
+            shared<Transform> _screen_to_raster;
+            shared<Transform> _raster_to_screen;
+            shared<Transform> _raster_to_camera;
          public:
-            ProjectiveCamera(const ref<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const ref<Transform>&  _camera_to_screen,const Bounds2f& screen_windows,ref<Film> film):Camera(camera_to_world,shutter_open,shutter_end,film),_camera_to_screen(_camera_to_screen){ 
-                _screen_to_raster = ref_cast(scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f)));
-                _raster_to_screen = ref_cast(inverse(*_screen_to_raster));
-                _raster_to_camera=ref_cast(inverse(*_camera_to_screen)/*screen2camera*/*(*_raster_to_screen));
+            ProjectiveCamera(const shared<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const shared<Transform>&  _camera_to_screen,const Bounds2f& screen_windows,shared<Film> film):Camera(camera_to_world,shutter_open,shutter_end,film),_camera_to_screen(_camera_to_screen){ 
+                _screen_to_raster = make_shared(scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f)));
+                _raster_to_screen = make_shared(inverse(*_screen_to_raster));
+                _raster_to_camera=make_shared(inverse(*_camera_to_screen)/*screen2camera*/*(*_raster_to_screen));
             }
     };
 NARUKAMI_END

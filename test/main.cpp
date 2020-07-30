@@ -1055,8 +1055,8 @@ TEST(mesh,create_mesh_triangles){
      std::vector<Normal3f> normals;
      std::vector<Point2f> uvs;
      std::vector<uint32_t> indices={0,1,2,1,2,3};
-     auto transform = ref_cast(translate(Vector3f(1,0,0)));
-     auto transform2 = ref_cast(translate(Vector3f(-1,0,0)));
+     auto transform = make_shared(translate(Vector3f(1,0,0)));
+     auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      EXPECT_EQ(meshs.size(),2);
      auto triange = meshs[0];
@@ -1069,8 +1069,8 @@ TEST(mesh,get_world_bounds){
      std::vector<Normal3f> normals;
      std::vector<Point2f> uvs;
      std::vector<uint32_t> indices={0,1,2,1,2,3};
-     auto transform = ref_cast(translate(Vector3f(1,0,0)));
-     auto transform2 = ref_cast(translate(Vector3f(-1,0,0)));
+     auto transform = make_shared(translate(Vector3f(1,0,0)));
+     auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
 
      auto triangle_bounds=meshs[0]->bounds();
@@ -1085,8 +1085,8 @@ TEST(primitive,create_mesh_primitives){
      std::vector<Normal3f> normals;
      std::vector<Point2f> uvs;
      std::vector<uint32_t> indices={0,1,2,1,2,3};
-     auto transform = ref_cast(translate(Vector3f(1,0,0)));
-     auto transform2 = ref_cast(translate(Vector3f(-1,0,0)));
+     auto transform = make_shared(translate(Vector3f(1,0,0)));
+     auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
      auto triangles=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
      auto primitives=create_mesh_primitives(triangles);
      EXPECT_EQ(primitives.size(),2);

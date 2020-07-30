@@ -37,7 +37,7 @@ public:
     Point3f p;
     Normal3f n;
     Point2f uv;
-    ref<Primitive> primitive;
+    shared<Primitive> primitive;
 public:
     Interaction():hit_t(INFINITE){};
     Interaction(const Point3f& p):hit_t(INFINITE),p(p){}

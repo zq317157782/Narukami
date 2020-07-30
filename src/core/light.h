@@ -31,10 +31,10 @@ NARUKAMI_BEGIN
 class Light
 {
 protected:
-    const ref<Transform> _light_to_world;
-    const ref<Transform> _world_to_light;
+    const shared<Transform> _light_to_world;
+    const shared<Transform> _world_to_light;
 public:
-    Light(const ref<Transform>& light_to_world,const ref<Transform>& world_to_light) : _light_to_world(light_to_world), _world_to_light(world_to_light) {}
+    Light(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light) : _light_to_world(light_to_world), _world_to_light(world_to_light) {}
     virtual Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
     virtual Color power() const = 0;
 };
@@ -44,7 +44,7 @@ class AreaLight : public Light
 private:
     float _area;
 public:
-    AreaLight(const ref<Transform>& light_to_world,const ref<Transform>& world_to_light,const float area) : Light(light_to_world,world_to_light),_area(area) {}
+    AreaLight(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light,const float area) : Light(light_to_world,world_to_light),_area(area) {}
     float area() const { return _area; }
     virtual Color L(const Interaction &interaction, const Vector3f &wi) const = 0;
 };

@@ -170,7 +170,7 @@ uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollaps
     return cur_offset;
 }
 
-MeshBLAS::MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primitives(primitives)
+MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _primitives(primitives)
 {
     STAT_INCREASE_COUNTER(MeshPrimitiveInfo_count, _primitives.size())
     std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
@@ -183,7 +183,7 @@ MeshBLAS::MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primiti
     _bounds = get_max_bounds(primitive_infos, 0, static_cast<uint32_t>(primitive_infos.size()));
 
     MemoryArena arena;
-    std::vector<ref<MeshPrimitive>> _ordered_primitives;
+    std::vector<shared<MeshPrimitive>> _ordered_primitives;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
@@ -203,7 +203,7 @@ MeshBLAS::MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives) : _primiti
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total)
+BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -525,7 +525,7 @@ std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
     return ret;
 }
 
-TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) :Primitive(Type::ACCELERATER),_instances(instance_list)
+TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) :Primitive(Type::ACCELERATER),_instances(instance_list)
 {
     STAT_INCREASE_COUNTER(BLASInstance_count, instance_list.size())
     std::vector<BLASInstanceInfo> instance_infos(instance_list.size());
@@ -537,7 +537,7 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) :Primitive(Type:
     _bounds = get_max_bounds(instance_infos, 0, static_cast<uint32_t>(instance_infos.size()));
 
     MemoryArena arena;
-    std::vector<ref<BLASInstance>> _ordered_instance_list;
+    std::vector<shared<BLASInstance>> _ordered_instance_list;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
@@ -555,7 +555,7 @@ TLAS::TLAS(const std::vector<ref<BLASInstance>> &instance_list) :Primitive(Type:
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<ref<BLASInstance>> &ordered, uint32_t *total)
+BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<shared<BLASInstance>> &ordered, uint32_t *total)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
@@ -652,7 +652,7 @@ BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
     return node;
 }
 
-std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<ref<BLASInstance>> &instance_list, uint32_t start, uint32_t count)
+std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<shared<BLASInstance>> &instance_list, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= instance_list.size());

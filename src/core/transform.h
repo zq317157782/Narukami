@@ -242,8 +242,8 @@ class AnimatedTransform
 private:
     float _start_time;
     float _end_time;
-    ref<Transform> _t1;
-    ref<Transform> _t2;
+    shared<Transform> _t1;
+    shared<Transform> _t2;
     Vector3f T[2];
     Quaternion R[2];
     Matrix4x4 S[2];
@@ -253,7 +253,7 @@ private:
     bool _has_rotation;
 
 public:
-    AnimatedTransform(const ref<Transform> t1, float start_time, const ref<Transform> t2, float end_time) : _start_time(start_time), _end_time(end_time), _t1(t1), _t2(t2)
+    AnimatedTransform(const shared<Transform> t1, float start_time, const shared<Transform> t2, float end_time) : _start_time(start_time), _end_time(end_time), _t1(t1), _t2(t2)
     {
 
         if (t1->mat == t2->mat)

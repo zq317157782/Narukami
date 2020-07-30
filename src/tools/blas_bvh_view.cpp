@@ -7,19 +7,19 @@
 #include <GLFW/glfw3.h>
 
 using namespace narukami;
-ref<MeshBLAS> get_blas()
+shared<MeshBLAS> get_blas()
 {
     std::vector<std::shared_ptr<TriangleMesh>> meshs;
     {
-        auto transform = ref_cast(identity());
+        auto transform = make_shared(identity());
         auto inv_transform = transform;
         meshs = load_mesh_triangles_from_obj(transform, inv_transform, "bunny.obj", ".");
     }
     auto primitives = create_mesh_primitives(meshs);
-    return ref<MeshBLAS>(new MeshBLAS(primitives));
+    return shared<MeshBLAS>(new MeshBLAS(primitives));
 }
 
-void draw_mesh(const ref<MeshPrimitive> &p)
+void draw_mesh(const shared<MeshPrimitive> &p)
 {
     auto v0 = (*p->mesh())[0];
     auto v1 = (*p->mesh())[1];
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    ref<MeshBLAS> blas = get_blas();
+    shared<MeshBLAS> blas = get_blas();
     auto bounds = blas->bounds();
     auto primitives = blas->get_mesh_primitives();
 

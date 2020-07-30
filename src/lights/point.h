@@ -31,7 +31,7 @@ class PointLight : public Light
 private:
     Color _I; //radiant intensity
 public:
-    PointLight(const ref<Transform>& light_to_world,const ref<Transform>& world_to_light, const Color &L) : Light(light_to_world,world_to_light), _I(L) {}
+    PointLight(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light, const Color &L) : Light(light_to_world,world_to_light), _I(L) {}
     Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
         auto light_position = (*_light_to_world)(Point3f(0.0f, 0.0f, 0.0f));

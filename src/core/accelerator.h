@@ -44,7 +44,7 @@ struct BVHMeshPrimitiveInfo
     Bounds3f bounds;
     Point3f centroid;
     BVHMeshPrimitiveInfo() = default;
-    BVHMeshPrimitiveInfo(const ref<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
+    BVHMeshPrimitiveInfo(const shared<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
 };
 
 /**
@@ -248,16 +248,16 @@ public:
 class MeshBLAS:public BLAS
 {
 private:
-    std::vector<ref<MeshPrimitive>> _primitives;
+    std::vector<shared<MeshPrimitive>> _primitives;
     std::vector<MeshPrimitiveInfo4p> _soa_primitive_infos;
     std::vector<QBVHNode> _nodes;
     Bounds3f _bounds;
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<ref<MeshPrimitive>> &ordered, uint32_t *total);
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
     
 public:
-    MeshBLAS(const std::vector<ref<MeshPrimitive>> &primitives);
+    MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives);
     bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
     bool trace_ray(const Ray &ray) const override;
     const Transform& object_to_world() const override {return IDENTITY;}
@@ -267,7 +267,7 @@ public:
 //以下函数主要用于可视化
 public:
     std::vector<QBVHNode> get_nodes_by_depth(uint32_t depth) const;
-    const std::vector<ref<MeshPrimitive>>& get_mesh_primitives() const {return _primitives;} 
+    const std::vector<shared<MeshPrimitive>>& get_mesh_primitives() const {return _primitives;} 
 
     void *operator new(size_t size);
     void operator delete(void *ptr);
@@ -276,13 +276,13 @@ public:
 class BLASInstance:public BLAS
 {
 private:
-    ref<BLAS> _blas;
+    shared<BLAS> _blas;
     const Transform *_world_to_blas;
     const Transform *_blas_to_world;
     Bounds3f _bounds;
 
 public:
-    BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const ref<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
+    BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const shared<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
     bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override
     {
@@ -314,7 +314,7 @@ struct BLASInstanceInfo
     Bounds3f bounds;
     Point3f centroid;
     BLASInstanceInfo() = default;
-    BLASInstanceInfo(const ref<BLASInstance> &instance, uint32_t index) : instance_index(index), bounds(instance->bounds()), centroid((instance->bounds().min_point + instance->bounds().max_point) * 0.5f) {}
+    BLASInstanceInfo(const shared<BLASInstance> &instance, uint32_t index) : instance_index(index), bounds(instance->bounds()), centroid((instance->bounds().min_point + instance->bounds().max_point) * 0.5f) {}
 };
 
 struct BLASInstanceInfo4p
@@ -326,17 +326,17 @@ struct BLASInstanceInfo4p
 class TLAS:public Primitive
 {
 private:
-    std::vector<ref<BLASInstance>> _instances;
+    std::vector<shared<BLASInstance>> _instances;
     std::vector<BLASInstanceInfo4p> _soa_instance_infos;
     std::vector<QBVHNode> _nodes;
     Bounds3f _bounds;
     
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<ref<BLASInstance>> &ordered, uint32_t *total);
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BLASInstanceInfo> &instance_infos, std::vector<shared<BLASInstance>> &ordered, uint32_t *total);
     void build_soa_instance_info(BVHBuildNode *node);
 
 public:
-    TLAS(const std::vector<ref<BLASInstance>> &instance);
+    TLAS(const std::vector<shared<BLASInstance>> &instance);
     bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
     bool trace_ray(const Ray &ray) const override;
     Bounds3f bounds() const override { return _bounds; }

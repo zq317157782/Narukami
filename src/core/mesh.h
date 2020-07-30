@@ -44,12 +44,12 @@ NARUKAMI_BEGIN
     class TriangleMesh
     {
         private:
-            ref<Transform> _object2world;
-            ref<Transform> _world2object;
-            ref<VertexData> _vertex_data;
+            shared<Transform> _object2world;
+            shared<Transform> _world2object;
+            shared<VertexData> _vertex_data;
             uint32_t _index[3];
         public:
-        TriangleMesh(const ref<Transform>& object2world, const ref<Transform>& world2object,const ref<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
+        TriangleMesh(const shared<Transform>& object2world, const shared<Transform>& world2object,const shared<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
 
         //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh().vertices[_index[i]]; }
         inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
@@ -58,14 +58,14 @@ NARUKAMI_BEGIN
         inline  Bounds3f bounds() const{return _union(_union((*this)[0],(*this)[1]),(*this)[2]);}
         inline  const Transform& object_to_world() const {return *_object2world;}
         inline  const Transform& world_to_object() const {return *_world2object;}
-        inline  Triangle geom_tri() const 
-        {
-            Triangle triangle;
-            triangle.v0 = (*this)[0];
-            triangle.e1 = (*this)[1] - triangle.v0;
-            triangle.e2 = (*this)[2] - triangle.v0; 
-            return triangle;
-        }
+        // inline  Triangle geom_tri() const 
+        // {
+        //     Triangle triangle;
+        //     triangle.v0 = (*this)[0];
+        //     triangle.e1 = (*this)[1] - triangle.v0;
+        //     triangle.e2 = (*this)[2] - triangle.v0; 
+        //     return triangle;
+        // }
         void * operator new(size_t size);
         void  operator delete(void * ptr);
         friend inline  std::ostream &operator<<(std::ostream &out, const TriangleMesh &v) { out << '(' << v[0] << ',' << v[1] << ',' << v[2] << ')'; return out; }
@@ -78,14 +78,14 @@ NARUKAMI_BEGIN
         return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
     }
 
-    void append(std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
-    std::vector<ref<TriangleMesh>> concat(const std::vector<ref<TriangleMesh>>& A,const std::vector<ref<TriangleMesh>>& B);
+    void append(std::vector<shared<TriangleMesh>>& A,const std::vector<shared<TriangleMesh>>& B);
+    std::vector<shared<TriangleMesh>> concat(const std::vector<shared<TriangleMesh>>& A,const std::vector<shared<TriangleMesh>>& B);
 
-    std::vector<ref<TriangleMesh>> create_mesh_triangles(const ref<Transform>& object2world, const ref<Transform>& world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs);    
-    std::vector<ref<TriangleMesh>> create_plane(const ref<Transform>& object2worldobject2wrold, const ref<Transform>& object2worldworld2object, const float width, const float height);
-    std::vector<ref<TriangleMesh>> create_disk(const ref<Transform>& object2worldobject2wrold,  const ref<Transform>& object2worldworld2object,float radius, const uint32_t vertex_density);
+    std::vector<shared<TriangleMesh>> create_mesh_triangles(const shared<Transform>& object2world, const shared<Transform>& world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs);    
+    std::vector<shared<TriangleMesh>> create_plane(const shared<Transform>& object2worldobject2wrold, const shared<Transform>& object2worldworld2object, const float width, const float height);
+    std::vector<shared<TriangleMesh>> create_disk(const shared<Transform>& object2worldobject2wrold,  const shared<Transform>& object2worldworld2object,float radius, const uint32_t vertex_density);
 
-    std::vector<Triangle4p> SoA_pack(const std::vector<ref<TriangleMesh>>&);
+    std::vector<Triangle4p> SoA_pack(const std::vector<shared<TriangleMesh>>&);
 
     
 NARUKAMI_END

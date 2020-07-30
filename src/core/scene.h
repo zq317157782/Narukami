@@ -32,11 +32,11 @@ SOFTWARE.
 NARUKAMI_BEGIN
 class Scene{
     private:
-        ref<TLAS> _accelerator;
+        shared<TLAS> _accelerator;
     public:
         std::vector<Light*> lights;
     public:
-        Scene(ref<TLAS>& accelerator,const std::vector<Light*> &lights):_accelerator(accelerator),lights(lights){}
+        Scene(shared<TLAS>& accelerator,const std::vector<Light*> &lights):_accelerator(accelerator),lights(lights){}
 
         inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
             return _accelerator->trace_ray(arena,ray,interaction);

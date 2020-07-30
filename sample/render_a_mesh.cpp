@@ -28,9 +28,9 @@ int main()
 
     
 
-    auto camera = PerspectiveCamera(ref_cast(AnimatedTransform(ref_cast(camera_transform),0,ref_cast(camera_transform2),1)),0,1,Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
+    auto camera = PerspectiveCamera(make_shared(AnimatedTransform(make_shared(camera_transform),0,make_shared(camera_transform2),1)),0,1,Bounds2f{{-1 * aspect, -1}, {1 * aspect, 1}}, 45, film);
 
-    std::vector<ref<BLASInstance>> instance_list;
+    std::vector<shared<BLASInstance>> instance_list;
 
     Transform blas_to_wrold = translate(1.0f, 0, 0);
     Transform world_to_blas = inverse(blas_to_wrold);
@@ -40,22 +40,22 @@ int main()
     {
         std::vector<std::shared_ptr<TriangleMesh>> meshs;
         {
-            auto transform = ref_cast(translate(Vector3f(0, 0, 0.0f)) * scale(0.2f, 0.2f, 0.2f) * rotate(90, Vector3f(0, 1, 0)));
-            auto inv_transform = ref_cast(inverse(*transform)); // translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
+            auto transform = make_shared(translate(Vector3f(0, 0, 0.0f)) * scale(0.2f, 0.2f, 0.2f) * rotate(90, Vector3f(0, 1, 0)));
+            auto inv_transform = make_shared(inverse(*transform)); // translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
             append(meshs, load_mesh_triangles_from_obj(transform, inv_transform, "bunny.obj", "."));
         }
         auto primitives = create_mesh_primitives(meshs);
-        auto blas = ref<MeshBLAS>(new MeshBLAS(primitives));
+        auto blas = shared<MeshBLAS>(new MeshBLAS(primitives));
 
         {
             
-            auto instance = ref<BLASInstance>(new BLASInstance(&blas_to_wrold, &world_to_blas, blas));
+            auto instance = shared<BLASInstance>(new BLASInstance(&blas_to_wrold, &world_to_blas, blas));
             instance_list.push_back(instance);
         }
 
         {
           
-            auto instance = ref<BLASInstance>(new BLASInstance(&blas_to_wrold2, &world_to_blas2, blas));
+            auto instance = shared<BLASInstance>(new BLASInstance(&blas_to_wrold2, &world_to_blas2, blas));
             instance_list.push_back(instance);
         }
     }
@@ -65,40 +65,40 @@ int main()
         std::vector<std::shared_ptr<TriangleMesh>> meshs;
         {
 
-            auto transform = ref_cast(translate(0, -1, 0) * rotate(90, 1, 0, 0));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(0, -1, 0) * rotate(90, 1, 0, 0));
+            auto inv_transform = make_shared(inverse(*transform));
             append(meshs, create_plane(transform, inv_transform, 5, 5));
         }
         {
-            auto transform = ref_cast(translate(0, 1, 0) * rotate(90, 1, 0, 0));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(0, 1, 0) * rotate(90, 1, 0, 0));
+            auto inv_transform = make_shared(inverse(*transform));
             append(meshs, create_plane(transform, inv_transform, 5, 5));
         }
 
         {
-            auto transform = ref_cast(translate(0, 0, 2.5f));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(0, 0, 2.5f));
+            auto inv_transform = make_shared(inverse(*transform));
             append(meshs, create_plane(transform, inv_transform, 5, 2));
         }
 
         {
-            auto transform = ref_cast(translate(2.5f, 0, 0) * rotate(90, 0, 1, 0));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(2.5f, 0, 0) * rotate(90, 0, 1, 0));
+            auto inv_transform = make_shared(inverse(*transform));
             append(meshs, create_plane(transform, inv_transform, 5, 2));
         }
 
         {
-            auto transform = ref_cast(translate(-2.5f, 0, 0) * rotate(90, 0, 1, 0));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(-2.5f, 0, 0) * rotate(90, 0, 1, 0));
+            auto inv_transform = make_shared(inverse(*transform));
             append(meshs, create_plane(transform, inv_transform, 5, 2));
         }
         auto primitives = create_mesh_primitives(meshs);
 
 
 
-        auto blas = ref<MeshBLAS>(new MeshBLAS(primitives));
+        auto blas = shared<MeshBLAS>(new MeshBLAS(primitives));
         {
-            auto instance = ref<BLASInstance>(new BLASInstance(&t, &t, blas));
+            auto instance = shared<BLASInstance>(new BLASInstance(&t, &t, blas));
             instance_list.push_back(instance);
         }
     }
@@ -107,14 +107,14 @@ int main()
     std::vector<Light *> lights;
     {
         {
-            // auto transform = ref_cast(translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0));
-            // auto inv_transform = ref_cast(inverse(*transform));
+            // auto transform = make_shared(translate(Vector3f(0.0f, 0.0f, 1.0f)) * rotate(90, 1, 0, 0));
+            // auto inv_transform = make_shared(inverse(*transform));
             // auto point_light = new PointLight(transform, inv_transform, Color(10, 10, 10));
             // lights.push_back(point_light);
         }
         {
-            auto transform = ref_cast(translate(Vector3f(0.0f, 1.0f, 1.0f)) * rotate(90, 1, 0, 0));
-            auto inv_transform = ref_cast(inverse(*transform));
+            auto transform = make_shared(translate(Vector3f(0.0f, 1.0f, 1.0f)) * rotate(90, 1, 0, 0));
+            auto inv_transform = make_shared(inverse(*transform));
             auto rect_light = new RectLight(transform, inv_transform, Color(10, 10, 10),false,1,1);
             lights.push_back(rect_light);
         }
@@ -130,7 +130,7 @@ int main()
     //     primitives = _union(primitives,create_primitives(disklight_triangles,disk_light.get()));
     // }
 
-    auto acce = ref<TLAS>(new TLAS(instance_list));
+    auto acce = shared<TLAS>(new TLAS(instance_list));
 
     Scene scene(acce, lights);
     Integrator integrator(&camera, &sampler);

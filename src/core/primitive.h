@@ -50,14 +50,14 @@ NARUKAMI_BEGIN
         virtual const Transform& world_to_object() const = 0;
     };
 
-    std::vector<ref<Primitive>> concat(const std::vector<ref<Primitive>>& a,const std::vector<ref<Primitive>>& b);
+    std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>>& a,const std::vector<shared<Primitive>>& b);
 
     class MeshPrimitive:public Primitive
     {
         private:
-            ref<TriangleMesh> _mesh;
+            shared<TriangleMesh> _mesh;
         public:
-            MeshPrimitive(const ref<TriangleMesh>& mesh):Primitive(Type::MESH),_mesh(mesh){}
+            MeshPrimitive(const shared<TriangleMesh>& mesh):Primitive(Type::MESH),_mesh(mesh){}
             Bounds3f bounds() const override {return _mesh->bounds();}
             const Transform& object_to_world() const override {return _mesh->object_to_world();}
             const Transform& world_to_object() const override {return _mesh->world_to_object();}
@@ -65,13 +65,13 @@ NARUKAMI_BEGIN
             bool trace_ray(const Ray &ray) const override;
             
 
-            const ref<TriangleMesh> mesh() const {return _mesh;}
+            const shared<TriangleMesh> mesh() const {return _mesh;}
 
             void * operator new(size_t size);
             void  operator delete(void * ptr);
     };
     
-    std::vector<ref<MeshPrimitive>> create_mesh_primitives(const std::vector<ref<TriangleMesh>>&);
+    std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>>&);
 
 
     struct MeshPrimitiveInfo4p{
@@ -83,5 +83,5 @@ NARUKAMI_BEGIN
         //***
     };
 
-    std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<ref<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
+    std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

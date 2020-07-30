@@ -48,17 +48,6 @@ narukami.h
 
 
 NARUKAMI_BEGIN
-
-template <typename T>
-using ref = std::shared_ptr<T>;
-
-template<typename T>
-inline ref<T> ref_cast(const T &t)
-{
-    T *ptr = new T(t);
-    return ref<T>(ptr);
-}
-
 class Quaternion;
 class Interaction;
 class Scene;
@@ -67,6 +56,15 @@ class AreaLight;
 class LightMaterial;
 class VisibilityTester;
 
+template <typename T>
+using shared = std::shared_ptr<T>;
+
+template<typename T>
+inline shared<T> make_shared(const T &t)
+{
+    T *ptr = new T(t);
+    return shared<T>(ptr);
+}
 
 inline int count_trailing_zero(uint32_t v){
 #if defined(__GNUC__) || defined(__clang__)
