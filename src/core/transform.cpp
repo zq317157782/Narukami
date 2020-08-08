@@ -80,5 +80,12 @@ Interaction Transform::operator()(const Interaction &i) const
     return new_i;
 };
 
+Interaction AnimatedTransform::operator()(float time, const Interaction &i) const
+{
+    Transform t;
+    interpolate(time, &t);
+    return t(i);
+}
+
 const Transform IDENTITY = identity();
 NARUKAMI_END

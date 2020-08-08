@@ -104,39 +104,38 @@ inline Transform scale(const Vector3f &vec)
     return scale(vec.x, vec.y, vec.z);
 }
 
-//clockwise
+//counterclockwise
 inline Transform rotate_x(const float theta)
 {
     auto rad = deg2rad(theta);
     auto sin_theta = sin(rad);
     auto cos_theta = cos(rad);
-    Matrix4x4 mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, cos_theta, sin_theta, 0.0f, 0.0f, -sin_theta, cos_theta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    Matrix4x4 mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, cos_theta, -sin_theta, 0.0f, 0.0f, sin_theta, cos_theta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     //Matrix4x4 inv_mat(1.0f,0.0f,0.0f,0.0f, 0.0f,cos_theta,-sin_theta, 0.0f,0.0f,sin_theta, cos_theta,0.0f,0.0f, 0.0f,0.0f,1.0f);
     return Transform(mat, transpose(mat));
 }
-//clockwise
+//counterclockwise
 inline Transform rotate_y(const float theta)
 {
     auto rad = deg2rad(theta);
     auto sin_theta = sin(rad);
     auto cos_theta = cos(rad);
-    Matrix4x4 mat(/*col0*/ cos_theta, 0.0f, -sin_theta, 0.0f, /*col1*/ 0.0f, 1.0f, 0.0f, 0.0f, /*col2*/ sin_theta, 0.0f, cos_theta, 0.0f, /*col3*/ 0.0f, 0.0f, 0.0f, 1.0f);
+    Matrix4x4 mat(/*col0*/ cos_theta, 0.0f, sin_theta, 0.0f, /*col1*/ 0.0f, 1.0f, 0.0f, 0.0f, /*col2*/ -sin_theta, 0.0f, cos_theta, 0.0f, /*col3*/ 0.0f, 0.0f, 0.0f, 1.0f);
 
     return Transform(mat, transpose(mat));
 }
-//clockwise
+//counterclockwise
 inline Transform rotate_z(const float theta)
 {
     auto rad = deg2rad(theta);
     auto sin_theta = sin(rad);
     auto cos_theta = cos(rad);
-    Matrix4x4 mat(/*col0*/ cos_theta, sin_theta, 0.0f, 0.0f, /*col1*/ -sin_theta, cos_theta, 0.0f, 0.0f, /*col2*/ 0.0f, 0.0f, 1.0f, 0.0f, /*col3*/ 0.0f, 0.0f, 0.0f, 1.0f);
+    Matrix4x4 mat(/*col0*/ cos_theta, -sin_theta, 0.0f, 0.0f, /*col1*/ sin_theta, cos_theta, 0.0f, 0.0f, /*col2*/ 0.0f, 0.0f, 1.0f, 0.0f, /*col3*/ 0.0f, 0.0f, 0.0f, 1.0f);
     return Transform(mat, transpose(mat));
 }
 
-//http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf
-//clockwise
-
+//http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf 
+//it's RGS
 inline Transform rotate(const float theta, const Vector3f &axis)
 {
     auto rad = deg2rad(theta);
@@ -161,8 +160,8 @@ inline Transform rotate(const float theta, const Vector3f &axis)
     mat[8] = t * a.x * a.z + sin_theta * a.y;
     mat[9] = t * a.y * a.z - sin_theta * a.x;
     mat[10] = t * a.z * a.z + cos_theta;
-
-    return Transform(mat, transpose(mat));
+    //因为这个算法是RHS的，所以需要交换逆和原来矩阵的位置，逆矩阵才是我们需要的变换
+    return Transform(transpose(mat),mat);
 }
 
 inline Transform rotate(const float theta, const float axis_x, const float axis_y, const float axis_z)
@@ -233,10 +232,7 @@ inline Transform perspective(float fov, float n, float f)
 
 extern const Transform IDENTITY;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-STAT_PERCENT("transform/AnimatedTransform has a animation", AnimatedTransform_anima_num, AnimatedTransform_anima_denom)
-STAT_PERCENT("transform/AnimatedTransform has a rotation", AnimatedTransform_rotation_num, AnimatedTransform_rotation_denom)
-STAT_PERCENT("transform/AnimatedTransform has a scale", AnimatedTransform_scale_num, AnimatedTransform_scale_denom)
+
 class AnimatedTransform
 {
 private:
@@ -253,7 +249,13 @@ private:
     bool _has_rotation;
 
 public:
-    AnimatedTransform(const shared<Transform> t1, float start_time, const shared<Transform> t2, float end_time) : _start_time(start_time), _end_time(end_time), _t1(t1), _t2(t2)
+    AnimatedTransform(const shared<Transform>& t) : _start_time(0), _end_time(0), _t1(t), _t2(t)
+    {
+        _has_animation = false;
+        _has_rotation = false;
+        _has_scale = false;
+    }
+    AnimatedTransform(const shared<Transform>& t1, float start_time, const shared<Transform>& t2, float end_time) : _start_time(start_time), _end_time(end_time), _t1(t1), _t2(t2)
     {
 
         if (t1->mat == t2->mat)
@@ -277,14 +279,11 @@ public:
         }
     }
 
-    void interpolate(float time, Transform *t)
+    void interpolate(float time, Transform *t) const
     {
-        STAT_INCREASE_COUNTER(AnimatedTransform_anima_denom,1);
-        STAT_INCREASE_COUNTER(AnimatedTransform_rotation_denom,1);
-        STAT_INCREASE_COUNTER(AnimatedTransform_scale_denom,1);
+
         if (_has_animation)
         {
-            STAT_INCREASE_COUNTER(AnimatedTransform_anima_num,1);
             if (time <= _start_time)
             {
                 (*t) = (*_t1);
@@ -302,7 +301,6 @@ public:
             Matrix4x4 scale;
             if (_has_scale)
             {
-                STAT_INCREASE_COUNTER(AnimatedTransform_scale_num,1);
                 for (int i = 0; i < 3; ++i)
                 {
                     for (int j = 0; j < 3; ++j)
@@ -314,13 +312,12 @@ public:
 
             Matrix4x4 trans_mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, trans.x, trans.y, trans.z, 1.0f);
             Matrix4x4 rotate_mat;
-            if(_has_rotation)
+            if (_has_rotation)
             {
-                STAT_INCREASE_COUNTER(AnimatedTransform_rotation_num,1);
                 rotate_mat = to_matrix(slerp(R[0], R[1], dt));
             }
+            
             Matrix4x4 mat = trans_mat * rotate_mat * scale;
-
             *t = Transform(mat);
         }
         else
@@ -328,6 +325,86 @@ public:
             (*t) = (*_t1);
             return;
         }
+    }
+
+    Bounds3f motion_bounds(const Bounds3f &b) const
+    {
+
+        if (!_has_animation)
+        {
+            return (*_t1)(b);
+        }
+        else
+        {
+            const float step = (_end_time - _start_time) / 1024;
+
+            Bounds3f ret;
+            for (int i = 0; i < 1024; ++i)
+            {
+                float time = _start_time + i * step;
+                Transform t;
+                interpolate(time, &t);
+                ret = _union(ret, t(b));
+            }
+            return ret;
+        }
+    }
+
+    Bounds3f operator()(float time, const Bounds3f &b) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(b);
+    }
+
+    inline Point3f operator()(float time, const Point3f &p) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(p);
+    }
+
+    inline Point3f4p operator()(float time, const Point3f4p &p) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(p);
+    }
+
+    inline Vector3f operator()(float time, const Vector3f &v) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(v);
+    }
+    inline Vector3f4p operator()(float time, const Vector3f4p &v) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(v);
+    }
+    inline Normal3f operator()(float time, const Normal3f &n) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(n);
+    }
+    inline Ray operator()(float time, const Ray &ray) const
+    {
+        Transform t;
+        interpolate(time, &t);
+        return t(ray);
+    }
+    Interaction operator()(float time, const Interaction &i) const;
+
+    Bounds3f operator()(const Bounds3f &b) const
+    {
+        return motion_bounds(b);
+    }
+
+    bool has_animation() const
+    {
+        return _has_animation;
     }
 
     void *operator new(size_t size);
