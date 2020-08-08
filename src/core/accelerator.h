@@ -260,8 +260,6 @@ public:
     MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives);
     bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
     bool trace_ray(const Ray &ray) const override;
-    const Transform& object_to_world() const override {return IDENTITY;}
-    const Transform& world_to_object() const override {return IDENTITY;}
     Bounds3f bounds() const override { return _bounds; }
 
 //以下函数主要用于可视化
@@ -277,31 +275,41 @@ class BLASInstance:public BLAS
 {
 private:
     shared<BLAS> _blas;
-    const Transform *_world_to_blas;
-    const Transform *_blas_to_world;
+    const shared<AnimatedTransform> _blas_to_world;
     Bounds3f _bounds;
 
 public:
-    BLASInstance(const Transform *blas_to_world, const Transform *world_to_blas, const shared<BLAS> &blas) : _blas_to_world(blas_to_world), _world_to_blas(world_to_blas), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
+    BLASInstance(const shared<AnimatedTransform>& blas_to_world,const shared<BLAS> &blas) : _blas_to_world(blas_to_world), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
     bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override
     {
-        auto blas_ray = (*_world_to_blas)(ray);
+        Transform w2b;
+        Transform b2w;
+        {
+            _blas_to_world->interpolate(ray.time,&b2w);
+            w2b = inverse(b2w);
+        }
+
+        auto blas_ray = w2b(ray);
         bool has_hit = _blas->trace_ray(arena, blas_ray,interaction);
-        (*interaction) = (*_blas_to_world)(*interaction);
+        (*interaction) = b2w(*interaction);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
 
     bool trace_ray(const Ray &ray) const override
     {
-        auto blas_ray = (*_world_to_blas)(ray);
+        Transform w2b;
+        Transform b2w;
+        {
+            _blas_to_world->interpolate(ray.time,&b2w);
+            w2b = inverse(b2w);
+        }
+        auto blas_ray = w2b(ray);
         bool has_hit = _blas->trace_ray(blas_ray);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
-    const Transform& object_to_world() const override {return *_blas_to_world;}
-    const Transform& world_to_object() const override {return *_world_to_blas;}
     Bounds3f bounds() const override { return _bounds; }
 
     void *operator new(size_t size);
@@ -340,8 +348,6 @@ public:
     bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
     bool trace_ray(const Ray &ray) const override;
     Bounds3f bounds() const override { return _bounds; }
-    const Transform& object_to_world() const override {return IDENTITY;}
-    const Transform& world_to_object() const override {return IDENTITY;}
 
     void *operator new(size_t size);
     void operator delete(void *ptr);

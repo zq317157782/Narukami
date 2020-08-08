@@ -55,15 +55,6 @@ public:
      
 };
 
-inline const Transform& get_object_to_world(const SurfaceInteraction& interaction)
-{
-    return interaction.primitive->object_to_world();
-}
-
-inline const Transform& get_world_to_object(const SurfaceInteraction& interaction)
-{
-    return interaction.primitive->world_to_object();
-}
 
 Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);
 

@@ -33,9 +33,10 @@ struct Ray
     Point3f o;
     Vector3f d;
     mutable float t_max;
+    float time;
 
-    inline Ray() : o(Point3f(0, 0, 0)), d(Vector3f(0, 0, 1)), t_max(INFINITE) {}
-    inline Ray(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(o), d(d), t_max(t_max) {}
+    inline Ray() : o(Point3f(0, 0, 0)), d(Vector3f(0, 0, 1)), t_max(INFINITE),time(0.0f) {}
+    inline Ray(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(o), d(d), t_max(t_max),time(0.0f) {}
 };
 inline std::ostream &operator<<(std::ostream &out, const Ray &ray)
 {

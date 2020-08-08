@@ -69,7 +69,7 @@ void Integrator::render(const Scene &scene)
                     float w = _camera->generate_normalized_ray(camera_sample, &ray);
                     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
                     Interaction interaction;
-                    constexpr int bounce_count = 5;
+                    constexpr int bounce_count = 0;
                     Color L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
 #if 0 //Normal Debug
@@ -109,17 +109,17 @@ void Integrator::render(const Scene &scene)
                                     }
                                 }
 
-                                if (bounce < bounce_count)
-                                {
-                                    auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
-                                    auto object_to_world = get_object_to_world(surface_interaction);
-                                    auto direction_world =  hemisphere_flip(normalize(object_to_world(direction_object)),interaction.n);
-                                    ray = Ray(interaction.p, direction_world);
-                                    ray = offset_ray(ray, interaction.n);
-                                    STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
+                                // if (bounce < bounce_count)
+                                // {
+                                //     auto direction_object = cosine_sample_hemisphere(clone_sampler->get_2D());
+                                //     auto object_to_world = get_object_to_world(surface_interaction);
+                                //     auto direction_world =  hemisphere_flip(normalize(object_to_world(direction_object)),interaction.n);
+                                //     ray = Ray(interaction.p, direction_world);
+                                //     ray = offset_ray(ray, interaction.n);
+                                //     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
 
-                                    throughout *= INV_PI * abs(direction_object.z);
-                                }
+                                //     throughout *= INV_PI * abs(direction_object.z);
+                                // }
                             }
                         }
                         else

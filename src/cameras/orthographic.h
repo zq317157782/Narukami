@@ -36,11 +36,12 @@ NARUKAMI_BEGIN
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override
             {
                 auto pCamera=transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
-                Ray rayCamera(pCamera,Vector3f(0,0,1));
-                float dt = shutter_open + sample.time * (shutter_end - shutter_open);
+                float shutter_time = shutter_open + sample.time * (shutter_end - shutter_open);
+                Ray ray_cam(pCamera,Vector3f(0,0,1),shutter_time);
+                ray_cam.time = shutter_time;
                 Transform c2w;
-                camera_to_world->interpolate(dt,&c2w);
-                (*ray)=c2w(rayCamera);
+                camera_to_world->interpolate(shutter_time,&c2w);
+                (*ray)=c2w(ray_cam);
                 return 1.0f;
             }  
     };

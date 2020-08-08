@@ -43,7 +43,7 @@ texture space:
         +------------------+
         (0,0)
 
-handeness: left
+handeness: left-hand
 
 sampler is sequeue, so No Sample Number Bound Limit!
         1D => van der Corput sequeue

@@ -46,8 +46,6 @@ NARUKAMI_BEGIN
         virtual Bounds3f bounds() const = 0;
         virtual bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const = 0;
         virtual bool trace_ray(const Ray &ray) const = 0;
-        virtual const Transform& object_to_world() const = 0;
-        virtual const Transform& world_to_object() const = 0;
     };
 
     std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>>& a,const std::vector<shared<Primitive>>& b);
@@ -59,8 +57,8 @@ NARUKAMI_BEGIN
         public:
             MeshPrimitive(const shared<TriangleMesh>& mesh):Primitive(Type::MESH),_mesh(mesh){}
             Bounds3f bounds() const override {return _mesh->bounds();}
-            const Transform& object_to_world() const override {return _mesh->object_to_world();}
-            const Transform& world_to_object() const override {return _mesh->world_to_object();}
+            const Transform& object_to_world() const  {return _mesh->object_to_world();}
+            const Transform& world_to_object() const  {return _mesh->world_to_object();}
             bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
             bool trace_ray(const Ray &ray) const override;
             

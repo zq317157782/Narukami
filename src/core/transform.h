@@ -230,8 +230,6 @@ inline Transform perspective(float fov, float n, float f)
     return scale(inv_tan_fov, inv_tan_fov, 1.0f) * Transform(m);
 }
 
-extern const Transform IDENTITY;
-
 
 class AnimatedTransform
 {

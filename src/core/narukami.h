@@ -81,4 +81,5 @@ inline int count_trailing_zero(uint32_t v){
 }
 
 
+
 NARUKAMI_END
