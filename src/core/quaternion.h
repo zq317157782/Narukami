@@ -144,11 +144,19 @@ inline Matrix4x4 to_matrix(const Quaternion &q)
     float z = q.z;
     float w = q.w;
 
-    return Matrix4x4(
-        1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - z * w), 2.0f * (x * z + y * w), 0.0f,
-        2.0f * (x * y + z * w), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - x * w), 0.0f,
-        2.0f * (x * z - y * w), 2.0f * (y * z + x * w), 1.0f - 2.0f * (x * x + y * y), 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
+    //LHS
+    return Matrix4x4(1.0f - 2.0f * (y * y + z * z),2.0f * (x * y + z * w),2.0f * (x * z - y * w),0.0f,
+                     2.0f * (x * y - z * w),1.0f - 2.0f * (x * x + z * z),2.0f * (y * z + x * w),0.0f,
+                     2.0f * (x * z + y * w),2.0f * (y * z - x * w),1.0f - 2.0f * (x * x + y * y),0.0f,
+                     0.0f,0.0f,0.0f,1.0f
+                    );
+
+    //RHS
+    // return Matrix4x4(
+    //     1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - z * w), 2.0f * (x * z + y * w), 0.0f,
+    //     2.0f * (x * y + z * w), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - x * w), 0.0f,
+    //     2.0f * (x * z - y * w), 2.0f * (y * z + x * w), 1.0f - 2.0f * (x * x + y * y), 0.0f,
+    //     0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 Quaternion slerp(const Quaternion &q1, const Quaternion &q2, float t);
