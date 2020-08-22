@@ -27,7 +27,6 @@ SOFTWARE.
 #include "core/sse.h"
 #include "core/simd.h"
 #include "core/math.h"
-#include "core/constant.h"
 NARUKAMI_BEGIN
 
 template <typename T>

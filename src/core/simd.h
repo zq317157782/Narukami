@@ -24,7 +24,6 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/math.h"
-#include "core/constant.h"
 #include "core/sse.h"
 
 NARUKAMI_BEGIN

@@ -29,6 +29,23 @@ SOFTWARE.
 #include <cmath>
 NARUKAMI_BEGIN
 
+/**********************constants ************************************/
+static   MAYBE_UNUSED constexpr float MIN_RCP_INPUT = 1E-18f;
+static   MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon();
+
+static   MAYBE_UNUSED constexpr float INFINITE =std::numeric_limits<float>::infinity();
+static   MAYBE_UNUSED constexpr float MAX =std::numeric_limits<float>::max();
+static   MAYBE_UNUSED constexpr float LOWEST =std::numeric_limits<float>::lowest();
+
+static MAYBE_UNUSED constexpr float PI = 3.14159265358979323846f;
+static MAYBE_UNUSED constexpr float INV_PI = 0.31830988618379067154f;
+static MAYBE_UNUSED constexpr float INV_TWO_PI = 0.15915494309189533577f;
+static MAYBE_UNUSED constexpr float INV_FOUR_PI = 0.07957747154594766788f;
+static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
+static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
+
+static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON = 1.0f -std::numeric_limits<float>::epsilon(); 
+
 //IEEE float format
 //32 bits
 //[31][30-23][22-0]
@@ -207,29 +224,19 @@ inline float atan2(const float x, const float y)
     return std::atan2f(x, y);
 }
 
-inline float madd(const float x, const float y, const float z)
+inline float fma(const float x, const float y, const float z)
+{
+    return std::fmaf(x,y,z);
+}
+
+inline int fma(const int x, const int y, const int z)
 {
     return x * y + z;
 }
 
-inline float msub(const float x, const float y, const float z)
-{
-    return x * y - z;
-}
-
-inline float nmadd(const float x, const float y, const float z)
-{
-    return -x * y + z;
-}
-
-inline float nmsub(const float x, const float y, const float z)
-{
-    return -x * y - z;
-}
-
 inline float lerp(const float x0, const float x1, const float t)
 {
-    return madd(1.0f - t, x0, t * x1);
+    return fma(1.0f - t, x0, t * x1);
 }
 
 inline float deg2rad(const float x) { return x * 1.74532925199432957692e-2f; }

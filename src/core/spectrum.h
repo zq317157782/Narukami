@@ -25,7 +25,6 @@ SOFTWARE.
 #pragma once
 
 #include "core/narukami.h"
-#include "core/constant.h"
 #include "core/math.h"
 NARUKAMI_BEGIN
     struct Color
