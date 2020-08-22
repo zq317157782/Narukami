@@ -18,19 +18,19 @@ TEST(math,rcp){
 TEST(math,isnan){
     float zero=0.0f;
     float x=0.0f/zero;
-    EXPECT_TRUE(isnan(x));
+    EXPECT_TRUE(narukami::isnan(x));
 
     x=1.0f/zero;
-    EXPECT_FALSE(isnan(x));
+    EXPECT_FALSE(narukami::isnan(x));
 }
 
 TEST(math,isinf){
     float zero=0.0f;
     float x=0.0f/zero;
-    EXPECT_FALSE(isinf(x));
+    EXPECT_FALSE(narukami::isinf(x));
 
     x=1.0f/zero;
-    EXPECT_TRUE(isinf(x));
+    EXPECT_TRUE(narukami::isinf(x));
 }
 
 TEST(math,cast_i2f){
@@ -97,7 +97,7 @@ TEST(math,reverse_bits_u32){
 
 
 TEST(math,zero_mul_infinite){
-    EXPECT_TRUE(isnan(0.0f*(1.0f/0.0f)));
+    EXPECT_TRUE(narukami::isnan(0.0f*(1.0f/0.0f)));
 }
 
 
@@ -936,47 +936,50 @@ TEST(transform,rotate_x){
     auto transform = rotate_x(90);
     auto v0=transform.mat * Vector3f(0,0,1);
     EXPECT_FLOAT_EQ(v0.x,0.0f);
-    EXPECT_FLOAT_EQ(v0.y,-1.0f);
+    EXPECT_FLOAT_EQ(v0.y,1.0f);
    // EXPECT_FLOAT_EQ(v0.z,0.0f);
     auto v1=transform.inv_mat * Vector3f(0,0,1);
     EXPECT_FLOAT_EQ(v1.x,0.0f);
-    EXPECT_FLOAT_EQ(v1.y,1.0f);
+    EXPECT_FLOAT_EQ(v1.y,-1.0f);
    // EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
 TEST(transform,rotate_y){
     auto transform = rotate_y(90);
     auto v0=transform.mat * Vector3f(0,0,1);
-    EXPECT_FLOAT_EQ(v0.x,1.0f);
+    EXPECT_FLOAT_EQ(v0.x,-1.0f);
     EXPECT_FLOAT_EQ(v0.y,0.0f);
    // EXPECT_FLOAT_EQ(v0.z,0.0f);
     auto v1=transform.inv_mat * Vector3f(0,0,1);
-    EXPECT_FLOAT_EQ(v1.x,-1.0f);
+    EXPECT_FLOAT_EQ(v1.x,1.0f);
     EXPECT_FLOAT_EQ(v1.y,0.0f);
    // EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
-// TEST(transform,rotate_z){
-//     auto transform = rotate_z(90);
-//     auto v0=transform.mat * Vector3f(1,0,0);
-//     EXPECT_FLOAT_EQ(v0.x,0.0f);
-//     EXPECT_FLOAT_EQ(v0.y,1.0f);
-//    // EXPECT_FLOAT_EQ(v0.z,0.0f);
-//     auto v1=transform.inv_mat * Vector3f(1,0,0);
-//     EXPECT_FLOAT_EQ(v1.x,0.0f);
-//     EXPECT_FLOAT_EQ(v1.y,-1.0f);
-//    // EXPECT_FLOAT_EQ(v1.z,0.0f);
-// }
+TEST(transform,rotate_z){
+    auto transform = rotate_z(90);
+    auto v0=transform.mat * Vector3f(1,0,0);
+    EXPECT_NEAR(v0.x,0.0f,00001);
+    EXPECT_NEAR(v0.y,-1.0f,00001);
+  
+   // EXPECT_FLOAT_EQ(v0.z,0.0f);
+    auto v1=transform.inv_mat * Vector3f(1,0,0);
+
+    EXPECT_NEAR(v1.x,0.0f,00001);
+    EXPECT_NEAR(v1.y,1.0f,00001);
+
+   // EXPECT_FLOAT_EQ(v1.z,0.0f);
+}
 
 TEST(transform,rotate){
-    auto transform = rotate(90,Vector3f(1,0,0));
-    auto v0=transform.mat * Vector3f(0,0,1);
-    EXPECT_FLOAT_EQ(v0.x,0.0f);
-    EXPECT_FLOAT_EQ(v0.y,-1.0f);
+    auto transform = rotate(90,Vector3f(0,0,1));
+    auto v0=transform.mat * Vector3f(1,0,0);
+    EXPECT_NEAR(v0.x, 0.0f,00001);
+    EXPECT_NEAR(v0.y,-1.0f,00001);
     //EXPECT_FLOAT_EQ(v0.z,0.0f);
-    auto v1=transform.inv_mat * Vector3f(0,0,1);
-    EXPECT_FLOAT_EQ(v1.x,0.0f);
-    EXPECT_FLOAT_EQ(v1.y,1.0f);
+    auto v1=transform.inv_mat * Vector3f(1,0,0);
+    EXPECT_NEAR(v1.x,0.0f,00001);
+    EXPECT_NEAR(v1.y,1.0f,00001);
     //EXPECT_FLOAT_EQ(v1.z,0.0f);
 }
 
@@ -998,12 +1001,12 @@ TEST(transform,look_at){
 }
 
 TEST(transform,vector3f){
-    auto transform = rotate(90,Vector3f(1,0,0));
-    auto v=transform(Vector3f(0,1,0));
+    auto transform = rotate(90,Vector3f(0,0,1));
+    auto v=transform(Vector3f(1,0,0));
     
     EXPECT_NEAR(v.x, 0.0f,0.00001);
-    EXPECT_NEAR(v.y, 0.0f,0.00001);
-    EXPECT_NEAR(v.z, 1.0f,0.00001);
+    EXPECT_NEAR(v.y, -1.0f,0.00001);
+    EXPECT_NEAR(v.z, 0.0f,0.00001);
 
 }
 
@@ -1358,17 +1361,17 @@ TEST(math,max_nan){
     float zero=0.0f;
     float x=0.0f/zero;
     auto a =max(1.0f,x);
-    EXPECT_TRUE(isnan(a));
+    EXPECT_TRUE(narukami::isnan(a));
 }
 
 TEST(float4,max_nan){
     float4 zero=float4(0.0f);
     float4 x=float4(0.0f)/zero;
     auto a =max(float4(1.0f),x);
-    EXPECT_TRUE(isnan(a[0]));
-    EXPECT_TRUE(isnan(a[1]));
-    EXPECT_TRUE(isnan(a[2]));
-    EXPECT_TRUE(isnan(a[3]));
+    EXPECT_TRUE(narukami::isnan(a[0]));
+    EXPECT_TRUE(narukami::isnan(a[1]));
+    EXPECT_TRUE(narukami::isnan(a[2]));
+    EXPECT_TRUE(narukami::isnan(a[3]));
 }
 
 TEST(bounds3f,offset){
