@@ -871,13 +871,14 @@ BENCHMARK(BM_radical_inverse_u32_base2)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 
 static void BM_generate_sobol02_sample(benchmark::State &state)
-{   RNG_pbrt rng;
+{   RNG rng;
     for (auto _ : state)
     {
 
         for(size_t i = 0; i < state.range(0); i++)
         {
-            benchmark::DoNotOptimize(narukami::sample_sobol02(i));
+            uint32_t scramble[2] = {rng.next_uint32(),rng.next_uint32()};
+            benchmark::DoNotOptimize(narukami::sobol02(i,scramble));
         }
         
     }
@@ -890,7 +891,7 @@ BENCHMARK(BM_generate_sobol02_sample)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 static void BM_sampler_get_2D(benchmark::State &state)
 {    
     narukami::Sampler s(32,(size_t)state.range(0));
-    s.switch_pixel(Point2i(0,0));
+    s.start_pixel(Point2i(0,0));
     for (auto _ : state)
     {   
         for(size_t i = 0; i < state.range(0); i++)

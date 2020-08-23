@@ -26,58 +26,9 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/math.h"
 #include "core/affine.h"
+#include "core/rng.h"
 
 NARUKAMI_BEGIN
-    
-    constexpr uint32_t SOBOL02_GENERATOR_MATRIX[2][32]={
-        {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648},
-        {1,3,5,15,17,51,85,255,257,771,1285,3855,4369,13107,21845,65535,65537,196611,327685,983055,1114129,3342387,5570645,16711935,16843009,50529027,84215045,252645135,286331153,858993459,1431655765,4294967295}
-    };
-
-    constexpr uint32_t REVERSED_SOBOL02_GENERATOR_MATRIX[2][32]={
-        {0x80000000, 0x40000000, 0x20000000, 0x10000000, 0x8000000, 0x4000000, 0x2000000, 0x1000000, 0x800000, 0x400000, 0x200000, 0x100000, 0x80000, 0x40000, 0x20000, 0x10000, 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1},
-        {0x80000000, 0xc0000000, 0xa0000000, 0xf0000000, 0x88000000, 0xcc000000, 0xaa000000, 0xff000000, 0x80800000, 0xc0c00000, 0xa0a00000, 0xf0f00000, 0x88880000, 0xcccc0000, 0xaaaa0000, 0xffff0000, 0x80008000, 0xc000c000, 0xa000a000, 0xf000f000, 0x88008800, 0xcc00cc00, 0xaa00aa00, 0xff00ff00, 0x80808080, 0xc0c0c0c0, 0xa0a0a0a0, 0xf0f0f0f0, 0x88888888, 0xcccccccc, 0xaaaaaaaa, 0xffffffff}
-    };
-
-    // constexpr uint32_t VAN_DER_CORPUT_GENERATOR_MATRIX[32]={
-
-    // };
-
-    constexpr uint32_t REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[32]={
-      0b10000000000000000000000000000000,
-      0b1000000000000000000000000000000,
-      0b100000000000000000000000000000,
-      0b10000000000000000000000000000,
-      0b1000000000000000000000000000,
-      0b100000000000000000000000000,
-      0b10000000000000000000000000,
-      0b1000000000000000000000000,
-      0b100000000000000000000000,
-      0b10000000000000000000000,
-      0b1000000000000000000000,
-      0b100000000000000000000,
-      0b10000000000000000000,
-      0b1000000000000000000,
-      0b100000000000000000,
-      0b10000000000000000,
-      0b1000000000000000,
-      0b100000000000000,
-      0b10000000000000,
-      0b1000000000000,
-      0b100000000000,
-      0b10000000000,
-      0b1000000000,
-      0b100000000,
-      0b10000000,
-      0b1000000,
-      0b100000,
-      0b10000,
-      0b1000,
-      0b100,
-      0b10,
-      0b1
-    };
-
     template<uint32_t base> float radical_inverse_u32(uint32_t x){
          uint32_t reverse = 0;
          float inv_base = 1.0f/base;
@@ -120,50 +71,28 @@ NARUKAMI_BEGIN
         return min((reverse+permution[0]*inv_base/(1-inv_base))*inv_baseN,ONE_MINUS_EPSILON);
     }
     
-
     //scramble after reverse 
     inline float scrambled_radical_inverse_u32_base2(uint32_t x,const uint32_t scramble){
          return (reverse_bits_u32(x)^scramble) * 0x1p-32f;
     }
 
-    uint32_t sobol_multi_generator_matrix(uint32_t x,const uint32_t* M);
-    
-    inline float sample_sobol(const uint32_t idx,const uint32_t* M){
-        return min(sobol_multi_generator_matrix(idx+1,M) * 0x1p-32f,ONE_MINUS_EPSILON);
+    template<typename T>
+    void shuffle(T* sampes,int count,int num_dim,RNG&rng)
+    {
+        for(int i=0;i<count;++i)
+        {
+            int other = i + rng.next_uint32(count-i);
+            for(int d=0;d<num_dim;++d)
+            {
+                std::swap(sampes[num_dim * i + d],sampes[num_dim * other + d]);
+            }
+        }
     }
 
-    inline float sample_scrambled_sobol(const uint32_t idx,const uint32_t* M,const uint32_t scramble){
-        return min((sobol_multi_generator_matrix(idx+1,M)^scramble)* 0x1p-32f,ONE_MINUS_EPSILON);
-    }
+    Point2f sobol02(const uint32_t idx,const uint32_t scramble[2]);
+    void sobol02(int sample_per_pixel, int pixel_num,Point2f *samples,RNG& rng);
 
-
-    Point2f sample_sobol02(const uint32_t idx);
-    Point2f sample_scrambled_sobol02(const uint32_t idx,const uint32_t scramble_x,const uint32_t scramble_y);
-
-
-    inline uint32_t gray_code(const uint32_t n){
-        return (n>>1)^n;
-    }
-
-    inline Point2f sample_scrambled_gray_code_sobol02(const uint32_t idx,uint32_t* scramble_x,uint32_t* scramble_y){
-        assert(scramble_x!=nullptr);
-        assert(scramble_y!=nullptr);
-        uint32_t col = count_trailing_zero(idx+1);
-        (*scramble_x)=(*scramble_x)^REVERSED_SOBOL02_GENERATOR_MATRIX[0][col];
-        (*scramble_y)=(*scramble_y)^REVERSED_SOBOL02_GENERATOR_MATRIX[1][col];
-
-        float x = min((*scramble_x)* 0x1p-32f,ONE_MINUS_EPSILON);
-        float y = min((*scramble_y)* 0x1p-32f,ONE_MINUS_EPSILON);
-
-        return Point2f(x,y);
-    }
-
-
-    inline float sample_scrambled_gray_code_van_der_corput(const uint32_t idx,uint32_t* scramble){
-        assert(scramble!=nullptr);
-        uint32_t col = count_trailing_zero(idx+1);
-        (*scramble)=(*scramble)^REVERSED_VAN_DER_CORPUT_GENERATOR_MATRIX[col];
-        return min((*scramble) * 0x1p-32f,ONE_MINUS_EPSILON);
-    }
-
+    float van_der_corput(const uint32_t idx,uint32_t scramble);
+    void van_der_corput(int sample_per_pixel, int pixel_num,float *samples, RNG& rng);
+   
 NARUKAMI_END

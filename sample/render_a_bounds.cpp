@@ -18,8 +18,7 @@ int main(){
     int isPositive[3]={1,1,1};
     for(int y=0;y<128;++y){
          for(int x=0;x<128;++x){
-             sampler.switch_pixel(Point2i(x,y));
-             sampler.switch_sample(0);
+             sampler.start_pixel(Point2i(x,y));
              do{
                 auto cameraSample = sampler.get_camera_sample(Point2i(x,y));
                 Ray ray;
@@ -27,7 +26,7 @@ int main(){
                 if(intersect(ray.o,Vector3f(1.0f/ray.d.x,1.0f/ray.d.y,1.0f/ray.d.z),0,1,isPositive,bound2)){
                     film->add_sample(cameraSample.pFilm,Color(1,1,1),1);
                 }
-             }while(sampler.switch_to_next_sample());
+             }while(sampler.start_next_sample());
             
          }
     }

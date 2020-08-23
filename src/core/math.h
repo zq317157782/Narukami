@@ -272,4 +272,15 @@ inline uint32_t reverse_bits_u32(uint32_t x)
     return x;
 }
 
+//TODO 搞清楚原理
+inline uint32_t round_up_pow2(uint32_t v) {
+    v--;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+    return v + 1;
+}
+
 NARUKAMI_END

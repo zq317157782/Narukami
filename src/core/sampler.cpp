@@ -25,87 +25,75 @@ SOFTWARE.
 #include "core/sampler.h"
 
 NARUKAMI_BEGIN
-Sampler::Sampler(const uint32_t spp, const uint32_t max_dim) : _spp(spp), _max_dim(max_dim), _current_state(nullptr)
+Sampler::Sampler(const uint32_t spp, const uint32_t max_dim):_dim_1d(0),_dim_2d(0),_sample_idx(0),_spp(round_up_pow2(spp)),_max_dim(max_dim)
 {
-}
-
-void Sampler::switch_pixel(const Point2i &p)
-{
-    auto ret = _states.find(p);
-    if (ret == _states.end())
+    _samples_1d.resize(_max_dim);
+    for(int i=0;i<_samples_1d.size();++i)
     {
-        SamplerState state;
-        state.current_sample_index = 0;
-        state.sample_1d_offsets = std::vector<uint32_t>(_spp);
-        state.sample_2d_offsets = std::vector<uint32_t>(_spp);
-
-        state.scramble_1d = std::vector<uint32_t>(_max_dim);
-        state.scramble_2d = std::vector<uint32_t>(_max_dim * 2);
-        //generate all scramble number
-        for (size_t i = 0; i < _max_dim; i++)
-        {
-            state.scramble_1d[i] = _rng.next_uint32();
-            state.scramble_2d[i * 2] = _rng.next_uint32();
-            state.scramble_2d[i * 2 + 1] = _rng.next_uint32();
-        }
-        state.pixel = p;
-
-        _states[p] = state;
+        _samples_1d[i].resize(_spp);
     }
 
-    _current_state = &_states[p];
+    _samples_2d.resize(_max_dim);
+     for(int i=0;i<_samples_2d.size();++i)
+    {
+        _samples_2d[i].resize(_spp);
+    }
 }
 
-bool Sampler::switch_to_next_sample()
+void Sampler::start_pixel(const Point2i &p)
 {
-    _current_state->current_sample_index++;
-    if (is_completed())
+    _dim_1d = 0;
+    _dim_2d = 0;
+    _sample_idx = 0;
+
+    for(int i=0;i<_samples_1d.size();++i)
     {
+        van_der_corput(_spp,1,&_samples_1d[i][0],_rng);
+    }
+
+    for(int i=0;i<_samples_2d.size();++i)
+    {
+        sobol02(_spp,1,&_samples_2d[i][0],_rng);
+    }
+}
+
+bool Sampler::start_next_sample()
+{
+    _dim_1d = 0;
+    _dim_2d = 0;
+    _sample_idx += 1;
+    if(_sample_idx == _spp)
+    {
+        _sample_idx=0;
         return false;
     }
-    
     return true;
 }
 
-bool Sampler::is_completed() const
-{
-    if (_current_state->current_sample_index >= _spp)
-    {
-        return true;
-    }
-    return false;
-}
 
 Point2f Sampler::get_2D()
 {
-    auto c = _current_state;
-    auto index = c->current_sample_index;
-    if (EXPECT_TAKEN(c->sample_2d_offsets[index] < _max_dim))
+    
+    if (EXPECT_TAKEN(_dim_2d < _max_dim))
     {
-        auto sample = sample_scrambled_gray_code_sobol02(c->current_sample_index, &c->scramble_2d[c->sample_2d_offsets[index] * 2], &c->scramble_2d[c->sample_2d_offsets[index] * 2 + 1]);
-        c->sample_2d_offsets[index]++;
-        return sample;
+        return _samples_2d[_dim_2d++][_sample_idx];
     }
     else
     {
         auto sample = Point2f(_rng.next_float(), _rng.next_float());
-        c->sample_2d_offsets[index]++;
+        _dim_2d++;
         return sample;
     }
 }
 float Sampler::get_1D()
 {
-    auto c = _current_state;
-    auto index = c->current_sample_index;
-    if (EXPECT_TAKEN(c->sample_1d_offsets[index] < _max_dim))
+    if (EXPECT_TAKEN(_dim_1d < _max_dim))
     {
-        auto sample = sample_scrambled_gray_code_van_der_corput(c->current_sample_index, &c->scramble_1d[c->sample_1d_offsets[index]]);
-        c->sample_1d_offsets[index]++;
-        return sample;
+        return _samples_1d[_dim_1d++][_sample_idx];
     }
     else
     {
-        c->sample_1d_offsets[index]++;
+        _dim_1d++;
         return _rng.next_float();
     }
 }

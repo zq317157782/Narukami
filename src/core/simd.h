@@ -31,7 +31,6 @@ NARUKAMI_BEGIN
 struct bool4
 {
     public:
-    typedef bool Scalar; 
     enum { size = 4 };
     union { __m128 xyzw; int i[4]; struct { int x,y,z,w; }; };
     
@@ -68,7 +67,6 @@ inline int movemask(const bool4& b){ return _mm_movemask_ps(b); }
 struct float4
 {
   public:
-    typedef float Scalar; 
     enum { size = 4 };
     union { __m128 xyzw; struct { float x, y, z, w; }; };
 

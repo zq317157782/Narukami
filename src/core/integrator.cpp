@@ -58,8 +58,7 @@ void Integrator::render(const Scene &scene)
 
             for (auto &&pixel : tile_bounds)
             {
-                clone_sampler->switch_pixel(pixel);
-                clone_sampler->switch_sample(0);
+                clone_sampler->start_pixel(pixel);
                 do
                 {
                     STAT_INCREASE_COUNTER(miss_intersection_denom, 1)
@@ -131,7 +130,7 @@ void Integrator::render(const Scene &scene)
 #endif
                     film_tile->add_sample(camera_sample.pFilm, L, w);
                     arena.reset();
-                } while (clone_sampler->switch_to_next_sample());
+                } while (clone_sampler->start_next_sample());
             }
             film->merge_film_tile(std::move(film_tile));
             rendering_reporter.update(1);

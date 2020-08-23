@@ -37,51 +37,26 @@ struct CameraSample
     float time;
 };
 
-struct SamplerState
-{
-    uint32_t current_sample_index;
-    std::vector<uint32_t> sample_1d_offsets;
-    std::vector<uint32_t> sample_2d_offsets;
-    std::vector<uint32_t> scramble_1d;
-    std::vector<uint32_t> scramble_2d;
-    Point2i pixel;
-};
-
 class Sampler
 {
 private:
-    uint32_t _spp;
-    const uint32_t _max_dim;
+    
+    uint32_t _dim_1d;
+    uint32_t _dim_2d;
+    uint32_t _sample_idx;
+    std::vector<std::vector<float>> _samples_1d;
+    std::vector<std::vector<Point2f>> _samples_2d;
     RNG _rng;
-    std::map<Point2i,SamplerState> _states;
-    SamplerState* _current_state;
+    const uint32_t _spp;
+    const uint32_t _max_dim;
 public:
     Sampler(const uint32_t spp, const uint32_t max_dim = 5);
-
-    void switch_pixel(const Point2i &p);
-    
-
-    void switch_sample(const uint32_t sample_index)
-    {
-        assert(sample_index<_spp);
-        _current_state->current_sample_index = sample_index;
-    }
-
-    bool switch_to_next_sample();
-
-    bool is_completed() const;
-
+    void start_pixel(const Point2i &p);
+    bool start_next_sample();
     Point2f get_2D();
     float get_1D();
     CameraSample get_camera_sample(const Point2i &raster);
-    inline void set_sample_index(const uint32_t idx)
-    {
-        _current_state->current_sample_index = idx;
-    }
-    inline uint32_t get_spp() const
-    {
-        return _spp;
-    }
+    inline uint32_t get_spp() const{return _spp;}
     std::unique_ptr<Sampler> clone(const uint64_t seed) const;
 };
 NARUKAMI_END
