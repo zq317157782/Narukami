@@ -33,17 +33,14 @@ NARUKAMI_BEGIN
 class Interaction
 {
 public:
-    float hit_t;
     Point3f p;
     Normal3f n;
     Point2f uv;
 public:
-    Interaction():hit_t(INFINITE){};
-    Interaction(const Point3f& p):hit_t(INFINITE),p(p){}
-    Interaction(const Point3f& p,const Normal3f& n):hit_t(INFINITE),p(p),n(n){}
+    Interaction(){};
+    Interaction(const Point3f& p):p(p){}
+    Interaction(const Point3f& p,const Normal3f& n):p(p),n(n){}
 };
-
-FINLINE bool is_closer(const Interaction& i,float t) {return t < i.hit_t;}
 
 FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;

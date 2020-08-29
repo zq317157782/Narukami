@@ -75,7 +75,6 @@ Interaction Transform::operator()(const Interaction &i) const
     Interaction new_i;
     new_i.p = (*this)(i.p);
     new_i.n = (*this)(i.n);
-    new_i.hit_t = i.hit_t;
     return new_i;
 };
 

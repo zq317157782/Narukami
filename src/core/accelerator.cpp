@@ -362,7 +362,7 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
 bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o, ray.d, interaction->hit_t);
+    SoARay soa_ray(ray.o, ray.d, ray.t_max);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
 
@@ -374,7 +374,7 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > interaction->hit_t)
+        if (node_stack.top().second > ray.t_max)
         {
             node_stack.pop();
             continue;
@@ -393,7 +393,7 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < interaction->hit_t)
+            if (box_hits[index] && box_t[index] < ray.t_max)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -408,7 +408,7 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
                         auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &uv, &triangle_index);
                         STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
 
-                        if (is_hit && is_closer(*interaction, hit_t))
+                        if (is_hit && hit_t < ray.t_max)
                         {
                             {
                                 has_hit = true;
@@ -416,13 +416,12 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
                             //更新射线的t_max
                             {
                                 soa_ray.t_max = float4(hit_t);
-                                ray.t_max = interaction->hit_t;
+                                ray.t_max = hit_t;
                             }
                             //更新interaction
                             {
                                 mesh_id = triangle_index;
                                 primitive_id = j;
-                                interaction->hit_t = hit_t;
                                 interaction->uv = uv;
                             }
                         }
@@ -721,7 +720,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o, ray.d, interaction->hit_t);
+    SoARay soa_ray(ray.o, ray.d, ray.t_max);
 
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
@@ -730,7 +729,7 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
     while (!node_stack.empty())
     {
 
-        if (node_stack.top().second > interaction->hit_t)
+        if (node_stack.top().second > ray.t_max)
         {
             node_stack.pop();
             continue;
@@ -749,7 +748,7 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
         {
             uint32_t index = orders[i];
             STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < interaction->hit_t)
+            if (box_hits[index] && box_t[index] < ray.t_max)
             {
                 STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
                 if (is_leaf(node->childrens[index]))
@@ -776,7 +775,8 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
                                         tlas_has_hit = true;
                                     }
                                     {
-                                        soa_ray.t_max = float4(interaction->hit_t);
+                                        //这里不需要更新ray的t_max,因为已经在blas中更新过了
+                                        soa_ray.t_max = float4(ray.t_max);
                                     }
                                 }
                             }
