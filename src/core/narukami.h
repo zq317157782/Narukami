@@ -28,14 +28,16 @@ narukami.h
 */
 
 //marco for namespace
-#define NARUKAMI_BEGIN  namespace narukami{
-#define NARUKAMI_END    }
+#define NARUKAMI_BEGIN \
+    namespace narukami \
+    {
+#define NARUKAMI_END }
 
 //define DEBUG marco
 #ifdef NDEBUG
-    #undef NARUKAMI_DEBUG
+#undef NARUKAMI_DEBUG
 #else
-    #define NARUKAMI_DEBUG
+#define NARUKAMI_DEBUG
 #endif
 
 #define NARUKAMI_STAT_ENABLED 1
@@ -45,9 +47,8 @@ narukami.h
 #include <iostream>
 #include "core/platform.h"
 
-
-
 NARUKAMI_BEGIN
+struct Ray;
 class Quaternion;
 class Interaction;
 class Scene;
@@ -55,31 +56,16 @@ class Light;
 class AreaLight;
 class LightMaterial;
 class VisibilityTester;
+class MemoryArena;
+
 
 template <typename T>
 using shared = std::shared_ptr<T>;
 
-template<typename T>
+template <typename T>
 inline shared<T> make_shared(const T &t)
 {
     T *ptr = new T(t);
     return shared<T>(ptr);
 }
-
-inline int count_trailing_zero(uint32_t v){
-#if defined(__GNUC__) || defined(__clang__)
-	return __builtin_ctz(v);
-#else
-	unsigned long index;
-    if (_BitScanForward(&index, v)){
-        return index;
-    }
-    else{
-         return 32;
-    }
-#endif
-}
-
-
-
 NARUKAMI_END

@@ -450,8 +450,8 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
         auto triangle = _soa_primitive_infos[primitive_id].triangle[mesh_id];
         interaction->p = barycentric_interpolate_position(triangle, interaction->uv);
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
-        auto primitive_offset = _soa_primitive_infos[primitive_id].offset + mesh_id;
-        interaction->primitive = _primitives[primitive_offset];
+        // auto primitive_offset = _soa_primitive_infos[primitive_id].offset + mesh_id;
+        // interaction->primitive = _primitives[primitive_offset];
     }
     return has_hit;
 }
@@ -525,7 +525,7 @@ std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
     return ret;
 }
 
-TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) :Primitive(Type::ACCELERATER),_instances(instance_list)
+TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) :_instances(instance_list)
 {
     STAT_INCREASE_COUNTER(BLASInstance_count, instance_list.size())
     std::vector<BLASInstanceInfo> instance_infos(instance_list.size());

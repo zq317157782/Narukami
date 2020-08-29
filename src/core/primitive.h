@@ -29,57 +29,54 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-   
-    class Primitive
-    {
-    public:
-        enum class Type
-        {
-            MESH,
-            ACCELERATER,
-        };
-    private:
-        Type _type;
-    public:
-        Primitive(const Type& type):_type(type){};
-        Type type() const {return _type;}
-        virtual Bounds3f bounds() const = 0;
-        virtual bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const = 0;
-        virtual bool trace_ray(const Ray &ray) const = 0;
-    };
+class ITracable
+{
+public:
+    virtual bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const = 0;
+    virtual bool trace_ray(const Ray &ray) const = 0;
+};
 
-    std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>>& a,const std::vector<shared<Primitive>>& b);
+class IBoundary
+{
+public:
+    virtual Bounds3f bounds() const = 0;
+};
+class Primitive : public ITracable, public IBoundary
+{
+};
 
-    class MeshPrimitive:public Primitive
-    {
-        private:
-            shared<TriangleMesh> _mesh;
-        public:
-            MeshPrimitive(const shared<TriangleMesh>& mesh):Primitive(Type::MESH),_mesh(mesh){}
-            Bounds3f bounds() const override {return _mesh->bounds();}
-            const Transform& object_to_world() const  {return _mesh->object_to_world();}
-            const Transform& world_to_object() const  {return _mesh->world_to_object();}
-            bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
-            bool trace_ray(const Ray &ray) const override;
-            
+std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, const std::vector<shared<Primitive>> &b);
 
-            const shared<TriangleMesh> mesh() const {return _mesh;}
+class MeshPrimitive : public Primitive
+{
+private:
+    shared<TriangleMesh> _mesh;
 
-            void * operator new(size_t size);
-            void  operator delete(void * ptr);
-    };
-    
-    std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>>&);
+public:
+    MeshPrimitive(const shared<TriangleMesh> &mesh) : Primitive(), _mesh(mesh) {}
+    Bounds3f bounds() const override { return _mesh->bounds(); }
+    const Transform &object_to_world() const { return _mesh->object_to_world(); }
+    const Transform &world_to_object() const { return _mesh->world_to_object(); }
+    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
+    bool trace_ray(const Ray &ray) const override;
 
+    const shared<TriangleMesh> mesh() const { return _mesh; }
 
-    struct MeshPrimitiveInfo4p{
-        Triangle4p triangle;
-        
-        //*** 128 bit
-        uint32_t offset;
-        uint32_t pad0,pad1,pad2;
-        //***
-    };
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
+};
 
-    std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
+std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>> &);
+
+struct MeshPrimitiveInfo4p
+{
+    Triangle4p triangle;
+
+    //*** 128 bit
+    uint32_t offset;
+    uint32_t pad0, pad1, pad2;
+    //***
+};
+
+std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

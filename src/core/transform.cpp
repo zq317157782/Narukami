@@ -75,7 +75,6 @@ Interaction Transform::operator()(const Interaction &i) const
     Interaction new_i;
     new_i.p = (*this)(i.p);
     new_i.n = (*this)(i.n);
-    new_i.primitive = i.primitive;
     new_i.hit_t = i.hit_t;
     return new_i;
 };
@@ -86,5 +85,4 @@ Interaction AnimatedTransform::operator()(float time, const Interaction &i) cons
     interpolate(time, &t);
     return t(i);
 }
-
 NARUKAMI_END

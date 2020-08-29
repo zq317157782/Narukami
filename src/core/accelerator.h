@@ -239,10 +239,10 @@ STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subno
 
 class ProgressReporter;
 
-class BLAS:public Primitive
+class BLAS:public ITracable,public IBoundary
 {
 public:
-    BLAS():Primitive(Type::ACCELERATER){}
+    BLAS(){}
 };
 
 class MeshBLAS:public BLAS
@@ -331,7 +331,7 @@ struct BLASInstanceInfo4p
     uint32_t offset;
 };
 
-class TLAS:public Primitive
+class TLAS:public ITracable,public IBoundary
 {
 private:
     std::vector<shared<BLASInstance>> _instances;

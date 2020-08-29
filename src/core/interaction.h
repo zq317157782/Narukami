@@ -37,7 +37,6 @@ public:
     Point3f p;
     Normal3f n;
     Point2f uv;
-    shared<Primitive> primitive;
 public:
     Interaction():hit_t(INFINITE){};
     Interaction(const Point3f& p):hit_t(INFINITE),p(p){}
@@ -50,10 +49,7 @@ FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;
 }
 
-class SurfaceInteraction:public Interaction{
-public:
-     
-};
+class SurfaceInteraction:public Interaction{};
 
 
 Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);
