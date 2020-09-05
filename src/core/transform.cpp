@@ -75,6 +75,7 @@ Interaction Transform::operator()(const Interaction &i) const
     Interaction new_i;
     new_i.p = (*this)(i.p);
     new_i.n = (*this)(i.n);
+    new_i.uv = i.uv;
     return new_i;
 };
 
@@ -84,4 +85,20 @@ Interaction AnimatedTransform::operator()(float time, const Interaction &i) cons
     interpolate(time, &t);
     return t(i);
 }
+
+SurfaceInteraction Transform::operator()(const SurfaceInteraction &i) const
+{
+    SurfaceInteraction new_i;
+    Interaction& a = new_i,b = i;
+    a = (*this)(b);
+    return new_i;
+};
+
+SurfaceInteraction AnimatedTransform::operator()(float time, const SurfaceInteraction &i) const
+{
+    Transform t;
+    interpolate(time, &t);
+    return t(i);
+}
+
 NARUKAMI_END

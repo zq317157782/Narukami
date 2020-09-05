@@ -46,7 +46,11 @@ FINLINE bool is_surface_interaction(const Interaction& interaction){
      return dot(interaction.n,interaction.n)!=0;
 }
 
-class SurfaceInteraction:public Interaction{};
+class SurfaceInteraction:public Interaction
+{
+    public:
+    Vector3f dpdu,dpdv;
+};
 
 
 Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);

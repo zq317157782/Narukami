@@ -29,20 +29,10 @@ SOFTWARE.
 #include "core/spectrum.h"
 
 NARUKAMI_BEGIN
-class ITracable
-{
-public:
-    virtual bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const = 0;
-    virtual bool trace_ray(const Ray &ray) const = 0;
-};
 
-class IBoundary
+class Primitive
 {
-public:
-    virtual Bounds3f bounds() const = 0;
-};
-class Primitive : public ITracable, public IBoundary
-{
+    virtual  Bounds3f bounds() const = 0;
 };
 
 std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, const std::vector<shared<Primitive>> &b);
@@ -57,11 +47,7 @@ public:
     Bounds3f bounds() const override { return _mesh->bounds(); }
     const Transform &object_to_world() const { return _mesh->object_to_world(); }
     const Transform &world_to_object() const { return _mesh->world_to_object(); }
-    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
-    bool trace_ray(const Ray &ray) const override;
-
     const shared<TriangleMesh> mesh() const { return _mesh; }
-
     void *operator new(size_t size);
     void operator delete(void *ptr);
 };

@@ -359,7 +359,7 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray.o, ray.d, ray.t_max);
@@ -368,8 +368,9 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
 
     bool has_hit = false;
 
-    uint32_t mesh_id;
-    uint32_t primitive_id;
+    uint32_t sub_soa_idx;
+    uint32_t soa_idx;
+    Point2f barycentric;
 
     while (!node_stack.empty())
     {
@@ -403,9 +404,9 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
                         float hit_t = INFINITE;
-                        Point2f uv;
+                        Point2f temp_barycentric;
                         int triangle_index;
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &uv, &triangle_index);
+                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &temp_barycentric, &triangle_index);
                         STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
 
                         if (is_hit && hit_t < ray.t_max)
@@ -418,11 +419,10 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
                                 soa_ray.t_max = float4(hit_t);
                                 ray.t_max = hit_t;
                             }
-                            //更新interaction
                             {
-                                mesh_id = triangle_index;
-                                primitive_id = j;
-                                interaction->uv = uv;
+                                sub_soa_idx = triangle_index;
+                                soa_idx = j;
+                                barycentric = temp_barycentric;
                             }
                         }
                     }
@@ -446,16 +446,17 @@ bool MeshBLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *intera
 
     if (has_hit)
     {
-        auto triangle = _soa_primitive_infos[primitive_id].triangle[mesh_id];
-        interaction->p = barycentric_interpolate_position(triangle, interaction->uv);
+        auto triangle = _soa_primitive_infos[soa_idx].triangle[sub_soa_idx];
+        interaction->p = barycentric_interpolate_position(triangle, barycentric);
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
-        // auto primitive_offset = _soa_primitive_infos[primitive_id].offset + mesh_id;
-        // interaction->primitive = _primitives[primitive_offset];
+        //dpdu,dpdv
+        auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
+        interaction->uv = primitive->mesh()->sample_uv(barycentric);
     }
     return has_hit;
 }
 
-bool MeshBLAS::trace_ray(const Ray &ray) const
+bool MeshBLAS::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -717,7 +718,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
     }
 }
 
-bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const
+bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray.o, ray.d, ray.t_max);
@@ -767,7 +768,7 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
                                 auto instance_offset = _soa_instance_infos[j].offset + k;
                                 auto blas_instance = _instances[instance_offset];
 
-                                bool has_hit = blas_instance->trace_ray(arena, ray, interaction);
+                                bool has_hit = blas_instance->intersect(arena, ray, interaction);
 
                                 if (has_hit)
                                 {
@@ -803,7 +804,7 @@ bool TLAS::trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interactio
     return tlas_has_hit;
 }
 
-bool TLAS::trace_ray(const Ray &ray) const
+bool TLAS::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
     SoARay soa_ray(ray);
@@ -843,7 +844,7 @@ bool TLAS::trace_ray(const Ray &ray) const
                             {
                                 auto instance_offset = _soa_instance_infos[j].offset + k;
                                 auto blas_instance = _instances[instance_offset];
-                                bool is_hit = blas_instance->trace_ray(ray);
+                                bool is_hit = blas_instance->intersect(ray);
                                 if (is_hit)
                                 {
                                     return true;

@@ -38,12 +38,12 @@ class Scene{
     public:
         Scene(shared<TLAS>& accelerator,const std::vector<Light*> &lights):_accelerator(accelerator),lights(lights){}
 
-        inline bool intersect(MemoryArena &arena,const Ray& ray,Interaction* interaction) const{
-            return _accelerator->trace_ray(arena,ray,interaction);
+        inline bool intersect(MemoryArena &arena,const Ray& ray,SurfaceInteraction* interaction) const{
+            return _accelerator->intersect(arena,ray,interaction);
         }
 
-        inline bool trace_ray(const Ray& ray) const{
-             return _accelerator->trace_ray(ray);
+        inline bool intersect(const Ray& ray) const{
+             return _accelerator->intersect(ray);
         }
 };
 NARUKAMI_END

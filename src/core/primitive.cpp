@@ -27,19 +27,6 @@ NARUKAMI_BEGIN
 
 MemoryPool<MeshPrimitive> g_mesh_primitive_pool(4096);
 
-bool MeshPrimitive::trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const
-{
-     std::cerr << "MeshPrimitive::trace_ray is not implemented" <<std::endl;
-     return false;
-}
-
-bool MeshPrimitive::trace_ray(const Ray &ray) const
-{
-    std::cerr << "MeshPrimitive::trace_ray is not implemented" <<std::endl;
-    return false;
-}
-
-
 void * MeshPrimitive::operator new(size_t size)
 {
     return g_mesh_primitive_pool.alloc();

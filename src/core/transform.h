@@ -48,6 +48,7 @@ struct SSE_ALIGNAS Transform
     Ray operator()(const Ray &ray) const;
     Bounds3f operator()(const Bounds3f &b) const;
     Interaction operator()(const Interaction &i) const;
+    SurfaceInteraction operator()(const SurfaceInteraction &i) const;
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
 
     void *operator new(size_t size);
@@ -394,6 +395,7 @@ public:
         return t(ray);
     }
     Interaction operator()(float time, const Interaction &i) const;
+    SurfaceInteraction operator()(float time, const SurfaceInteraction &i) const;
 
     Bounds3f operator()(const Bounds3f &b) const
     {

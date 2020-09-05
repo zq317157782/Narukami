@@ -67,7 +67,7 @@ void Integrator::render(const Scene &scene)
                     Ray ray;
                     float w = _camera->generate_normalized_ray(camera_sample, &ray);
                     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
-                    Interaction interaction;
+                    SurfaceInteraction interaction;
                     constexpr int bounce_count = 0;
                     Color L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;

@@ -51,6 +51,7 @@ NARUKAMI_BEGIN
 struct Ray;
 class Quaternion;
 class Interaction;
+class SurfaceInteraction;
 class Scene;
 class Light;
 class AreaLight;

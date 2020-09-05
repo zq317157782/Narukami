@@ -239,10 +239,13 @@ STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subno
 
 class ProgressReporter;
 
-class BLAS:public ITracable,public IBoundary
+class BLAS
 {
 public:
     BLAS(){}
+    virtual bool intersect(MemoryArena &arena, const Ray &ray,SurfaceInteraction* interaction) const = 0;
+    virtual bool intersect(const Ray &ray) const = 0;
+    virtual Bounds3f bounds() const = 0;
 };
 
 class MeshBLAS:public BLAS
@@ -256,11 +259,16 @@ private:
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total);
     void build_soa_primitive_info(BVHBuildNode *node);
     
+    shared<MeshPrimitive> get_mesh_primitive(int soa_primitive_id,int soa_offset) const
+    {
+        auto primitive_offset = _soa_primitive_infos[soa_primitive_id].offset + soa_offset;
+        return _primitives[primitive_offset];
+    }
 public:
     MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives);
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override;
-    bool trace_ray(const Ray &ray) const override;
-    Bounds3f bounds() const override { return _bounds; }
+    bool intersect(MemoryArena &arena, const Ray &ray,SurfaceInteraction* interaction) const override;
+    bool intersect(const Ray &ray) const override;
+    Bounds3f bounds() const override{ return _bounds; }
 
 //以下函数主要用于可视化
 public:
@@ -281,7 +289,7 @@ private:
 public:
     BLASInstance(const shared<AnimatedTransform>& blas_to_world,const shared<BLAS> &blas) : _blas_to_world(blas_to_world), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
-    bool trace_ray(MemoryArena &arena, const Ray &ray,Interaction* interaction) const override
+    bool intersect(MemoryArena &arena, const Ray &ray,SurfaceInteraction* interaction) const override
     {
         Transform w2b;
         Transform b2w;
@@ -291,13 +299,13 @@ public:
         }
 
         auto blas_ray = w2b(ray);
-        bool has_hit = _blas->trace_ray(arena, blas_ray,interaction);
+        bool has_hit = _blas->intersect(arena, blas_ray,interaction);
         (*interaction) = b2w(*interaction);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
 
-    bool trace_ray(const Ray &ray) const override
+    bool intersect(const Ray &ray) const override
     {
         Transform w2b;
         Transform b2w;
@@ -306,11 +314,11 @@ public:
             w2b = inverse(b2w);
         }
         auto blas_ray = w2b(ray);
-        bool has_hit = _blas->trace_ray(blas_ray);
+        bool has_hit = _blas->intersect(blas_ray);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
-    Bounds3f bounds() const override { return _bounds; }
+    Bounds3f bounds() const override{ return _bounds; }
 
     void *operator new(size_t size);
     void operator delete(void *ptr);
@@ -331,7 +339,7 @@ struct BLASInstanceInfo4p
     uint32_t offset;
 };
 
-class TLAS:public ITracable,public IBoundary
+class TLAS
 {
 private:
     std::vector<shared<BLASInstance>> _instances;
@@ -345,9 +353,9 @@ private:
 
 public:
     TLAS(const std::vector<shared<BLASInstance>> &instance);
-    bool trace_ray(MemoryArena &arena, const Ray &ray, Interaction *interaction) const override;
-    bool trace_ray(const Ray &ray) const override;
-    Bounds3f bounds() const override { return _bounds; }
+    bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const;
+    bool intersect(const Ray &ray) const;
+    Bounds3f bounds() const { return _bounds; }
 
     void *operator new(size_t size);
     void operator delete(void *ptr);
