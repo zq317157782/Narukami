@@ -58,6 +58,20 @@ Ray Transform::operator()(const Ray &ray) const
     return r;
 }
 
+RayDifferential Transform::operator()(const RayDifferential &ray) const
+{
+    RayDifferential r(ray);
+    r.o = (*this)(ray.o);
+    r.d = (*this)(ray.d);
+    
+    r.ox = (*this)(ray.ox);
+    r.dx = (*this)(ray.dx);
+
+    r.oy = (*this)(ray.oy);
+    r.dy = (*this)(ray.dy);
+    return r;
+}
+
 Bounds3f Transform::operator()(const Bounds3f &b) const
 {
     auto b0 = _union((*this)(corner(b, 0)), (*this)(corner(b, 1)));
@@ -91,6 +105,10 @@ SurfaceInteraction Transform::operator()(const SurfaceInteraction &i) const
     SurfaceInteraction new_i;
     Interaction& a = new_i,b = i;
     a = (*this)(b);
+    new_i.dpdu = i.dpdu;
+    new_i.dpdv = i.dpdv;
+    new_i.dpdx = i.dpdx;
+    new_i.dpdy = i.dpdy;
     return new_i;
 };
 

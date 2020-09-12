@@ -35,15 +35,36 @@ NARUKAMI_BEGIN
             
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const override
             {
-                auto pCamera=transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
+                auto point_camera = transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
                 float shutter_time = shutter_open + sample.time * (shutter_end - shutter_open);
-                Ray ray_cam(pCamera,Vector3f(0,0,1),shutter_time);
+                Ray ray_cam(point_camera,Vector3f(0.0f,0.0f,1.0f),shutter_time);
                 ray_cam.time = shutter_time;
                 Transform c2w;
                 camera_to_world->interpolate(shutter_time,&c2w);
                 (*ray)=c2w(ray_cam);
                 return 1.0f;
             }  
+
+            inline virtual float generate_normalized_ray_differential(const CameraSample &sample, RayDifferential *ray) const override
+            {
+                auto point_camera = transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y,0));
+                auto point_camera_x = transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x + 1.0f,sample.pFilm.y,0));
+                auto point_camera_y = transform_4x4(*_raster_to_camera,Point3f(sample.pFilm.x,sample.pFilm.y + 1.0f,0));
+                
+                float shutter_time = shutter_open + sample.time * (shutter_end - shutter_open);
+                RayDifferential ray_cam(point_camera,Vector3f(0.0f,0.0f,1.0f),shutter_time);
+                ray_cam.time = shutter_time;
+                
+                ray_cam.ox = point_camera_x;
+                ray_cam.dx = Vector3f(0.0f,0.0f,1.0f);
+                ray_cam.oy = point_camera_y;
+                ray_cam.dy = Vector3f(0.0f,0.0f,1.0f);
+
+                Transform c2w;
+                camera_to_world->interpolate(shutter_time,&c2w);
+                (*ray)=c2w(ray_cam);
+                return 1.0f;
+            }
     };
 NARUKAMI_END
 

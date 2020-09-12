@@ -46,6 +46,7 @@ struct SSE_ALIGNAS Transform
     inline Vector3f4p operator()(const Vector3f4p &v) const { return mat * v; }
     inline Normal3f operator()(const Normal3f &n) const { return transpose(inv_mat) * Vector3f(n); }
     Ray operator()(const Ray &ray) const;
+    RayDifferential operator()(const RayDifferential &ray) const;
     Bounds3f operator()(const Bounds3f &b) const;
     Interaction operator()(const Interaction &i) const;
     SurfaceInteraction operator()(const SurfaceInteraction &i) const;

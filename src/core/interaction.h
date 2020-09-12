@@ -49,9 +49,29 @@ FINLINE bool is_surface_interaction(const Interaction& interaction){
 class SurfaceInteraction:public Interaction
 {
     public:
+    //世界空间和纹理空间之间的偏导
     Vector3f dpdu,dpdv;
+    //世界空间和屏幕空间之间的偏导
+    Vector3f dpdx,dpdy;
 };
 
+/**
+ * 先使用法线n和交点p建立一个平面
+ * 然后计算ray differential的两个offset射线和平面的交点
+ * 然后使用forward差分近似计算dpdx和dpdy
+*/
+inline void compute_differential(const RayDifferential &ray,SurfaceInteraction& i)
+{
+    float d = - dot(i.n,Vector3f(i.p));
+
+    float tx = (-d - dot(i.n,Vector3f(ray.ox)))/dot(i.n,ray.dx);
+    float ty = (-d - dot(i.n,Vector3f(ray.oy)))/dot(i.n,ray.dy);
+
+    //forward differential
+    i.dpdx = ray.ox + tx * ray.dx - i.p;
+    i.dpdy = ray.oy + ty * ray.dy - i.p;
+    
+}
 
 Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);
 

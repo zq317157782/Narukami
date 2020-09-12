@@ -77,6 +77,21 @@ inline std::ostream &operator<<(std::ostream &out, const SoARay &ray)
     return out;
 }
 
+struct RayDifferential:public Ray
+{
+    Point3f ox,oy;
+    Vector3f dx,dy;
+
+    inline RayDifferential() : Ray() {}
+    inline RayDifferential(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : Ray(o,d,t_max) {}
+};
+
+inline std::ostream &operator<<(std::ostream &out, const RayDifferential &ray)
+{
+    out << "[o:" << ray.o << " d:" << ray.d << " t:" << float4(ray.t_max) <<" ox:"<<ray.ox<<" dx:"<<ray.dx<<" oy:"<<ray.oy <<" dy:"<<ray.dy<<"]";
+    return out;
+}
+
 struct Triangle
 {
     Point3f v0;

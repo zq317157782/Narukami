@@ -39,6 +39,7 @@ NARUKAMI_BEGIN
             const float shutter_end;
             inline Camera(const shared<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,shared<Film> film):camera_to_world(camera_to_world),shutter_open(shutter_open),shutter_end(shutter_end),film(std::move(film)){}
             inline virtual float generate_normalized_ray(const CameraSample& sample,Ray* ray) const=0;
+            inline virtual float generate_normalized_ray_differential(const CameraSample& sample,RayDifferential* ray) const= 0;
             inline shared<Film> get_film() const {return film;}
     };
 

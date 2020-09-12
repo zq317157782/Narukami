@@ -83,16 +83,36 @@ inline int cast_f2i(const float x)
     return v.i;
 }
 
-template<typename T>
-inline typename std::enable_if_t<std::is_floating_point<T>::value,bool> isnan(const T x)
+// template<typename T>
+// inline typename std::enable_if_t<std::is_floating_point<T>::value,bool> isnan(const T x)
+// {
+//     return std::isnan(x);
+// }
+
+inline bool isnan(float x)
 {
     return std::isnan(x);
 }
 
-template<typename T>
-inline typename std::enable_if_t<std::is_floating_point<T>::value,bool> isinf(const T x)
+inline bool isnan(int x)
+{
+    return false;
+}
+
+// template<typename T>
+// inline typename std::enable_if_t<std::is_floating_point<T>::value,bool> isinf(const T x)
+// {
+//     return std::isinf(x);
+// }
+
+inline bool isinf(float x)
 {
     return std::isinf(x);
+}
+
+inline bool isinf(int x)
+{
+    return false;
 }
 
 inline float sign(const float x)
