@@ -94,7 +94,7 @@ inline Point2f uniform_sample_triangle_barycentric(const Point2f &u)
 
 inline Point3f uniform_sample_triangle(const Triangle& tri, const Point2f &u)
 {
-    return barycentric_interpolate_position(tri,uniform_sample_triangle_barycentric(u));
+    return get_vertex(tri,uniform_sample_triangle_barycentric(u));
 }
 
 NARUKAMI_END

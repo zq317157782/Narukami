@@ -125,6 +125,17 @@ public:
         uint32_t idx = _segments[segment].faces[face].vertex_index[vertex];
         return _positions[idx];
     }
+    inline Point3f get_vertex(uint32_t segment, uint32_t face, Point2f &barycentric) const
+    {
+        assert(segment < _segments.size());
+        assert(face < _segments[segment].faces.size());
+        const Point2f& u = barycentric;
+        MeshFace mf = _segments[segment].faces[face];
+        Point3f p0 = _positions[mf.vertex_index[0]];
+        Point3f p1 = _positions[mf.vertex_index[1]];
+        Point3f p2 = _positions[mf.vertex_index[2]];
+        return barycentric_interpolate(p0,p1,p2,u.x,u.y);
+    }
     inline Point2f get_texcoord(uint32_t segment, uint32_t face, uint32_t vertex) const
     {
         assert(vertex >= 0 && vertex <= 2);
@@ -134,10 +145,11 @@ public:
         return _texcoords[idx];
     }
 
-    inline Point2f get_texcoord(uint32_t segment, uint32_t face, const Point2f &u) const
+    inline Point2f get_texcoord(uint32_t segment, uint32_t face, const Point2f &barycentric) const
     {
         assert(segment < _segments.size());
         assert(face < _segments[segment].faces.size());
+        const Point2f& u = barycentric;
         MeshFace mf = _segments[segment].faces[face];
         if(_texcoords.size() > 0)
         {
@@ -149,6 +161,8 @@ public:
         else
             return Point2f(0.0f,0.0f);       
     }
+
+    
 
     inline Bounds3f get_face_bounds(uint32_t segment, uint32_t face) const
     {

@@ -172,7 +172,7 @@ uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollaps
 
 MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _primitives(primitives)
 {
-    STAT_INCREASE_COUNTER(MeshPrimitiveInfo_count, _primitives.size())
+    STAT_INCREASE_COUNTER(primitive_count, _primitives.size())
     std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
     for (uint32_t i = 0; i < _primitives.size(); ++i)
     {
@@ -198,8 +198,7 @@ MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _prim
 
     flatten(_nodes, 0, collapse_root, &offset);
 
-    STAT_INCREASE_MEMORY_COUNTER(Primitive_memory_cost, sizeof(Primitive) * _primitives.size())
-    STAT_INCREASE_MEMORY_COUNTER(MeshPrimitiveInfo4p_memory_cost, sizeof(MeshPrimitiveInfo4p) * _soa_primitive_infos.size())
+    STAT_INCREASE_MEMORY_COUNTER(primitive_memory_cost, sizeof(Primitive) * _primitives.size())
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
@@ -310,24 +309,22 @@ void MeshBLAS::build_soa_primitive_info(BVHBuildNode *node)
 
     if (is_leaf(node))
     {
-        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_1_4, 1, (node->num % 4) == 1)
-        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_2_4, 1, (node->num % 4) == 2)
-        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_3_4, 1, (node->num % 4) == 3)
-        STAT_INCREASE_COUNTER_CONDITION(SoAPrimitiveInfo_num_4_4, 1, (node->num % 4) == 0)
+        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 1, (node->num % 4) == 1)
+        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 2, (node->num % 4) == 2)
+        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 3, (node->num % 4) == 3)
+        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 4, (node->num % 4) == 0)
+       
 
         auto primitive_infos = pack_mesh_primitives(_primitives, node->offset, node->num);
         node->num = static_cast<uint32_t>(primitive_infos.size());
         node->offset = static_cast<uint32_t>(_soa_primitive_infos.size());
         _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
 
-        STAT_INCREASE_COUNTER(MeshPrimitiveInfo4p_count, primitive_infos.size())
+        STAT_INCREASE_COUNTER(SoA_utilization_ratio_num,(static_cast<uint32_t>(primitive_infos.size()) - 1) * 4)
+        STAT_INCREASE_COUNTER(SoA_utilization_ratio_denom, static_cast<uint32_t>(primitive_infos.size()) * 4)
 
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_1_4, static_cast<uint32_t>(primitive_infos.size()))
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_2_4, static_cast<uint32_t>(primitive_infos.size()))
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_3_4, static_cast<uint32_t>(primitive_infos.size()))
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_denom_4_4, static_cast<uint32_t>(primitive_infos.size()))
 
-        STAT_INCREASE_COUNTER(SoAPrimitiveInfo_num_4_4, node->num - 1)
+
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
@@ -447,7 +444,7 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
     if (has_hit)
     {
         auto triangle = _soa_primitive_infos[soa_idx].triangle[sub_soa_idx];
-        interaction->p = barycentric_interpolate_position(triangle, barycentric);
+        interaction->p = get_vertex(triangle, barycentric);
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
         //dpdu,dpdv
         auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
@@ -527,7 +524,7 @@ std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
 
 TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) :_instances(instance_list)
 {
-    STAT_INCREASE_COUNTER(BLASInstance_count, instance_list.size())
+    STAT_INCREASE_COUNTER(blas_instance_num, instance_list.size())
     std::vector<BLASInstanceInfo> instance_infos(instance_list.size());
     for (uint32_t i = 0; i < instance_list.size(); ++i)
     {
@@ -691,24 +688,10 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 
     if (is_leaf(node))
     {
-        STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_1_4, 1, (node->num % 4) == 1)
-        STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_2_4, 1, (node->num % 4) == 2)
-        STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_3_4, 1, (node->num % 4) == 3)
-        STAT_INCREASE_COUNTER_CONDITION(BLASInstanceInfo4p_num_4_4, 1, (node->num % 4) == 0)
-
         auto instance_infos = pack_instances(_instances, node->offset, node->num);
         node->num = static_cast<uint32_t>(instance_infos.size());
         node->offset = static_cast<uint32_t>(_soa_instance_infos.size());
         _soa_instance_infos.insert(_soa_instance_infos.end(), instance_infos.begin(), instance_infos.end());
-
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_count, instance_infos.size())
-
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_1_4, static_cast<uint32_t>(instance_infos.size()))
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_2_4, static_cast<uint32_t>(instance_infos.size()))
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_3_4, static_cast<uint32_t>(instance_infos.size()))
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_denom_4_4, static_cast<uint32_t>(instance_infos.size()))
-
-        STAT_INCREASE_COUNTER(BLASInstanceInfo4p_num_4_4, node->num - 1)
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])

@@ -109,9 +109,9 @@ inline Normal3f get_normalized_normal(const Triangle &tri)
     return normalize(cross(tri.e1, tri.e2));
 }
 
-inline Point3f barycentric_interpolate_position(const Triangle &tri, const Point2f &uv)
+inline Point3f get_vertex(const Triangle &tri, const Point2f &barycentric)
 {
-    return tri.v0 + tri.e1 * uv.x + tri.e2 * uv.y;
+    return   tri.v0 + tri.e1 * barycentric.x + tri.e2 * barycentric.y;
 }
 
 

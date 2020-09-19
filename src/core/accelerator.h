@@ -216,25 +216,14 @@ struct BucketInfo
 };
 
 //MeshBLAS ONLY
-STAT_COUNTER("accelerator/MeshPrimitive's num", MeshPrimitiveInfo_count)
-STAT_COUNTER("accelerator/MeshPrimitiveInfo4p's num", MeshPrimitiveInfo4p_count)
-STAT_MEMORY_COUNTER("accelerator/MeshPrimitive's memory", Primitive_memory_cost)
-STAT_MEMORY_COUNTER("accelerator/MeshPrimitiveInfo4p's memory", MeshPrimitiveInfo4p_memory_cost)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(1)'s ratio", SoAPrimitiveInfo_num_1_4, SoAPrimitiveInfo_denom_1_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(2)'s ratio", SoAPrimitiveInfo_num_2_4, SoAPrimitiveInfo_denom_2_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(3)'s ratio", SoAPrimitiveInfo_num_3_4, SoAPrimitiveInfo_denom_3_4)
-STAT_PERCENT("accelerator/MeshPrimitiveInfo4p(4)'s ratio", SoAPrimitiveInfo_num_4_4, SoAPrimitiveInfo_denom_4_4)
-STAT_COUNTER("accelerator/ Triangle4p's intersect num", intersect_triangle_num)
+STAT_COUNTER("accelerator/primitive num", primitive_count)
+STAT_MEMORY_COUNTER("accelerator/primitive memory", primitive_memory_cost)
+STAT_PERCENT("accelerator/blas SoA utilization ratio", SoA_utilization_ratio_num, SoA_utilization_ratio_denom)
+STAT_COUNTER("accelerator/intersect triangle num", intersect_triangle_num)
 //TLAS ONLY
-STAT_COUNTER("accelerator/BLASInstance's num", BLASInstance_count)
-STAT_COUNTER("accelerator/BLASInstanceInfo4p's num", BLASInstanceInfo4p_count)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(1)'s ratio", BLASInstanceInfo4p_num_1_4, BLASInstanceInfo4p_denom_1_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(2)'s ratio", BLASInstanceInfo4p_num_2_4, BLASInstanceInfo4p_denom_2_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(3)'s ratio", BLASInstanceInfo4p_num_3_4, BLASInstanceInfo4p_denom_3_4)
-STAT_PERCENT("accelerator/BLASInstanceInfo4p(4)'s ratio", BLASInstanceInfo4p_num_4_4, BLASInstanceInfo4p_denom_4_4)
-
+STAT_COUNTER("accelerator/blas instance num", blas_instance_num)
 // GENERL
-STAT_MEMORY_COUNTER("accelerator/QBVH node's memory", QBVH_node_memory_cost)
+STAT_MEMORY_COUNTER("accelerator/QBVH node memory", QBVH_node_memory_cost)
 STAT_PERCENT("accelerator/ratio of travel QBVH's four subnode(25%:just one subnode is visited. 50%:two subnodes are  visited and so on.) ", ordered_traversal_num, ordered_traversal_denom)
 
 class ProgressReporter;

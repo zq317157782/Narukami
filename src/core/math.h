@@ -281,6 +281,12 @@ inline float offset(const float x0,const float x1,const float x){
     return (x-x0)/(x1-x0);
 }
 
+template<typename T>
+T barycentric_interpolate(const T& x0,const T& x1,const T& x2,float t,float s)
+{
+    return x0 * (1.0f - t - s) + x1 * t + x2 * s;
+}
+
 //from pbrt
 inline uint32_t reverse_bits_u32(uint32_t x)
 {
