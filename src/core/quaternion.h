@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #pragma once
 #include "core/narukami.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 NARUKAMI_BEGIN
 
 class Quaternion

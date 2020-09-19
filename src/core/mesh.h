@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #pragma once
 #include "core/narukami.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 #include "core/transform.h"
 #include "core/stat.h"
 #include "core/geometry.h"

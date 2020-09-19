@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include "core/narukami.h"
 #include "core/math.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 #include "core/rng.h"
 
 NARUKAMI_BEGIN

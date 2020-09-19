@@ -25,7 +25,7 @@ SOFTWARE.
 #pragma once
 
 #include "core/narukami.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 #include "core/geometry.h"
 #include "core/quaternion.h"
 #include "core/memory.h"

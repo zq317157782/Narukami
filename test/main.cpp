@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 
 using namespace narukami;
 

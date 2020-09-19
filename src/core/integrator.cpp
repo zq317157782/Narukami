@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include "core/integrator.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 #include "core/sampling.h"
 #include "core/light.h"
 #include "core/parallel.h"

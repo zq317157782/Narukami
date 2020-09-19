@@ -22,7 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "core/affine.h"
+#include "core/geometry.h"
 #include "core/quaternion.h"
 NARUKAMI_BEGIN
 void polar_decompose(const Matrix4x4 &m, Vector3f *T, Quaternion *Q, Matrix4x4 *S)
@@ -68,4 +68,5 @@ void polar_decompose(const Matrix4x4 &m, Vector3f *T, Quaternion *Q, Matrix4x4 *
 
     *S = inverse(R) * M;
 }
+
 NARUKAMI_END

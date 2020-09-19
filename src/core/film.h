@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/spectrum.h"
 #include "core/geometry.h"
-#include "core/affine.h"
+#include "core/geometry.h"
 #include <mutex>
 NARUKAMI_BEGIN
 
