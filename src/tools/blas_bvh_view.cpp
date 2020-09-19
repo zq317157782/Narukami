@@ -9,21 +9,21 @@
 using namespace narukami;
 shared<MeshBLAS> get_blas()
 {
-    std::vector<std::shared_ptr<TriangleMesh>> meshs;
+    std::shared_ptr<Mesh> mesh;
     {
         auto transform = make_shared(identity());
         auto inv_transform = transform;
-        meshs = load_mesh_triangles_from_obj(transform, inv_transform, "bunny.obj", ".");
+        mesh = load_mesh<MeshFileFormat::OBJ>(transform, inv_transform, "bunny.obj", ".");
     }
-    auto primitives = create_mesh_primitives(meshs);
+    auto primitives = create_mesh_primitives(mesh);
     return shared<MeshBLAS>(new MeshBLAS(primitives));
 }
 
 void draw_mesh(const shared<MeshPrimitive> &p)
 {
-    auto v0 = (*p->mesh())[0];
-    auto v1 = (*p->mesh())[1];
-    auto v2 = (*p->mesh())[2];
+    auto v0 = p->get_vertex(0);
+    auto v1 = p->get_vertex(1);
+    auto v2 = p->get_vertex(2);
 
     glBegin(GL_LINE_STRIP);
     glColor3f(1, 1, 1);

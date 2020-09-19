@@ -40,19 +40,22 @@ std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, c
 class MeshPrimitive : public Primitive
 {
 private:
-    shared<TriangleMesh> _mesh;
-
+    shared<Mesh> _mesh;
+    uint32_t _segment;
+    uint32_t _face;
 public:
-    MeshPrimitive(const shared<TriangleMesh> &mesh) : Primitive(), _mesh(mesh) {}
-    Bounds3f bounds() const override { return _mesh->bounds(); }
+    MeshPrimitive(const shared<Mesh> &mesh,uint32_t segment,uint32_t face) : Primitive(), _mesh(mesh), _segment(segment),_face(face){}
+    Bounds3f bounds() const override { return _mesh->get_face_bounds(_segment,_face); }
     const Transform &object_to_world() const { return _mesh->object_to_world(); }
     const Transform &world_to_object() const { return _mesh->world_to_object(); }
-    const shared<TriangleMesh> mesh() const { return _mesh; }
+    Point3f get_vertex(uint32_t vertex) const {return _mesh->get_vertex(_segment,_face,vertex);}
+    Point2f get_texcoord(Point2f& u ) const {return _mesh->get_texcoord(_segment,_face,u);}
+   
     void *operator new(size_t size);
     void operator delete(void *ptr);
 };
 
-std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>> &);
+std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &mesh);
 
 struct MeshPrimitiveInfo4p
 {

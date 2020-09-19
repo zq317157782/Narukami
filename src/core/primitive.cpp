@@ -27,23 +27,29 @@ NARUKAMI_BEGIN
 
 MemoryPool<MeshPrimitive> g_mesh_primitive_pool(4096);
 
-void * MeshPrimitive::operator new(size_t size)
+void *MeshPrimitive::operator new(size_t size)
 {
     return g_mesh_primitive_pool.alloc();
 }
 
-void  MeshPrimitive::operator delete(void * ptr)
+void MeshPrimitive::operator delete(void *ptr)
 {
-    g_mesh_primitive_pool.dealloc(reinterpret_cast<MeshPrimitive*>(ptr));
+    g_mesh_primitive_pool.dealloc(reinterpret_cast<MeshPrimitive *>(ptr));
 }
 
-std::vector<shared<MeshPrimitive>> create_mesh_primitives(const std::vector<shared<TriangleMesh>>& meshs){
+std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &mesh)
+{
+
     std::vector<shared<MeshPrimitive>> primitives;
-    for (uint32_t i = 0; i < meshs.size(); ++i)
+
+    for (uint32_t s = 0; s < mesh->get_segment_count(); ++s)
     {
-        primitives.push_back(shared<MeshPrimitive>(new MeshPrimitive(meshs[i])));
+        for (int f = 0; f < mesh->get_face_count(s); ++f)
+        {
+             primitives.push_back(shared<MeshPrimitive>(new MeshPrimitive(mesh,s,f)));
+        }
     }
-    
+
     return primitives;
 }
 
@@ -52,7 +58,7 @@ std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<M
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    uint32_t soa_count = (uint32_t)(count-1)/ SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;
@@ -62,10 +68,10 @@ std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<M
     {
         if (i < count)
         {
-            auto m = triangles[start + i]->mesh();
-            auto v0 = (*m)[0];
-            auto e1 = (*m)[1] - v0;
-            auto e2 = (*m)[2] - v0;
+            auto m = triangles[start + i];
+            auto v0 = m->get_vertex(0);
+            auto e1 = m->get_vertex(1) - v0;
+            auto e2 = m->get_vertex(2) - v0;
 
             v0_array.push_back(v0);
             e1_array.push_back(e1);
@@ -93,11 +99,11 @@ std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<M
     return soa_primitives;
 }
 
-std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>>& a,const std::vector<shared<Primitive>>& b)
+std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, const std::vector<shared<Primitive>> &b)
 {
     std::vector<shared<Primitive>> c;
-    c.insert(c.end(),a.begin(),a.end());
-    c.insert(c.end(),b.begin(),b.end());
+    c.insert(c.end(), a.begin(), a.end());
+    c.insert(c.end(), b.begin(), b.end());
     return c;
 }
 

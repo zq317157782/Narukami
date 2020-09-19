@@ -64,24 +64,43 @@ void Integrator::render(const Scene &scene)
                     STAT_INCREASE_COUNTER(miss_intersection_denom, 1)
                     // film->add_sample(pixel,{clone_sampler->get_1D(),clone_sampler->get_1D(),clone_sampler->get_1D()}, 1);
                     auto camera_sample = clone_sampler->get_camera_sample(pixel);
-                    Ray ray;
-                    float w = _camera->generate_normalized_ray(camera_sample, &ray);
+                    RayDifferential ray;
+                    float w = _camera->generate_normalized_ray_differential(camera_sample, &ray);
                     STAT_INCREASE_MEMORY_COUNTER(ray_count, 1)
                     SurfaceInteraction interaction;
                     constexpr int bounce_count = 0;
                     Color L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
-#if 0 //Normal Debug
+#if 1 //Debug
                      if (scene.intersect(arena, ray, &interaction))
                      {
-                         if (is_surface_interaction(interaction))
-                         {
-                             SurfaceInteraction &surface_interaction = static_cast<SurfaceInteraction &>(interaction);
-                             float r = surface_interaction.n.x * 0.5f + 0.5f;
-                             float g = surface_interaction.n.y * 0.5f + 0.5f;
-                             float b = surface_interaction.n.z * 0.5f + 0.5f;
-                             L = Color(r,g,b); 
-                         }
+                         compute_differential(ray,interaction);
+                         
+                        //Normal Debug
+                        // {
+                        //     float r = interaction.n.x * 0.5f + 0.5f;
+                        //     float g = interaction.n.y * 0.5f + 0.5f;
+                        //     float b = interaction.n.z * 0.5f + 0.5f;
+                        //     L = Color(r,g,b); 
+                        // }
+                        // UV
+                        // {
+                        //     float r = interaction.uv.x;
+                        //     float g = interaction.uv.y;
+                        //     float b = 0;
+                        //     L = Color(r,g,b); 
+                        // }
+
+                        //dot(dpdx,dpdy)
+                        {
+                            Normal3f n = normalize(cross(interaction.dpdx,interaction.dpdy));
+                            float r = n.x * 0.5f + 0.5f;
+                            float g = n.y * 0.5f + 0.5f;
+                            float b = n.z * 0.5f + 0.5f;
+                            L = Color(r,g,b); 
+                        }
+                       
+                         
                      }
 #else
                     int bounce = 0;

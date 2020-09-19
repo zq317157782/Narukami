@@ -451,7 +451,7 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
         //dpdu,dpdv
         auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
-        interaction->uv = primitive->mesh()->sample_uv(barycentric);
+        interaction->uv = primitive->get_texcoord(barycentric);
     }
     return has_hit;
 }

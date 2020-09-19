@@ -164,6 +164,9 @@ public:
 #define STAT_INCREASE_COUNTER(var, count) \
     var += count;
 
+#define STAT_DECREASE_COUNTER(var, count) \
+    var -= count;
+
 #define STAT_INCREASE_COUNTER_CONDITION(var, count, condition) \
     if (condition)                                             \
     {                                                          \
@@ -178,6 +181,7 @@ public:
 #define STAT_MEMORY_COUNTER(name, var)
 #define STAT_PERCENT(name, num, denom)
 #define STAT_INCREASE_COUNTER(var, count)
+#define STAT_DECREASE_COUNTER(var, count)
 #define STAT_INCREASE_COUNTER_CONDITION(var, count, condition)
 #define STAT_INCREASE_MEMORY_COUNTER(var, count)
 #endif

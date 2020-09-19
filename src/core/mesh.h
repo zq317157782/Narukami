@@ -30,63 +30,157 @@ SOFTWARE.
 #include "core/memory.h"
 #include <vector>
 NARUKAMI_BEGIN
-   
-    struct VertexData
+STAT_COUNTER("mesh/total vertex count", mesh_total_vertex_count)
+STAT_COUNTER("mesh/total segment count", mesh_total_segment_count)
+STAT_COUNTER("mesh/total face count", mesh_total_face_count)
+struct MeshFace
+{
+    uint32_t vertex_index[3];
+    uint32_t normal_index[3];
+    uint32_t texcoord_index[3];
+    MeshFace() = default;
+    MeshFace(const uint32_t vi[3], const uint32_t ni[3], const uint32_t ti[3])
     {
-        std::vector<Point3f>  positions;
-        std::vector<Normal3f> normals;
-        std::vector<Point2f>  uvs;
-
-        void * operator new(size_t size);
-        void  operator delete(void * ptr);
-    };
-
-    class TriangleMesh
+        memcpy_t(vertex_index, vi, 3);
+        memcpy_t(normal_index, vi, 3);
+        memcpy_t(texcoord_index, ti, 3);
+    }
+};
+struct MeshSegment
+{
+    std::vector<MeshFace> faces;
+    MeshSegment() = default;
+    MeshSegment(const std::vector<MeshFace> &fs)
     {
-        private:
-            shared<Transform> _object2world;
-            shared<Transform> _world2object;
-            shared<VertexData> _vertex_data;
-            uint32_t _index[3];
-        public:
-        TriangleMesh(const shared<Transform>& object2world, const shared<Transform>& world2object,const shared<VertexData>& vertex_data,const uint32_t index[3]):_object2world(object2world), _world2object(world2object),_vertex_data(vertex_data){memcpy(_index,index,3*sizeof(uint32_t) );}
+        assert(fs.size() > 0);
+        faces.resize(fs.size());
+        memcpy_t(&faces[0], &fs[0], fs.size());
+    }
+};
+class Mesh
+{
+private:
+    shared<Transform> _object2world;
+    shared<Transform> _world2object;
+private:
+    std::vector<Point3f> _positions;
+    std::vector<Normal3f> _normals;
+    std::vector<Point2f> _texcoords;
+    std::vector<MeshSegment> _segments;
 
-        //inline Point3f& operator[](const int i){ assert(i>=0&&i<2); return mesh().vertices[_index[i]]; }
-        inline  Point3f operator[](const int i) const { assert(i>=0&&i<=2); return _vertex_data->positions[_index[i]];}
-        inline  Point2f get_uv(const int i) const{ assert(i>=0&&i<=2);return _vertex_data->uvs[_index[i]];}
-        inline  Point2f sample_uv(const Point2f& u) const { return _vertex_data->uvs[_index[0]]*(1.0f-u.x-u.y)+_vertex_data->uvs[_index[1]]*u.x + _vertex_data->uvs[_index[2]] * u.y;}
-        inline  Bounds3f bounds() const{return _union(_union((*this)[0],(*this)[1]),(*this)[2]);}
-        inline  const Transform& object_to_world() const {return *_object2world;}
-        inline  const Transform& world_to_object() const {return *_world2object;}
-        // inline  Triangle geom_tri() const 
-        // {
-        //     Triangle triangle;
-        //     triangle.v0 = (*this)[0];
-        //     triangle.e1 = (*this)[1] - triangle.v0;
-        //     triangle.e2 = (*this)[2] - triangle.v0; 
-        //     return triangle;
-        // }
-        void * operator new(size_t size);
-        void  operator delete(void * ptr);
-        friend inline  std::ostream &operator<<(std::ostream &out, const TriangleMesh &v) { out << '(' << v[0] << ',' << v[1] << ',' << v[2] << ')'; return out; }
-    };
-    
-    inline bool intersect(const Ray& ray,const TriangleMesh& triangle,float* t,Point2f* uv){
-        auto v0 = triangle[0];
-        auto e1 = triangle[1]-v0;
-        auto e2 = triangle[2]-v0;
-        return intersect(ray.o,ray.d,ray.t_max,v0,e1,e2,t,uv);
+public:
+    Mesh(const shared<Transform> &object2world,const shared<Transform> &world2object, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &texcoords, const std::vector<MeshSegment> &segments):_object2world(object2world),_world2object(world2object)
+    {
+
+        assert(positions.size() > 0);
+
+        _positions.resize(positions.size());
+        for (int i = 0; i < positions.size(); ++i)
+        {
+            _positions[i] = (*object2world)(positions[i]);
+        }
+
+        if (normals.size() > 0)
+        {
+            _normals.resize(normals.size());
+            memcpy_t(&_normals[0], &normals[0], normals.size());
+        }
+
+        if (texcoords.size() > 0)
+        {
+            _texcoords.resize(texcoords.size());
+            memcpy_t(&_texcoords[0], &texcoords[0], texcoords.size());
+        }
+
+        for (auto &&s : segments)
+        {
+            _segments.push_back(s);
+        }
+        /********************STAT************************/
+        
+        STAT_INCREASE_COUNTER(mesh_total_vertex_count,_positions.size())
+        STAT_INCREASE_COUNTER(mesh_total_segment_count,_segments.size())
+        for(int s=0;s<_segments.size();++s)
+        {
+            STAT_INCREASE_COUNTER(mesh_total_face_count,_segments[s].faces.size())
+        }
     }
 
-    void append(std::vector<shared<TriangleMesh>>& A,const std::vector<shared<TriangleMesh>>& B);
-    std::vector<shared<TriangleMesh>> concat(const std::vector<shared<TriangleMesh>>& A,const std::vector<shared<TriangleMesh>>& B);
-
-    std::vector<shared<TriangleMesh>> create_mesh_triangles(const shared<Transform>& object2world, const shared<Transform>& world2object, const std::vector<uint32_t> &indices, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &uvs);    
-    std::vector<shared<TriangleMesh>> create_plane(const shared<Transform>& object2worldobject2wrold, const shared<Transform>& object2worldworld2object, const float width, const float height);
-    std::vector<shared<TriangleMesh>> create_disk(const shared<Transform>& object2worldobject2wrold,  const shared<Transform>& object2worldworld2object,float radius, const uint32_t vertex_density);
-
-    std::vector<Triangle4p> SoA_pack(const std::vector<shared<TriangleMesh>>&);
-
+    ~Mesh()
+    {
+        STAT_DECREASE_COUNTER(mesh_total_vertex_count,_positions.size())
+        STAT_DECREASE_COUNTER(mesh_total_segment_count,_segments.size())
+        for(int s=0;s<_segments.size();++s)
+        {
+            STAT_DECREASE_COUNTER(mesh_total_face_count,_segments[s].faces.size());
+        }
+    }
     
-NARUKAMI_END
 
+    inline Point3f get_vertex(uint32_t segment, uint32_t face, uint32_t vertex) const
+    {
+        assert(vertex >= 0 && vertex <= 2);
+        assert(segment < _segments.size());
+        assert(face < _segments[segment].faces.size());
+        uint32_t idx = _segments[segment].faces[face].vertex_index[vertex];
+        return _positions[idx];
+    }
+    inline Point2f get_texcoord(uint32_t segment, uint32_t face, uint32_t vertex) const
+    {
+        assert(vertex >= 0 && vertex <= 2);
+        assert(segment < _segments.size());
+        assert(face < _segments[segment].faces.size());
+        uint32_t idx = _segments[segment].faces[face].texcoord_index[vertex];
+        return _texcoords[idx];
+    }
+
+    inline Point2f get_texcoord(uint32_t segment, uint32_t face, const Point2f &u) const
+    {
+        assert(segment < _segments.size());
+        assert(face < _segments[segment].faces.size());
+        MeshFace mf = _segments[segment].faces[face];
+        if(_texcoords.size() > 0)
+        {
+            Point2f t0 = _texcoords[mf.texcoord_index[0]];
+            Point2f t1 = _texcoords[mf.texcoord_index[1]];
+            Point2f t2 = _texcoords[mf.texcoord_index[2]];
+            return t0 * (1.0f - u.x - u.y) + t1 * u.x + t2 * u.y;
+        }
+        else
+            return Point2f(0.0f,0.0f);       
+    }
+
+    inline Bounds3f get_face_bounds(uint32_t segment, uint32_t face) const
+    {
+        assert(segment < _segments.size());
+        assert(face < _segments[segment].faces.size());
+        MeshFace mf = _segments[segment].faces[face];
+
+        Point3f v0 = _positions[mf.vertex_index[0]];
+        Point3f v1 = _positions[mf.vertex_index[1]];
+        Point3f v2 = _positions[mf.vertex_index[2]];
+        return _union(_union(v0, v1), v2);
+    }
+
+    inline const Transform &object_to_world() const { return *_object2world; }
+    inline const Transform &world_to_object() const { return *_world2object; }
+
+    inline size_t get_segment_count() const {return _segments.size();}
+    inline size_t get_face_count(uint32_t segment) const {return _segments[segment].faces.size();}
+
+    inline friend std::ostream &operator<<(std::ostream &out, const Mesh &mesh)
+    {
+        out << "[ vertex num:" << mesh._positions.size() << " normal num:" << mesh._normals.size() << " texcoord num:" << mesh._texcoords.size() << " segment num:" << mesh._segments.size() << " ]";
+        return out;
+    }
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
+};
+
+
+shared<Mesh> create_plane(const shared<Transform> &object2world, const shared<Transform> &world2object, const float width, const float height);
+// std::vector<shared<TriangleMesh>> create_disk(const shared<Transform> &object2worldobject2wrold, const shared<Transform> &object2worldworld2object, float radius, const uint32_t vertex_density);
+
+
+NARUKAMI_END

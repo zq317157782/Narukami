@@ -602,61 +602,61 @@ BENCHMARK(BM_sub_matrix3x3_determinant_common)->Arg(1)->Arg(5)->Arg(10)->Arg(50)
 
 #include "core/transform.h"
 #include "core/mesh.h"
-static void BM_meshdata_intersect(benchmark::State &state)
-{   
-     std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
-     std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
-     std::vector<Normal3f> normals;
-     std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = make_shared(translate(Vector3f(0,0,0)));
-     auto transform2 = make_shared(translate(Vector3f(0,0,0)));
-     auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
-     float t;
-     Point2f uv;
-    for (auto _ : state)
-    {
+// static void BM_meshdata_intersect(benchmark::State &state)
+// {   
+//      std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
+//      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
+//      std::vector<Normal3f> normals;
+//      std::vector<uint32_t> indices={0,1,3,1,2,3};
+//      auto transform = make_shared(translate(Vector3f(0,0,0)));
+//      auto transform2 = make_shared(translate(Vector3f(0,0,0)));
+//      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
+//      float t;
+//      Point2f uv;
+//     for (auto _ : state)
+//     {
 
-        for(size_t i = 0; i < state.range(0); i++)
-        {
-            for(size_t j=0;j<meshs.size();++j){
-                Ray ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
-                benchmark::DoNotOptimize(intersect(ray,*meshs[j],&t,&uv));
-            }
-        }
+//         for(size_t i = 0; i < state.range(0); i++)
+//         {
+//             for(size_t j=0;j<meshs.size();++j){
+//                 Ray ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
+//                 benchmark::DoNotOptimize(intersect(ray,*meshs[j],&t,&uv));
+//             }
+//         }
         
-    }
+//     }
 
-}
-BENCHMARK(BM_meshdata_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+// }
+// BENCHMARK(BM_meshdata_intersect)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
 
-static void BM_meshdata_intersect_sse(benchmark::State &state)
-{   
-    std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
-     std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
-     std::vector<Normal3f> normals;
-     std::vector<uint32_t> indices={0,1,3,1,2,3};
-     auto transform = make_shared(translate(Vector3f(0,0,0)));
-     auto transform2 = make_shared(translate(Vector3f(0,0,0)));
-     auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
-     auto soa_triangles=SoA_pack(meshs);
-     float t;
-     Point2f uv;
-    for (auto _ : state)
-    {
+// static void BM_meshdata_intersect_sse(benchmark::State &state)
+// {   
+//     std::vector<Point3f> vertices={Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1),Point3f(1,1,1)};
+//      std::vector<Point2f> uvs = {Point2f(0,1),Point2f(0,0),Point2f(1,0),Point2f(1,1)};
+//      std::vector<Normal3f> normals;
+//      std::vector<uint32_t> indices={0,1,3,1,2,3};
+//      auto transform = make_shared(translate(Vector3f(0,0,0)));
+//      auto transform2 = make_shared(translate(Vector3f(0,0,0)));
+//      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
+//      auto soa_triangles=SoA_pack(meshs);
+//      float t;
+//      Point2f uv;
+//     for (auto _ : state)
+//     {
 
-        for(size_t i = 0; i < state.range(0); i++)
-        {
-            for(size_t j=0;j<soa_triangles.size();++j){
-                SoARay ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
-                benchmark::DoNotOptimize(intersect(ray,soa_triangles[j],&t,&uv,nullptr));
-            }
-        }
+//         for(size_t i = 0; i < state.range(0); i++)
+//         {
+//             for(size_t j=0;j<soa_triangles.size();++j){
+//                 SoARay ray(Point3f(0.5f,0.5f,0.5f),narukami::Vector3f(0,0,1));
+//                 benchmark::DoNotOptimize(intersect(ray,soa_triangles[j],&t,&uv,nullptr));
+//             }
+//         }
         
-    }
+//     }
 
-}
-BENCHMARK(BM_meshdata_intersect_sse)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
+// }
+// BENCHMARK(BM_meshdata_intersect_sse)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 #include "core/rng.h"
 static void BM_rng_next_float(benchmark::State &state)
 {   narukami::RNG rng;

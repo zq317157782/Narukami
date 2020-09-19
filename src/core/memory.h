@@ -87,10 +87,17 @@ inline void free_aligned(void * ptr){
 }
 
 #if defined(NARUKAMI_IS_WIN)
-inline void * memcpy(void* const dst,const void* const src,size_t size){
+inline void * memcpy(void* const dst,const void* const src,size_t size)
+{
 	return std::memcpy(dst,src,size);
 }
 #endif
+
+template<typename T>
+inline T* memcpy_t(T* const dst,const T* const src,size_t size)
+{
+	return static_cast<T*>(memcpy(dst,src,size * sizeof(T)));
+}
 
 #define STACK_ALLOC(T,count) (T*)alloca(count*sizeof(T))
 
