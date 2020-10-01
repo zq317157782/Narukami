@@ -50,6 +50,7 @@ public:
     const Transform &world_to_object() const { return _mesh->world_to_object(); }
     Point3f get_vertex(uint32_t vertex) const {return _mesh->get_vertex(_segment,_face,vertex);}
     Point2f get_texcoord(Point2f& u ) const {return _mesh->get_texcoord(_segment,_face,u);}
+    Point2f get_texcoord(uint32_t vertex) const {return _mesh->get_texcoord(_segment,_face,vertex);}
    
     void *operator new(size_t size);
     void operator delete(void *ptr);

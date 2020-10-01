@@ -444,10 +444,43 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
     if (has_hit)
     {
         auto triangle = _soa_primitive_infos[soa_idx].triangle[sub_soa_idx];
+        auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
+        //交点和法线
         interaction->p = get_vertex(triangle, barycentric);
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
         //dpdu,dpdv
-        auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
+        Vector3f dpdu,dpdv;
+
+        Vector3f dp10 = triangle.e1;
+        Vector3f dp20 = triangle.e2;
+
+        Point2f uv0 = primitive->get_texcoord(0);
+        Point2f uv1 = primitive->get_texcoord(1);
+        Point2f uv2 = primitive->get_texcoord(2);
+
+        Vector2f duv10 = uv1 - uv0;
+        Vector2f duv20 = uv2 - uv0;
+
+        //使用 delta X 和 delta Y 计算导数
+        //判断行列式 是否退化
+        float det = duv10[0] * duv20[1] - duv20[0] * duv10[1];
+        if(det == 0)
+        {
+            coordinate_system(interaction->n,&dpdu,&dpdv);
+        }
+        else
+        {
+            //求2x2矩阵的逆
+
+            dpdu = duv20.y * dp10 - duv10.y * dp20;
+            dpdv = -duv20.x * dp10 + duv10.x * dp20;
+            dpdu/=det;
+            dpdv/=det;
+        }
+
+        interaction->dpdu = dpdu;
+        interaction->dpdv = dpdv;
+
         interaction->uv = primitive->get_texcoord(barycentric);
     }
     return has_hit;

@@ -62,6 +62,7 @@ class Mesh
 private:
     shared<Transform> _object2world;
     shared<Transform> _world2object;
+
 private:
     std::vector<Point3f> _positions;
     std::vector<Normal3f> _normals;
@@ -69,7 +70,7 @@ private:
     std::vector<MeshSegment> _segments;
 
 public:
-    Mesh(const shared<Transform> &object2world,const shared<Transform> &world2object, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &texcoords, const std::vector<MeshSegment> &segments):_object2world(object2world),_world2object(world2object)
+    Mesh(const shared<Transform> &object2world, const shared<Transform> &world2object, const std::vector<Point3f> &positions, const std::vector<Normal3f> &normals, const std::vector<Point2f> &texcoords, const std::vector<MeshSegment> &segments) : _object2world(object2world), _world2object(world2object)
     {
 
         assert(positions.size() > 0);
@@ -97,25 +98,24 @@ public:
             _segments.push_back(s);
         }
         /********************STAT************************/
-        
-        STAT_INCREASE_COUNTER(mesh_total_vertex_count,_positions.size())
-        STAT_INCREASE_COUNTER(mesh_total_segment_count,_segments.size())
-        for(int s=0;s<_segments.size();++s)
+
+        STAT_INCREASE_COUNTER(mesh_total_vertex_count, _positions.size())
+        STAT_INCREASE_COUNTER(mesh_total_segment_count, _segments.size())
+        for (int s = 0; s < _segments.size(); ++s)
         {
-            STAT_INCREASE_COUNTER(mesh_total_face_count,_segments[s].faces.size())
+            STAT_INCREASE_COUNTER(mesh_total_face_count, _segments[s].faces.size())
         }
     }
 
     ~Mesh()
     {
-        STAT_DECREASE_COUNTER(mesh_total_vertex_count,_positions.size())
-        STAT_DECREASE_COUNTER(mesh_total_segment_count,_segments.size())
-        for(int s=0;s<_segments.size();++s)
+        STAT_DECREASE_COUNTER(mesh_total_vertex_count, _positions.size())
+        STAT_DECREASE_COUNTER(mesh_total_segment_count, _segments.size())
+        for (int s = 0; s < _segments.size(); ++s)
         {
-            STAT_DECREASE_COUNTER(mesh_total_face_count,_segments[s].faces.size());
+            STAT_DECREASE_COUNTER(mesh_total_face_count, _segments[s].faces.size());
         }
     }
-    
 
     inline Point3f get_vertex(uint32_t segment, uint32_t face, uint32_t vertex) const
     {
@@ -129,40 +129,44 @@ public:
     {
         assert(segment < _segments.size());
         assert(face < _segments[segment].faces.size());
-        const Point2f& u = barycentric;
+        const Point2f &u = barycentric;
         MeshFace mf = _segments[segment].faces[face];
         Point3f p0 = _positions[mf.vertex_index[0]];
         Point3f p1 = _positions[mf.vertex_index[1]];
         Point3f p2 = _positions[mf.vertex_index[2]];
-        return barycentric_interpolate(p0,p1,p2,u.x,u.y);
+        return barycentric_interpolate(p0, p1, p2, u.x, u.y);
     }
     inline Point2f get_texcoord(uint32_t segment, uint32_t face, uint32_t vertex) const
     {
         assert(vertex >= 0 && vertex <= 2);
         assert(segment < _segments.size());
         assert(face < _segments[segment].faces.size());
-        uint32_t idx = _segments[segment].faces[face].texcoord_index[vertex];
-        return _texcoords[idx];
+        if (_texcoords.size() > 0)
+        {
+            uint32_t idx = _segments[segment].faces[face].texcoord_index[vertex];
+            return _texcoords[idx];
+        }
+        else
+            return Point2f(0.0f, 0.0f);
     }
 
     inline Point2f get_texcoord(uint32_t segment, uint32_t face, const Point2f &barycentric) const
     {
         assert(segment < _segments.size());
         assert(face < _segments[segment].faces.size());
-        const Point2f& u = barycentric;
-        MeshFace mf = _segments[segment].faces[face];
-        if(_texcoords.size() > 0)
+
+        if (_texcoords.size() > 0)
         {
+            const Point2f &u = barycentric;
+            MeshFace mf = _segments[segment].faces[face];
             Point2f t0 = _texcoords[mf.texcoord_index[0]];
             Point2f t1 = _texcoords[mf.texcoord_index[1]];
             Point2f t2 = _texcoords[mf.texcoord_index[2]];
             return t0 * (1.0f - u.x - u.y) + t1 * u.x + t2 * u.y;
         }
         else
-            return Point2f(0.0f,0.0f);       
+            return Point2f(0.0f, 0.0f);
     }
-
-    
 
     inline Bounds3f get_face_bounds(uint32_t segment, uint32_t face) const
     {
@@ -179,8 +183,8 @@ public:
     inline const Transform &object_to_world() const { return *_object2world; }
     inline const Transform &world_to_object() const { return *_world2object; }
 
-    inline size_t get_segment_count() const {return _segments.size();}
-    inline size_t get_face_count(uint32_t segment) const {return _segments[segment].faces.size();}
+    inline size_t get_segment_count() const { return _segments.size(); }
+    inline size_t get_face_count(uint32_t segment) const { return _segments[segment].faces.size(); }
 
     inline friend std::ostream &operator<<(std::ostream &out, const Mesh &mesh)
     {
@@ -192,9 +196,7 @@ public:
     void operator delete(void *ptr);
 };
 
-
 shared<Mesh> create_plane(const shared<Transform> &object2world, const shared<Transform> &world2object, const float width, const float height);
 // std::vector<shared<TriangleMesh>> create_disk(const shared<Transform> &object2worldobject2wrold, const shared<Transform> &object2worldworld2object, float radius, const uint32_t vertex_density);
-
 
 NARUKAMI_END

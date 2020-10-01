@@ -137,6 +137,16 @@ inline Vector3<T> operator+(const Vector3<T> &v1, const Vector3<T> &v2)
 }
 
 template <typename T>
+inline Vector3<T> operator-(const Vector3<T> &v1, const Vector3<T> &v2)
+{
+    Vector3<T> v;
+    v.x = v1.x - v2.x;
+    v.y = v1.y - v2.y;
+    v.z = v1.z - v2.z;
+    return v;
+}
+
+template <typename T>
 inline Vector3<T> operator*(const Vector3<T> &v1, const Vector3<T> &v2)
 {
     Vector3<T> v;
@@ -1027,6 +1037,10 @@ inline T dot(const Vector3<T> &v1, const Normal3<T> &v2) { return v1.x * v2.x + 
 template <typename T>
 inline T dot(const Normal3<T> &v1, const Normal3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 template <typename T>
+inline Vector3<T> cross(const Normal3<T> &v1, const Vector3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
+template <typename T>
+inline Vector3<T> cross(const Vector3<T> &v1, const Normal3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
+template <typename T>
 inline Normal3f normalize(const Normal3<T> &v1)
 {
     float inv_l = rsqrt(dot(v1, v1));
@@ -1034,6 +1048,8 @@ inline Normal3f normalize(const Normal3<T> &v1)
 }
 template <typename T>
 inline float length(const Normal3<T> &v) { return sqrt(static_cast<float>(dot(v, v))); }
+
+
 //---NORMAL3 END---
 
 //---POINT2 BEGIN---
@@ -1248,6 +1264,15 @@ inline Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v)
     return rp;
 }
 
+template <typename T>
+inline Vector2<T> operator-(const Point2<T> &p0, const Point2<T> &p1)
+{
+    Vector2<T> v;
+    v.x = p0.x - p1.x;
+    v.y = p0.y - p1.y;
+    return v;
+}
+
 //matrix3x4 
 inline Vector3f operator*(const Matrix4x4 &M, const Vector3f &v)
 {
@@ -1365,6 +1390,37 @@ inline T hemisphere_flip(const T &n, const U &wo)
 {
     return dot(n, wo) > 0 ? n : -n;
 }
+
+template<typename T>
+void coordinate_system(const Vector3<T>& v0,Vector3<T>* v1,Vector3<T>* v2)
+{
+    if(abs(v0.x) > abs(v0.y))
+    {
+        *v1 = normalize(Vector3<T>(-v0.z,0,v0.x));
+    }
+    else
+    {
+        *v1 = normalize(Vector3<T>(0,v0.z,-v0.y));
+    }
+
+    *v2 = cross(v0,*v1);
+}
+
+template<typename T>
+void coordinate_system(const Normal3<T>& v0,Vector3<T>* v1,Vector3<T>* v2)
+{
+    if(abs(v0.x) > abs(v0.y))
+    {
+        *v1 = normalize(Vector3<T>(-v0.z,0,v0.x));
+    }
+    else
+    {
+        *v1 = normalize(Vector3<T>(0,v0.z,-v0.y));
+    }
+
+    *v2 = cross(v0,*v1);
+}
+
 struct Ray
 {
     Point3f o;
