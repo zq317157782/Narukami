@@ -38,13 +38,13 @@ NARUKAMI_BEGIN
 /**
  * 描述每个MeshPrimitive的额外信息
 */
-struct BVHMeshPrimitiveInfo
+struct BVHMeshPrimitiveState
 {
     uint32_t prim_index;
     Bounds3f bounds;
     Point3f centroid;
-    BVHMeshPrimitiveInfo() = default;
-    BVHMeshPrimitiveInfo(const shared<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
+    BVHMeshPrimitiveState() = default;
+    BVHMeshPrimitiveState(const shared<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
 };
 
 /**
@@ -241,16 +241,16 @@ class MeshBLAS:public BLAS
 {
 private:
     std::vector<shared<MeshPrimitive>> _primitives;
-    std::vector<MeshPrimitiveInfo4p> _soa_primitive_infos;
+    std::vector<CompactMeshPrimitive> _compact_primitives;
     std::vector<QBVHNode> _nodes;
     Bounds3f _bounds;
 
-    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total);
-    void build_soa_primitive_info(BVHBuildNode *node);
+    BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveState> &primitive_states, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total);
+    void build_compact_primitives(BVHBuildNode *node);
     
-    shared<MeshPrimitive> get_mesh_primitive(int soa_primitive_id,int soa_offset) const
+    shared<MeshPrimitive> get_mesh_primitive(int compact_primitive_id,int compact_primitive_offset) const
     {
-        auto primitive_offset = _soa_primitive_infos[soa_primitive_id].offset + soa_offset;
+        auto primitive_offset = _compact_primitives[compact_primitive_id].offset + compact_primitive_offset;
         return _primitives[primitive_offset];
     }
 public:
@@ -322,7 +322,7 @@ struct BLASInstanceInfo
     BLASInstanceInfo(const shared<BLASInstance> &instance, uint32_t index) : instance_index(index), bounds(instance->bounds()), centroid((instance->bounds().min_point + instance->bounds().max_point) * 0.5f) {}
 };
 
-struct BLASInstanceInfo4p
+struct CompactBLASInstance
 {
     Bounds3f4p bounds;
     uint32_t offset;
@@ -332,7 +332,7 @@ class TLAS
 {
 private:
     std::vector<shared<BLASInstance>> _instances;
-    std::vector<BLASInstanceInfo4p> _soa_instance_infos;
+    std::vector<CompactBLASInstance> _compact_instances;
     std::vector<QBVHNode> _nodes;
     Bounds3f _bounds;
     

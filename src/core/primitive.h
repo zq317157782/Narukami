@@ -58,7 +58,7 @@ public:
 
 std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &mesh);
 
-struct MeshPrimitiveInfo4p
+struct CompactMeshPrimitive
 {
     Triangle4p triangle;
 
@@ -68,5 +68,7 @@ struct MeshPrimitiveInfo4p
     //***
 };
 
-std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
+
+
+std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

@@ -173,27 +173,27 @@ uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollaps
 MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _primitives(primitives)
 {
     STAT_INCREASE_COUNTER(primitive_count, _primitives.size())
-    std::vector<BVHMeshPrimitiveInfo> primitive_infos(_primitives.size());
+    std::vector<BVHMeshPrimitiveState> primitive_states(_primitives.size());
     for (uint32_t i = 0; i < _primitives.size(); ++i)
     {
-        primitive_infos[i] = BVHMeshPrimitiveInfo(_primitives[i], i);
+        primitive_states[i] = BVHMeshPrimitiveState(_primitives[i], i);
     }
 
     //获取所有MeshPrimitive的Bounds
-    _bounds = get_max_bounds(primitive_infos, 0, static_cast<uint32_t>(primitive_infos.size()));
+    _bounds = get_max_bounds(primitive_states, 0, static_cast<uint32_t>(primitive_states.size()));
 
     MemoryArena arena;
     std::vector<shared<MeshPrimitive>> _ordered_primitives;
     uint32_t total_build_node_num = 0;
     uint32_t total_collapse_node_num = 0;
 
-    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_infos.size()), primitive_infos, _ordered_primitives, &total_build_node_num);
+    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_states.size()), primitive_states, _ordered_primitives, &total_build_node_num);
 
     _primitives = _ordered_primitives;
     auto collapse_root = collapse(arena, build_root, &total_collapse_node_num);
 
     _nodes.resize(total_collapse_node_num);
-    build_soa_primitive_info(build_root);
+    build_compact_primitives(build_root);
     uint32_t offset = 0;
 
     flatten(_nodes, 0, collapse_root, &offset);
@@ -202,11 +202,11 @@ MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _prim
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
 
-BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveInfo> &primitive_infos, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total)
+BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveState> &primitive_states, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total)
 {
     auto node = arena.alloc<BVHBuildNode>(1);
     (*total)++;
-    Bounds3f max_bounds = get_max_bounds(primitive_infos, start, end);
+    Bounds3f max_bounds = get_max_bounds(primitive_states, start, end);
 
     uint32_t num = end - start;
     if (num <= BLAS_ELEMENT_NUM_PER_LEAF)
@@ -214,7 +214,7 @@ BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, 
         uint32_t offset = static_cast<uint32_t>(ordered.size());
         for (uint32_t i = start; i < end; i++)
         {
-            ordered.push_back(_primitives[primitive_infos[i].prim_index]);
+            ordered.push_back(_primitives[primitive_states[i].prim_index]);
         }
         init_leaf(node, offset, num, max_bounds);
     }
@@ -223,7 +223,7 @@ BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, 
         Bounds3f centroid_bounds;
         for (uint32_t i = start; i < end; i++)
         {
-            centroid_bounds = _union(centroid_bounds, primitive_infos[i].centroid);
+            centroid_bounds = _union(centroid_bounds, primitive_states[i].centroid);
         }
 
         auto dim = max_extent(centroid_bounds);
@@ -232,20 +232,9 @@ BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, 
         {
             //degenerate
             auto mid = (start + end) / 2;
-            std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+            std::nth_element(&primitive_states[start], &primitive_states[mid], &primitive_states[end - 1] + 1, [dim](const BVHMeshPrimitiveState &p0, const BVHMeshPrimitiveState &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
+            init_interior(node, build(arena, start, mid, primitive_states, ordered, total), build(arena, mid, end, primitive_states, ordered, total), dim);
         }
-        // else if (num <= 2 * BLAS_ELEMENT_NUM_PER_LEAF)
-        // {
-        //     auto mid = start + BLAS_ELEMENT_NUM_PER_LEAF;
-        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-        //     init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
-        // }
-        //else{
-        //     auto mid = start+2*BLAS_ELEMENT_NUM_PER_LEAF;
-        //     std::nth_element(&primitive_infos[start], &primitive_infos[mid], &primitive_infos[end - 1] + 1, [dim](const BVHMeshPrimitiveInfo &p0, const BVHMeshPrimitiveInfo &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-        //     init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
-        // }
         else
         {
             //SAH
@@ -253,9 +242,9 @@ BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, 
 
             for (uint32_t i = start; i < end; ++i)
             {
-                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds, primitive_infos[i].centroid)[dim]);
+                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds, primitive_states[i].centroid)[dim]);
                 bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
-                bucket_infos[bucket_index].bounds = _union(bucket_infos[bucket_index].bounds, primitive_infos[i].bounds);
+                bucket_infos[bucket_index].bounds = _union(bucket_infos[bucket_index].bounds, primitive_states[i].bounds);
                 bucket_infos[bucket_index].count++;
             }
 
@@ -290,21 +279,19 @@ BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, 
                 }
             }
 
-            // auto mid_point = (centroid_bounds.max_point[dim] + centroid_bounds.min_point[dim]) / 2;
-            // auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [dim, mid_point](const BVHMeshPrimitiveInfo &pi) { return pi.centroid[dim] < mid_point; });
-            auto mid_ptr = std::partition(&primitive_infos[start], &primitive_infos[end - 1] + 1, [=](const BVHMeshPrimitiveInfo &pi) {
+            auto mid_ptr = std::partition(&primitive_states[start], &primitive_states[end - 1] + 1, [=](const BVHMeshPrimitiveState &pi) {
                 auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
                 bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
                 return bucket_index <= min_cost_bucket_index;
             });
-            auto mid = static_cast<uint32_t>(mid_ptr - &primitive_infos[0]);
-            init_interior(node, build(arena, start, mid, primitive_infos, ordered, total), build(arena, mid, end, primitive_infos, ordered, total), dim);
+            auto mid = static_cast<uint32_t>(mid_ptr - &primitive_states[0]);
+            init_interior(node, build(arena, start, mid, primitive_states, ordered, total), build(arena, mid, end, primitive_states, ordered, total), dim);
         }
     }
     return node;
 }
 
-void MeshBLAS::build_soa_primitive_info(BVHBuildNode *node)
+void MeshBLAS::build_compact_primitives(BVHBuildNode *node)
 {
 
     if (is_leaf(node))
@@ -315,13 +302,13 @@ void MeshBLAS::build_soa_primitive_info(BVHBuildNode *node)
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 4, (node->num % 4) == 0)
        
 
-        auto primitive_infos = pack_mesh_primitives(_primitives, node->offset, node->num);
-        node->num = static_cast<uint32_t>(primitive_infos.size());
-        node->offset = static_cast<uint32_t>(_soa_primitive_infos.size());
-        _soa_primitive_infos.insert(_soa_primitive_infos.end(), primitive_infos.begin(), primitive_infos.end());
+        auto primitive_states = pack_mesh_primitives(_primitives, node->offset, node->num);
+        node->num = static_cast<uint32_t>(primitive_states.size());
+        node->offset = static_cast<uint32_t>(_compact_primitives.size());
+        _compact_primitives.insert(_compact_primitives.end(), primitive_states.begin(), primitive_states.end());
 
-        STAT_INCREASE_COUNTER(SoA_utilization_ratio_num,(static_cast<uint32_t>(primitive_infos.size()) - 1) * 4)
-        STAT_INCREASE_COUNTER(SoA_utilization_ratio_denom, static_cast<uint32_t>(primitive_infos.size()) * 4)
+        STAT_INCREASE_COUNTER(SoA_utilization_ratio_num,(static_cast<uint32_t>(primitive_states.size()) - 1) * 4)
+        STAT_INCREASE_COUNTER(SoA_utilization_ratio_denom, static_cast<uint32_t>(primitive_states.size()) * 4)
 
 
 
@@ -329,8 +316,8 @@ void MeshBLAS::build_soa_primitive_info(BVHBuildNode *node)
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
     {
-        build_soa_primitive_info(node->childrens[0]);
-        build_soa_primitive_info(node->childrens[1]);
+        build_compact_primitives(node->childrens[0]);
+        build_compact_primitives(node->childrens[1]);
     }
 }
 
@@ -365,8 +352,8 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
 
     bool has_hit = false;
 
-    uint32_t sub_soa_idx;
-    uint32_t soa_idx;
+    uint32_t compact_offset;
+    uint32_t compact_idx;
     Point2f barycentric;
 
     while (!node_stack.empty())
@@ -403,7 +390,7 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
                         float hit_t = INFINITE;
                         Point2f temp_barycentric;
                         int triangle_index;
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle, &hit_t, &temp_barycentric, &triangle_index);
+                        auto is_hit = narukami::intersect(soa_ray, _compact_primitives[j].triangle, &hit_t, &temp_barycentric, &triangle_index);
                         STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
 
                         if (is_hit && hit_t < ray.t_max)
@@ -417,8 +404,8 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
                                 ray.t_max = hit_t;
                             }
                             {
-                                sub_soa_idx = triangle_index;
-                                soa_idx = j;
+                                compact_offset = triangle_index;
+                                compact_idx = j;
                                 barycentric = temp_barycentric;
                             }
                         }
@@ -443,8 +430,8 @@ bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction 
 
     if (has_hit)
     {
-        auto triangle = _soa_primitive_infos[soa_idx].triangle[sub_soa_idx];
-        auto primitive = get_mesh_primitive(soa_idx,sub_soa_idx);
+        auto triangle = _compact_primitives[compact_idx].triangle[compact_offset];
+        auto primitive = get_mesh_primitive(compact_idx,compact_offset);
         //交点和法线
         interaction->p = get_vertex(triangle, barycentric);
         interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
@@ -516,7 +503,7 @@ bool MeshBLAS::intersect(const Ray &ray) const
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-                        auto is_hit = narukami::intersect(soa_ray, _soa_primitive_infos[j].triangle);
+                        auto is_hit = narukami::intersect(soa_ray, _compact_primitives[j].triangle);
                         if (is_hit)
                         {
                             return true;
@@ -682,7 +669,7 @@ BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
     return node;
 }
 
-std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<shared<BLASInstance>> &instance_list, uint32_t start, uint32_t count)
+std::vector<CompactBLASInstance> pack_instances(const std::vector<shared<BLASInstance>> &instance_list, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= instance_list.size());
@@ -702,11 +689,11 @@ std::vector<BLASInstanceInfo4p> pack_instances(const std::vector<shared<BLASInst
             bounds_array.push_back(Bounds3f());
         }
     }
-    std::vector<BLASInstanceInfo4p> soa_instance_info;
+    std::vector<CompactBLASInstance> soa_instance_info;
 
     for (uint32_t i = 0; i < soa_count; ++i)
     {
-        BLASInstanceInfo4p instance;
+        CompactBLASInstance instance;
         instance.bounds = load(&bounds_array[i * SSE_FLOAT_COUNT]);
 
         instance.offset = start + i * SSE_FLOAT_COUNT;
@@ -723,8 +710,8 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
     {
         auto instance_infos = pack_instances(_instances, node->offset, node->num);
         node->num = static_cast<uint32_t>(instance_infos.size());
-        node->offset = static_cast<uint32_t>(_soa_instance_infos.size());
-        _soa_instance_infos.insert(_soa_instance_infos.end(), instance_infos.begin(), instance_infos.end());
+        node->offset = static_cast<uint32_t>(_compact_instances.size());
+        _compact_instances.insert(_compact_instances.end(), instance_infos.begin(), instance_infos.end());
     }
     //codition-> the interior node must has two child node
     if (node->childrens[0] && node->childrens[1])
@@ -775,13 +762,13 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *int
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
 
-                        auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds);
+                        auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _compact_instances[j].bounds);
 
                         for (uint32_t k = 0; k < 4; k++)
                         {
                             if (leaf_box_hits[k])
                             {
-                                auto instance_offset = _soa_instance_infos[j].offset + k;
+                                auto instance_offset = _compact_instances[j].offset + k;
                                 auto blas_instance = _instances[instance_offset];
 
                                 bool has_hit = blas_instance->intersect(arena, ray, interaction);
@@ -852,13 +839,13 @@ bool TLAS::intersect(const Ray &ray) const
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
 
-                        auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _soa_instance_infos[j].bounds);
+                        auto leaf_box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, _compact_instances[j].bounds);
 
                         for (uint32_t k = 0; k < 4; k++)
                         {
                             if (leaf_box_hits[k])
                             {
-                                auto instance_offset = _soa_instance_infos[j].offset + k;
+                                auto instance_offset = _compact_instances[j].offset + k;
                                 auto blas_instance = _instances[instance_offset];
                                 bool is_hit = blas_instance->intersect(ray);
                                 if (is_hit)

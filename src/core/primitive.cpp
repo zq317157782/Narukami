@@ -53,7 +53,7 @@ std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &me
     return primitives;
 }
 
-std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
+std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -84,11 +84,11 @@ std::vector<MeshPrimitiveInfo4p> pack_mesh_primitives(const std::vector<shared<M
             e2_array.push_back(Vector3f());
         }
     }
-    std::vector<MeshPrimitiveInfo4p> soa_primitives;
+    std::vector<CompactMeshPrimitive> soa_primitives;
 
     for (uint32_t i = 0; i < soa_count; ++i)
     {
-        MeshPrimitiveInfo4p primitive;
+        CompactMeshPrimitive primitive;
         primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
