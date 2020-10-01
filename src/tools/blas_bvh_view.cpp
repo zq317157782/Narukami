@@ -13,7 +13,7 @@ shared<MeshBLAS> get_blas()
     {
         auto transform = make_shared(identity());
         auto inv_transform = transform;
-        mesh = load_mesh<MeshFileFormat::OBJ>(transform, inv_transform, "bunny.obj", ".");
+        mesh = load_mesh<MeshFileFormat::OBJ>(transform, inv_transform, "bunny.obj");
     }
     auto primitives = create_mesh_primitives(mesh);
     return shared<MeshBLAS>(new MeshBLAS(primitives));

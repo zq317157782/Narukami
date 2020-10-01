@@ -42,8 +42,15 @@ struct MeshFace
     MeshFace(const uint32_t vi[3], const uint32_t ni[3], const uint32_t ti[3])
     {
         memcpy_t(vertex_index, vi, 3);
-        memcpy_t(normal_index, vi, 3);
+        memcpy_t(normal_index, ni, 3);
         memcpy_t(texcoord_index, ti, 3);
+    }
+
+    MeshFace(const uint32_t vi[3])
+    {
+        memcpy_t(vertex_index, vi, 3);
+        memcpy_t(normal_index, vi, 3);
+        memcpy_t(texcoord_index, vi, 3);
     }
 };
 struct MeshSegment

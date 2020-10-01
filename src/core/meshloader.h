@@ -24,22 +24,25 @@ SOFTWARE.
 #pragma once
 #include "core/narukami.h"
 #include "core/mesh.h"
+#include "core/file.h"
 #include "tiny_obj_loader.h"
+#include "tinyply.h"
 NARUKAMI_BEGIN
 
 enum class MeshFileFormat
 {
-    OBJ
+    OBJ,
+    PLY
 };
 
 template <MeshFileFormat format>
-shared<Mesh> load_mesh(const shared<Transform> &object2world,const shared<Transform> &world2object,const char *file_name, const char *base_path)
+shared<Mesh> load_mesh(const shared<Transform> &object2world, const shared<Transform> &world2object, const char *file_name)
 {
     return shared<Mesh>();
 }
 
 template <>
-shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2world,const shared<Transform> &world2object,const char *file_name, const char *base_path)
+shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2world, const shared<Transform> &world2object, const char *file_name)
 {
     //第一阶段:载入模型的数据，并且判断数据是否载入正确
     tinyobj::attrib_t attrib;
@@ -49,7 +52,7 @@ shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2worl
     std::string warn;
     std::string err;
 
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name, base_path, true);
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name, "", true);
     if (!warn.empty())
     {
         std::cout << warn << std::endl;
@@ -67,9 +70,6 @@ shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2worl
 
     //第二阶段:转换到渲染器的Mesh格式
 
-    bool has_normal = attrib.normals.size() > 0 ? true : false;
-    bool has_uv = attrib.texcoords.size() > 0 ? true : false;
-
     std::vector<Point3f> positions;
     for (size_t i = 0; i < attrib.vertices.size(); i += 3)
     {
@@ -86,7 +86,6 @@ shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2worl
         uvs.push_back(Point2f(attrib.texcoords[i], attrib.texcoords[i + 1]));
     }
 
-   
     std::vector<MeshSegment> segments;
     for (size_t s = 0; s < shapes.size(); s++)
     {
@@ -110,13 +109,92 @@ shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2worl
                 ti[v] = idx.texcoord_index;
             }
             index_offset += fv;
-            faces.push_back(MeshFace(vi,ni,ti));
+            faces.push_back(MeshFace(vi, ni, ti));
         }
 
         MeshSegment segment(faces);
         segments.push_back(segment);
     }
-    shared<Mesh> mesh = make_shared<Mesh>(object2world, world2object,positions, normals, uvs,segments);
+    shared<Mesh> mesh = make_shared<Mesh>(object2world, world2object, positions, normals, uvs, segments);
+    return mesh;
+}
+
+template <>
+shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2world, const shared<Transform> &world2object,const char *file_name)
+{
+
+    std::unique_ptr<std::istream> file_stream;
+    std::vector<uint8_t> byte_buffer;
+    byte_buffer = read_file_binary(file_name);
+    file_stream.reset(new memory_stream((char *)byte_buffer.data(), byte_buffer.size()));
+
+    tinyply::PlyFile file;
+    file.parse_header(*file_stream);
+    std::shared_ptr<tinyply::PlyData> ply_vertices, ply_normals, ply_texcoords,ply_faces;
+    try
+    {
+        ply_vertices = file.request_properties_from_element("vertex", {"x", "y", "z"});
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "tinyply exception: " << e.what() << std::endl;
+    }
+    try
+    {
+        ply_normals = file.request_properties_from_element("vertex", {"nx", "ny", "nz"});
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "tinyply exception: " << e.what() << std::endl;
+    }
+    try
+    {
+        ply_texcoords = file.request_properties_from_element("vertex", {"u", "v"});
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "tinyply exception: " << e.what() << std::endl;
+    }
+    try
+    {
+        ply_faces = file.request_properties_from_element("face", {"vertex_indices"}, 3);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "tinyply exception: " << e.what() << std::endl;
+    }
+    file.read(*file_stream);
+
+    std::vector<Point3f> positions(ply_vertices->count);
+    memcpy(positions.data(),ply_vertices->buffer.get(), ply_vertices->buffer.size_bytes());
+    std::vector<Normal3f> normals;
+    if(ply_normals)
+    {
+        normals.resize(ply_normals->count);
+        memcpy(normals.data(),ply_normals->buffer.get(), ply_normals->buffer.size_bytes());
+    }
+    
+    std::vector<Point2f> texcoords;
+    if(ply_texcoords)
+    {
+        texcoords.resize(ply_normals->count);
+        memcpy(texcoords.data(),ply_texcoords->buffer.get(), ply_texcoords->buffer.size_bytes());
+    }
+
+    std::vector<uint32_t> faces_array(ply_faces->count * 3);
+    memcpy(faces_array.data(),ply_faces->buffer.get(), ply_faces->buffer.size_bytes());
+
+    std::vector<MeshFace> faces;
+    for(int i=0;i<ply_faces->count;++i)
+    {
+        uint32_t vi[3];
+        memcpy(vi,&faces_array[i * 3], 3 * sizeof(uint32_t));
+        faces.push_back(vi);
+    }
+    std::vector<MeshSegment> segments;
+    MeshSegment segment(faces);
+    segments.push_back(segment);
+    shared<Mesh> mesh = make_shared<Mesh>(object2world, world2object, positions, normals, texcoords, segments);
     return mesh;
 }
 NARUKAMI_END

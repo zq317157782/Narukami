@@ -14,7 +14,7 @@ else()
 endif()
 
 
-
+  
 
 include_directories(src)
 include_directories(external)
@@ -24,8 +24,9 @@ include_directories(external/lodepng)
 include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
 include_directories(external/glfw/include)
- 
- 
+include_directories(external/tinyply/source)
+    
+   
 aux_source_directory(src/core SRC_CORE)
 aux_source_directory(src/cameras SRC_CAMERAS)
 aux_source_directory(src/materials SRC_MATERIALS)
@@ -35,21 +36,20 @@ set(gtest_force_shared_crt ON)
 set(BUILD_GMOCK OFF)
 set(BUILD_GTEST ON)
 add_subdirectory(external/googletest)
- 
+   
 # #add glog
 # set(WITH_GFLAGS OFF)
 # add_subdirectory(external/glog)
-
 #add lua
 add_subdirectory(external/lua)
-
 #add tinyobjloader
 add_subdirectory(external/tinyobjloader)
-
 # #add sdl2
 # add_subdirectory(external/sdl2)
-
 add_subdirectory(external/glfw)
+add_subdirectory(external/tinyply)
+
+
 
 
 #add embree3
@@ -71,7 +71,7 @@ target_link_libraries(narukami tinyobjloader)
 
 #tools
 add_executable(blas_bvh_view src/tools/blas_bvh_view.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-target_link_libraries(blas_bvh_view glfw tinyobjloader ${OPENGL_LIBRARIES}) 
+target_link_libraries(blas_bvh_view glfw tinyobjloader tinyply ${OPENGL_LIBRARIES}) 
 
 #narukami_test
 add_executable(narukami_test test/main.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
@@ -86,15 +86,16 @@ target_link_libraries(narukami_benchmark benchmark)
 #samples
 add_executable(sample_render_a_soatriangle sample/render_a_soatriangle.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 add_executable(sample_render_a_mesh sample/render_a_mesh.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} ${SRC_MATERIALS_LIGHTS})
-target_link_libraries(sample_render_a_mesh tinyobjloader)
+target_link_libraries(sample_render_a_mesh tinyobjloader tinyply)
 add_executable(sample_render_a_texture_space sample/render_a_texture_space.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(sample_render_a_bounds sample/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_render_a_bounds sample/render_a_bounds.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} )
 add_executable(sample_output_2d_random_number sample/output_2d_random_number.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-add_executable(sample_output_sampler_data sample/output_sampler_data.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_output_sampler_data sample/output_sampler_data.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG} )
 add_executable(sample_render_a_sample_distribution sample/render_a_sample_distribution.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 add_executable(sample_accelerator_test sample/accelerator_test.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
-target_link_libraries(sample_accelerator_test tinyobjloader)
+target_link_libraries(sample_accelerator_test tinyobjloader tinyply)
 add_executable(sample_test_parallel_for sample/test_parallel_for.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
+add_executable(sample_test_animatedtransform sample/test_animatedtrasform.cpp ${SRC_CORE} ${SRC_CAMERAS} ${EXT_LODEPNG})
 
 
  
