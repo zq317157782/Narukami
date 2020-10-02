@@ -71,5 +71,5 @@ struct CompactMeshPrimitive
 bool intersect(RayPack& soa_ray,const CompactMeshPrimitive& compact_primitive,float* hit_t, Point2f* temp_param_uv, int * temp_compact_offset);
 bool intersect(RayPack& soa_ray,const CompactMeshPrimitive& compact_primitive);
 void setup_interaction(const CompactMeshPrimitive& ,const shared<MeshPrimitive> &,uint32_t ,const Ray& ,const Point2f&,SurfaceInteraction * );
-std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
+std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END

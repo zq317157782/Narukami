@@ -107,7 +107,7 @@ void setup_interaction(const CompactMeshPrimitive& compact_primitive,const share
         interaction->uv = primitive->get_texcoord(param_uv);
 }
 
-std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
+std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());

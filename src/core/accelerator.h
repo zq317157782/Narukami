@@ -419,7 +419,7 @@ void CompactBLAS<PrimitiveType, CompactPrimitiveType>::build_compact_primitives(
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 3, (node->num % 4) == 3)
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 4, (node->num % 4) == 0)
 
-        auto primitive_states = pack_mesh_primitives(_primitives, node->offset, node->num);
+        auto primitive_states = pack_compact_primitives(_primitives, node->offset, node->num);
         node->num = static_cast<uint32_t>(primitive_states.size());
         node->offset = static_cast<uint32_t>(_compact_primitives.size());
         _compact_primitives.insert(_compact_primitives.end(), primitive_states.begin(), primitive_states.end());
