@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #include "core/primitive.h"
 #include "core/memory.h"
+#include "core/interaction.h"
 NARUKAMI_BEGIN
 
 MemoryPool<MeshPrimitive> g_mesh_primitive_pool(4096);
@@ -51,6 +52,59 @@ std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &me
     }
 
     return primitives;
+}
+
+bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive,float* hit_t, Point2f* temp_param_uv, int * temp_compact_offset)
+{
+    return intersect(soa_ray,compact_primitive.triangle, hit_t, temp_param_uv, temp_compact_offset);
+}
+
+bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive)
+{
+    return intersect(soa_ray, compact_primitive.triangle);
+}
+
+
+void setup_interaction(const CompactMeshPrimitive& compact_primitive,const shared<MeshPrimitive> & primitive,uint32_t compact_offset,const Ray& ray,const Point2f&param_uv,SurfaceInteraction * interaction)
+{
+        auto triangle = compact_primitive.triangle[compact_offset];
+        //交点和法线
+        interaction->p = get_vertex(triangle, param_uv);
+        interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
+        //dpdu,dpdv
+        Vector3f dpdu, dpdv;
+
+        Vector3f dp10 = triangle.e1;
+        Vector3f dp20 = triangle.e2;
+
+        Point2f uv0 = primitive->get_texcoord(0);
+        Point2f uv1 = primitive->get_texcoord(1);
+        Point2f uv2 = primitive->get_texcoord(2);
+
+        Vector2f duv10 = uv1 - uv0;
+        Vector2f duv20 = uv2 - uv0;
+
+        //使用 delta X 和 delta Y 计算导数
+        //判断行列式 是否退化
+        float det = duv10[0] * duv20[1] - duv20[0] * duv10[1];
+        if (det == 0)
+        {
+            coordinate_system(interaction->n, &dpdu, &dpdv);
+        }
+        else
+        {
+            //求2x2矩阵的逆
+
+            dpdu = duv20.y * dp10 - duv10.y * dp20;
+            dpdv = -duv20.x * dp10 + duv10.x * dp20;
+            dpdu /= det;
+            dpdv /= det;
+        }
+
+        interaction->dpdu = dpdu;
+        interaction->dpdv = dpdv;
+
+        interaction->uv = primitive->get_texcoord(param_uv);
 }
 
 std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)

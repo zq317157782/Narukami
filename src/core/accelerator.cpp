@@ -25,55 +25,38 @@ SOFTWARE.
 #include "core/progressreporter.h"
 NARUKAMI_BEGIN
 
-MemoryPool<MeshBLAS> g_mesh_blas_pool(4096);
+// MemoryPool<MeshBLAS> g_mesh_blas_pool(4096);
 
-void * MeshBLAS::operator new(size_t size)
-{
-    return g_mesh_blas_pool.alloc();
-}
+// void *MeshBLAS::operator new(size_t size)
+// {
+//     return g_mesh_blas_pool.alloc();
+// }
 
-void  MeshBLAS::operator delete(void * ptr)
-{
-    g_mesh_blas_pool.dealloc(reinterpret_cast<MeshBLAS*>(ptr));
-}
+// void MeshBLAS::operator delete(void *ptr)
+// {
+//     g_mesh_blas_pool.dealloc(reinterpret_cast<MeshBLAS *>(ptr));
+// }
 
 MemoryPool<BLASInstance> g_blas_instance_pool(4096);
-void * BLASInstance::operator new(size_t size)
+void *BLASInstance::operator new(size_t size)
 {
     return g_blas_instance_pool.alloc();
 }
 
-void  BLASInstance::operator delete(void * ptr)
+void BLASInstance::operator delete(void *ptr)
 {
-    g_blas_instance_pool.dealloc(reinterpret_cast<BLASInstance*>(ptr));
+    g_blas_instance_pool.dealloc(reinterpret_cast<BLASInstance *>(ptr));
 }
 
 MemoryPool<TLAS> g_tlas_pool(1);
-void * TLAS::operator new(size_t size)
+void *TLAS::operator new(size_t size)
 {
     return g_tlas_pool.alloc();
 }
 
-void  TLAS::operator delete(void * ptr)
+void TLAS::operator delete(void *ptr)
 {
-    g_tlas_pool.dealloc(reinterpret_cast<TLAS*>(ptr));
-}
-
-constexpr uint32_t BLAS_ELEMENT_NUM_PER_LEAF = 64;
-constexpr int BLAS_SAH_BUCKET_NUM = 12;
-
-constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;
-constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
-
-template <typename T>
-Bounds3f get_max_bounds(std::vector<T> &infos, uint32_t start, uint32_t end)
-{
-    Bounds3f max_bounds;
-    for (uint32_t i = start; i < end; i++)
-    {
-        max_bounds = _union(max_bounds, infos[i].bounds);
-    }
-    return max_bounds;
+    g_tlas_pool.dealloc(reinterpret_cast<TLAS *>(ptr));
 }
 
 QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root, uint32_t *total)
@@ -170,157 +153,6 @@ uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollaps
     return cur_offset;
 }
 
-MeshBLAS::MeshBLAS(const std::vector<shared<MeshPrimitive>> &primitives) : _primitives(primitives)
-{
-    STAT_INCREASE_COUNTER(primitive_count, _primitives.size())
-    std::vector<BVHMeshPrimitiveState> primitive_states(_primitives.size());
-    for (uint32_t i = 0; i < _primitives.size(); ++i)
-    {
-        primitive_states[i] = BVHMeshPrimitiveState(_primitives[i], i);
-    }
-
-    //获取所有MeshPrimitive的Bounds
-    _bounds = get_max_bounds(primitive_states, 0, static_cast<uint32_t>(primitive_states.size()));
-
-    MemoryArena arena;
-    std::vector<shared<MeshPrimitive>> _ordered_primitives;
-    uint32_t total_build_node_num = 0;
-    uint32_t total_collapse_node_num = 0;
-
-    auto build_root = build(arena, 0, static_cast<uint32_t>(primitive_states.size()), primitive_states, _ordered_primitives, &total_build_node_num);
-
-    _primitives = _ordered_primitives;
-    auto collapse_root = collapse(arena, build_root, &total_collapse_node_num);
-
-    _nodes.resize(total_collapse_node_num);
-    build_compact_primitives(build_root);
-    uint32_t offset = 0;
-
-    flatten(_nodes, 0, collapse_root, &offset);
-
-    STAT_INCREASE_MEMORY_COUNTER(primitive_memory_cost, sizeof(Primitive) * _primitives.size())
-    STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
-}
-
-BVHBuildNode *MeshBLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHMeshPrimitiveState> &primitive_states, std::vector<shared<MeshPrimitive>> &ordered, uint32_t *total)
-{
-    auto node = arena.alloc<BVHBuildNode>(1);
-    (*total)++;
-    Bounds3f max_bounds = get_max_bounds(primitive_states, start, end);
-
-    uint32_t num = end - start;
-    if (num <= BLAS_ELEMENT_NUM_PER_LEAF)
-    {
-        uint32_t offset = static_cast<uint32_t>(ordered.size());
-        for (uint32_t i = start; i < end; i++)
-        {
-            ordered.push_back(_primitives[primitive_states[i].prim_index]);
-        }
-        init_leaf(node, offset, num, max_bounds);
-    }
-    else
-    {
-        Bounds3f centroid_bounds;
-        for (uint32_t i = start; i < end; i++)
-        {
-            centroid_bounds = _union(centroid_bounds, primitive_states[i].centroid);
-        }
-
-        auto dim = max_extent(centroid_bounds);
-
-        if (centroid_bounds.min_point[dim] == centroid_bounds.max_point[dim])
-        {
-            //degenerate
-            auto mid = (start + end) / 2;
-            std::nth_element(&primitive_states[start], &primitive_states[mid], &primitive_states[end - 1] + 1, [dim](const BVHMeshPrimitiveState &p0, const BVHMeshPrimitiveState &p1) { return p0.centroid[dim] < p1.centroid[dim]; });
-            init_interior(node, build(arena, start, mid, primitive_states, ordered, total), build(arena, mid, end, primitive_states, ordered, total), dim);
-        }
-        else
-        {
-            //SAH
-            BucketInfo bucket_infos[BLAS_SAH_BUCKET_NUM];
-
-            for (uint32_t i = start; i < end; ++i)
-            {
-                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds, primitive_states[i].centroid)[dim]);
-                bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
-                bucket_infos[bucket_index].bounds = _union(bucket_infos[bucket_index].bounds, primitive_states[i].bounds);
-                bucket_infos[bucket_index].count++;
-            }
-
-            //compute cost function
-            float costs[BLAS_SAH_BUCKET_NUM - 1];
-            for (uint32_t i = 0; i < BLAS_SAH_BUCKET_NUM - 1; i++)
-            {
-                Bounds3f b0, b1;
-                uint32_t count0 = 0, count1 = 0;
-                for (uint32_t j = 0; j <= i; j++)
-                {
-                    b0 = _union(b0, bucket_infos[j].bounds);
-                    count0 += bucket_infos[j].count;
-                }
-                for (uint32_t j = i + 1; j < BLAS_SAH_BUCKET_NUM; j++)
-                {
-                    b1 = _union(b1, bucket_infos[j].bounds);
-                    count1 += bucket_infos[j].count;
-                }
-
-                costs[i] = 0.125f + (count0 * surface_area(b0) + count1 * surface_area(b1)) / surface_area(max_bounds);
-            }
-
-            float min_cost = costs[0];
-            int min_cost_bucket_index = 0;
-            for (uint32_t i = 1; i < BLAS_SAH_BUCKET_NUM - 1; i++)
-            {
-                if (costs[i] < min_cost)
-                {
-                    min_cost = costs[i];
-                    min_cost_bucket_index = i;
-                }
-            }
-
-            auto mid_ptr = std::partition(&primitive_states[start], &primitive_states[end - 1] + 1, [=](const BVHMeshPrimitiveState &pi) {
-                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
-                bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
-                return bucket_index <= min_cost_bucket_index;
-            });
-            auto mid = static_cast<uint32_t>(mid_ptr - &primitive_states[0]);
-            init_interior(node, build(arena, start, mid, primitive_states, ordered, total), build(arena, mid, end, primitive_states, ordered, total), dim);
-        }
-    }
-    return node;
-}
-
-void MeshBLAS::build_compact_primitives(BVHBuildNode *node)
-{
-
-    if (is_leaf(node))
-    {
-        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 1, (node->num % 4) == 1)
-        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 2, (node->num % 4) == 2)
-        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 3, (node->num % 4) == 3)
-        STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 4, (node->num % 4) == 0)
-       
-
-        auto primitive_states = pack_mesh_primitives(_primitives, node->offset, node->num);
-        node->num = static_cast<uint32_t>(primitive_states.size());
-        node->offset = static_cast<uint32_t>(_compact_primitives.size());
-        _compact_primitives.insert(_compact_primitives.end(), primitive_states.begin(), primitive_states.end());
-
-        STAT_INCREASE_COUNTER(SoA_utilization_ratio_num,(static_cast<uint32_t>(primitive_states.size()) - 1) * 4)
-        STAT_INCREASE_COUNTER(SoA_utilization_ratio_denom, static_cast<uint32_t>(primitive_states.size()) * 4)
-
-
-
-    }
-    //codition-> the interior node must has two child node
-    if (node->childrens[0] && node->childrens[1])
-    {
-        build_compact_primitives(node->childrens[0]);
-        build_compact_primitives(node->childrens[1]);
-    }
-}
-
 void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t orders[4])
 {
     orders[0] = 0;
@@ -343,206 +175,7 @@ void get_traversal_orders(const QBVHNode &node, const Vector3f &dir, uint32_t or
     }
 }
 
-bool MeshBLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
-{
-    std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o, ray.d, ray.t_max);
-    int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    node_stack.push({&_nodes[0], 0.0f});
-
-    bool has_hit = false;
-
-    uint32_t compact_offset;
-    uint32_t compact_idx;
-    Point2f barycentric;
-
-    while (!node_stack.empty())
-    {
-
-        if (node_stack.top().second > ray.t_max)
-        {
-            node_stack.pop();
-            continue;
-        }
-
-        auto node = node_stack.top().first;
-        node_stack.pop();
-        float4 box_t;
-        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
-
-        bool push_child[4] = {false, false, false, false};
-        uint32_t orders[4];
-        get_traversal_orders((*node), ray.d, orders);
-
-        for (uint32_t i = 0; i < 4; ++i)
-        {
-            uint32_t index = orders[i];
-            STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index] && box_t[index] < ray.t_max)
-            {
-                STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
-                if (is_leaf(node->childrens[index]))
-                {
-                    auto offset = leaf_offset(node->childrens[index]);
-                    auto num = leaf_num(node->childrens[index]);
-                    for (uint32_t j = offset; j < offset + num; ++j)
-                    {
-                        float hit_t = INFINITE;
-                        Point2f temp_barycentric;
-                        int triangle_index;
-                        auto is_hit = narukami::intersect(soa_ray, _compact_primitives[j].triangle, &hit_t, &temp_barycentric, &triangle_index);
-                        STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
-
-                        if (is_hit && hit_t < ray.t_max)
-                        {
-                            {
-                                has_hit = true;
-                            }
-                            //更新射线的t_max
-                            {
-                                soa_ray.t_max = float4(hit_t);
-                                ray.t_max = hit_t;
-                            }
-                            {
-                                compact_offset = triangle_index;
-                                compact_idx = j;
-                                barycentric = temp_barycentric;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    push_child[index] = true;
-                }
-            }
-        }
-
-        for (uint32_t i = 0; i < 4; i++)
-        {
-            uint32_t index = orders[i];
-            if (push_child[index])
-            {
-                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
-            }
-        }
-    }
-
-    if (has_hit)
-    {
-        auto triangle = _compact_primitives[compact_idx].triangle[compact_offset];
-        auto primitive = get_mesh_primitive(compact_idx,compact_offset);
-        //交点和法线
-        interaction->p = get_vertex(triangle, barycentric);
-        interaction->n = hemisphere_flip(get_normalized_normal(triangle), -ray.d);
-        //dpdu,dpdv
-        Vector3f dpdu,dpdv;
-
-        Vector3f dp10 = triangle.e1;
-        Vector3f dp20 = triangle.e2;
-
-        Point2f uv0 = primitive->get_texcoord(0);
-        Point2f uv1 = primitive->get_texcoord(1);
-        Point2f uv2 = primitive->get_texcoord(2);
-
-        Vector2f duv10 = uv1 - uv0;
-        Vector2f duv20 = uv2 - uv0;
-
-        //使用 delta X 和 delta Y 计算导数
-        //判断行列式 是否退化
-        float det = duv10[0] * duv20[1] - duv20[0] * duv10[1];
-        if(det == 0)
-        {
-            coordinate_system(interaction->n,&dpdu,&dpdv);
-        }
-        else
-        {
-            //求2x2矩阵的逆
-
-            dpdu = duv20.y * dp10 - duv10.y * dp20;
-            dpdv = -duv20.x * dp10 + duv10.x * dp20;
-            dpdu/=det;
-            dpdv/=det;
-        }
-
-        interaction->dpdu = dpdu;
-        interaction->dpdv = dpdv;
-
-        interaction->uv = primitive->get_texcoord(barycentric);
-    }
-    return has_hit;
-}
-
-bool MeshBLAS::intersect(const Ray &ray) const
-{
-    std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray);
-    int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    node_stack.push({&_nodes[0], 0.0f});
-    while (!node_stack.empty())
-    {
-        auto node = node_stack.top().first;
-        node_stack.pop();
-        float4 box_t;
-        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
-
-        bool push_child[4] = {false, false, false, false};
-        uint32_t orders[4];
-        get_traversal_orders((*node), ray.d, orders);
-
-        for (uint32_t i = 0; i < 4; ++i)
-        {
-            uint32_t index = orders[i];
-            STAT_INCREASE_COUNTER(ordered_traversal_denom, 1)
-            if (box_hits[index])
-            {
-                STAT_INCREASE_COUNTER(ordered_traversal_num, 1)
-                if (is_leaf(node->childrens[index]))
-                {
-                    auto offset = leaf_offset(node->childrens[index]);
-                    auto num = leaf_num(node->childrens[index]);
-                    for (uint32_t j = offset; j < offset + num; ++j)
-                    {
-                        auto is_hit = narukami::intersect(soa_ray, _compact_primitives[j].triangle);
-                        if (is_hit)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                else
-                {
-                    push_child[index] = true;
-                }
-            }
-        }
-
-        for (uint32_t i = 0; i < 4; i++)
-        {
-            uint32_t index = orders[i];
-            if (push_child[index])
-            {
-                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
-            }
-        }
-    }
-    return false;
-}
-
-std::vector<QBVHNode> MeshBLAS::get_nodes_by_depth(uint32_t depth) const
-{
-    std::vector<QBVHNode> ret;
-    for (auto &node : _nodes)
-    {
-        if (node.depth == depth)
-        {
-            ret.push_back(node);
-        }
-    }
-    return ret;
-}
-
-TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) :_instances(instance_list)
+TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) : _instances(instance_list)
 {
     STAT_INCREASE_COUNTER(blas_instance_num, instance_list.size())
     std::vector<BLASInstanceInfo> instance_infos(instance_list.size());

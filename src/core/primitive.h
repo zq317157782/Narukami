@@ -49,7 +49,7 @@ public:
     const Transform &object_to_world() const { return _mesh->object_to_world(); }
     const Transform &world_to_object() const { return _mesh->world_to_object(); }
     Point3f get_vertex(uint32_t vertex) const {return _mesh->get_vertex(_segment,_face,vertex);}
-    Point2f get_texcoord(Point2f& u ) const {return _mesh->get_texcoord(_segment,_face,u);}
+    Point2f get_texcoord(const Point2f& u ) const {return _mesh->get_texcoord(_segment,_face,u);}
     Point2f get_texcoord(uint32_t vertex) const {return _mesh->get_texcoord(_segment,_face,vertex);}
    
     void *operator new(size_t size);
@@ -68,7 +68,8 @@ struct CompactMeshPrimitive
     //***
 };
 
-
-
+bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive,float* hit_t, Point2f* temp_param_uv, int * temp_compact_offset);
+bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive);
+void setup_interaction(const CompactMeshPrimitive& ,const shared<MeshPrimitive> &,uint32_t ,const Ray& ,const Point2f&,SurfaceInteraction * );
 std::vector<CompactMeshPrimitive> pack_mesh_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count);
 NARUKAMI_END
