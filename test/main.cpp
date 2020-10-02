@@ -584,25 +584,25 @@ TEST(matrix4x4,eq){
     
 }
 
-TEST(matrix4x4,transform_inverse_noscale){
+TEST(matrix4x4,inverse_tr){
     Matrix4x4 mat;
-    Matrix4x4 mat2 = transform_inverse_noscale(mat);
+    Matrix4x4 mat2 = inverse_tr(mat);
     EXPECT_TRUE(mat==mat2);
 
     Matrix4x4 mat3(1,0,0,0,0,1,0,0,0,0,1,0,1,1,1,1);
-    Matrix4x4 mat4=transform_inverse_noscale(mat3);
+    Matrix4x4 mat4=inverse_tr(mat3);
     Matrix4x4 mat5(1,0,0,0,0,1,0,0,0,0,1,0,-1,-1,-1,1);
     EXPECT_EQ(mat5,mat4);
 }
 
 
-TEST(matrix4x4,transform_inverse){
+TEST(matrix4x4,inverse_trs){
     Matrix4x4 mat;
-    Matrix4x4 mat2 = transform_inverse(mat);
+    Matrix4x4 mat2 = inverse_trs(mat);
     EXPECT_TRUE(mat==mat2);
 
     Matrix4x4 mat3(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,1);
-    Matrix4x4 mat4=transform_inverse(mat3);
+    Matrix4x4 mat4=inverse_trs(mat3);
     Matrix4x4 mat5(0.5f,0,0,0,0,0.5f,0,0,0,0,0.5f,0,0,0,0,1);
     EXPECT_EQ(mat5,mat4);
 }

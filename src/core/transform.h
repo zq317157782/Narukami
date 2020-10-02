@@ -51,7 +51,7 @@ struct SSE_ALIGNAS Transform
     Interaction operator()(const Interaction &i) const;
     SurfaceInteraction operator()(const SurfaceInteraction &i) const;
     inline Transform operator()(const Transform &t) const { return Transform(mat * t.mat, t.inv_mat * inv_mat); }
-
+    
     void *operator new(size_t size);
     void operator delete(void *ptr);
 };
@@ -62,6 +62,8 @@ inline std::ostream &operator<<(std::ostream &out, const Transform &t)
     return out;
 }
 
+
+
 inline Point3f transform_4x4(const Transform &t, const Point3f &p)
 {
     return mul_4x4(t.mat, p);
@@ -70,6 +72,14 @@ inline Point3f transform_4x4(const Transform &t, const Point3f &p)
 inline Transform identity()
 {
     return Transform();
+}
+
+inline Transform create_transform_trs(const Matrix4x4 &mat)
+{
+    Transform t;
+    t.mat = mat;
+    t.inv_mat = inverse_trs(mat);
+    return t;
 }
 
 inline Transform inverse(const Transform &transform)
@@ -198,7 +208,7 @@ inline Transform look_at(const Point3f &o, const Point3f &target, const Vector3f
     cam2wrold.m[13] = o.y;
     cam2wrold.m[14] = o.z;
     cam2wrold.m[15] = 1.0f;
-    return Transform(cam2wrold, transform_inverse_noscale(cam2wrold));
+    return Transform(cam2wrold, inverse_tr(cam2wrold));
 }
 
 inline Transform look_at(float eye_x, float eye_y, float eye_z, float c_x, float c_y, float c_z, float up_x, float up_y, float up_z)
@@ -318,7 +328,8 @@ public:
             }
             
             Matrix4x4 mat = trans_mat * rotate_mat * scale;
-            *t = Transform(mat);
+            //默认认为只有TRS矩阵会计算polor分解，所以这里使用求逆速度更加快的，不考虑透视的transform
+            *t = create_transform_trs(mat);
         }
         else
         {

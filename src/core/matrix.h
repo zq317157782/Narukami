@@ -213,7 +213,7 @@ inline Matrix4x4 operator*(const Matrix4x4 &A, const Matrix4x4 &B)
 }
 
 //https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html#_appendix_2
-inline Matrix4x4 transform_inverse_noscale(const Matrix4x4 &mat)
+inline Matrix4x4 inverse_tr(const Matrix4x4 &mat)
 {
     Matrix4x4 r;
     //transpose left-upper 3x3
@@ -233,7 +233,7 @@ inline Matrix4x4 transform_inverse_noscale(const Matrix4x4 &mat)
     return r;
 }
 
-inline Matrix4x4 transform_inverse(const Matrix4x4 &mat)
+inline Matrix4x4 inverse_trs(const Matrix4x4 &mat)
 {
     Matrix4x4 r;
     //transpose left-upper 3x3

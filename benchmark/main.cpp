@@ -311,16 +311,16 @@ BENCHMARK(BM_matrix4x4_mul_matrix4x4_sse);
 
 
 
-static void BM_matrix4x4_transform_inverse(benchmark::State &state)
+static void BM_matrix4x4_inverse_trs(benchmark::State &state)
 {
     narukami::Matrix4x4 M;
     narukami::Matrix4x4 M2;
     for (auto _ : state)
     {
-         benchmark::DoNotOptimize(M2=narukami::transform_inverse(M));
+         benchmark::DoNotOptimize(M2=narukami::inverse_trs(M));
     }
 }
-BENCHMARK(BM_matrix4x4_transform_inverse);
+BENCHMARK(BM_matrix4x4_inverse_trs);
 
 static void BM_matrix4x4_inverse(benchmark::State &state)
 {
