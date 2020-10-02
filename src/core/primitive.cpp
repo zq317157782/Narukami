@@ -54,12 +54,12 @@ std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &me
     return primitives;
 }
 
-bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive,float* hit_t, Point2f* temp_param_uv, int * temp_compact_offset)
+bool intersect(RayPack& soa_ray,const CompactMeshPrimitive& compact_primitive,float* hit_t, Point2f* temp_param_uv, int * temp_compact_offset)
 {
     return intersect(soa_ray,compact_primitive.triangle, hit_t, temp_param_uv, temp_compact_offset);
 }
 
-bool intersect(SoARay& soa_ray,const CompactMeshPrimitive& compact_primitive)
+bool intersect(RayPack& soa_ray,const CompactMeshPrimitive& compact_primitive)
 {
     return intersect(soa_ray, compact_primitive.triangle);
 }

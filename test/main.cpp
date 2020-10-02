@@ -370,17 +370,17 @@ TEST(point3f,max){
 
 
 TEST(soapoint3f,min){
-    Point3f4p p0(1,10,2);
-    Point3f4p p1(10,3,7);
+    Point3fPack p0(1,10,2);
+    Point3fPack p1(10,3,7);
     auto min_point=min(p0,p1);
-    EXPECT_EQ(min_point,Point3f4p(1,3,2));
+    EXPECT_EQ(min_point,Point3fPack(1,3,2));
 }
 
 TEST(soapoint3f,max){
-    Point3f4p p0(1,10,2);
-    Point3f4p p1(10,3,7);
+    Point3fPack p0(1,10,2);
+    Point3fPack p1(10,3,7);
     auto max_point=max(p0,p1);
-    EXPECT_EQ(max_point,Point3f4p(10,10,7));
+    EXPECT_EQ(max_point,Point3fPack(10,10,7));
 }
 
 
@@ -685,9 +685,9 @@ TEST(matrix4x4,add){
 
 TEST(matrix4x4,soavector3){
     Matrix4x4 mat(2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,1);
-    Vector3f4p v(float4(1),float4(2),float4(3));
+    Vector3fPack v(float4(1),float4(2),float4(3));
     auto v2=mat*v;
-    EXPECT_EQ(v2,Vector3f4p(float4(2),float4(4),float4(6)));
+    EXPECT_EQ(v2,Vector3fPack(float4(2),float4(4),float4(6)));
 }
 
 TEST(matrix4x4,mat_mul_point){
@@ -706,9 +706,9 @@ TEST(matrix4x4,mat_mul_ssepoint){
 
 TEST(matrix4x4,mat_mul_soapoint){
     Matrix4x4 mat(1,0,0,0,0,1,0,0,0,0,1,0,1,2,3,1);
-    Point3f4p p;
+    Point3fPack p;
     auto p2=mat*p;
-    EXPECT_EQ(p2,Point3f4p(1,2,3));
+    EXPECT_EQ(p2,Point3fPack(1,2,3));
 }
 
 TEST(matrix4x4,sub_matrix3x3_determinant){
@@ -717,38 +717,38 @@ TEST(matrix4x4,sub_matrix3x3_determinant){
     EXPECT_EQ(det,1);
 }
 
-TEST(Vector3f4p,eq){
-    Vector3f4p v1;
-    Vector3f4p v2(0);
+TEST(Vector3fPack,eq){
+    Vector3fPack v1;
+    Vector3fPack v2(0);
     EXPECT_EQ(v1==v2,15);
 }
 
-TEST(Vector3f4p,not_eq){
-    Vector3f4p v1;
-    Vector3f4p v2(1);
+TEST(Vector3fPack,not_eq){
+    Vector3fPack v1;
+    Vector3fPack v2(1);
     EXPECT_EQ(v1!=v2,15);
 }
 
-TEST(Vector3f4p,dot){
-    Vector3f4p v1(1,2,0);
-    Vector3f4p v2(1,2,0);
+TEST(Vector3fPack,dot){
+    Vector3fPack v1(1,2,0);
+    Vector3fPack v2(1,2,0);
     auto value =dot(v1,v2);
     EXPECT_TRUE(all(float4(value)==float4(5)));
 }
 
 
-TEST(Vector3f4p,cross){
-    Vector3f4p v1(1,0,0);
-    Vector3f4p v2(0,1,0);
-    Vector3f4p v3 =cross(v1,v2);
-    EXPECT_EQ(v3,Vector3f4p(0,0,1));
+TEST(Vector3fPack,cross){
+    Vector3fPack v1(1,0,0);
+    Vector3fPack v2(0,1,0);
+    Vector3fPack v3 =cross(v1,v2);
+    EXPECT_EQ(v3,Vector3fPack(0,0,1));
 }
 
 
-// TEST(Vector3f4p,safe_rcp){
-//     Vector3f4p v1(1,0,0);
+// TEST(Vector3fPack,safe_rcp){
+//     Vector3fPack v1(1,0,0);
 //     auto v2 = safe_rcp(v1);
-//     EXPECT_EQ(v2,Vector3f4p(0,0,1));
+//     EXPECT_EQ(v2,Vector3fPack(0,0,1));
 // }
 
 TEST(Euclid,point_add_vector){
@@ -775,11 +775,11 @@ TEST(Euclid,distance_sse){
 
 
 TEST(Euclid,point_minus_point){
-    Point3f4p p(2);
-    Point3f4p p2(1);
-    Vector3f4p v=p-p2;
+    Point3fPack p(2);
+    Point3fPack p2(1);
+    Vector3fPack v=p-p2;
 
-    EXPECT_EQ(v,Vector3f4p(1));
+    EXPECT_EQ(v,Vector3fPack(1));
 }
 #include "core/geometry.h"
 TEST(geometry,ray_intersect_triangle){
@@ -818,52 +818,52 @@ TEST(geometry,get_normalized_normal){
 TEST(geometry,ray_intersect_soatriangle){
     
 
-    Triangle4p triangle;
-    triangle.v0 = Point3f4p(0,0,2);
-    triangle.e1 = Vector3f4p(1,0,0);
-    triangle.e2 = Vector3f4p(0,1,0);
+    TrianglePack triangle;
+    triangle.v0 = Point3fPack(0,0,2);
+    triangle.e1 = Vector3fPack(1,0,0);
+    triangle.e2 = Vector3fPack(0,1,0);
     float t;
     Point2f uv;
 
-    SoARay r(Point3f(0,0,0),Vector3f(0,0,1));
+    RayPack r(Point3f(0,0,0),Vector3f(0,0,1));
     auto a=intersect(r,triangle);
     EXPECT_EQ((a),true);
 
-    SoARay r2(Point3f(1,0,0),Vector3f(0,0,1));
+    RayPack r2(Point3f(1,0,0),Vector3f(0,0,1));
     auto a2=intersect(r2,triangle,&t,&uv,nullptr,SSE_MASK(false,false,false,false));
     EXPECT_EQ((a2),false);
 
 
 
-    SoARay r3(Point3f(1.1,0,0),Vector3f(0,0,1));
+    RayPack r3(Point3f(1.1,0,0),Vector3f(0,0,1));
     auto a3=intersect(r3,triangle);
     EXPECT_EQ((a3),false);
 
 
-    SoARay r4(Point3f(0,1.1,0),Vector3f(0,0,1));
+    RayPack r4(Point3f(0,1.1,0),Vector3f(0,0,1));
     auto a4=intersect(r4,triangle);
     EXPECT_EQ((a4),false);
    
 }
 
 TEST(geometry,size_of_soatriangle){
-    EXPECT_EQ(sizeof(Triangle4p),144);
+    EXPECT_EQ(sizeof(TrianglePack),144);
 }
 
 TEST(SoAbound3f,intersect0){
     
-    Bounds3f4p bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
-    SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
+    Bounds3fPack bound(Point3fPack(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3fPack(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    RayPack ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
     int p[3]={1,1,1};
-    auto a=intersect(ray.o,Vector3f4p(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
+    auto a=intersect(ray.o,Vector3fPack(INFINITE,INFINITE,1),float4(0.0f),float4(INFINITE),p,bound);
     EXPECT_EQ(any(a),true);
 }
 
 
 TEST(SoAbound3f,intersect1){
     
-    Bounds3f4p bound(Point3f4p(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3f4p(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
-    SoARay ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
+    Bounds3fPack bound(Point3fPack(Point3f(0.1f,0.1f,0.1f),Point3f(0.1f,0.6f,0.1f),Point3f(0.6f,0.1f,0.1f),Point3f(0.6f,0.6f,0.1f)),Point3fPack(Point3f(0.4f,0.4f,1.0f),Point3f(0.4f,0.9f,1.0f),Point3f(0.9f,0.4f,1.0f),Point3f(0.9f,0.9f,1.0f)));
+    RayPack ray(Point3f(0.2f,0.2f,0),Vector3f(0,0,1));
     int p[3]={1,1,1};
     float4 tHit;
     auto a=intersect(ray.o,safe_rcp(ray.d),float4(0.0f),float4(INFINITE),p,bound,&tHit);

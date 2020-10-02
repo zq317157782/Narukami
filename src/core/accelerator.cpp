@@ -357,7 +357,7 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o, ray.d, ray.t_max);
+    RayPack soa_ray(ray.o, ray.d, ray.t_max);
 
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
@@ -443,7 +443,7 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *int
 bool TLAS::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray);
+    RayPack soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
     Point2f uv;

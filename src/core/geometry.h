@@ -386,7 +386,7 @@ inline SSEVector3f sqrt(const SSEVector3f &v) { return sqrt(v.xyzw); }
 inline SSEVector3f rsqrt(const SSEVector3f &v) { return rsqrt(v.xyzw); }
 
 //SoA struct vector3f
-struct SSE_ALIGNAS Vector3f4p
+struct SSE_ALIGNAS Vector3fPack
 {
     union {
         float4 xxxx;
@@ -412,12 +412,12 @@ struct SSE_ALIGNAS Vector3f4p
         };
     };
 
-    inline Vector3f4p() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
-    inline explicit Vector3f4p(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
-    inline Vector3f4p(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
-    inline explicit Vector3f4p(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
-    inline Vector3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
-    inline Vector3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Vector3fPack() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
+    inline explicit Vector3fPack(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
+    inline Vector3fPack(const Vector3f &v0, const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
+    inline explicit Vector3fPack(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
+    inline Vector3fPack(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Vector3fPack(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
     
     inline Vector3f operator[](const int idx) const
     {
@@ -426,7 +426,7 @@ struct SSE_ALIGNAS Vector3f4p
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const Vector3f4p &v)
+inline std::ostream &operator<<(std::ostream &out, const Vector3fPack &v)
 {
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
@@ -435,7 +435,7 @@ inline std::ostream &operator<<(std::ostream &out, const Vector3f4p &v)
     return out;
 }
 
-inline int operator==(const Vector3f4p &v0, const Vector3f4p &v1)
+inline int operator==(const Vector3fPack &v0, const Vector3fPack &v1)
 {
     bool4 mask_xxxx = (v0.xxxx == v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy == v1.yyyy);
@@ -443,7 +443,7 @@ inline int operator==(const Vector3f4p &v0, const Vector3f4p &v1)
 
     return movemask((mask_xxxx & mask_yyyy) & mask_zzzz);
 }
-inline int operator!=(const Vector3f4p &v0, const Vector3f4p &v1)
+inline int operator!=(const Vector3fPack &v0, const Vector3fPack &v1)
 {
     bool4 mask_xxxx = (v0.xxxx != v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy != v1.yyyy);
@@ -451,42 +451,42 @@ inline int operator!=(const Vector3f4p &v0, const Vector3f4p &v1)
     return movemask((mask_xxxx | mask_yyyy) | mask_zzzz);
 }
 
-inline float4 dot(const Vector3f4p &v0, const Vector3f4p &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
+inline float4 dot(const Vector3fPack &v0, const Vector3fPack &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
 
-inline Vector3f4p cross(const Vector3f4p &v0, const Vector3f4p &v1)
+inline Vector3fPack cross(const Vector3fPack &v0, const Vector3fPack &v1)
 {
     float4 xxxx = v0.yyyy * v1.zzzz - v0.zzzz * v1.yyyy;
     float4 yyyy = v0.zzzz * v1.xxxx - v0.xxxx * v1.zzzz;
     float4 zzzz = v0.xxxx * v1.yyyy - v0.yyyy * v1.xxxx;
-    return Vector3f4p(xxxx, yyyy, zzzz);
+    return Vector3fPack(xxxx, yyyy, zzzz);
 }
 
-inline Vector3f4p rcp(const Vector3f4p &v)
+inline Vector3fPack rcp(const Vector3fPack &v)
 {
-    Vector3f4p vv;
+    Vector3fPack vv;
     vv.xxxx = rcp(v.xxxx);
     vv.yyyy = rcp(v.yyyy);
     vv.zzzz = rcp(v.zzzz);
     return vv;
 }
-inline Vector3f4p safe_rcp(const Vector3f4p &v)
+inline Vector3fPack safe_rcp(const Vector3fPack &v)
 {
-    Vector3f4p vv;
+    Vector3fPack vv;
     vv.xxxx = safe_rcp(v.xxxx);
     vv.yyyy = safe_rcp(v.yyyy);
     vv.zzzz = safe_rcp(v.zzzz);
     return vv;
 }
-inline Vector3f4p robust_rcp(const Vector3f4p &v)
+inline Vector3fPack robust_rcp(const Vector3fPack &v)
 {
-    Vector3f4p vv;
+    Vector3fPack vv;
     auto one = float4(1.0f);
     vv.xxxx = one / v.xxxx;
     vv.yyyy = one / v.yyyy;
     vv.zzzz = one / v.zzzz;
     return vv;
 }
-inline Vector3f4p load(const Vector3f *vector_array) { return Vector3f4p(vector_array[0], vector_array[1], vector_array[2], vector_array[3]); }
+inline Vector3fPack load(const Vector3f *vector_array) { return Vector3fPack(vector_array[0], vector_array[1], vector_array[2], vector_array[3]); }
 //---VECTOR3 END---
 
 //---VECTOR2 BEGIN---
@@ -824,7 +824,7 @@ inline SSEPoint3f sqrt(const SSEPoint3f &v) { return sqrt(v.xyzw); }
 inline SSEPoint3f rsqrt(const SSEPoint3f &v) { return rsqrt(v.xyzw); }
 
 //TODO : need to refactor
-struct SSE_ALIGNAS Point3f4p
+struct SSE_ALIGNAS Point3fPack
 {
     union {
         float4 xxxx;
@@ -852,12 +852,12 @@ struct SSE_ALIGNAS Point3f4p
 
     typedef float Scalar;
 
-    inline Point3f4p() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
-    inline explicit Point3f4p(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
-    inline Point3f4p(const Point3f &v0, const Point3f &v1, const Point3f &v2, const Point3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
-    inline explicit Point3f4p(const Point3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
-    inline Point3f4p(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
-    inline Point3f4p(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Point3fPack() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
+    inline explicit Point3fPack(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
+    inline Point3fPack(const Point3f &v0, const Point3f &v1, const Point3f &v2, const Point3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
+    inline explicit Point3fPack(const Point3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
+    inline Point3fPack(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Point3fPack(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
 
     inline Point3f operator[](const int idx) const
     {
@@ -866,7 +866,7 @@ struct SSE_ALIGNAS Point3f4p
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const Point3f4p &v)
+inline std::ostream &operator<<(std::ostream &out, const Point3fPack &v)
 {
     out << '(' << v.x0 << ',' << v.y0 << ',' << v.z0 << ')';
     out << '(' << v.x1 << ',' << v.y1 << ',' << v.z1 << ')';
@@ -875,7 +875,7 @@ inline std::ostream &operator<<(std::ostream &out, const Point3f4p &v)
     return out;
 }
 
-inline int operator==(const Point3f4p &v0, const Point3f4p &v1)
+inline int operator==(const Point3fPack &v0, const Point3fPack &v1)
 {
 
     bool4 mask_xxxx = (v0.xxxx == v1.xxxx);
@@ -884,7 +884,7 @@ inline int operator==(const Point3f4p &v0, const Point3f4p &v1)
 
     return movemask((mask_xxxx & mask_yyyy) & mask_zzzz);
 }
-inline int operator!=(const Point3f4p &v0, const Point3f4p &v1)
+inline int operator!=(const Point3fPack &v0, const Point3fPack &v1)
 {
     bool4 mask_xxxx = (v0.xxxx != v1.xxxx);
     bool4 mask_yyyy = (v0.yyyy != v1.yyyy);
@@ -892,19 +892,19 @@ inline int operator!=(const Point3f4p &v0, const Point3f4p &v1)
     return movemask((mask_xxxx | mask_yyyy) | mask_zzzz);
 }
 
-inline Point3f4p min(const Point3f4p &p0, const Point3f4p &p1)
+inline Point3fPack min(const Point3fPack &p0, const Point3fPack &p1)
 {
-    return Point3f4p(min(p0.xxxx, p1.xxxx), min(p0.yyyy, p1.yyyy), min(p0.zzzz, p1.zzzz));
+    return Point3fPack(min(p0.xxxx, p1.xxxx), min(p0.yyyy, p1.yyyy), min(p0.zzzz, p1.zzzz));
 }
 
-inline Point3f4p max(const Point3f4p &p0, const Point3f4p &p1)
+inline Point3fPack max(const Point3fPack &p0, const Point3fPack &p1)
 {
-    return Point3f4p(max(p0.xxxx, p1.xxxx), max(p0.yyyy, p1.yyyy), max(p0.zzzz, p1.zzzz));
+    return Point3fPack(max(p0.xxxx, p1.xxxx), max(p0.yyyy, p1.yyyy), max(p0.zzzz, p1.zzzz));
 }
 
-inline Point3f4p load(const Point3f *point_array)
+inline Point3fPack load(const Point3f *point_array)
 {
-    return Point3f4p(point_array[0], point_array[1], point_array[2], point_array[3]);
+    return Point3fPack(point_array[0], point_array[1], point_array[2], point_array[3]);
 }
 //---POINT3 END---
 
@@ -1339,7 +1339,7 @@ inline SSEPoint3f operator*(const Matrix4x4 &M, const SSEPoint3f &v)
     return SSEPoint3f(r.xyzw);
 }
 
-inline Vector3f4p operator*(const Matrix4x4 &M, const Vector3f4p &v)
+inline Vector3fPack operator*(const Matrix4x4 &M, const Vector3fPack &v)
 {
     float4 r_xxxx = swizzle<0, 0, 0, 0>(M.col[0]) /*m00*/ * v.xxxx;
     r_xxxx = r_xxxx + swizzle<0, 0, 0, 0>(M.col[1]) /*m10*/ * v.yyyy;
@@ -1353,10 +1353,10 @@ inline Vector3f4p operator*(const Matrix4x4 &M, const Vector3f4p &v)
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[1]) /*m12*/ * v.yyyy;
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[2]) /*m22*/ * v.zzzz;
 
-    return Vector3f4p(r_xxxx, r_yyyy, r_zzzz);
+    return Vector3fPack(r_xxxx, r_yyyy, r_zzzz);
 }
 
-inline Point3f4p operator*(const Matrix4x4 &M, const Point3f4p &v)
+inline Point3fPack operator*(const Matrix4x4 &M, const Point3fPack &v)
 {
     float4 r_xxxx = swizzle<0, 0, 0, 0>(M.col[0]) /*m00*/ * v.xxxx;
     r_xxxx = r_xxxx + swizzle<0, 0, 0, 0>(M.col[1]) /*m10*/ * v.yyyy;
@@ -1373,15 +1373,15 @@ inline Point3f4p operator*(const Matrix4x4 &M, const Point3f4p &v)
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[2]) /*m22*/ * v.zzzz;
     r_zzzz = r_zzzz + swizzle<2, 2, 2, 2>(M.col[3]);
 
-    return Point3f4p(r_xxxx, r_yyyy, r_zzzz);
+    return Point3fPack(r_xxxx, r_yyyy, r_zzzz);
 }
 
-inline Vector3f4p operator-(const Point3f4p &p0, const Point3f4p &p1)
+inline Vector3fPack operator-(const Point3fPack &p0, const Point3fPack &p1)
 {
     auto xxxx = p0.xxxx - p1.xxxx;
     auto yyyy = p0.yyyy - p1.yyyy;
     auto zzzz = p0.zzzz - p1.zzzz;
-    return Vector3f4p(xxxx, yyyy, zzzz);
+    return Vector3fPack(xxxx, yyyy, zzzz);
 }
 
 
@@ -1455,16 +1455,16 @@ inline Ray offset_ray(const Ray &ray, const Normal3f &n)
     return Ray(o_offseted,ray.d,max(0.0f,ray.t_max-epsion));
 }
 
-struct SSE_ALIGNAS SoARay
+struct SSE_ALIGNAS RayPack
 {
-    Point3f4p o;
-    Vector3f4p d;
+    Point3fPack o;
+    Vector3fPack d;
     mutable float4 t_max;
 
-    inline SoARay(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(Point3f4p(o)), d(Vector3f4p(d)), t_max(t_max) {}
-    inline explicit SoARay(const Ray &ray) : o(ray.o), d(ray.d), t_max(ray.t_max) {}
+    inline RayPack(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(Point3fPack(o)), d(Vector3fPack(d)), t_max(t_max) {}
+    inline explicit RayPack(const Ray &ray) : o(ray.o), d(ray.d), t_max(ray.t_max) {}
 };
-inline std::ostream &operator<<(std::ostream &out, const SoARay &ray)
+inline std::ostream &operator<<(std::ostream &out, const RayPack &ray)
 {
     out << "[o:" << ray.o << " d:" << ray.d << " t:" << float4(ray.t_max) << "]";
     return out;
@@ -1531,11 +1531,11 @@ inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
 }
 
 //v0(128*3)+e1(128*3)+e2(128*3)
-struct SSE_ALIGNAS Triangle4p
+struct SSE_ALIGNAS TrianglePack
 {
-    Point3f4p v0;
-    Vector3f4p e1;
-    Vector3f4p e2;
+    Point3fPack v0;
+    Vector3fPack e1;
+    Vector3fPack e2;
 
     Triangle operator[](const uint32_t idx) const
     {
@@ -1548,7 +1548,7 @@ struct SSE_ALIGNAS Triangle4p
     }
 };
 
-inline std::ostream &operator<<(std::ostream &out, const Triangle4p &triangle)
+inline std::ostream &operator<<(std::ostream &out, const TrianglePack &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";
     return out;
@@ -1825,14 +1825,14 @@ inline const Point3<T> corner(const Bounds3<T> &b,int idx)
     return Point3<T>(b[x].x,b[y].y,b[z].z);
 }
 
-struct SSE_ALIGNAS Bounds3f4p
+struct SSE_ALIGNAS Bounds3fPack
 {
-    Point3f4p min_point;
-    Point3f4p max_point;
+    Point3fPack min_point;
+    Point3fPack max_point;
 
     // 0:min point
     // 1:max point
-    inline const Point3f4p &column(const int idx) const
+    inline const Point3fPack &column(const int idx) const
     {
         assert(idx >= 0 && idx < 2);
         return (&min_point)[idx];
@@ -1844,28 +1844,28 @@ struct SSE_ALIGNAS Bounds3f4p
         return Bounds3f(min_point[idx],max_point[idx]);
     }
     
-    inline Bounds3f4p()
+    inline Bounds3fPack()
     {
-        min_point = Point3f4p(MAX, MAX, MAX);
-        max_point = Point3f4p(LOWEST, LOWEST, LOWEST);
+        min_point = Point3fPack(MAX, MAX, MAX);
+        max_point = Point3fPack(LOWEST, LOWEST, LOWEST);
     }
 
-    inline Bounds3f4p(const Point3f4p &p0, const Point3f4p &p1)
+    inline Bounds3fPack(const Point3fPack &p0, const Point3fPack &p1)
     {
         min_point = min(p0, p1);
         max_point = max(p0, p1);
     }
 
-    inline Bounds3f4p(const Bounds3f bounds[4])
+    inline Bounds3fPack(const Bounds3f bounds[4])
     {
-        min_point = Point3f4p(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
-        max_point = Point3f4p(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
+        min_point = Point3fPack(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
+        max_point = Point3fPack(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
     }
 
     
 };
 
-inline void store(const Bounds3f4p& bounds,Bounds3f* array)
+inline void store(const Bounds3fPack& bounds,Bounds3f* array)
 {
     
     array[0].min_point = bounds.min_point[0];
@@ -1879,15 +1879,15 @@ inline void store(const Bounds3f4p& bounds,Bounds3f* array)
     array[3].max_point = bounds.max_point[3];
 }
 
-inline std::ostream &operator<<(std::ostream &out, const Bounds3f4p &box)
+inline std::ostream &operator<<(std::ostream &out, const Bounds3fPack &box)
 {
     out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
     return out;
 }
 
-inline Bounds3f4p load(const Bounds3f *bound_array)
+inline Bounds3fPack load(const Bounds3f *bound_array)
 {
-    return Bounds3f4p(bound_array);
+    return Bounds3fPack(bound_array);
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
@@ -1969,7 +1969,7 @@ FINLINE int check(const bool4 &mask, const float4 &t_results, const float4 &u_re
     return idx;
 }
 
-inline bool4 intersect(const SoARay &ray, const Triangle4p &triangle, float4 *t_results, float4 *u_results, float4 *v_results, bool4 mask = SSE_MASK_TRUE)
+inline bool4 intersect(const RayPack &ray, const TrianglePack &triangle, float4 *t_results, float4 *u_results, float4 *v_results, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -2035,7 +2035,7 @@ inline bool4 intersect(const SoARay &ray, const Triangle4p &triangle, float4 *t_
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-inline bool intersect(const SoARay &ray, const Triangle4p &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const RayPack &ray, const TrianglePack &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -2117,7 +2117,7 @@ inline bool intersect(const SoARay &ray, const Triangle4p &triangle, float *t_re
     return true;
 }
 
-inline bool intersect(const SoARay &ray, const Triangle4p &triangle, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const RayPack &ray, const TrianglePack &triangle, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -2187,7 +2187,7 @@ inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, floa
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box)
+inline bool4 intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3fPack &box)
 {
     // x
     t_min = max((box.column(1 - isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_min);
@@ -2205,7 +2205,7 @@ inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min
     return t_min <= t_max;
 }
 
-inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box, float4 *t)
+inline bool4 intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3fPack &box, float4 *t)
 {
     // x
     t_min = max((box.column(1 - isPositive[0]).xxxx - o.xxxx) * inv_d.xxxx, t_min);
@@ -2227,7 +2227,7 @@ inline bool4 intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min
 
 
 //TODO need to test
-inline bool intersect(const Point3f4p &o, const Vector3f4p &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3f4p &box, float *t_result,int* index)
+inline bool intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3fPack &box, float *t_result,int* index)
 {
     float4 t;
     auto mask = intersect(o,inv_d,t_min,t_max,isPositive,box,&t);

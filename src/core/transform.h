@@ -41,9 +41,9 @@ struct SSE_ALIGNAS Transform
     inline Transform(const Matrix4x4 &mat, const Matrix4x4 &inv_mat) : mat(mat), inv_mat(inv_mat) {}
     inline Transform(const float *mat, const float *inv_mat) : mat(mat), inv_mat(inv_mat) {}
     inline Point3f operator()(const Point3f &p) const { return mat * p; }
-    inline Point3f4p operator()(const Point3f4p &p) const { return mat * p; }
+    inline Point3fPack operator()(const Point3fPack &p) const { return mat * p; }
     inline Vector3f operator()(const Vector3f &v) const { return mat * v; }
-    inline Vector3f4p operator()(const Vector3f4p &v) const { return mat * v; }
+    inline Vector3fPack operator()(const Vector3fPack &v) const { return mat * v; }
     inline Normal3f operator()(const Normal3f &n) const { return transpose(inv_mat) * Vector3f(n); }
     Ray operator()(const Ray &ray) const;
     RayDifferential operator()(const RayDifferential &ray) const;
@@ -364,7 +364,7 @@ public:
         return t(p);
     }
 
-    inline Point3f4p operator()(float time, const Point3f4p &p) const
+    inline Point3fPack operator()(float time, const Point3fPack &p) const
     {
         Transform t;
         interpolate(time, &t);
@@ -377,7 +377,7 @@ public:
         interpolate(time, &t);
         return t(v);
     }
-    inline Vector3f4p operator()(float time, const Vector3f4p &v) const
+    inline Vector3fPack operator()(float time, const Vector3fPack &v) const
     {
         Transform t;
         interpolate(time, &t);

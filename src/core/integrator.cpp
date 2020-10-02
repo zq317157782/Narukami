@@ -93,7 +93,7 @@ void Integrator::render(const Scene &scene)
 
                         //dot(dpdx,dpdy)
                         {
-                            Normal3f n = normalize(cross(interaction.dpdx,interaction.dpdy));
+                            Normal3f n = normalize(cross(interaction.dpdu,interaction.dpdv));
                             float r = n.x * 0.5f + 0.5f;
                             float g = n.y * 0.5f + 0.5f;
                             float b = n.z * 0.5f + 0.5f;

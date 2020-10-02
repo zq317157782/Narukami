@@ -117,7 +117,7 @@ struct QBVHCollapseNode
 
 struct SSE_ALIGNAS QBVHNode
 {
-    Bounds3f4p bounds;
+    Bounds3fPack bounds;
     uint32_t childrens[4];
     uint32_t axis0, axis1, axis2;
     uint32_t depth;
@@ -190,7 +190,7 @@ inline void init_QBVH_node(QBVHNode *node, uint32_t depth, const QBVHCollapseNod
         bounds[3] = Bounds3f();
     }
 
-    node->bounds = Bounds3f4p(bounds);
+    node->bounds = Bounds3fPack(bounds);
 
     if (is_leaf(cn->data[0]))
     {
@@ -439,7 +439,7 @@ template <class PrimitiveType, class CompactPrimitiveType>
 bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray.o, ray.d, ray.t_max);
+    RayPack soa_ray(ray.o, ray.d, ray.t_max);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
 
@@ -530,7 +530,7 @@ template <class PrimitiveType, class CompactPrimitiveType>
 bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(const Ray &ray) const
 {
     std::stack<std::pair<const QBVHNode *, float>> node_stack;
-    SoARay soa_ray(ray);
+    RayPack soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
     node_stack.push({&_nodes[0], 0.0f});
     while (!node_stack.empty())
@@ -638,7 +638,7 @@ struct BLASInstanceInfo
 
 struct CompactBLASInstance
 {
-    Bounds3f4p bounds;
+    Bounds3fPack bounds;
     uint32_t offset;
 };
 

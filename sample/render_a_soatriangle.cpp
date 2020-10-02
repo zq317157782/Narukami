@@ -3,10 +3,10 @@
 #include "lodepng.h"
 #include "core/geometry.h"
 int main(){
-    narukami::Triangle4p triangle;
-    triangle.v0 = narukami::Point3f4p(0,0,0);
-    triangle.e1 = narukami::Vector3f4p(1,0,0);
-    triangle.e2 = narukami::Vector3f4p(0,1,0);
+    narukami::TrianglePack triangle;
+    triangle.v0 = narukami::Point3fPack(0,0,0);
+    triangle.e1 = narukami::Vector3fPack(1,0,0);
+    triangle.e2 = narukami::Vector3fPack(0,1,0);
 
     
 
@@ -14,7 +14,7 @@ int main(){
 	for (int i = 0; i<128*128; ++i) {
 		narukami::Point2f uv;
 		float t;
-        narukami::SoARay ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
+        narukami::RayPack ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
         bool b=intersect(ray,triangle,&t,&uv,nullptr);
 		
 		float rgb[3];
