@@ -972,6 +972,18 @@ static void BM_construct_rvalue(benchmark::State &state)
 }
 BENCHMARK(BM_construct_rvalue)->Arg(1)->Arg(5)->Arg(10)->Arg(50);
 
+static void BM_vector3fpack_ctor(benchmark::State &state)
+{
+    narukami::float4 xxxx = float4(0.0f);
+    narukami::float4 yyyy = float4(1.0f);
+    narukami::float4 zzzz = float4(2.0f);
+    narukami::Vector3fPack v;
+    for (auto _ : state)
+    {
+         benchmark::DoNotOptimize(v=narukami::Vector3fPack(xxxx,yyyy,zzzz));
+    }
+}
+BENCHMARK(BM_vector3fpack_ctor);
 
 
 BENCHMARK_MAIN();

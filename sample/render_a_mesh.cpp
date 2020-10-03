@@ -22,7 +22,7 @@ int main()
 {
     auto camera_transform = translate(0, 0, -4)  ;//* rotate(-1.5f,0,0,1);
     auto camera_transform2 = translate(0, 0, -4) ;//* rotate( 1.5f,0,0,1);
-    auto sampler = Sampler(1);
+    auto sampler = Sampler(128);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
 

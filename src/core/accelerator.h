@@ -272,13 +272,15 @@ class CompactBLAS : public BLAS
 private:
     std::vector<shared<PrimitiveType>> _primitives;
     std::vector<CompactPrimitiveType> _compact_primitives;
+    std::vector<uint32_t> _compact_primitive_offsets;
     std::vector<QBVHNode> _nodes;
     Bounds3f _bounds;
     BVHBuildNode *build(MemoryArena &arena, uint32_t start, uint32_t end, std::vector<BVHPrimitiveState<PrimitiveType>> &primitive_states, std::vector<shared<PrimitiveType>> &ordered, uint32_t *total);
     void build_compact_primitives(BVHBuildNode *node);
     shared<PrimitiveType> get_primitive(int compact_primitive_id, int compact_primitive_offset) const
     {
-        auto primitive_offset = _compact_primitives[compact_primitive_id].offset + compact_primitive_offset;
+        uint32_t offset = _compact_primitive_offsets[compact_primitive_id];
+        auto primitive_offset = offset + compact_primitive_offset;
         return _primitives[primitive_offset];
     }
 
@@ -418,11 +420,12 @@ void CompactBLAS<PrimitiveType, CompactPrimitiveType>::build_compact_primitives(
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 2, (node->num % 4) == 2)
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 3, (node->num % 4) == 3)
         STAT_INCREASE_COUNTER_CONDITION(SoA_utilization_ratio_num, 4, (node->num % 4) == 0)
-
-        auto primitive_states = pack_compact_primitives(_primitives, node->offset, node->num);
+        std::vector<uint32_t> primitive_offsets;
+        auto primitive_states = pack_compact_primitives(_primitives, node->offset, node->num,&primitive_offsets);
         node->num = static_cast<uint32_t>(primitive_states.size());
         node->offset = static_cast<uint32_t>(_compact_primitives.size());
         _compact_primitives.insert(_compact_primitives.end(), primitive_states.begin(), primitive_states.end());
+        _compact_primitive_offsets.insert(_compact_primitive_offsets.end(), primitive_offsets.begin(), primitive_offsets.end());
 
         STAT_INCREASE_COUNTER(SoA_utilization_ratio_num, (static_cast<uint32_t>(primitive_states.size()) - 1) * 4)
         STAT_INCREASE_COUNTER(SoA_utilization_ratio_denom, static_cast<uint32_t>(primitive_states.size()) * 4)

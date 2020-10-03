@@ -107,7 +107,7 @@ void setup_interaction(const CompactMeshPrimitive& compact_primitive,const share
         interaction->uv = primitive->get_texcoord(param_uv);
 }
 
-std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count)
+std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count,std::vector<uint32_t> * offsets)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -146,13 +146,13 @@ std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shar
         primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
         primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
-        primitive.offset = start + i * SSE_FLOAT_COUNT;
+        //primitive.offset = start + i * SSE_FLOAT_COUNT;
         soa_primitives.push_back(primitive);
+        offsets->push_back(start + i * SSE_FLOAT_COUNT);
     }
 
     return soa_primitives;
 }
-
 std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, const std::vector<shared<Primitive>> &b)
 {
     std::vector<shared<Primitive>> c;

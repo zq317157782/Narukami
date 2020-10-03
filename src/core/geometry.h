@@ -166,7 +166,7 @@ inline Vector3<T> operator*(const Vector3<T> &v1, const T &f)
 }
 
 template <typename T>
-inline Vector3<T> operator*(const T &f,const Vector3<T> &v1)
+inline Vector3<T> operator*(const T &f, const Vector3<T> &v1)
 {
     return v1 * f;
 }
@@ -291,7 +291,8 @@ inline Vector3<T> max(const Vector3<T> &v0, const Vector3<T> &v1) { return Vecto
 //16 bit
 struct SSE_ALIGNAS SSEVector3f
 {
-    union {
+    union
+    {
         float4 xyzw;
         struct
         {
@@ -388,7 +389,8 @@ inline SSEVector3f rsqrt(const SSEVector3f &v) { return rsqrt(v.xyzw); }
 //SoA struct vector3f
 struct SSE_ALIGNAS Vector3fPack
 {
-    union {
+    union
+    {
         float4 xxxx;
         struct
         {
@@ -396,7 +398,8 @@ struct SSE_ALIGNAS Vector3fPack
         };
     };
 
-    union {
+    union
+    {
         float4 yyyy;
         struct
         {
@@ -404,7 +407,8 @@ struct SSE_ALIGNAS Vector3fPack
         };
     };
 
-    union {
+    union
+    {
         float4 zzzz;
         struct
         {
@@ -418,7 +422,7 @@ struct SSE_ALIGNAS Vector3fPack
     inline explicit Vector3fPack(const Vector3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
     inline Vector3fPack(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
     inline Vector3fPack(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
-    
+
     inline Vector3f operator[](const int idx) const
     {
         assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
@@ -451,6 +455,19 @@ inline int operator!=(const Vector3fPack &v0, const Vector3fPack &v1)
     return movemask((mask_xxxx | mask_yyyy) | mask_zzzz);
 }
 
+inline Vector3fPack operator-(const Vector3fPack &v)
+{
+    return Vector3fPack(-v.xxxx, -v.yyyy, -v.zzzz);
+}
+
+inline Vector3fPack operator*(const Vector3fPack &v, float4 c)
+{
+    float4 xxxx = v.xxxx * c;
+    float4 yyyy = v.yyyy * c;
+    float4 zzzz = v.zzzz * c;
+    return Vector3fPack(xxxx, yyyy, zzzz);
+}
+
 inline float4 dot(const Vector3fPack &v0, const Vector3fPack &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
 
 inline Vector3fPack cross(const Vector3fPack &v0, const Vector3fPack &v1)
@@ -459,6 +476,12 @@ inline Vector3fPack cross(const Vector3fPack &v0, const Vector3fPack &v1)
     float4 yyyy = v0.zzzz * v1.xxxx - v0.xxxx * v1.zzzz;
     float4 zzzz = v0.xxxx * v1.yyyy - v0.yyyy * v1.xxxx;
     return Vector3fPack(xxxx, yyyy, zzzz);
+}
+
+inline Vector3fPack normalize(const Vector3fPack &v)
+{
+    float4 sqr = dot(v, v);
+    return v * rsqrt(sqr);
 }
 
 inline Vector3fPack rcp(const Vector3fPack &v)
@@ -648,6 +671,17 @@ inline Point3<T> operator+(const Point3<T> &v1, const Point3<T> &v2)
     v.z = v1.z + v2.z;
     return v;
 }
+
+template <typename T>
+inline Point3<T> operator+(const Vector3<T> &v1, const Point3<T> &v2)
+{
+    Point3<T> v;
+    v.x = v1.x + v2.x;
+    v.y = v1.y + v2.y;
+    v.z = v1.z + v2.z;
+    return v;
+}
+
 //compenont wise
 template <typename T>
 inline Point3<T> operator*(const Point3<T> &v1, const Point3<T> &v2)
@@ -725,9 +759,9 @@ inline bool operator!=(const Point3<T> &v1, const Point3<T> &v2)
 template <typename T>
 inline Point3f rcp(const Point3<T> &v1) { return Point3f(rcp(v1.x), rcp(v1.y), rcp(v1.z)); }
 template <typename T>
-inline Point3<T> abs(const Point3<T> &v1) { return Point3f(abs(v1.x), abs(v1.y), abs(v1.z)); }
+inline Point3<T> abs(const Point3<T> &v1) { return Point3<T>(abs(v1.x), abs(v1.y), abs(v1.z)); }
 template <typename T>
-inline Point3<T> sign(const Point3<T> &v1) { return Point3f(sign(v1.x), sign(v1.y), sign(v1.z)); }
+inline Point3<T> sign(const Point3<T> &v1) { return Point3<T>(sign(v1.x), sign(v1.y), sign(v1.z)); }
 
 template <typename T>
 inline Point3f sqrt(const Point3<T> &v1) { return Point3f(sqrt(v1.x), sqrt(v1.y), sqrt(v1.z)); }
@@ -739,11 +773,21 @@ inline Point3<T> min(const Point3<T> &p0, const Point3<T> &p1) { return Point3<T
 template <typename T>
 inline Point3<T> max(const Point3<T> &p0, const Point3<T> &p1) { return Point3<T>(max(p0.x, p1.x), max(p0.y, p1.y), max(p0.z, p1.z)); }
 
+template <typename T>
+inline Point3<T> lerp(const Point3<T> &p0, const Point3<T> &p1,float a)
+{
+    float x = lerp(p0.x,p1.x,a);
+    float y = lerp(p0.y,p1.y,a);
+    float z = lerp(p0.z,p1.z,a);
+    return Point3<T>(x,y,z);
+}
+
 //--- [SSE] ---
 //16 bit
 struct SSE_ALIGNAS SSEPoint3f
 {
-    union {
+    union
+    {
         float4 xyzw;
         struct
         {
@@ -826,7 +870,8 @@ inline SSEPoint3f rsqrt(const SSEPoint3f &v) { return rsqrt(v.xyzw); }
 //TODO : need to refactor
 struct SSE_ALIGNAS Point3fPack
 {
-    union {
+    union
+    {
         float4 xxxx;
         struct
         {
@@ -834,7 +879,8 @@ struct SSE_ALIGNAS Point3fPack
         };
     };
 
-    union {
+    union
+    {
         float4 yyyy;
         struct
         {
@@ -842,7 +888,8 @@ struct SSE_ALIGNAS Point3fPack
         };
     };
 
-    union {
+    union
+    {
         float4 zzzz;
         struct
         {
@@ -914,6 +961,7 @@ struct Normal3
 {
 public:
     T x, y, z;
+
 public:
     inline Normal3() : x((T)0), y((T)0), z((T)0) {}
     inline explicit Normal3(const float a) : x(a), y(a), z(a) { assert(!isnan(a)); }
@@ -1037,6 +1085,10 @@ inline T dot(const Vector3<T> &v1, const Normal3<T> &v2) { return v1.x * v2.x + 
 template <typename T>
 inline T dot(const Normal3<T> &v1, const Normal3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 template <typename T>
+inline T dot(const Point3<T> &v1, const Normal3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
+template <typename T>
+inline T dot(const Normal3<T> &v1, const Point3<T> &v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
+template <typename T>
 inline Vector3<T> cross(const Normal3<T> &v1, const Vector3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
 template <typename T>
 inline Vector3<T> cross(const Vector3<T> &v1, const Normal3<T> &v2) { return Vector3<T>(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
@@ -1049,6 +1101,50 @@ inline Normal3f normalize(const Normal3<T> &v1)
 template <typename T>
 inline float length(const Normal3<T> &v) { return sqrt(static_cast<float>(dot(v, v))); }
 
+struct SSE_ALIGNAS Normal3fPack
+{
+    union
+    {
+        float4 xxxx;
+        struct
+        {
+            float x0, x1, x2, x3;
+        };
+    };
+
+    union
+    {
+        float4 yyyy;
+        struct
+        {
+            float y0, y1, y2, y3;
+        };
+    };
+
+    union
+    {
+        float4 zzzz;
+        struct
+        {
+            float z0, z1, z2, z3;
+        };
+    };
+
+    typedef float Scalar;
+
+    inline Normal3fPack() : xxxx(0.0f), yyyy(0.0f), zzzz(0.0f) {}
+    inline explicit Normal3fPack(const float a) : xxxx(a), yyyy(a), zzzz(a) { assert(!isnan(a)); }
+    inline Normal3fPack(const Normal3f &v0, const Normal3f &v1, const Normal3f &v2, const Normal3f &v3) : xxxx(v0.x, v1.x, v2.x, v3.x), yyyy(v0.y, v1.y, v2.y, v3.y), zzzz(v0.z, v1.z, v2.z, v3.z) {}
+    inline explicit Normal3fPack(const Normal3f &v) : xxxx(v.x), yyyy(v.y), zzzz(v.z) {}
+    inline Normal3fPack(const float4 &x, const float4 &y, const float4 &z) : xxxx(x), yyyy(y), zzzz(z) {}
+    inline Normal3fPack(const float x, const float y, const float z) : xxxx(x), yyyy(y), zzzz(z) {}
+
+    inline Normal3f operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        return Normal3f(xxxx[idx], yyyy[idx], zzzz[idx]);
+    }
+};
 
 //---NORMAL3 END---
 
@@ -1058,6 +1154,7 @@ struct Point2
 {
 public:
     T x, y;
+
 public:
     inline Point2() : x((T)0), y((T)0) {}
     inline explicit Point2(const float a) : x(a), y(a) { assert(!isnan(a)); }
@@ -1068,6 +1165,7 @@ public:
     }
     template <typename U>
     inline explicit Point2(const Point2<U> &p) : x((T)p.x), y((T)p.y) {}
+    inline Point2(const Point3<T> &p) : x(p.x), y(p.y) {}
     //just for checking assert for debug
 #ifdef NARUKAMI_DEBUG
     inline Point2(const Point2 &v1)
@@ -1163,6 +1261,25 @@ inline Point2<T> operator+(const Point2<T> &v1, const Point2<T> &v2)
     v.y = v1.y + v2.y;
     return v;
 }
+
+template <typename T>
+inline Point2<T> operator+(const Vector2<T> &v1, const Point2<T> &v2)
+{
+    Point2<T> v;
+    v.x = v1.x + v2.x;
+    v.y = v1.y + v2.y;
+    return v;
+}
+
+template <typename T>
+inline Point2<T> operator+(const Point2<T> &v1, const Vector2<T> &v2)
+{
+    Point2<T> v;
+    v.x = v1.x + v2.x;
+    v.y = v1.y + v2.y;
+    return v;
+}
+
 template <typename T>
 inline Point2<T> operator+(const Point2<T> &v1, const T &f)
 {
@@ -1195,6 +1312,9 @@ inline Point2<T> operator*(const Point2<T> &v1, const T &f)
     v.y = v1.y * f;
     return v;
 }
+
+template <typename T>
+inline Point2<T> abs(const Point2<T> &v1) { return Point2(abs(v1.x), abs(v1.y), abs(v1.z)); }
 
 template <typename T>
 inline Point2<T> min(const Point2<T> &p0, const Point2<T> &p1) { return Point2<T>(min(p0.x, p1.x), min(p0.y, p1.y)); }
@@ -1248,14 +1368,6 @@ inline float distance(const Point3f &p1, const Point3f &p2) { return length(p2 -
 inline float distance(const SSEPoint3f &p1, const SSEPoint3f &p2) { return length(p2 - p1); }
 
 template <typename T>
-inline Point2<T> operator+(const Point2<T> &p, const Vector2<T> &v)
-{
-    Point2<T> rp;
-    rp.x = p.x + v.x;
-    rp.y = p.y + v.y;
-    return rp;
-}
-template <typename T>
 inline Point2<T> operator-(const Point2<T> &p, const Vector2<T> &v)
 {
     Point2<T> rp;
@@ -1273,7 +1385,7 @@ inline Vector2<T> operator-(const Point2<T> &p0, const Point2<T> &p1)
     return v;
 }
 
-//matrix3x4 
+//matrix3x4
 inline Vector3f operator*(const Matrix4x4 &M, const Vector3f &v)
 {
     // 8ns
@@ -1288,7 +1400,7 @@ inline Vector3f operator*(const Matrix4x4 &M, const Vector3f &v)
     float z = M.m[2] * v.x + M.m[6] * v.y + M.m[10] * v.z;
     return Vector3f(x, y, z);
 }
-//matrix3x4 
+//matrix3x4
 inline Point3f operator*(const Matrix4x4 &M, const Point3f &v)
 {
     float4 r = M.col[0] * v.x;
@@ -1384,41 +1496,56 @@ inline Vector3fPack operator-(const Point3fPack &p0, const Point3fPack &p1)
     return Vector3fPack(xxxx, yyyy, zzzz);
 }
 
+inline Point3fPack operator+(const Point3fPack &p0, const Vector3fPack &v)
+{
+    auto xxxx = p0.xxxx + v.xxxx;
+    auto yyyy = p0.yyyy + v.yyyy;
+    auto zzzz = p0.zzzz + v.zzzz;
+    return Point3fPack(xxxx, yyyy, zzzz);
+}
 
-template<typename T,typename U>
+inline Point3fPack operator-(const Point3fPack &p0, const Vector3fPack &v)
+{
+    auto xxxx = p0.xxxx - v.xxxx;
+    auto yyyy = p0.yyyy - v.yyyy;
+    auto zzzz = p0.zzzz - v.zzzz;
+    return Point3fPack(xxxx, yyyy, zzzz);
+}
+
+template <typename T, typename U>
 inline T hemisphere_flip(const T &n, const U &wo)
 {
     return dot(n, wo) > 0 ? n : -n;
 }
 
-template<typename T>
-void coordinate_system(const Vector3<T>& v0,Vector3<T>* v1,Vector3<T>* v2)
+template <typename T>
+void coordinate_system(const Vector3<T> &v0, Vector3<T> *v1, Vector3<T> *v2)
 {
-    if(abs(v0.x) > abs(v0.y))
+    if (abs(v0.x) > abs(v0.y))
     {
-        *v1 = normalize(Vector3<T>(-v0.z,0,v0.x));
+        *v1 = normalize(Vector3<T>(-v0.z, 0, v0.x));
     }
     else
     {
-        *v1 = normalize(Vector3<T>(0,v0.z,-v0.y));
+        *v1 = normalize(Vector3<T>(0, v0.z, -v0.y));
     }
 
-    *v2 = cross(v0,*v1);
+    *v2 = cross(v0, *v1);
 }
 
-template<typename T>
-void coordinate_system(const Normal3<T>& v0,Vector3<T>* v1,Vector3<T>* v2)
+template <typename T>
+void coordinate_system(const Normal3<T> &v0, Vector3<T> *v1, Vector3<T> *v2)
 {
-    if(abs(v0.x) > abs(v0.y))
+    if (abs(v0.x) > abs(v0.y))
     {
-        *v1 = normalize(Vector3<T>(-v0.z,0,v0.x));
+        *v1 = normalize(Vector3<T>(-v0.z, 0, v0.x));
     }
     else
     {
-        *v1 = normalize(Vector3<T>(0,v0.z,-v0.y));
+        *v1 = normalize(Vector3<T>(0, v0.z, -v0.y));
     }
 
-    *v2 = cross(v0,*v1);
+    *v2 = cross(v0, *v1);
 }
 
 struct Ray
@@ -1428,8 +1555,8 @@ struct Ray
     mutable float t_max;
     float time;
 
-    inline Ray() : o(Point3f(0, 0, 0)), d(Vector3f(0, 0, 1)), t_max(INFINITE),time(0.0f) {}
-    inline Ray(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(o), d(d), t_max(t_max),time(0.0f) {}
+    inline Ray() : o(Point3f(0, 0, 0)), d(Vector3f(0, 0, 1)), t_max(INFINITE), time(0.0f) {}
+    inline Ray(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : o(o), d(d), t_max(t_max), time(0.0f) {}
 };
 inline std::ostream &operator<<(std::ostream &out, const Ray &ray)
 {
@@ -1452,7 +1579,7 @@ inline Ray offset_ray(const Ray &ray, const Normal3f &n)
                        fabsf(ray.o.y) < origin ? ray.o.y + float_scale * n.y : p_i.y,
                        fabsf(ray.o.z) < origin ? ray.o.z + float_scale * n.z : p_i.z);
     float epsion = length(o_offseted - ray.o);
-    return Ray(o_offseted,ray.d,max(0.0f,ray.t_max-epsion));
+    return Ray(o_offseted, ray.d, max(0.0f, ray.t_max - epsion));
 }
 
 struct SSE_ALIGNAS RayPack
@@ -1470,18 +1597,18 @@ inline std::ostream &operator<<(std::ostream &out, const RayPack &ray)
     return out;
 }
 
-struct RayDifferential:public Ray
+struct RayDifferential : public Ray
 {
-    Point3f ox,oy;
-    Vector3f dx,dy;
+    Point3f ox, oy;
+    Vector3f dx, dy;
 
     inline RayDifferential() : Ray() {}
-    inline RayDifferential(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : Ray(o,d,t_max) {}
+    inline RayDifferential(const Point3f &o, const Vector3f &d, const float t_max = INFINITE) : Ray(o, d, t_max) {}
 };
 
 inline std::ostream &operator<<(std::ostream &out, const RayDifferential &ray)
 {
-    out << "[o:" << ray.o << " d:" << ray.d << " t:" << float4(ray.t_max) <<" ox:"<<ray.ox<<" dx:"<<ray.dx<<" oy:"<<ray.oy <<" dy:"<<ray.dy<<"]";
+    out << "[o:" << ray.o << " d:" << ray.d << " t:" << float4(ray.t_max) << " ox:" << ray.ox << " dx:" << ray.dx << " oy:" << ray.oy << " dy:" << ray.dy << "]";
     return out;
 }
 
@@ -1504,15 +1631,14 @@ inline Normal3f get_normalized_normal(const Triangle &tri)
 
 inline Point3f get_vertex(const Triangle &tri, const Point2f &barycentric)
 {
-    return   tri.v0 + tri.e1 * barycentric.x + tri.e2 * barycentric.y;
+    return tri.v0 + tri.e1 * barycentric.x + tri.e2 * barycentric.y;
 }
-
 
 inline bool is_degraded(const Triangle &tri)
 {
-    float inner_product = dot(tri.e1,tri.e2);
+    float inner_product = dot(tri.e1, tri.e2);
     //TODO can simper?
-    if(inner_product==0||inner_product==1||inner_product==-1)
+    if (inner_product == 0 || inner_product == 1 || inner_product == -1)
     {
         return true;
     }
@@ -1521,7 +1647,7 @@ inline bool is_degraded(const Triangle &tri)
 
 inline float area(const Triangle &tri)
 {
-    return length(cross(tri.e1,tri.e2))/2;
+    return length(cross(tri.e1, tri.e2)) / 2;
 }
 
 inline std::ostream &operator<<(std::ostream &out, const Triangle &triangle)
@@ -1536,6 +1662,9 @@ struct SSE_ALIGNAS TrianglePack
     Point3fPack v0;
     Vector3fPack e1;
     Vector3fPack e2;
+
+    TrianglePack() = default;
+    TrianglePack(const Point3fPack &v0, const Vector3fPack &e1, const Vector3fPack &e2) : v0(v0), e1(e1), e2(e2) {}
 
     Triangle operator[](const uint32_t idx) const
     {
@@ -1552,342 +1681,6 @@ inline std::ostream &operator<<(std::ostream &out, const TrianglePack &triangle)
 {
     out << "[v0:" << triangle.v0 << " e1:" << triangle.e1 << " e2:" << triangle.e2 << "]";
     return out;
-}
-
-template <typename T>
-struct Bounds2
-{
-    Point2<T> min_point;
-    Point2<T> max_point;
-    inline const Point2<T> &operator[](const int idx) const
-    {
-        assert(idx >= 0 && idx < 2);
-        return (&min_point)[idx];
-    }
-    inline Point2<T> &operator[](const int idx)
-    {
-        assert(idx >= 0 && idx < 2);
-        return (&min_point)[idx];
-    }
-
-    inline Bounds2()
-    {
-        T min_value = std::numeric_limits<T>::lowest();
-        T max_value = std::numeric_limits<T>::max();
-        min_point = Point2<T>(max_value, max_value);
-        max_point = Point2<T>(min_value, min_value);
-    }
-
-    inline Bounds2(const Point2<T> &p0, const Point2<T> &p1)
-    {
-        min_point = min(p0, p1);
-        max_point = max(p0, p1);
-    }
-
-    template <typename U>
-    inline explicit Bounds2(const Bounds2<U> &bounds)
-    {
-        min_point = Point2<T>(bounds.min_point);
-        max_point = Point2<T>(bounds.max_point);
-    }
-};
-template <typename T>
-inline std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box)
-{
-    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
-    return out;
-}
-
-template <typename T>
-inline T area(const Bounds2<T> &bounds)
-{
-    T w = bounds.max_point.x - bounds.min_point.x;
-    T h = bounds.max_point.y - bounds.min_point.y;
-    return w * h;
-}
-
-template <typename T>
-inline Vector2<T> diagonal(const Bounds2<T> &bounds)
-{
-    T w = bounds.max_point.x - bounds.min_point.x;
-    T h = bounds.max_point.y - bounds.min_point.y;
-    return Vector2<T>(w,h);
-}
-
-
-template <typename T>
-inline bool inside_exclusive(const Point2<T> &p, const Bounds2<T> &bounds)
-{
-    bool cond_x = p.x >= bounds.min_point.x && p.x < bounds.max_point.x;
-    bool cond_y = p.y >= bounds.min_point.y && p.y < bounds.max_point.y;
-    return (cond_x && cond_y);
-}
-
-template <typename T>
-inline Bounds2<T> intersect(const Bounds2<T> &b0,const Bounds2<T> &b1) 
-{ 
-    return Bounds2<T>(max(b0.min_point,b1.min_point),min(b0.max_point,b1.max_point));
-}
-
-template <typename T>
-inline T width(const Bounds2<T> &bounds) { return bounds.max_point.x - bounds.min_point.x; }
-template <typename T>
-inline T height(const Bounds2<T> &bounds) { return bounds.max_point.y - bounds.min_point.y; }
-
-typedef Bounds2<float> Bounds2f;
-typedef Bounds2<int> Bounds2i;
-
-// from PBRT
-class Bounds2iIterator : public std::forward_iterator_tag
-{
-public:
-    inline Bounds2iIterator(const Bounds2i &b, const Point2i &pt) : _p(pt), _bounds(&b)
-    {
-    }
-    inline Bounds2iIterator operator++()
-    {
-        advance();
-        return *this;
-    }
-    inline Bounds2iIterator operator++(int)
-    {
-        Bounds2iIterator old = *this;
-        advance();
-        return old;
-    }
-    inline bool operator==(const Bounds2iIterator &bi) const
-    {
-        return _p == bi._p && _bounds == bi._bounds;
-    }
-    inline bool operator!=(const Bounds2iIterator &bi) const
-    {
-        return _p != bi._p || _bounds != bi._bounds;
-    }
-
-    inline Point2i operator*() const
-    {
-        return _p;
-    }
-
-private:
-    inline void advance()
-    {
-        ++_p.x;
-        if (_p.x == _bounds->max_point.x)
-        {
-            _p.x = _bounds->min_point.x;
-            ++_p.y;
-        }
-    }
-    Point2i _p;
-    const Bounds2i *_bounds;
-};
-
-inline Bounds2iIterator begin(const Bounds2i &b)
-{
-    return Bounds2iIterator(b, b.min_point);
-}
-
-inline Bounds2iIterator end(const Bounds2i &b)
-{
-    Point2i pEnd(b.min_point.x, b.max_point.y);
-    if (b.min_point.x >= b.max_point.x || b.min_point.y >= b.max_point.y)
-        pEnd = b.min_point;
-    return Bounds2iIterator(b, pEnd);
-}
-
-template <typename T>
-struct Bounds3
-{
-    Point3<T> min_point;
-    Point3<T> max_point;
-    // 0:min point
-    // 1:max point
-    inline const Point3<T> &operator[](const int idx) const
-    {
-        assert(idx >= 0 && idx < 2);
-        return (&min_point)[idx];
-    }
-
-    inline Bounds3()
-    {
-        T min_value = std::numeric_limits<T>::lowest();
-        T max_value = std::numeric_limits<T>::max();
-        min_point = Point3<T>(max_value, max_value, max_value);
-        max_point = Point3<T>(min_value, min_value, min_value);
-    }
-
-    inline Bounds3(const Point3<T> &p0, const Point3<T> &p1)
-    {
-        min_point = min(p0, p1);
-        max_point = max(p0, p1);
-    }
-};
-
-template <typename T>
-inline std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box)
-{
-    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
-    return out;
-}
-
-typedef Bounds3<float> Bounds3f;
-typedef Bounds3<int> Bounds3i;
-
-template <typename T>
-inline bool operator==(const Bounds3<T> &b0, const Bounds3<T> &b1)
-{
-    return (b0.min_point == b1.min_point) && (b0.max_point == b1.max_point);
-}
-template <typename T>
-inline bool operator!=(const Bounds3<T> &b0, const Bounds3<T> &b1)
-{
-    return (b0.min_point != b1.min_point) || (b0.max_point != b1.max_point);
-}
-
-template <typename T>
-inline Bounds3<T> _union(const Point3<T> &p0, const Point3<T> &p1)
-{
-    return Bounds3<T>(p0, p1);
-}
-template <typename T>
-inline Bounds3<T> _union(const Bounds3<T> &b0, const Point3<T> &p1)
-{
-    return Bounds3<T>(min(b0.min_point, p1), max(b0.max_point, p1));
-}
-template <typename T>
-inline Bounds3<T> _union(const Point3<T> &p1, const Bounds3<T> &b0)
-{
-    return _union(b0, p1);
-}
-template <typename T>
-inline Bounds3<T> _union(const Bounds3<T> &b0, const Bounds3<T> &b1)
-{
-    return _union(min(b0.min_point, b1.min_point), max(b0.max_point, b1.max_point));
-}
-
-template <typename T>
-inline Bounds3<T> intersect(const Bounds3<T> &b0,const Bounds3<T> &b1) 
-{ 
-    return Bounds3<T>(max(b0.min_point,b1.min_point),min(b0.max_point,b1.max_point));
-}
-
-template <typename T>
-inline int max_extent(const Bounds3<T> &b0)
-{
-    Vector3<T> v = b0.max_point - b0.min_point;
-    if (v[0] > v[1] && v[0] > v[2])
-    {
-        return 0;
-    }
-    else if (v[1] > v[2])
-    {
-        return 1;
-    }
-    else
-    {
-        return 2;
-    }
-}
-
-template <typename T>
-inline Vector3f offset(const Bounds3<T> &b0, const Point3<T> &p0)
-{
-    return static_cast<Vector3f>(p0 - b0.min_point) / static_cast<Vector3f>(b0.max_point - b0.min_point);
-}
-
-template <typename T>
-inline T surface_area(const Bounds3<T> &bounds)
-{
-    T w = bounds.max_point.x - bounds.min_point.x;
-    T h = bounds.max_point.y - bounds.min_point.y;
-    T d = bounds.max_point.z - bounds.min_point.z;
-
-    return (w * h + w * d + d * h) * 2;
-}
-
-
-// 0 => (0,0,0)
-// 1 => (1,0,0)
-// 2 => (0,1,0)
-// 3 => (1,1,0)
-// 4 => (0,0,1)
-// 5 => (1,0,1)
-// 6 => (0,1,1)
-// 7 => (1,1,1)
-
-template <typename T>
-inline const Point3<T> corner(const Bounds3<T> &b,int idx)
-{
-    int x = idx&0x01;
-    int y = (idx>>1)&0x01;
-    int z = (idx>>2)&0x01;
-    return Point3<T>(b[x].x,b[y].y,b[z].z);
-}
-
-struct SSE_ALIGNAS Bounds3fPack
-{
-    Point3fPack min_point;
-    Point3fPack max_point;
-
-    // 0:min point
-    // 1:max point
-    inline const Point3fPack &column(const int idx) const
-    {
-        assert(idx >= 0 && idx < 2);
-        return (&min_point)[idx];
-    }
-
-    inline Bounds3f operator[](const int idx) const
-    {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
-        return Bounds3f(min_point[idx],max_point[idx]);
-    }
-    
-    inline Bounds3fPack()
-    {
-        min_point = Point3fPack(MAX, MAX, MAX);
-        max_point = Point3fPack(LOWEST, LOWEST, LOWEST);
-    }
-
-    inline Bounds3fPack(const Point3fPack &p0, const Point3fPack &p1)
-    {
-        min_point = min(p0, p1);
-        max_point = max(p0, p1);
-    }
-
-    inline Bounds3fPack(const Bounds3f bounds[4])
-    {
-        min_point = Point3fPack(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
-        max_point = Point3fPack(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
-    }
-
-    
-};
-
-inline void store(const Bounds3fPack& bounds,Bounds3f* array)
-{
-    
-    array[0].min_point = bounds.min_point[0];
-    array[1].min_point = bounds.min_point[1];
-    array[2].min_point = bounds.min_point[2];
-    array[3].min_point = bounds.min_point[3];
-
-    array[0].max_point = bounds.max_point[0];
-    array[1].max_point = bounds.max_point[1];
-    array[2].max_point = bounds.max_point[2];
-    array[3].max_point = bounds.max_point[3];
-}
-
-inline std::ostream &operator<<(std::ostream &out, const Bounds3fPack &box)
-{
-    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
-    return out;
-}
-
-inline Bounds3fPack load(const Bounds3f *bound_array)
-{
-    return Bounds3fPack(bound_array);
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
@@ -2035,7 +1828,7 @@ inline bool4 intersect(const RayPack &ray, const TrianglePack &triangle, float4 
 }
 
 //Tomas Moll https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-inline bool intersect(const RayPack &ray, const TrianglePack &triangle, float *t_result , Point2f *uv , int *index, bool4 mask = SSE_MASK_TRUE)
+inline bool intersect(const RayPack &ray, const TrianglePack &triangle, float *t_result, Point2f *uv, int *index, bool4 mask = SSE_MASK_TRUE)
 {
     auto O = ray.o;
     auto D = ray.d;
@@ -2170,6 +1963,338 @@ inline bool intersect(const RayPack &ray, const TrianglePack &triangle, bool4 ma
     return true;
 }
 
+template <typename T>
+struct Bounds2
+{
+    Point2<T> min_point;
+    Point2<T> max_point;
+    inline const Point2<T> &operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 2);
+        return (&min_point)[idx];
+    }
+    inline Point2<T> &operator[](const int idx)
+    {
+        assert(idx >= 0 && idx < 2);
+        return (&min_point)[idx];
+    }
+
+    inline Bounds2()
+    {
+        T min_value = std::numeric_limits<T>::lowest();
+        T max_value = std::numeric_limits<T>::max();
+        min_point = Point2<T>(max_value, max_value);
+        max_point = Point2<T>(min_value, min_value);
+    }
+
+    inline Bounds2(const Point2<T> &p0, const Point2<T> &p1)
+    {
+        min_point = min(p0, p1);
+        max_point = max(p0, p1);
+    }
+
+    template <typename U>
+    inline explicit Bounds2(const Bounds2<U> &bounds)
+    {
+        min_point = Point2<T>(bounds.min_point);
+        max_point = Point2<T>(bounds.max_point);
+    }
+};
+template <typename T>
+inline std::ostream &operator<<(std::ostream &out, const Bounds2<T> &box)
+{
+    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
+    return out;
+}
+
+template <typename T>
+inline T area(const Bounds2<T> &bounds)
+{
+    T w = bounds.max_point.x - bounds.min_point.x;
+    T h = bounds.max_point.y - bounds.min_point.y;
+    return w * h;
+}
+
+template <typename T>
+inline Vector2<T> diagonal(const Bounds2<T> &bounds)
+{
+    T w = bounds.max_point.x - bounds.min_point.x;
+    T h = bounds.max_point.y - bounds.min_point.y;
+    return Vector2<T>(w, h);
+}
+
+template <typename T>
+inline bool inside_exclusive(const Point2<T> &p, const Bounds2<T> &bounds)
+{
+    bool cond_x = p.x >= bounds.min_point.x && p.x < bounds.max_point.x;
+    bool cond_y = p.y >= bounds.min_point.y && p.y < bounds.max_point.y;
+    return (cond_x && cond_y);
+}
+
+template <typename T>
+inline Bounds2<T> intersect(const Bounds2<T> &b0, const Bounds2<T> &b1)
+{
+    return Bounds2<T>(max(b0.min_point, b1.min_point), min(b0.max_point, b1.max_point));
+}
+
+template <typename T>
+inline T width(const Bounds2<T> &bounds) { return bounds.max_point.x - bounds.min_point.x; }
+template <typename T>
+inline T height(const Bounds2<T> &bounds) { return bounds.max_point.y - bounds.min_point.y; }
+
+typedef Bounds2<float> Bounds2f;
+typedef Bounds2<int> Bounds2i;
+
+// from PBRT
+class Bounds2iIterator : public std::forward_iterator_tag
+{
+public:
+    inline Bounds2iIterator(const Bounds2i &b, const Point2i &pt) : _p(pt), _bounds(&b)
+    {
+    }
+    inline Bounds2iIterator operator++()
+    {
+        advance();
+        return *this;
+    }
+    inline Bounds2iIterator operator++(int)
+    {
+        Bounds2iIterator old = *this;
+        advance();
+        return old;
+    }
+    inline bool operator==(const Bounds2iIterator &bi) const
+    {
+        return _p == bi._p && _bounds == bi._bounds;
+    }
+    inline bool operator!=(const Bounds2iIterator &bi) const
+    {
+        return _p != bi._p || _bounds != bi._bounds;
+    }
+
+    inline Point2i operator*() const
+    {
+        return _p;
+    }
+
+private:
+    inline void advance()
+    {
+        ++_p.x;
+        if (_p.x == _bounds->max_point.x)
+        {
+            _p.x = _bounds->min_point.x;
+            ++_p.y;
+        }
+    }
+    Point2i _p;
+    const Bounds2i *_bounds;
+};
+
+inline Bounds2iIterator begin(const Bounds2i &b)
+{
+    return Bounds2iIterator(b, b.min_point);
+}
+
+inline Bounds2iIterator end(const Bounds2i &b)
+{
+    Point2i pEnd(b.min_point.x, b.max_point.y);
+    if (b.min_point.x >= b.max_point.x || b.min_point.y >= b.max_point.y)
+        pEnd = b.min_point;
+    return Bounds2iIterator(b, pEnd);
+}
+
+template <typename T>
+struct Bounds3
+{
+    Point3<T> min_point;
+    Point3<T> max_point;
+    // 0:min point
+    // 1:max point
+    inline const Point3<T> &operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 2);
+        return (&min_point)[idx];
+    }
+
+    inline Bounds3()
+    {
+        T min_value = std::numeric_limits<T>::lowest();
+        T max_value = std::numeric_limits<T>::max();
+        min_point = Point3<T>(max_value, max_value, max_value);
+        max_point = Point3<T>(min_value, min_value, min_value);
+    }
+
+    inline Bounds3(const Point3<T> &p0, const Point3<T> &p1)
+    {
+        min_point = min(p0, p1);
+        max_point = max(p0, p1);
+    }
+};
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &out, const Bounds3<T> &box)
+{
+    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
+    return out;
+}
+
+typedef Bounds3<float> Bounds3f;
+typedef Bounds3<int> Bounds3i;
+
+template <typename T>
+inline bool operator==(const Bounds3<T> &b0, const Bounds3<T> &b1)
+{
+    return (b0.min_point == b1.min_point) && (b0.max_point == b1.max_point);
+}
+template <typename T>
+inline bool operator!=(const Bounds3<T> &b0, const Bounds3<T> &b1)
+{
+    return (b0.min_point != b1.min_point) || (b0.max_point != b1.max_point);
+}
+
+template <typename T>
+inline Bounds3<T> _union(const Point3<T> &p0, const Point3<T> &p1)
+{
+    return Bounds3<T>(p0, p1);
+}
+template <typename T>
+inline Bounds3<T> _union(const Bounds3<T> &b0, const Point3<T> &p1)
+{
+    return Bounds3<T>(min(b0.min_point, p1), max(b0.max_point, p1));
+}
+template <typename T>
+inline Bounds3<T> _union(const Point3<T> &p1, const Bounds3<T> &b0)
+{
+    return _union(b0, p1);
+}
+template <typename T>
+inline Bounds3<T> _union(const Bounds3<T> &b0, const Bounds3<T> &b1)
+{
+    return _union(min(b0.min_point, b1.min_point), max(b0.max_point, b1.max_point));
+}
+
+template <typename T>
+inline Bounds3<T> intersect(const Bounds3<T> &b0, const Bounds3<T> &b1)
+{
+    return Bounds3<T>(max(b0.min_point, b1.min_point), min(b0.max_point, b1.max_point));
+}
+
+template <typename T>
+inline int max_extent(const Bounds3<T> &b0)
+{
+    Vector3<T> v = b0.max_point - b0.min_point;
+    if (v[0] > v[1] && v[0] > v[2])
+    {
+        return 0;
+    }
+    else if (v[1] > v[2])
+    {
+        return 1;
+    }
+    else
+    {
+        return 2;
+    }
+}
+
+template <typename T>
+inline Vector3f offset(const Bounds3<T> &b0, const Point3<T> &p0)
+{
+    return static_cast<Vector3f>(p0 - b0.min_point) / static_cast<Vector3f>(b0.max_point - b0.min_point);
+}
+
+template <typename T>
+inline T surface_area(const Bounds3<T> &bounds)
+{
+    T w = bounds.max_point.x - bounds.min_point.x;
+    T h = bounds.max_point.y - bounds.min_point.y;
+    T d = bounds.max_point.z - bounds.min_point.z;
+
+    return (w * h + w * d + d * h) * 2;
+}
+
+// 0 => (0,0,0)
+// 1 => (1,0,0)
+// 2 => (0,1,0)
+// 3 => (1,1,0)
+// 4 => (0,0,1)
+// 5 => (1,0,1)
+// 6 => (0,1,1)
+// 7 => (1,1,1)
+
+template <typename T>
+inline const Point3<T> corner(const Bounds3<T> &b, int idx)
+{
+    int x = idx & 0x01;
+    int y = (idx >> 1) & 0x01;
+    int z = (idx >> 2) & 0x01;
+    return Point3<T>(b[x].x, b[y].y, b[z].z);
+}
+
+struct SSE_ALIGNAS Bounds3fPack
+{
+    Point3fPack min_point;
+    Point3fPack max_point;
+
+    // 0:min point
+    // 1:max point
+    inline const Point3fPack &column(const int idx) const
+    {
+        assert(idx >= 0 && idx < 2);
+        return (&min_point)[idx];
+    }
+
+    inline Bounds3f operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        return Bounds3f(min_point[idx], max_point[idx]);
+    }
+
+    inline Bounds3fPack()
+    {
+        min_point = Point3fPack(MAX, MAX, MAX);
+        max_point = Point3fPack(LOWEST, LOWEST, LOWEST);
+    }
+
+    inline Bounds3fPack(const Point3fPack &p0, const Point3fPack &p1)
+    {
+        min_point = min(p0, p1);
+        max_point = max(p0, p1);
+    }
+
+    inline Bounds3fPack(const Bounds3f bounds[4])
+    {
+        min_point = Point3fPack(bounds[0].min_point, bounds[1].min_point, bounds[2].min_point, bounds[3].min_point);
+        max_point = Point3fPack(bounds[0].max_point, bounds[1].max_point, bounds[2].max_point, bounds[3].max_point);
+    }
+};
+
+inline void store(const Bounds3fPack &bounds, Bounds3f *array)
+{
+
+    array[0].min_point = bounds.min_point[0];
+    array[1].min_point = bounds.min_point[1];
+    array[2].min_point = bounds.min_point[2];
+    array[3].min_point = bounds.min_point[3];
+
+    array[0].max_point = bounds.max_point[0];
+    array[1].max_point = bounds.max_point[1];
+    array[2].max_point = bounds.max_point[2];
+    array[3].max_point = bounds.max_point[3];
+}
+
+inline std::ostream &operator<<(std::ostream &out, const Bounds3fPack &box)
+{
+    out << "[min point:" << box.min_point << " max point:" << box.max_point << "]";
+    return out;
+}
+
+inline Bounds3fPack load(const Bounds3f *bound_array)
+{
+    return Bounds3fPack(bound_array);
+}
+
 //https://www.slideshare.net/ssuser2848d3/qbv
 //single ray with four box
 inline bool intersect(const Point3f &o, const Vector3f &inv_d, float t_min, float t_max, const int isPositive[3], const Bounds3f &box)
@@ -2225,13 +2350,12 @@ inline bool4 intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t
     return t_min <= t_max;
 }
 
-
 //TODO need to test
-inline bool intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3fPack &box, float *t_result,int* index)
+inline bool intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_min, float4 t_max, const int isPositive[3], const Bounds3fPack &box, float *t_result, int *index)
 {
     float4 t;
-    auto mask = intersect(o,inv_d,t_min,t_max,isPositive,box,&t);
-    if(EXPECT_TAKEN(none(mask)))
+    auto mask = intersect(o, inv_d, t_min, t_max, isPositive, box, &t);
+    if (EXPECT_TAKEN(none(mask)))
     {
         return false;
     }
@@ -2259,6 +2383,89 @@ inline bool intersect(const Point3fPack &o, const Vector3fPack &inv_d, float4 t_
         }
     }
     return true;
+}
 
+struct Plane
+{
+    float d;
+    Normal3f n;
+};
+
+inline bool intersect(const Ray &ray, const Plane &plane, float *t)
+{
+    float ddotn = dot(ray.d, plane.n);
+    if (ddotn != 0)
+    {
+        (*t) = (plane.d - dot(ray.o, plane.n)) / ddotn;
+        return true;
+    }
+    return false;
+}
+
+// p0        p1
+//   +-----+
+//   |     |
+//   |     |
+//   |     |
+//   |     |
+//   +-----+
+// p2        p3
+struct Quad
+{
+    Point3f p0,p1,p2,p3;
+};
+
+struct QuadPack
+{
+    Point3fPack p0,p1,p2,p3;
+};
+
+inline bool intersect(const RayPack &ray, const QuadPack &quad,int * triangle_index,float *t_result, Point2f *uv, int *index, bool4 mask = SSE_MASK_TRUE)
+{
+
+    TrianglePack triangle0(quad.p0, quad.p2 - quad.p0, quad.p3 - quad.p0);
+    float t0 = INFINITE;
+    int index0;
+    Point2f uv0;
+    bool is_hit0 = intersect(ray, triangle0, &t0, &uv0, &index0, mask);
+
+    TrianglePack triangle1(quad.p0, quad.p1 - quad.p0, quad.p3 - quad.p0);
+    float t1 = INFINITE;
+    int index1;
+    Point2f uv1;
+    bool is_hit1 = intersect(ray, triangle1, &t1, &uv1, &index1, mask);
+
+    if (is_hit0 || is_hit1)
+    {
+        if (t0 <= t1)
+        {
+            (*t_result) = t0;
+            (*uv) = uv0;
+            (*index) = index0;
+            (*triangle_index) = 0;
+        }
+        else
+        {
+            (*t_result) = t1;
+            (*uv) = uv1;
+            (*index) = index1;
+            (*triangle_index) = 1;
+        }
+        return true;
+    }
+    return false;
+}
+
+struct Curve
+{
+    Point3f cp0,cp1,cp2,cp3;
+};
+
+//from pbrt
+inline Point3f blossom(const Curve& curve,float u0,float u1,float u2)
+{
+    Point3f a[3] = {lerp(curve.cp0, curve.cp1,u0),lerp(curve.cp0, curve.cp1,u0),lerp(curve.cp0, curve.cp1,u0)};
+    Point3f b[2] = {lerp(a[0], a[1],u1), lerp(a[1], a[2],u1) };
+    return lerp(b[0],b[1],u2);
 }
 NARUKAMI_END
