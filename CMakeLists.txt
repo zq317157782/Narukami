@@ -25,6 +25,8 @@ include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
 include_directories(external/glfw/include)
 include_directories(external/tinyply/source)
+include_directories(external/cyCodeBase)
+
     
    
 aux_source_directory(src/core SRC_CORE)
