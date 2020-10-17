@@ -122,27 +122,29 @@ QBVHCollapseNode *collapse(MemoryArena &arena, const BVHBuildNode *subtree_root,
     return node;
 }
 
-uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollapseNode *c_node, uint32_t *offset)
+uint32_t flatten(std::vector<QBVHNode> &nodes, uint32_t depth, const QBVHCollapseNode *c_node, uint32_t *offset, uint32_t *max_depth)
 {
     auto cur_offset = (*offset);
     (*offset)++;
     init_QBVH_node(&nodes[cur_offset], depth, c_node);
 
+    (*max_depth) = max((*max_depth), depth);
+
     if (c_node->childrens[0] != nullptr)
     {
-        nodes[cur_offset].childrens[0] = flatten(nodes, depth + 1, c_node->childrens[0], offset);
+        nodes[cur_offset].childrens[0] = flatten(nodes, depth + 1, c_node->childrens[0], offset, max_depth);
     }
     if (c_node->childrens[1] != nullptr)
     {
-        nodes[cur_offset].childrens[1] = flatten(nodes, depth + 1, c_node->childrens[1], offset);
+        nodes[cur_offset].childrens[1] = flatten(nodes, depth + 1, c_node->childrens[1], offset, max_depth);
     }
     if (c_node->childrens[2] != nullptr)
     {
-        nodes[cur_offset].childrens[2] = flatten(nodes, depth + 1, c_node->childrens[2], offset);
+        nodes[cur_offset].childrens[2] = flatten(nodes, depth + 1, c_node->childrens[2], offset, max_depth);
     }
     if (c_node->childrens[3] != nullptr)
     {
-        nodes[cur_offset].childrens[3] = flatten(nodes, depth + 1, c_node->childrens[3], offset);
+        nodes[cur_offset].childrens[3] = flatten(nodes, depth + 1, c_node->childrens[3], offset, max_depth);
     }
 
     //set QBVH's split axis
@@ -199,8 +201,8 @@ TLAS::TLAS(const std::vector<shared<BLASInstance>> &instance_list) : _instances(
 
     build_soa_instance_info(build_root);
     uint32_t offset = 0;
-
-    flatten(_nodes, 0, collapse_root, &offset);
+    _max_depth = 0;
+    flatten(_nodes, 0, collapse_root, &offset, &_max_depth);
 
     STAT_INCREASE_MEMORY_COUNTER(QBVH_node_memory_cost, sizeof(QBVHNode) * total_collapse_node_num)
 }
@@ -356,24 +358,44 @@ void TLAS::build_soa_instance_info(BVHBuildNode *node)
 
 bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
 {
-    std::stack<std::pair<const QBVHNode *, float>> node_stack;
+    int stack_top_idx = 0;
+    int max_stack_num = 1 + _max_depth * 3;
+    NodeStackElement *node_stack = arena.alloc<NodeStackElement>(max_stack_num);
+
+    auto stack_push = [&stack_top_idx, max_stack_num, node_stack](const NodeStackElement &e) {
+        node_stack[stack_top_idx] = e;
+        stack_top_idx++;
+    };
+
+    auto stack_top = [&stack_top_idx, max_stack_num, node_stack]() {
+        return &node_stack[stack_top_idx - 1];
+    };
+
+    auto stack_pop = [&stack_top_idx, max_stack_num, node_stack]() {
+        stack_top_idx--;
+        return &node_stack[stack_top_idx];
+    };
+
+    auto stack_empty = [&stack_top_idx, max_stack_num, node_stack]() {
+        return stack_top_idx <= 0;
+    };
+
     RayPack soa_ray(ray.o, ray.d, ray.t_max);
 
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    node_stack.push({&_nodes[0], 0.0f});
+    stack_push({&_nodes[0], 0.0f});
 
     bool tlas_has_hit = false;
-    while (!node_stack.empty())
+    while (!stack_empty())
     {
 
-        if (node_stack.top().second > ray.t_max)
+        if (stack_top()->t > ray.t_max)
         {
-            node_stack.pop();
+            stack_pop();
             continue;
         }
 
-        auto node = node_stack.top().first;
-        node_stack.pop();
+        auto node = stack_pop()->node;
         float4 box_t;
         auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
@@ -432,7 +454,7 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *int
             uint32_t index = orders[i];
             if (push_child[index])
             {
-                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
+                stack_push({&_nodes[node->childrens[index]], box_t[index]});
             }
         }
     }
@@ -440,17 +462,32 @@ bool TLAS::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *int
     return tlas_has_hit;
 }
 
-bool TLAS::intersect(const Ray &ray) const
+bool TLAS::intersect(MemoryArena &arena, const Ray &ray) const
 {
-    std::stack<std::pair<const QBVHNode *, float>> node_stack;
+    int stack_top_idx = 0;
+    int max_stack_num = 1 + _max_depth * 3;
+    NodeStackElement *node_stack = arena.alloc<NodeStackElement>(max_stack_num);
+
+    auto stack_push = [&stack_top_idx, max_stack_num, node_stack](const NodeStackElement &e) {
+        node_stack[stack_top_idx] = e;
+        stack_top_idx++;
+    };
+
+    auto stack_pop = [&stack_top_idx, max_stack_num, node_stack]() {
+        stack_top_idx--;
+        return &node_stack[stack_top_idx];
+    };
+
+    auto stack_empty = [&stack_top_idx, max_stack_num, node_stack]() {
+        return stack_top_idx <= 0;
+    };
     RayPack soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    node_stack.push({&_nodes[0], 0.0f});
+    stack_push({&_nodes[0], 0.0f});
     Point2f uv;
-    while (!node_stack.empty())
+    while (!stack_empty())
     {
-        auto node = node_stack.top().first;
-        node_stack.pop();
+        auto node = stack_pop()->node;
         float4 box_t;
         auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
@@ -480,7 +517,7 @@ bool TLAS::intersect(const Ray &ray) const
                             {
                                 auto instance_offset = _compact_instances[j].offset + k;
                                 auto blas_instance = _instances[instance_offset];
-                                bool is_hit = blas_instance->intersect(ray);
+                                bool is_hit = blas_instance->intersect(arena, ray);
                                 if (is_hit)
                                 {
                                     return true;
@@ -501,7 +538,7 @@ bool TLAS::intersect(const Ray &ray) const
             uint32_t index = orders[i];
             if (push_child[index])
             {
-                node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
+                stack_push({&_nodes[node->childrens[index]], box_t[index]});
             }
         }
     }

@@ -71,7 +71,7 @@ void Integrator::render(const Scene &scene)
                     constexpr int bounce_count = 0;
                     Color L(0.0f, 0.0f, 0.0f);
                     float throughout = 1.0f;
-#if 1 //Debug
+#if 0 //Debug
                      if (scene.intersect(arena, ray, &interaction))
                      {
                          compute_differential(ray,interaction);
@@ -84,21 +84,21 @@ void Integrator::render(const Scene &scene)
                         //     L = Color(r,g,b); 
                         // }
                         // UV
-                        // {
-                        //     float r = interaction.uv.x;
-                        //     float g = interaction.uv.y;
-                        //     float b = 0;
-                        //     L = Color(r,g,b); 
-                        // }
-
-                        //dot(dpdx,dpdy)
                         {
-                            Normal3f n = normalize(cross(interaction.dpdu,interaction.dpdv));
-                            float r = n.x * 0.5f + 0.5f;
-                            float g = n.y * 0.5f + 0.5f;
-                            float b = n.z * 0.5f + 0.5f;
+                            float r = interaction.uv.x;
+                            float g = interaction.uv.y;
+                            float b = 0;
                             L = Color(r,g,b); 
                         }
+
+                        //dot(dpdx,dpdy)
+                        // {
+                        //     Normal3f n = normalize(cross(interaction.dpdu,interaction.dpdv));
+                        //     float r = n.x * 0.5f + 0.5f;
+                        //     float g = n.y * 0.5f + 0.5f;
+                        //     float b = n.z * 0.5f + 0.5f;
+                        //     L = Color(r,g,b); 
+                        // }
                        
                          
                      }
@@ -121,7 +121,7 @@ void Integrator::render(const Scene &scene)
                                     float pdf;
                                     VisibilityTester tester;
                                     auto Li = light->sample_Li(surface_interaction, clone_sampler->get_2D(), &wi, &pdf, &tester);
-                                    if (pdf > 0 && !is_black(Li) && tester.unoccluded(scene))
+                                    if (pdf > 0 && !is_black(Li) && tester.unoccluded(arena,scene))
                                     {
                                         L = L + INV_PI * saturate(dot(surface_interaction.n, wi)) * throughout * Li * rcp(pdf);
                                     }

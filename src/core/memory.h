@@ -184,9 +184,6 @@ class MemoryArena{
 
 };
 
-STAT_COUNTER("memory/total memory pool alloc count",memory_pool_alloc_count)
-STAT_MEMORY_COUNTER("memory/total memory pool alloc",memory_pool_alloc)
-STAT_MEMORY_COUNTER("memory/total memory pool dealloc",memory_pool_dealloc)
 template<typename T,int LINE_SIZE = NARUKAMI_L1_CACHE_LINE>
 class MemoryPool
 {
@@ -210,7 +207,6 @@ class MemoryPool
 		if(_head == nullptr)
 		{
 			//no free node
-			STAT_INCREASE_MEMORY_COUNTER(memory_pool_alloc, _chunck_element_num)
 			T* chunck = alloc_aligned<T,LINE_SIZE>(_chunck_element_num);
 			_chuncks.push_back(chunck);
 
@@ -225,7 +221,6 @@ class MemoryPool
 
 		T* ret = reinterpret_cast<T*>(_head);
 		_head = _head->next;
-		STAT_INCREASE_COUNTER(memory_pool_alloc_count, 1)
 		return ret;
 	}
 
@@ -244,13 +239,11 @@ class MemoryPool
 	{
 		for(uint32_t i = 0;i<_chuncks.size();++i)
 		{
-			STAT_INCREASE_MEMORY_COUNTER(memory_pool_dealloc, _chunck_element_num)
 			free_aligned(_chuncks[i]);
 		}
 		_chuncks.empty();
 	}
 };
-
 NARUKAMI_END
 
 // void* operator new(size_t sz);
