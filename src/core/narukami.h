@@ -42,6 +42,28 @@ narukami.h
 
 #define NARUKAMI_STAT_ENABLED 1
 
+#ifndef NARIKAMI_CUSTOM_LOGGER
+#define NARIKAMI_STD_LOGGER
+#endif
+
+#ifdef NARIKAMI_STD_LOGGER
+#define NARUKAMI_LOG(...) { \
+fprintf(stdout, __VA_ARGS__); \
+fprintf(stdout,"\n"); \
+}
+#define NARUKAMI_WARNING(...) { \
+fprintf(stdout, "%s: line %d:\t", __FILE__, __LINE__); \
+fprintf(stdout, __VA_ARGS__); \
+fprintf(stdout,"\n"); \
+}
+#define NARUKAMI_ERROR(...) { \
+fprintf(stderr, "%s: line %d:\t", __FILE__, __LINE__); \
+fprintf(stderr, __VA_ARGS__); \
+fprintf(stderr,"\n"); \
+}
+
+#endif
+
 #include <assert.h>
 #include <ostream>
 #include <iostream>
@@ -58,7 +80,6 @@ class AreaLight;
 class LightMaterial;
 class VisibilityTester;
 class MemoryArena;
-
 
 template <typename T>
 using shared = std::shared_ptr<T>;

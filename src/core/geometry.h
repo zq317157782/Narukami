@@ -712,6 +712,38 @@ inline Point3<T> operator/(const Point3<T> &v1, const T &f)
     return v;
 }
 template <typename T>
+inline Point3<T> &operator+=(Point3<T> &v, float a)
+{
+    v.x += a;
+    v.y += a;
+    v.z += a;
+    return v;
+}
+template <typename T>
+inline Point3<T> &operator-=(Point3<T> &v, float a)
+{
+    v.x -= a;
+    v.y -= a;
+    v.z -= a;
+    return v;
+}
+template <typename T>
+inline Point3<T> &operator+=(Point3<T> &v, const Point3<T> &v1)
+{
+    v.x += v1.x;
+    v.y += v1.y;
+    v.z += v1.z;
+    return v;
+}
+template <typename T>
+inline Point3<T> &operator-=(Point3<T> &v, const Point3<T> &v1)
+{
+    v.x -= v1.x;
+    v.y -= v1.y;
+    v.z -= v1.z;
+    return v;
+}
+template <typename T>
 inline Point3<T> &operator*=(Point3<T> &v, const Point3<T> &v1)
 {
     v.x *= v1.x;
@@ -774,12 +806,12 @@ template <typename T>
 inline Point3<T> max(const Point3<T> &p0, const Point3<T> &p1) { return Point3<T>(max(p0.x, p1.x), max(p0.y, p1.y), max(p0.z, p1.z)); }
 
 template <typename T>
-inline Point3<T> lerp(const Point3<T> &p0, const Point3<T> &p1,float a)
+inline Point3<T> lerp(const Point3<T> &p0, const Point3<T> &p1, float a)
 {
-    float x = lerp(p0.x,p1.x,a);
-    float y = lerp(p0.y,p1.y,a);
-    float z = lerp(p0.z,p1.z,a);
-    return Point3<T>(x,y,z);
+    float x = lerp(p0.x, p1.x, a);
+    float y = lerp(p0.y, p1.y, a);
+    float z = lerp(p0.z, p1.z, a);
+    return Point3<T>(x, y, z);
 }
 
 //--- [SSE] ---
@@ -2173,13 +2205,20 @@ inline Bounds3<T> _union(const Bounds3<T> &b0, const Bounds3<T> &b1)
 {
     return _union(min(b0.min_point, b1.min_point), max(b0.max_point, b1.max_point));
 }
-
 template <typename T>
 inline Bounds3<T> intersect(const Bounds3<T> &b0, const Bounds3<T> &b1)
 {
     return Bounds3<T>(max(b0.min_point, b1.min_point), min(b0.max_point, b1.max_point));
 }
-
+template <typename T>
+inline Bounds3<T> expand(const Bounds3<T> &b, float w)
+{
+    Bounds3<T> bounds = b;
+    float hw = w * 0.5f;
+    bounds.min_point -= hw;
+    bounds.max_point += hw;
+    return bounds;
+}
 template <typename T>
 inline int max_extent(const Bounds3<T> &b0)
 {
@@ -2412,15 +2451,21 @@ inline bool intersect(const Ray &ray, const Plane &plane, float *t)
 // p2        p3
 struct Quad
 {
-    Point3f p0,p1,p2,p3;
+    Point3f p0, p1, p2, p3;
 };
 
 struct QuadPack
 {
-    Point3fPack p0,p1,p2,p3;
+    Point3fPack p0, p1, p2, p3;
 };
 
-inline bool intersect(const RayPack &ray, const QuadPack &quad,int * triangle_index,float *t_result, Point2f *uv, int *index, bool4 mask = SSE_MASK_TRUE)
+inline std::ostream &operator<<(std::ostream &out, const QuadPack &quad)
+{
+    out << "[top-left:" << quad.p0 << " top-right:" << quad.p1 << " bottom-left:" << quad.p2 << " bottom-right:" << quad.p3 <<"]";
+    return out;
+}
+
+inline bool intersect(const RayPack &ray, const QuadPack &quad, int *triangle_index, float *t_result, Point2f *uv, int *index, bool4 mask = SSE_MASK_TRUE)
 {
 
     TrianglePack triangle0(quad.p0, quad.p2 - quad.p0, quad.p3 - quad.p0);
@@ -2429,7 +2474,7 @@ inline bool intersect(const RayPack &ray, const QuadPack &quad,int * triangle_in
     Point2f uv0;
     bool is_hit0 = intersect(ray, triangle0, &t0, &uv0, &index0, mask);
 
-    TrianglePack triangle1(quad.p0, quad.p1 - quad.p0, quad.p3 - quad.p0);
+    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0,quad.p1 - quad.p0);
     float t1 = INFINITE;
     int index1;
     Point2f uv1;
@@ -2456,16 +2501,32 @@ inline bool intersect(const RayPack &ray, const QuadPack &quad,int * triangle_in
     return false;
 }
 
+inline bool intersect(const RayPack &ray, const QuadPack &quad, bool4 mask = SSE_MASK_TRUE)
+{
+
+    TrianglePack triangle0(quad.p0, quad.p2 - quad.p0, quad.p3 - quad.p0);
+    bool is_hit0 = intersect(ray, triangle0, mask);
+
+    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0,quad.p1 - quad.p0);
+    bool is_hit1 = intersect(ray, triangle1, mask);
+
+    if (is_hit0 || is_hit1)
+    {
+        return true;
+    }
+    return false;
+}
+
 struct Curve
 {
-    Point3f cp0,cp1,cp2,cp3;
+    Point3f cp0, cp1, cp2, cp3;
 };
 
 //from pbrt
-inline Point3f blossom(const Curve& curve,float u0,float u1,float u2)
+inline Point3f blossom(const Curve &curve, float u0, float u1, float u2)
 {
-    Point3f a[3] = {lerp(curve.cp0, curve.cp1,u0),lerp(curve.cp0, curve.cp1,u0),lerp(curve.cp0, curve.cp1,u0)};
-    Point3f b[2] = {lerp(a[0], a[1],u1), lerp(a[1], a[2],u1) };
-    return lerp(b[0],b[1],u2);
+    Point3f a[3] = {lerp(curve.cp0, curve.cp1, u0), lerp(curve.cp0, curve.cp1, u0), lerp(curve.cp0, curve.cp1, u0)};
+    Point3f b[2] = {lerp(a[0], a[1], u1), lerp(a[1], a[2], u1)};
+    return lerp(b[0], b[1], u2);
 }
 NARUKAMI_END

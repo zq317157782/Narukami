@@ -1,5 +1,7 @@
 #include "core/narukami.h"
 #include "core/mesh.h"
+#include "core/hairstrands.h"
+#include "core/hairstrandsloader.h"
 #include "core/meshloader.h"
 #include "core/primitive.h"
 #include "core/accelerator.h"
@@ -7,7 +9,10 @@
 #include <GLFW/glfw3.h>
 
 using namespace narukami;
-shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_blas()
+
+
+
+shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_mesh_blas()
 {
     std::shared_ptr<Mesh> mesh;
     {
@@ -17,6 +22,18 @@ shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_blas()
     }
     auto primitives = create_mesh_primitives(mesh);
     return shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive,CompactMeshPrimitive>(primitives));
+}
+
+shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>> get_hair_blas()
+{
+    std::shared_ptr<HairStrands> hair;
+    {
+        auto transform = make_shared(identity());
+        auto inv_transform = transform;
+        hair = load_hairstrands<HairStrandsFileFormat::HAIR>(transform, inv_transform, "wCurly.hair",1.0f);
+    }
+    auto primitives = create_hair_segment_primitives(hair);
+    return shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>>(new CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>(primitives));
 }
 
 void draw_mesh(const shared<MeshPrimitive> &p)
@@ -32,6 +49,18 @@ void draw_mesh(const shared<MeshPrimitive> &p)
     glVertex3f(v2.x, v2.y, v2.z);
     glEnd();
 }
+
+void draw_hair(const shared<HairSegmentPrimitive> &p)
+{
+    auto v0 = p->get_start_vertex();
+    auto v1 = p->get_end_vertex();
+    glBegin(GL_LINES);
+    glColor3f(1, 1, 1); 
+    glVertex3f(v0.x, v0.y, v0.z);
+    glVertex3f(v1.x, v1.y, v1.z);
+    glEnd();
+}
+
 
 void draw_bounds(const Bounds3f &bounds, float r, float g, float b)
 {
@@ -119,133 +148,133 @@ const static int HEIGHT = 512;
 
 int main(int argc, char *argv[])
 {
-    // GLFWwindow *window;
+    GLFWwindow *window;
 
-    // /* Initialize the library */
-    // if (!glfwInit())
-    //     return -1;
+    /* Initialize the library */
+    if (!glfwInit())
+        return -1;
 
-    // /* Create a windowed mode window and its OpenGL context */
-    // window = glfwCreateWindow(WIDTH, HEIGHT, "MeshBLAS BVH Viewer", NULL, NULL);
-    // if (!window)
-    // {
-    //     glfwTerminate();
-    //     return -1;
-    // }
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(WIDTH, HEIGHT, "MeshBLAS BVH Viewer", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
 
-    // /* Make the window's context current */
-    // glfwMakeContextCurrent(window);
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
 
-    // shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> blas = get_blas();
-    // auto bounds = blas->bounds();
-    // auto primitives = blas->get_mesh_primitives();
+    auto blas = get_hair_blas();
+    auto bounds = blas->bounds();
+    auto primitives = blas->get_primitives();
 
-    // glfwSetKeyCallback(window, key_callback);
+    glfwSetKeyCallback(window, key_callback);
 
-    // int cache_depth = 0;
-    // auto nodes = blas->get_nodes_by_depth(cache_depth);
-    // glEnable(GL_DEPTH_TEST);
-    // /* Loop until the user closes the window */
-    // while (!glfwWindowShouldClose(window))
-    // {
-    //     /* Render here */
-    //     glClear(GL_COLOR_BUFFER_BIT);
+    int cache_depth = 0;
+    auto nodes = blas->get_nodes(cache_depth);
+    glEnable(GL_DEPTH_TEST);
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    //     float ratio;
-    //     int width, height;
+        float ratio;
+        int width, height;
 
-    //     glfwGetFramebufferSize(window, &width, &height);
-    //     ratio = width / (float)height; //窗口的宽高比
+        glfwGetFramebufferSize(window, &width, &height);
+        ratio = width / (float)height; //窗口的宽高比
 
-    //     float max_extent_x = bounds.max_point.x - bounds.min_point.x;
-    //     float max_extent_y = bounds.max_point.y - bounds.min_point.y;
+        float max_extent_x = bounds.max_point.x - bounds.min_point.x;
+        float max_extent_y = bounds.max_point.y - bounds.min_point.y;
 
-    //     float look_x = (bounds.max_point.x + bounds.min_point.x)/2;
-    //     float look_y = (bounds.max_point.y + bounds.min_point.y)/2;
-    //     float look_z = (bounds.max_point.z + bounds.min_point.z)/2;
+        float look_x = (bounds.max_point.x + bounds.min_point.x)/2;
+        float look_y = (bounds.max_point.y + bounds.min_point.y)/2;
+        float look_z = (bounds.max_point.z + bounds.min_point.z)/2;
 
-    //     float horizontal0 = 0;
-    //     float horizontal1 = 0;
-    //     float vertical0 = 0;
-    //     float vertical1 = 0;
+        float horizontal0 = 0;
+        float horizontal1 = 0;
+        float vertical0 = 0;
+        float vertical1 = 0;
 
-    //     float zNear = 0;
-    //     float zFar = 0;
+        float zNear = 0;
+        float zFar = 0;
 
-    //     if (max_extent_x >= max_extent_y)
-    //     {
-    //         horizontal0 = look_x - max_extent_x/2;
-    //         horizontal1 = look_x + max_extent_x/2;
-    //         vertical0 =   look_y - max_extent_x / ratio / 2;
-    //         vertical1 =   look_y + max_extent_x / ratio / 2;
+        if (max_extent_x >= max_extent_y)
+        {
+            horizontal0 = look_x - max_extent_x/2;
+            horizontal1 = look_x + max_extent_x/2;
+            vertical0 =   look_y - max_extent_x / ratio / 2;
+            vertical1 =   look_y + max_extent_x / ratio / 2;
 
-    //         zNear = max_extent_x / 2 / narukami::tan(deg2rad(30));
-    //         zFar = bounds.max_point.z - bounds.min_point.z + zNear;
-    //     }
-    //     else
-    //     {
-    //         vertical0 = look_y - max_extent_y/2;
-    //         vertical1 = look_y + max_extent_y/2;
-    //         horizontal0 = look_x - max_extent_y * ratio / 2;
-    //         horizontal1 = look_x + max_extent_y * ratio / 2;
-    //         zNear = max_extent_y / 2 / narukami::tan(deg2rad(30));
-    //         zFar = bounds.max_point.z - bounds.min_point.z + zNear;
-    //     }
+            zNear = max_extent_x / 2 / narukami::tan(deg2rad(30));
+            zFar = bounds.max_point.z - bounds.min_point.z + zNear;
+        }
+        else
+        {
+            vertical0 = look_y - max_extent_y/2;
+            vertical1 = look_y + max_extent_y/2;
+            horizontal0 = look_x - max_extent_y * ratio / 2;
+            horizontal1 = look_x + max_extent_y * ratio / 2;
+            zNear = max_extent_y / 2 / narukami::tan(deg2rad(30));
+            zFar = bounds.max_point.z - bounds.min_point.z + zNear;
+        }
 
-    //     glViewport(0, 0, width, height);
+        glViewport(0, 0, width, height);
 
-    //     glClearColor(0.18f, 0.04f, 0.14f, 1.0f);
-    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //     glMatrixMode(GL_PROJECTION);
-    //     glLoadIdentity();
-    //     glFrustum(                    // 设置投影矩阵为透视投影:
-    //         horizontal0, horizontal1, //   - 透视视景体的左右边位置
-    //         vertical0, vertical1,     //   - 透视视景体的上下边位置
-    //         zNear, zFar+zNear);             //   - 透视视景体的前后边位置
+        glClearColor(0.18f, 0.04f, 0.14f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glFrustum(                    // 设置投影矩阵为透视投影:
+            horizontal0, horizontal1, //   - 透视视景体的左右边位置
+            vertical0, vertical1,     //   - 透视视景体的上下边位置
+            zNear, zFar+zNear);             //   - 透视视景体的前后边位置
 
-    //     glMatrixMode(GL_MODELVIEW);
-    //     glLoadIdentity();
-    //     auto transform = look_at(0.0f, 0.0f, bounds.min_point.z - zNear, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);//look_at(look_x, look_y, bounds.min_point.z - zNear, look_x, look_y, look_z, 0.0f, 1.0f, 0.0f);
-    //     float matrix[16]; // = {1,0,0,0,
-    //     //                     0,1,0,0,
-    //     //                     0,0,1,0,
-    //     //                     0,0,-0.5f,1};
-    //     store(transform.mat, matrix);
-    //     glLoadMatrixf(matrix);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        auto transform = look_at(0.0f, 0.0f, bounds.min_point.z - zNear, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);//look_at(look_x, look_y, bounds.min_point.z - zNear, look_x, look_y, look_z, 0.0f, 1.0f, 0.0f);
+        float matrix[16]; // = {1,0,0,0,
+        //                     0,1,0,0,
+        //                     0,0,1,0,
+        //                     0,0,-0.5f,1};
+        store(transform.mat, matrix);
+        glLoadMatrixf(matrix);
 
-    //     if (cache_depth != depth)
-    //     {
-    //         cache_depth = depth;
-    //         nodes = blas->get_nodes_by_depth(cache_depth);
-    //         if (nodes.size() == 0)
-    //         {
-    //             cache_depth = depth = 0;
-    //             nodes = blas->get_nodes_by_depth(cache_depth);
-    //         }
-    //     }
+        if (cache_depth != depth)
+        {
+            cache_depth = depth;
+            nodes = blas->get_nodes(cache_depth);
+            if (nodes.size() == 0)
+            {
+                cache_depth = depth = 0;
+                nodes = blas->get_nodes(cache_depth);
+            }
+        }
 
-    //     draw_bounds(bounds, 0, 1, 0);
-    //      for (auto &node : nodes)
-    //     {
-    //         draw_bounds(node,1,0,0);
-    //     }
-    //     for (auto &p : primitives)
-    //     {
-    //         draw_mesh(p);
-    //     }
+        draw_bounds(bounds, 0, 1, 0);
+         for (auto &node : nodes)
+        {
+            draw_bounds(node,1,0,0);
+        }
+        for (auto &p : primitives)
+        {
+            draw_hair(p);
+        }
 
-    //     char  buffer[200];
-    //     sprintf(buffer,"MeshBLAS BVH Viewer : primitive %d depth %d",primitives.size(),depth);
-    //     glfwSetWindowTitle(window,buffer);
+        char  buffer[200];
+        sprintf(buffer,"MeshBLAS BVH Viewer : primitive %d depth %d",primitives.size(),depth);
+        glfwSetWindowTitle(window,buffer);
        
 
-    //     /* Swap front and back buffers */
-    //     glfwSwapBuffers(window);
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
 
-    //     /* Poll for and process events */
-    //     glfwPollEvents();
-    // }
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
 
-    // glfwTerminate();
+    glfwTerminate();
     return 0;
 }

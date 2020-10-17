@@ -289,6 +289,18 @@ public:
     bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const override;
     bool intersect(const Ray &ray) const override;
     Bounds3f bounds() const override { return _bounds; }
+public:
+    std::vector<shared<PrimitiveType>> get_primitives() const {return _primitives;}
+    std::vector<QBVHNode> get_nodes(uint32_t depth) const
+    {
+        std::vector<QBVHNode> nodes;
+        for(auto&& n:_nodes)
+        {
+            if(n.depth == depth)
+            nodes.push_back(n);
+        }
+        return nodes;
+    }
 };
 
 template <class PrimitiveType, class CompactPrimitiveType>
@@ -451,6 +463,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
     uint32_t compact_offset;
     uint32_t compact_idx;
     Point2f param_uv;
+    PrimitiveHitPoint hit_point;
 
     while (!node_stack.empty())
     {
@@ -482,26 +495,23 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
                     auto num = leaf_num(node->childrens[index]);
                     for (uint32_t j = offset; j < offset + num; ++j)
                     {
-                        float hit_t = INFINITE;
-                        Point2f temp_param_uv;
-                        int temp_compact_offset;
-                        auto is_hit = narukami::intersect(soa_ray,_compact_primitives[j],&hit_t, &temp_param_uv, &temp_compact_offset);//narukami::intersect(soa_ray, _compact_primitives[j].triangle, &hit_t, &temp_param_uv, &temp_compact_offset);
+                        auto is_hit = narukami::intersect(soa_ray,_compact_primitives[j],&hit_point);//narukami::intersect(soa_ray, _compact_primitives[j].triangle, &hit_t, &temp_param_uv, &temp_compact_offset);
                         STAT_INCREASE_COUNTER(intersect_triangle_num, 1)
 
-                        if (is_hit && hit_t < ray.t_max)
+                        if (is_hit && hit_point.hit_t < ray.t_max)
                         {
                             {
                                 has_hit = true;
                             }
                             //更新射线的t_max
                             {
-                                soa_ray.t_max = float4(hit_t);
-                                ray.t_max = hit_t;
+                                soa_ray.t_max = float4(hit_point.hit_t);
+                                ray.t_max = hit_point.hit_t;
                             }
                             {
-                                compact_offset = temp_compact_offset;
+                                compact_offset = hit_point.compact_offset;
                                 compact_idx = j;
-                                param_uv = temp_param_uv;
+                                param_uv = hit_point.param_uv;
                             }
                         }
                     }
@@ -525,7 +535,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
 
     if (has_hit)
     {
-        setup_interaction(_compact_primitives[compact_idx],get_primitive(compact_idx, compact_offset),compact_offset,ray,param_uv,interaction);
+        setup_interaction(_compact_primitives[compact_idx],get_primitive(compact_idx, compact_offset),ray,hit_point,interaction);
     }
     return has_hit;
 }

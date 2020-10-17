@@ -156,5 +156,6 @@ inline float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-
 inline float4 select(const bool4& mask,const float4 &a,const float4 &b){ return _mm_blendv_ps(b,a,mask); }
 inline bool4 select(const bool4& mask,const bool4 &a,const bool4 &b){ return _mm_blendv_ps(b,a,mask); }
 inline void store(const float4 &x,float* data){ _mm_store_ps(data,x.xyzw);}
+inline float4 load(float* data){ return _mm_load_ps(data);}
 
 NARUKAMI_END
