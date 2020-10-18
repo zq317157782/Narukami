@@ -43,11 +43,11 @@ void FilmTile::add_sample(const Point2f& pos,const Color& l,const float weight) 
     p1 = min(p1, _pixel_bounds.max_point);
     for (int x = p0.x; x < p1.x; ++x)
     {
-        int idx_x = min((int)floor(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+        int idx_x = min(static_cast<int>(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
         float filter_weight_x = _filter_lut[idx_x];
         for (int y = p0.y; y < p1.y; ++y)
         {
-            int idx_y = min((int)floor(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+            int idx_y = min(static_cast<int>(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             TilePixel &pixel = get_tile_pixel(Point2i(x, y));
             {
@@ -134,11 +134,11 @@ void Film::add_sample(const Point2f &pos, const Color &l, const float weight) co
     p1 = min(p1, _cropped_pixel_bounds.max_point);
     for (int x = p0.x; x < p1.x; ++x)
     {
-        int idx_x = min((int)floor(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+        int idx_x = min(static_cast<int>(abs(x - dp.x) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
         float filter_weight_x = _filter_lut[idx_x];
         for (int y = p0.y; y < p1.y; ++y)
         {
-            int idx_y = min((int)floor(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
+            int idx_y = min(static_cast<int>(abs(y - dp.y) * _inv_filter_radius * NARUKAMI_FILM_FILTER_LUT_WIDTH), NARUKAMI_FILM_FILTER_LUT_WIDTH - 1);
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             Pixel &pixel = get_pixel(Point2i(x, y));
             {
