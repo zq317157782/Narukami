@@ -468,6 +468,15 @@ inline Vector3fPack operator*(const Vector3fPack &v, float4 c)
     return Vector3fPack(xxxx, yyyy, zzzz);
 }
 
+inline Vector3fPack operator/(float4 c, const Vector3fPack &v)
+{
+    Vector3fPack vv;
+    vv.xxxx = c / v.xxxx;
+    vv.yyyy = c / v.yyyy;
+    vv.zzzz = c / v.zzzz;
+    return vv;
+}
+
 inline float4 dot(const Vector3fPack &v0, const Vector3fPack &v1) { return v0.xxxx * v1.xxxx + v0.yyyy * v1.yyyy + v0.zzzz * v1.zzzz; }
 
 inline Vector3fPack cross(const Vector3fPack &v0, const Vector3fPack &v1)
@@ -492,6 +501,7 @@ inline Vector3fPack rcp(const Vector3fPack &v)
     vv.zzzz = rcp(v.zzzz);
     return vv;
 }
+
 inline Vector3fPack safe_rcp(const Vector3fPack &v)
 {
     Vector3fPack vv;
@@ -500,15 +510,7 @@ inline Vector3fPack safe_rcp(const Vector3fPack &v)
     vv.zzzz = safe_rcp(v.zzzz);
     return vv;
 }
-inline Vector3fPack robust_rcp(const Vector3fPack &v)
-{
-    Vector3fPack vv;
-    auto one = float4(1.0f);
-    vv.xxxx = one / v.xxxx;
-    vv.yyyy = one / v.yyyy;
-    vv.zzzz = one / v.zzzz;
-    return vv;
-}
+
 inline Vector3fPack load(const Vector3f *vector_array) { return Vector3fPack(vector_array[0], vector_array[1], vector_array[2], vector_array[3]); }
 //---VECTOR3 END---
 
@@ -2461,7 +2463,7 @@ struct QuadPack
 
 inline std::ostream &operator<<(std::ostream &out, const QuadPack &quad)
 {
-    out << "[top-left:" << quad.p0 << " top-right:" << quad.p1 << " bottom-left:" << quad.p2 << " bottom-right:" << quad.p3 <<"]";
+    out << "[top-left:" << quad.p0 << " top-right:" << quad.p1 << " bottom-left:" << quad.p2 << " bottom-right:" << quad.p3 << "]";
     return out;
 }
 
@@ -2474,7 +2476,7 @@ inline bool intersect(const RayPack &ray, const QuadPack &quad, int *triangle_in
     Point2f uv0;
     bool is_hit0 = intersect(ray, triangle0, &t0, &uv0, &index0, mask);
 
-    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0,quad.p1 - quad.p0);
+    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0, quad.p1 - quad.p0);
     float t1 = INFINITE;
     int index1;
     Point2f uv1;
@@ -2507,7 +2509,7 @@ inline bool intersect(const RayPack &ray, const QuadPack &quad, bool4 mask = SSE
     TrianglePack triangle0(quad.p0, quad.p2 - quad.p0, quad.p3 - quad.p0);
     bool is_hit0 = intersect(ray, triangle0, mask);
 
-    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0,quad.p1 - quad.p0);
+    TrianglePack triangle1(quad.p0, quad.p3 - quad.p0, quad.p1 - quad.p0);
     bool is_hit1 = intersect(ray, triangle1, mask);
 
     if (is_hit0 || is_hit1)

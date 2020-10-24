@@ -482,7 +482,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(const Ray &ray,
 
         auto node = node_stack.pop().first;
         float4 box_t;
-        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
+        auto box_hits = narukami::intersect(soa_ray.o, safe_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
         bool push_child[4] = {false, false, false, false};
         uint32_t orders[4];
@@ -556,7 +556,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(const Ray &ray)
     {
         auto node = node_stack.pop();
         float4 box_t;
-        auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
+        auto box_hits = narukami::intersect(soa_ray.o, safe_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
         bool push_child[4] = {false, false, false, false};
         uint32_t orders[4];

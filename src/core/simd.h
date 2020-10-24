@@ -136,7 +136,8 @@ inline  float4 sign(const float4& v){ auto mask = _mm_cmplt_ps(v,_mm_setzero_ps(
 inline float4 sqrt(const float4& v){ return _mm_sqrt_ps(v.xyzw); }
 inline float4 rsqrt(const float4& v){ const __m128 r = _mm_rsqrt_ps(v.xyzw); const __m128 c = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(1.5f), r),_mm_mul_ps(_mm_mul_ps(_mm_mul_ps(v.xyzw, _mm_set1_ps(-0.5f)), r), _mm_mul_ps(r, r))); return c; }
 inline  float4 rcp(const float4& x){ const __m128 r = _mm_rcp_ps(x); return _mm_mul_ps(r,_mm_sub_ps(_mm_set1_ps(2.0f), _mm_mul_ps(r, x))); }
-inline  float4 zero_fix(const float4& x){ auto min_rcp_input = _mm_set1_ps(MIN_RCP_INPUT); return _mm_blendv_ps(x.xyzw,min_rcp_input,_mm_cmplt_ps(x.xyzw,min_rcp_input)); }
+
+inline  float4 zero_fix(const float4& x){ auto min_rcp_input = _mm_set1_ps(MIN_RCP_INPUT); return _mm_blendv_ps(x.xyzw,min_rcp_input,_mm_cmplt_ps(abs(x.xyzw),min_rcp_input)); }
 inline  float4 safe_rcp(const float4& x){ return rcp(zero_fix(x)); }
 
 inline  float4 min(const float4& x,const float4& y){ return _mm_min_ps(x.xyzw,y.xyzw); }
