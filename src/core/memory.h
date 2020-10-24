@@ -244,6 +244,48 @@ class MemoryPool
 		_chuncks.empty();
 	}
 };
+
+template<typename T,int deep>
+class LocalStack
+{
+	private:
+		T* _data;
+		int _top;
+	public:
+	LocalStack()
+	{
+		_data = reinterpret_cast<T*>(alloca(deep * sizeof(T)));
+		_top = 0;
+	}
+
+	T top() const
+	{
+		return _data[_top - 1];
+	}
+
+	T pop()
+	{
+		_top--;
+		return _data[_top];
+	}
+
+	void push(const T& v)
+	{
+		_data[_top] = v;
+		_top++;
+	}
+
+	bool empty() const
+	{
+		return _top <= 0;
+	}
+
+	bool full() const
+	{
+		return _top >= deep;
+	} 
+};
+
 NARUKAMI_END
 
 // void* operator new(size_t sz);

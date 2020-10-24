@@ -86,7 +86,7 @@ private:
 public:
     VisibilityTester() = default;
     VisibilityTester(const Interaction &p0, const Interaction &p1) : _p0(p0), _p1(p1) {}
-    bool unoccluded(MemoryArena &arena,const Scene &scene) const;
+    bool unoccluded(const Scene &scene) const;
 };
 
 

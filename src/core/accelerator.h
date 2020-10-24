@@ -51,6 +51,8 @@ constexpr int BLAS_SAH_BUCKET_NUM = 12;
 constexpr uint32_t ACCELERATOR_ELEMENT_NUM_PER_LEAF = 64;
 constexpr int ACCELERATOR_SAH_BUCKET_NUM = 12;
 
+constexpr uint32_t MAX_LOCAL_STACK_DEEP = 64;
+
 /**
  * 描述每个MeshPrimitive的额外信息
 */
@@ -224,14 +226,8 @@ inline void init_QBVH_node(QBVHNode *node, uint32_t depth, const QBVHCollapseNod
     node->depth = depth;
 }
 
-struct NodeStackElement
-{
-    const QBVHNode * node;
-    float t;
-};
-
 /*SAH分割策略使用的Bucket信息*/
-struct BucketInfo
+struct BucketState
 {
     Bounds3f bounds;
     uint32_t count = 0;
@@ -258,8 +254,8 @@ class BLAS
 {
 public:
     BLAS() {}
-    virtual bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const = 0;
-    virtual bool intersect(MemoryArena &arena,const Ray &ray) const = 0;
+    virtual bool intersect(const Ray &ray, SurfaceInteraction *interaction) const = 0;
+    virtual bool intersect(const Ray &ray) const = 0;
     virtual Bounds3f bounds() const = 0;
 };
 
@@ -293,8 +289,8 @@ private:
 
 public:
     CompactBLAS(const std::vector<shared<PrimitiveType>> &primitives);
-    bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const override;
-    bool intersect(MemoryArena &arena,const Ray &ray) const override;
+    bool intersect(const Ray &ray, SurfaceInteraction *interaction) const override;
+    bool intersect(const Ray &ray) const override;
     Bounds3f bounds() const override { return _bounds; }
 public:
     std::vector<shared<PrimitiveType>> get_primitives() const {return _primitives;}
@@ -378,7 +374,7 @@ BVHBuildNode *CompactBLAS<PrimitiveType, CompactPrimitiveType>::build(MemoryAren
         else
         {
             //SAH
-            BucketInfo bucket_infos[BLAS_SAH_BUCKET_NUM];
+            BucketState bucket_infos[BLAS_SAH_BUCKET_NUM];
 
             for (uint32_t i = start; i < end; ++i)
             {
@@ -459,38 +455,14 @@ void CompactBLAS<PrimitiveType, CompactPrimitiveType>::build_compact_primitives(
 }
 
 template <class PrimitiveType, class CompactPrimitiveType>
-bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const
+bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(const Ray &ray, SurfaceInteraction *interaction) const
 {   
-    int stack_top_idx = 0;
-    int max_stack_num = 1 + _max_depth * 3;
-    NodeStackElement * node_stack = arena.alloc<NodeStackElement>(max_stack_num);
-
-    auto stack_push = [&stack_top_idx,max_stack_num,node_stack](const NodeStackElement& e)
-    {
-        node_stack[stack_top_idx] = e;
-        stack_top_idx++;
-    };
-
-    auto stack_top = [&stack_top_idx,max_stack_num,node_stack]()
-    {
-        return &node_stack[stack_top_idx - 1];
-    };
-
-    auto stack_pop = [&stack_top_idx,max_stack_num,node_stack]()
-    {
-        stack_top_idx--;
-        return &node_stack[stack_top_idx];
-    };
-
-    auto stack_empty = [&stack_top_idx,max_stack_num,node_stack]()
-    {
-        return stack_top_idx <= 0;
-    };
-
+   
+    LocalStack<std::pair<const QBVHNode*,float>,MAX_LOCAL_STACK_DEEP> node_stack;
     //NodeStackElement arena.
     RayPack soa_ray(ray.o, ray.d, ray.t_max);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    stack_push({&_nodes[0], 0.0f});
+    node_stack.push({&_nodes[0], 0.0f});
     
 
     bool has_hit = false;
@@ -500,15 +472,15 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
     Point2f param_uv;
     PrimitiveHitPoint hit_point;
 
-    while (!stack_empty())
+    while (!node_stack.empty())
     {
-        if (stack_top()->t > ray.t_max)
+        if (node_stack.top().second > ray.t_max)
         {
-            stack_pop();
+            node_stack.pop();
             continue;
         }
 
-        auto node = stack_pop()->node;
+        auto node = node_stack.pop().first;
         float4 box_t;
         auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
@@ -562,7 +534,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
             uint32_t index = orders[i];
             if (push_child[index])
             {
-                stack_push({&_nodes[node->childrens[index]], box_t[index]});
+               node_stack.push({&_nodes[node->childrens[index]], box_t[index]});
             }
         }
     }
@@ -574,35 +546,15 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
     return has_hit;
 }
 template <class PrimitiveType, class CompactPrimitiveType>
-bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &arena,const Ray &ray) const
+bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(const Ray &ray) const
 {
-    int stack_top_idx = 0;
-    int max_stack_num = 1 + _max_depth * 3;
-    NodeStackElement * node_stack = arena.alloc<NodeStackElement>(max_stack_num);
-
-    auto stack_push = [&stack_top_idx,max_stack_num,node_stack](const NodeStackElement& e)
-    {
-        node_stack[stack_top_idx] = e;
-        stack_top_idx++;
-    };
-
-    auto stack_pop = [&stack_top_idx,max_stack_num,node_stack]()
-    {
-        stack_top_idx--;
-        return &node_stack[stack_top_idx];
-    };
-
-    auto stack_empty = [&stack_top_idx,max_stack_num,node_stack]()
-    {
-        return stack_top_idx <= 0;
-    };
-
+    LocalStack<const QBVHNode*,MAX_LOCAL_STACK_DEEP> node_stack;
     RayPack soa_ray(ray);
     int is_positive[3] = {ray.d[0] >= 0 ? 1 : 0, ray.d[1] >= 0 ? 1 : 0, ray.d[2] >= 0 ? 1 : 0};
-    stack_push({&_nodes[0], 0.0f});
-    while (!stack_empty())
+    node_stack.push(&_nodes[0]);
+    while (!node_stack.empty())
     {
-        auto node = stack_pop()->node;
+        auto node = node_stack.pop();
         float4 box_t;
         auto box_hits = narukami::intersect(soa_ray.o, robust_rcp(soa_ray.d), float4(0), float4(soa_ray.t_max), is_positive, node->bounds, &box_t);
 
@@ -642,7 +594,7 @@ bool CompactBLAS<PrimitiveType, CompactPrimitiveType>::intersect(MemoryArena &ar
             uint32_t index = orders[i];
             if (push_child[index])
             {
-                stack_push({&_nodes[node->childrens[index]], box_t[index]});
+               node_stack.push(&_nodes[node->childrens[index]]);
             }
         }
     }
@@ -658,7 +610,7 @@ private:
 public:
     BLASInstance(const shared<AnimatedTransform> &blas_to_world, const shared<BLAS> &blas) : _blas_to_world(blas_to_world), _blas(blas) { _bounds = (*_blas_to_world)(_blas->bounds()); };
 
-    bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const override
+    bool intersect(const Ray &ray, SurfaceInteraction *interaction) const override
     {
         Transform w2b;
         Transform b2w;
@@ -668,13 +620,13 @@ public:
         }
 
         auto blas_ray = w2b(ray);
-        bool has_hit = _blas->intersect(arena, blas_ray, interaction);
+        bool has_hit = _blas->intersect(blas_ray, interaction);
         (*interaction) = b2w(*interaction);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
 
-    bool intersect(MemoryArena &arena,const Ray &ray) const override
+    bool intersect(const Ray &ray) const override
     {
         Transform w2b;
         Transform b2w;
@@ -683,7 +635,7 @@ public:
             w2b = inverse(b2w);
         }
         auto blas_ray = w2b(ray);
-        bool has_hit = _blas->intersect(arena,blas_ray);
+        bool has_hit = _blas->intersect(blas_ray);
         ray.t_max = blas_ray.t_max;
         return has_hit;
     }
@@ -722,8 +674,8 @@ private:
 
 public:
     TLAS(const std::vector<shared<BLASInstance>> &instance);
-    bool intersect(MemoryArena &arena, const Ray &ray, SurfaceInteraction *interaction) const;
-    bool intersect(MemoryArena &arena,const Ray &ray) const;
+    bool intersect(const Ray &ray, SurfaceInteraction *interaction) const;
+    bool intersect(const Ray &ray) const;
     Bounds3f bounds() const { return _bounds; }
 
     void *operator new(size_t size);
