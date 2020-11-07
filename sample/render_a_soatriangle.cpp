@@ -2,21 +2,35 @@
 #include <vector>
 #include "lodepng.h"
 #include "core/geometry.h"
+#include "core/simd.h"
 int main(){
     narukami::TrianglePack triangle;
     triangle.v0 = narukami::Point3fPack(0,0,0);
     triangle.e1 = narukami::Vector3fPack(1,0,0);
     triangle.e2 = narukami::Vector3fPack(0,1,0);
 
-    
+	 narukami::QuadPack quad;
+	 quad.p0 = narukami::Point3fPack(0.0f,0,0);
+	 quad.p1 = narukami::Point3fPack(1.0f,0,0);
+	 quad.p2 = narukami::Point3fPack(0.0f,1,0);
+	 quad.p3 = narukami::Point3fPack(1.0f,1,0);
+	// segment.p0 = narukami::Point3fPack(0.5f,0,0);
+	// segment.p1 = narukami::Point3fPack(0.5f,1,0);
+
+	narukami::Plane plane;
+	plane.d = 1;
+	plane.n = narukami::Normal3f(0,0,1);
 
     std::vector<uint8_t> image;
 	for (int i = 0; i<128*128; ++i) {
 		narukami::Point2f uv;
 		float t;
         narukami::RayPack ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
-        bool b=intersect(ray,triangle,&t,&uv,nullptr);
-		
+
+		//narukami::Ray ray(narukami::Point3f((i/128.0f)/128.0f,(i%128)/128.0f,0),narukami::Vector3f(0,0,1));
+       //bool b=intersect(ray,triangle,&t,&uv,nullptr);
+	    int index,triangle_index;
+		bool b=intersect(ray,quad,&triangle_index,&t,&uv,&index);
 		float rgb[3];
 		if (b){
             rgb[0] = uv.x;

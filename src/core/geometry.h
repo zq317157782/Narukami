@@ -2294,8 +2294,8 @@ struct SSE_ALIGNAS Bounds3fPack
 
     inline Bounds3fPack()
     {
-        min_point = Point3fPack(MAX, MAX, MAX);
-        max_point = Point3fPack(LOWEST, LOWEST, LOWEST);
+        min_point = Point3fPack(OVERFLOW_LIMIT, OVERFLOW_LIMIT, OVERFLOW_LIMIT);
+        max_point = Point3fPack(UNDERFLOW_LIMIT, UNDERFLOW_LIMIT, UNDERFLOW_LIMIT);
     }
 
     inline Bounds3fPack(const Point3fPack &p0, const Point3fPack &p1)

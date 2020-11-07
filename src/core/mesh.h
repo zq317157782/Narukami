@@ -141,7 +141,7 @@ public:
         Point3f p0 = _positions[mf.vertex_index[0]];
         Point3f p1 = _positions[mf.vertex_index[1]];
         Point3f p2 = _positions[mf.vertex_index[2]];
-        return barycentric_interpolate(p0, p1, p2, u.x, u.y);
+        return bycerp(p0, p1, p2, u.x, u.y);
     }
     inline Point2f get_texcoord(uint32_t segment, uint32_t face, uint32_t vertex) const
     {

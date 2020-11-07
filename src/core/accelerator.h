@@ -416,7 +416,7 @@ BVHBuildNode *CompactBLAS<PrimitiveType, CompactPrimitiveType>::build(MemoryAren
             }
 
             auto mid_ptr = std::partition(&primitive_states[start], &primitive_states[end - 1] + 1, [=](const BVHPrimitiveState<PrimitiveType> &pi) {
-                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * offset(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
+                auto bucket_index = static_cast<int>(BLAS_SAH_BUCKET_NUM * between(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
                 bucket_index = min(bucket_index, BLAS_SAH_BUCKET_NUM - 1);
                 return bucket_index <= min_cost_bucket_index;
             });

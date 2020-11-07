@@ -293,7 +293,7 @@ BVHBuildNode *TLAS::build(MemoryArena &arena, uint32_t start, uint32_t end, std:
             }
 
             auto mid_ptr = std::partition(&instance_infos[start], &instance_infos[end - 1] + 1, [=](const BLASInstanceInfo &pi) {
-                auto bucket_index = static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM * offset(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
+                auto bucket_index = static_cast<int>(ACCELERATOR_SAH_BUCKET_NUM * between(centroid_bounds.min_point[dim], centroid_bounds.max_point[dim], pi.centroid[dim]));
                 bucket_index = min(bucket_index, ACCELERATOR_SAH_BUCKET_NUM - 1);
                 return bucket_index <= min_cost_bucket_index;
             });
