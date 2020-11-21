@@ -43,6 +43,10 @@ void write_image_to_file(const char* file_name,const float* data,const int width
 			    rgb[1] = data[(y*width+x)*3+1];
 			    rgb[2] = data[(y*width+x)*3+2];
 
+                rgb[0] = pow(rgb[0],0.45f);
+                rgb[1] = pow(rgb[1],0.45f);
+                rgb[2] = pow(rgb[2],0.45f);
+
                 //clamp to 0~1 for png
                 rgb[0] = clamp(rgb[0],0.0f,1.0f);
                 rgb[1] = clamp(rgb[1],0.0f,1.0f);

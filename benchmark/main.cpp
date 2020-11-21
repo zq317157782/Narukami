@@ -1,7 +1,7 @@
 #include "benchmark.h"
 #include <xmmintrin.h>
 #include "core/geometry.h"
-#include "core/geometry.h"
+#include "core/spectrum.h"
 using namespace narukami;
 
 /*******************************************************************************/
@@ -110,6 +110,112 @@ static void BM_narukami_rsqrt_quake(benchmark::State &state)
     }
 }
 BENCHMARK(BM_narukami_rsqrt_quake)->Arg(1024);
+
+/*******************************************************************************/
+/***************************************spectrum********************************/
+struct SPD_Scaler
+{
+   
+    float samples[SPD_SAMPLE_COUNT];
+    
+    SPD_Scaler()
+    {
+        for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
+        {
+            samples[i] = 0.0f;
+        }
+    }
+
+    SPD_Scaler(float v)
+    {
+        for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
+        {
+            samples[i] = v;
+        }
+    }
+
+    float operator[](int idx) const
+    {
+        assert(idx >= 0 && idx < SPD_SAMPLE_COUNT);
+        return samples[idx];
+    }
+};
+
+inline SPD_Scaler operator+(const SPD_Scaler &lhs, const SPD_Scaler &rhs)
+{
+    SPD_Scaler spd;
+    for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
+    {
+        spd.samples[i] = lhs.samples[i] + rhs.samples[i];
+    }
+    return spd;
+}
+
+inline bool is_black(const SPD_Scaler &spd)
+{
+    for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
+    {
+        if(spd.samples[i] != 0.0f)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static void BM_trivial_SPD_operator_add(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        for (auto i = 0; i < state.range(0); i++)
+        {
+            SPD_Scaler lhs = float(i),rhs = float(i);
+            benchmark::DoNotOptimize(lhs + rhs);
+        }
+    }
+}
+BENCHMARK(BM_trivial_SPD_operator_add)->Arg(1024);
+
+
+static void BM_narukami_SPD_operator_add(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        for (auto i = 0; i < state.range(0); i++)
+        {
+            Spectrum lhs = float(i),rhs = float(i);
+            benchmark::DoNotOptimize(lhs + rhs);
+        }
+    }
+}
+BENCHMARK(BM_narukami_SPD_operator_add)->Arg(1024);
+
+static void BM_trivial_SPD_is_black(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        for (auto i = 0; i < state.range(0); i++)
+        {
+            SPD_Scaler lhs = 0.0f;
+            benchmark::DoNotOptimize(is_black(lhs));
+        }
+    }
+}
+BENCHMARK(BM_trivial_SPD_is_black)->Arg(1024);
+
+static void BM_narukami_SPD_is_black(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        for (auto i = 0; i < state.range(0); i++)
+        {
+            Spectrum lhs = 0.0f;
+            benchmark::DoNotOptimize(is_black(lhs));
+        }
+    }
+}
+BENCHMARK(BM_narukami_SPD_is_black)->Arg(1024);
+
 
 // static void BM_common_rsqrt(benchmark::State &state)
 // {

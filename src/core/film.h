@@ -36,11 +36,11 @@ NARUKAMI_BEGIN
 
 struct TilePixel
 {
-   Color intensity;
+   Spectrum intensity;
    float weight;
 
    TilePixel(){
-       intensity=Color();
+       intensity=Spectrum();
        weight=0.0f;
    }
 };
@@ -58,7 +58,7 @@ class FilmTile
     public:
         FilmTile( const Bounds2i& pixel_bounds,const float* filter_lut,const float filter_radius);
         friend class Film;
-        void add_sample(const Point2f& pos,const Color& l,const float weight) const;
+        void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
         TilePixel& get_tile_pixel(const Point2i& p) const;
         inline  Bounds2i get_pixel_bounds() const{
             return _pixel_bounds;
@@ -67,11 +67,11 @@ class FilmTile
 
 struct Pixel
 {
-   Color intensity;
+   Spectrum intensity;
    float weight;
 
    Pixel(){
-       intensity=Color();
+       intensity=Spectrum();
        weight=0.0f;
    }
 };
@@ -105,7 +105,7 @@ class Film{
             return Bounds2i(Bounds2f(min_point,max_point));
         }
         void write_to_file(const char* file_name) const;
-        void add_sample(const Point2f& pos,const Color& l,const float weight) const;
+        void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
 
         std::unique_ptr<FilmTile> get_film_tile(const Bounds2i& sample_bounds) const;
         void merge_film_tile(std::unique_ptr<FilmTile> tile);

@@ -22,9 +22,11 @@
 using namespace narukami;
 int main()
 {
+
+    Spectrum::init();
     auto camera_transform = translate(0, 0, -4);  //* rotate(-1.5f,0,0,1);
     auto camera_transform2 = translate(0, 0, -4); //* rotate( 1.5f,0,0,1);
-    auto sampler = Sampler(128);
+    auto sampler = Sampler(32);
     auto film = std::make_shared<Film>(Point2i(1920, 1080), Bounds2f(Point2f(0, 0), Point2f(1, 1)));
     float aspect = 16.0f / 9.0f;
 
@@ -71,9 +73,9 @@ int main()
     {
         shared<HairStrands> hairstrands;
         {
-            auto transform = make_shared(translate(Vector3f(0, 0, 1.0f)) * scale(0.01f, 0.01f, 0.01f) * rotate(90, Vector3f(0, 0, 1))* rotate(180, Vector3f(0, 1, 0))) ;
+            auto transform = make_shared(translate(Vector3f(0, 0, 1.0f)) * scale(0.01f, 0.01f, 0.01f) * rotate(90, Vector3f(0, 0, 1)) * rotate(180, Vector3f(0, 1, 0)));
             auto inv_transform = make_shared(inverse(*transform)); // translate(Vector3f(-0.5f, -0.5f, -1))*scale(0.2f,0.2f,0.2f)*rotate(-90,Vector3f(0,1,0));
-            hairstrands = load_hairstrands<HairStrandsFileFormat::HAIR>(transform, inv_transform, "wCurly.hair",0.1f);
+            hairstrands = load_hairstrands<HairStrandsFileFormat::HAIR>(transform, inv_transform, "wCurly.hair", 0.1f);
         }
         auto primitives = create_hair_segment_primitives(hairstrands);
         auto blas = shared<CompactBLAS<HairSegmentPrimitive, CompactHairSegmentPrimitive>>(new CompactBLAS<HairSegmentPrimitive, CompactHairSegmentPrimitive>(primitives));
@@ -149,7 +151,7 @@ int main()
         } {
             auto transform = make_shared(translate(Vector3f(0.0f, 1.0f, 0.5f)) * rotate(-90, 1, 0, 0));
             auto inv_transform = make_shared(inverse(*transform));
-            auto rect_light = new RectLight(transform, inv_transform, Color(10, 10, 10), false, 1, 1);
+            auto rect_light = new RectLight(transform, inv_transform, tungsten_lamp_3000k(50), false, 1, 1);
             lights.push_back(rect_light);
         }
     }

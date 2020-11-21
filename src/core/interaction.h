@@ -73,7 +73,7 @@ inline void compute_differential(const RayDifferential &ray,SurfaceInteraction& 
     
 }
 
-Color Le(const SurfaceInteraction& interaction,const Vector3f& wi);
+Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi);
 
 
 // _p0 is the start point

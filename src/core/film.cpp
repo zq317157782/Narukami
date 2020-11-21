@@ -31,7 +31,7 @@ FilmTile::FilmTile( const Bounds2i& pixel_bounds,const float* filter_lut,const f
     _tile_pixels = std::unique_ptr<TilePixel[]>(new TilePixel[area(_pixel_bounds)]);
 }
 
-void FilmTile::add_sample(const Point2f& pos,const Color& l,const float weight) const
+void FilmTile::add_sample(const Point2f& pos,const Spectrum& l,const float weight) const
 {
     
      //calculate bounds
@@ -51,9 +51,7 @@ void FilmTile::add_sample(const Point2f& pos,const Color& l,const float weight) 
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             TilePixel &pixel = get_tile_pixel(Point2i(x, y));
             {
-                pixel.intensity[0] += l.r * weight * filter_weight;
-                pixel.intensity[1] += l.g * weight * filter_weight;
-                pixel.intensity[2] += l.b * weight * filter_weight;
+                pixel.intensity += l * weight * filter_weight;
             }
             pixel.weight += filter_weight;
         }
@@ -112,9 +110,15 @@ void Film::write_to_file(const char *file_name) const
             {
                 inv_w = 1.0f;
             }
-            data.push_back(pixel.intensity[0] * inv_w);
-            data.push_back(pixel.intensity[1] * inv_w);
-            data.push_back(pixel.intensity[2] * inv_w);
+            
+            float xyz[3];
+            to_xyz(pixel.intensity * inv_w,xyz);
+            float rgb[3];
+            xyz_to_rgb(xyz,rgb);
+
+            data.push_back(rgb[0]);
+            data.push_back(rgb[1]);
+            data.push_back(rgb[2]);
         }
     }
     write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
@@ -122,7 +126,7 @@ void Film::write_to_file(const char *file_name) const
 
 
 
-void Film::add_sample(const Point2f &pos, const Color &l, const float weight) const
+void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
 {
 
     //calculate bounds
@@ -142,9 +146,7 @@ void Film::add_sample(const Point2f &pos, const Color &l, const float weight) co
             float filter_weight = _filter_lut[idx_y] * filter_weight_x;
             Pixel &pixel = get_pixel(Point2i(x, y));
             {
-                pixel.intensity[0] += l.r * weight * filter_weight;
-                pixel.intensity[1] += l.g * weight * filter_weight;
-                pixel.intensity[2] += l.b * weight * filter_weight;
+                pixel.intensity += l * weight * filter_weight;
             }
             pixel.weight += filter_weight;
         }

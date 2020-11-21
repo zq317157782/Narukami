@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "core/geometry.h"
+#include "core/spectrum.h"
 
 using namespace narukami;
 /********************************************************/
@@ -166,6 +167,35 @@ TEST(rsqrt_quake, zero)
 {
     //雷神的rsqrt在处理0.0的输入的时候，会返回一个超大的浮点数，但是不是inf
     //EXPECT_FLOAT_EQ(rsqrt_quake(0.0f),INFINITE);
+}
+
+/********************************************************/
+/************************spectrum************************/
+
+TEST(Spectrum, assign)
+{
+    float wavelengh_values[SPD_SAMPLE_COUNT];
+    for(int i=0;i<SPD_SAMPLE_COUNT;++i)
+    {
+        wavelengh_values[i] = float(i);
+    }
+
+    Spectrum spd(wavelengh_values);
+    for(int i=0;i<SPD_SAMPLE_COUNT;++i)
+    {
+       EXPECT_FLOAT_EQ(spd[i],float(i));
+    }
+}
+
+TEST(Spectrum, to_xyz)
+{
+    Spectrum::init();
+    float xyz[3];
+    to_xyz(Spectrum::X,xyz);
+
+    EXPECT_EQ(xyz[0],100);
+    EXPECT_EQ(xyz[1],100);
+    EXPECT_EQ(xyz[2],100);
 }
 
 // TEST(math,isnan){

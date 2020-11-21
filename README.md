@@ -47,7 +47,7 @@ lightweight PBRT-style path tracer
  - [x] Sobol 02 sampler (it's a (0,2)-sequence,so no max spp limit)
     - [x] 1D/2D sample component
     - [x] 1D/2D sample array 
- - [ ] basic SPD
+ - [ ] basic Spectrum
  - [ ] basic Camera
     - [x] orthographic camera
     - [x] perspective camera

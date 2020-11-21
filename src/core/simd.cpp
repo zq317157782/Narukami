@@ -21,34 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#pragma once
-
 #include "core/narukami.h"
-#include "core/transform.h"
-#include "core/spectrum.h"
-#include "core/interaction.h"
+#include "core/simd.h"
+
 NARUKAMI_BEGIN
-class Light
-{
-protected:
-    const shared<Transform> _light_to_world;
-    const shared<Transform> _world_to_light;
-
-public:
-    Light(const shared<Transform> &light_to_world, const shared<Transform> &world_to_light) : _light_to_world(light_to_world), _world_to_light(world_to_light) {}
-    virtual Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) = 0;
-    virtual Spectrum power() const = 0;
-};
-
-class AreaLight : public Light
-{
-private:
-    float _area;
-
-public:
-    AreaLight(const shared<Transform> &light_to_world, const shared<Transform> &world_to_light, const float area) : Light(light_to_world, world_to_light), _area(area) {}
-    float area() const { return _area; }
-    virtual Spectrum L(const Interaction &interaction, const Vector3f &wi) const = 0;
-};
-
+    float4 float4::zero = float4();
 NARUKAMI_END

@@ -309,11 +309,11 @@ std::vector<CompactBLASInstance> pack_instances(const std::vector<shared<BLASIns
     assert(count > 0);
     assert((start + count) <= instance_list.size());
 
-    uint32_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count - 1) / SSE_WIDTH + 1;
 
     std::vector<Bounds3f> bounds_array;
 
-    for (uint32_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
+    for (uint32_t i = 0; i < soa_count * SSE_WIDTH; ++i)
     {
         if (i < count)
         {
@@ -329,9 +329,9 @@ std::vector<CompactBLASInstance> pack_instances(const std::vector<shared<BLASIns
     for (uint32_t i = 0; i < soa_count; ++i)
     {
         CompactBLASInstance instance;
-        instance.bounds = load(&bounds_array[i * SSE_FLOAT_COUNT]);
+        instance.bounds = load(&bounds_array[i * SSE_WIDTH]);
 
-        instance.offset = start + i * SSE_FLOAT_COUNT;
+        instance.offset = start + i * SSE_WIDTH;
         soa_instance_info.push_back(instance);
     }
 

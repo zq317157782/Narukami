@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/light.h"
 #include "core/material.h"
 NARUKAMI_BEGIN
-Color Le(const SurfaceInteraction& interaction,const Vector3f& wi)
+Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
 {
     // if(interaction.primitive->area_light!=nullptr)
     // {
@@ -34,7 +34,7 @@ Color Le(const SurfaceInteraction& interaction,const Vector3f& wi)
     // }
     // else
     {
-        return Color(0.0f,0.0f,0.0f);
+        return Spectrum(0.0f);
     }
 }
 NARUKAMI_END

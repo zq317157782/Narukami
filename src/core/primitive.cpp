@@ -111,13 +111,13 @@ std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shar
     assert(count > 0);
     assert((start + count) <= triangles.size());
 
-    uint32_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count - 1) / SSE_WIDTH + 1;
 
     std::vector<Point3f> v0_array;
     std::vector<Vector3f> e1_array;
     std::vector<Vector3f> e2_array;
 
-    for (uint32_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
+    for (uint32_t i = 0; i < soa_count * SSE_WIDTH; ++i)
     {
         if (i < count)
         {
@@ -142,12 +142,12 @@ std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shar
     for (uint32_t i = 0; i < soa_count; ++i)
     {
         CompactMeshPrimitive primitive;
-        primitive.triangle.v0 = load(&v0_array[i * SSE_FLOAT_COUNT]);
-        primitive.triangle.e1 = load(&e1_array[i * SSE_FLOAT_COUNT]);
-        primitive.triangle.e2 = load(&e2_array[i * SSE_FLOAT_COUNT]);
-        //primitive.offset = start + i * SSE_FLOAT_COUNT;
+        primitive.triangle.v0 = load(&v0_array[i * SSE_WIDTH]);
+        primitive.triangle.e1 = load(&e1_array[i * SSE_WIDTH]);
+        primitive.triangle.e2 = load(&e2_array[i * SSE_WIDTH]);
+        //primitive.offset = start + i * SSE_WIDTH;
         soa_primitives.push_back(primitive);
-        offsets->push_back(start + i * SSE_FLOAT_COUNT);
+        offsets->push_back(start + i * SSE_WIDTH);
     }
 
     return soa_primitives;
@@ -180,14 +180,14 @@ std::vector<CompactHairSegmentPrimitive> pack_compact_primitives(const std::vect
     assert(count > 0);
     assert((start + count) <= segments.size());
 
-    uint32_t soa_count = (uint32_t)(count - 1) / SSE_FLOAT_COUNT + 1;
+    uint32_t soa_count = (uint32_t)(count - 1) / SSE_WIDTH + 1;
 
     std::vector<Point3f> p0_array;
     std::vector<Point3f> p1_array;
     std::vector<float> w0_array;
     std::vector<float> w1_array;
 
-    for (uint32_t i = 0; i < soa_count * SSE_FLOAT_COUNT; ++i)
+    for (uint32_t i = 0; i < soa_count * SSE_WIDTH; ++i)
     {
         if (i < count)
         {
@@ -215,12 +215,12 @@ std::vector<CompactHairSegmentPrimitive> pack_compact_primitives(const std::vect
     for (uint32_t i = 0; i < soa_count; ++i)
     {
         CompactHairSegmentPrimitive primitive;
-        primitive.p0 = load(&p0_array[i * SSE_FLOAT_COUNT]);
-        primitive.p1 = load(&p1_array[i * SSE_FLOAT_COUNT]);
-        primitive.w0 = load(&w0_array[i * SSE_FLOAT_COUNT]);
-        primitive.w1 = load(&w1_array[i * SSE_FLOAT_COUNT]);
+        primitive.p0 = load(&p0_array[i * SSE_WIDTH]);
+        primitive.p1 = load(&p1_array[i * SSE_WIDTH]);
+        primitive.w0 = load(&w0_array[i * SSE_WIDTH]);
+        primitive.w1 = load(&w1_array[i * SSE_WIDTH]);
         soa_primitives.push_back(primitive);
-        offsets->push_back(start + i * SSE_FLOAT_COUNT);
+        offsets->push_back(start + i * SSE_WIDTH);
     }
 
     return soa_primitives;

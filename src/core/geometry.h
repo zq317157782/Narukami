@@ -425,7 +425,7 @@ struct SSE_ALIGNAS Vector3fPack
 
     inline Vector3f operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        assert(idx >= 0 && idx < SSE_WIDTH);
         return Vector3f(xxxx[idx], yyyy[idx], zzzz[idx]);
     }
 };
@@ -942,7 +942,7 @@ struct SSE_ALIGNAS Point3fPack
 
     inline Point3f operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        assert(idx >= 0 && idx < SSE_WIDTH);
         return Point3f(xxxx[idx], yyyy[idx], zzzz[idx]);
     }
 };
@@ -1175,7 +1175,7 @@ struct SSE_ALIGNAS Normal3fPack
 
     inline Normal3f operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        assert(idx >= 0 && idx < SSE_WIDTH);
         return Normal3f(xxxx[idx], yyyy[idx], zzzz[idx]);
     }
 };
@@ -1702,7 +1702,7 @@ struct SSE_ALIGNAS TrianglePack
 
     Triangle operator[](const uint32_t idx) const
     {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        assert(idx >= 0 && idx < SSE_WIDTH);
         Triangle triangle;
         triangle.v0 = v0[idx];
         triangle.e1 = e1[idx];
@@ -2288,7 +2288,7 @@ struct SSE_ALIGNAS Bounds3fPack
 
     inline Bounds3f operator[](const int idx) const
     {
-        assert(idx >= 0 && idx < SSE_FLOAT_COUNT);
+        assert(idx >= 0 && idx < SSE_WIDTH);
         return Bounds3f(min_point[idx], max_point[idx]);
     }
 

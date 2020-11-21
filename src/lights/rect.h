@@ -35,15 +35,15 @@ NARUKAMI_BEGIN
 class RectLight : public AreaLight
 {
 private:
-    Color _radiance;
+    Spectrum _radiance;
     bool _two_side;
     float _width, _height;
 
 public:
-    RectLight(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light,const Color &L, bool two_side, const float w, const float h) : AreaLight(light_to_world,world_to_light,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
+    RectLight(const shared<Transform>& light_to_world,const shared<Transform>& world_to_light,const Spectrum &L, bool two_side, const float w, const float h) : AreaLight(light_to_world,world_to_light,w*h), _radiance(L), _two_side(two_side), _width(w), _height(h){
     }
 
-    Color sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
+    Spectrum sample_Li(const Interaction &interaction, const Point2f &u, Vector3f *wi, float *pdf, VisibilityTester *tester) override
     {
 
         Point3f local_light_position((u.x - 0.5f) * _width, (u.y - 0.5f) * _height, 0);
@@ -55,7 +55,7 @@ public:
         auto costheta = (*_world_to_light)(-(*wi)).z;
         if (!_two_side && costheta <= 0.0f)
         {
-            return Color(0.0f, 0.0f, 0.0f);
+            return Spectrum(0.0f);
         }
 
         if (pdf)
@@ -70,18 +70,18 @@ public:
         return _radiance;
     }
 
-    Color L(const Interaction &interaction, const Vector3f &wi) const override
+    Spectrum L(const Interaction &interaction, const Vector3f &wi) const override
     {
         if (!_two_side && (*_world_to_light)(wi).z >= 0)
         {
-            return Color(0.0f, 0.0f, 0.0f);
+            return Spectrum(0.0f);
         }
         return _radiance;
     }
 
-    Color power() const override
+    Spectrum power() const override
     {
-        Color power = area() * PI * _radiance;
+        Spectrum power = area() * PI * _radiance;
         power=_two_side?power*2.0f:power;
         return power;
     }

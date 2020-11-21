@@ -63,6 +63,7 @@ inline bool none(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)==0x0;}
 inline bool not_all(const bool4& b){ return (_mm_movemask_ps(b.xyzw)&0xF)!=0xF;}
 
 inline int movemask(const bool4& b){ return _mm_movemask_ps(b); }
+inline bool4 select(const bool4& mask,const bool4 &a,const bool4 &b){ return _mm_blendv_ps(b,a,mask); }
 
 struct float4
 {
@@ -79,8 +80,9 @@ struct float4
     inline operator const __m128&() const{return xyzw;}
     inline const float &operator[](const int idx) const{assert(idx >= 0 && idx < size);return (&x)[idx];}
     inline float &operator[](const int idx){assert(idx >= 0 && idx < size);return (&x)[idx];}
-};
 
+    static float4 zero;
+};
 
 inline std::ostream &operator<<(std::ostream &out, const float4 &v){out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';return out;}
 
@@ -155,8 +157,6 @@ inline float4 madd(const float4 &a,const float4 &b,const float4 &c){ return a*b+
 inline float4 msub(const float4 &a,const float4 &b,const float4 &c){ return a*b-c; }
 
 inline float4 select(const bool4& mask,const float4 &a,const float4 &b){ return _mm_blendv_ps(b,a,mask); }
-inline bool4 select(const bool4& mask,const bool4 &a,const bool4 &b){ return _mm_blendv_ps(b,a,mask); }
 inline void store(const float4 &x,float* data){ _mm_store_ps(data,x.xyzw);}
 inline float4 load(float* data){ return _mm_load_ps(data);}
-
 NARUKAMI_END
