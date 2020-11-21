@@ -22,14 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "core/light.h"
-#include "core/scene.h"
 NARUKAMI_BEGIN
-bool VisibilityTester::unoccluded(const Scene &scene) const
-{
-    //TODO float percise
-    Ray ray(_p0.p, _p1.p - _p0.p, 0.99f);
-    ray = offset_ray(ray, _p0.n);
-    return !scene.intersect(ray);
-}
 
 NARUKAMI_END

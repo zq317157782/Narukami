@@ -917,7 +917,7 @@ void Spectrum::init()
     }
 }
 
-void to_xyz(const Spectrum &spd, float xyz[3])
+void spd_to_xyz(const Spectrum &spd, float xyz[3])
 {
     float4 xxxx, yyyy, zzzz;
     for (int i = 0; i < SPD_SSE_SAMPLE_COUNT; ++i)
@@ -936,6 +936,25 @@ void to_xyz(const Spectrum &spd, float xyz[3])
     xyz[1] = y * scale;
     xyz[2] = z * scale;
 }
+
+void xyz_to_rgb(const float xyz[3], float rgb[3]) {
+    rgb[0] =  3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
+    rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
+    rgb[2] =  0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
+}
+
+// RGB::RGB(const XYZ&)
+// {
+
+// }
+
+RGB::RGB(const Spectrum& spd)
+{
+    float xyz[3];
+    spd_to_xyz(spd,xyz);
+    xyz_to_rgb(xyz,&r);
+}
+
 
 void blackbody(const float *lambda, int n, float T, float *Le)
 {

@@ -28,16 +28,44 @@ SOFTWARE.
 #include "core/math.h"
 #include "simd.h"
 NARUKAMI_BEGIN
-struct Color
+
+struct Spectrum;
+struct RGB; 
+
+struct XYZ
+{
+    float x, y, z;
+    inline XYZ() : x(0.0f), y(0.0f), z(0.0f) {}
+    inline XYZ(const float x, const float y, const float z) : x(x), y(y), z(z)
+    {
+        assert(!isnan(x));
+        assert(!isnan(y));
+        assert(!isnan(z));
+    }
+    inline float operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 3);
+        return (&x)[idx];
+    }
+    inline float &operator[](const int idx)
+    {
+        assert(idx >= 0 && idx < 3);
+        return (&x)[idx];
+    }
+};
+
+struct RGB
 {
     float r, g, b;
-    inline Color() : r(0.0f), g(0.0f), b(0.0f) {}
-    inline Color(const float r, const float g, const float b) : r(r), g(g), b(b)
+    inline RGB() : r(0.0f), g(0.0f), b(0.0f) {}
+    inline RGB(const float r, const float g, const float b) : r(r), g(g), b(b)
     {
         assert(!isnan(r));
         assert(!isnan(g));
         assert(!isnan(b));
     }
+    //explicit RGB(const XYZ&);
+    explicit RGB(const Spectrum&);
     inline float operator[](const int idx) const
     {
         assert(idx >= 0 && idx < 3);
@@ -49,12 +77,12 @@ struct Color
         return (&r)[idx];
     }
 };
-inline std::ostream &operator<<(std::ostream &out, const Color &L)
+inline std::ostream &operator<<(std::ostream &out, const RGB &L)
 {
     out << '(' << L.r << ',' << L.g << ',' << L.b << ')';
     return out;
 }
-inline bool operator==(const Color &a, const Color &b)
+inline bool operator==(const RGB &a, const RGB &b)
 {
     if ((a.r == b.r) && (a.g == b.g) && (a.b == b.b))
     {
@@ -62,7 +90,7 @@ inline bool operator==(const Color &a, const Color &b)
     }
     return false;
 }
-inline bool operator!=(const Color &a, const Color &b)
+inline bool operator!=(const RGB &a, const RGB &b)
 {
     if ((a.r != b.r) || (a.g != b.g) || (a.b != b.b))
     {
@@ -71,43 +99,45 @@ inline bool operator!=(const Color &a, const Color &b)
     return false;
 }
 
-inline Color operator+(const Color &L1, const Color &L2)
+inline RGB operator+(const RGB &L1, const RGB &L2)
 {
-    Color L;
+    RGB L;
     L.r = L1.r + L2.r;
     L.g = L1.g + L2.g;
     L.b = L1.b + L2.b;
     return L;
 }
-inline Color operator*(const Color &L1, const Color &L2)
+inline RGB operator*(const RGB &L1, const RGB &L2)
 {
-    Color L;
+    RGB L;
     L.r = L1.r * L2.r;
     L.g = L1.g * L2.g;
     L.b = L1.b * L2.b;
     return L;
 }
-inline Color operator*(const Color &L1, const float f)
+inline RGB operator*(const RGB &L1, const float f)
 {
     assert(!isnan(f));
-    Color L;
+    assert(f!=0.0f);
+    RGB L;
     L.r = L1.r * f;
     L.g = L1.g * f;
     L.b = L1.b * f;
     return L;
 }
-inline Color operator*(const float f, const Color &L1) { return L1 * f; }
-inline Color operator/(const Color &L1, const float f)
+inline RGB operator*(const float f, const RGB &L1) { return L1 * f; }
+inline RGB operator/(const RGB &L1, const float f)
 {
     assert(!isnan(f));
-    Color L;
+    assert(f!=0.0f);
+    RGB L;
     L.r = L1.r / f;
     L.g = L1.g / f;
     L.b = L1.b / f;
     return L;
 }
 
-inline bool is_black(const Color &L) { return L.r == 0 && L.g == 0 && L.b == 0; }
+inline bool is_black(const RGB &L) { return L.r == 0 && L.g == 0 && L.b == 0; }
 //--------------------------------------------------------------------------------------------------------------------------------
 constexpr int WAVELENGTH_MIN = 360;
 constexpr int WAVELENGTH_MAX = 830;
@@ -170,6 +200,18 @@ struct Spectrum
 
     static void init();
 };
+
+inline bool isnan(const Spectrum &spd)
+{
+    for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
+    {
+        if(isnan(spd[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 inline std::ostream &operator<<(std::ostream &out, const Spectrum &spd)
 {
@@ -274,15 +316,6 @@ inline Spectrum operator/(const Spectrum &lhs, float rhs)
 }
 
 Spectrum from_sample_data(const float *lambda, float *sample, int n);
-
-void to_xyz(const Spectrum &spd, float xyz[3]);
-
-inline void xyz_to_rgb(const float xyz[3], float rgb[3]) {
-    rgb[0] =  3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
-    rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
-    rgb[2] =  0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
-}
-
 
 void blackbody(const float *lambda, int n, float T, float *Le);
 void blackbody_normalized(const float *lambda, int n, float T, float *Le);

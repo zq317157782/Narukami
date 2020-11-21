@@ -25,6 +25,7 @@ SOFTWARE.
 #include "core/interaction.h"
 #include "core/light.h"
 #include "core/material.h"
+#include "core/scene.h"
 NARUKAMI_BEGIN
 Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
 {
@@ -37,4 +38,13 @@ Spectrum Le(const SurfaceInteraction& interaction,const Vector3f& wi)
         return Spectrum(0.0f);
     }
 }
+
+bool VisibilityTester::unoccluded(const Scene &scene) const
+{
+    //TODO float percise
+    Ray ray(_p0.p, _p1.p - _p0.p, 0.99f);
+    ray = offset_ray(ray, _p0.n);
+    return !scene.intersect(ray);
+}
+
 NARUKAMI_END

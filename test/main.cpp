@@ -187,16 +187,16 @@ TEST(Spectrum, assign)
     }
 }
 
-TEST(Spectrum, to_xyz)
-{
-    Spectrum::init();
-    float xyz[3];
-    to_xyz(Spectrum::X,xyz);
+// TEST(Spectrum, to_xyz)
+// {
+//     Spectrum::init();
+//     float xyz[3];
+//     to_xyz(Spectrum::X,xyz);
 
-    EXPECT_EQ(xyz[0],100);
-    EXPECT_EQ(xyz[1],100);
-    EXPECT_EQ(xyz[2],100);
-}
+//     EXPECT_EQ(xyz[0],100);
+//     EXPECT_EQ(xyz[1],100);
+//     EXPECT_EQ(xyz[2],100);
+// }
 
 // TEST(math,isnan){
 //     float zero=0.0f;

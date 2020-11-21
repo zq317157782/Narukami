@@ -111,11 +111,7 @@ void Film::write_to_file(const char *file_name) const
                 inv_w = 1.0f;
             }
             
-            float xyz[3];
-            to_xyz(pixel.intensity * inv_w,xyz);
-            float rgb[3];
-            xyz_to_rgb(xyz,rgb);
-
+            RGB rgb(pixel.intensity * inv_w);
             data.push_back(rgb[0]);
             data.push_back(rgb[1]);
             data.push_back(rgb[2]);
