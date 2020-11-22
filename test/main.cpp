@@ -1,8 +1,64 @@
 #include "gtest/gtest.h"
 #include "core/geometry.h"
 #include "core/spectrum.h"
+#include "core/optional.h"
 
 using namespace narukami;
+
+TEST(optional, ctor)
+{
+    optional<int> a0;
+    EXPECT_FALSE(a0);
+
+    optional<int> a1 = 1;
+    EXPECT_TRUE(a1);
+
+    optional<int> a2 = a1;
+    EXPECT_TRUE(a2);
+
+    //右值
+    EXPECT_TRUE(optional<int>(1));
+}
+
+TEST(optional, observer)
+{
+    optional<int> a1 = 1;
+    EXPECT_EQ(*a1, 1);
+
+    *a1 = 2;
+    EXPECT_EQ(*a1, 2);
+
+    optional<std::string> a3 = "abc";
+    EXPECT_EQ(a3->size(), 3);
+
+    a3.value() = "abcd";
+    EXPECT_EQ(a3->size(), 4);
+}
+
+TEST(optional, is_trivially_destructible)
+{
+    EXPECT_TRUE(std::is_trivially_destructible<optional<int>>());
+    EXPECT_FALSE(std::is_trivially_destructible<optional<std::string>>());
+}
+
+TEST(optional, swap)
+{
+    {
+        optional<int> a1 = 1;
+        optional<int> a2;
+        a1.swap(a2);
+        EXPECT_FALSE(a1);
+        EXPECT_TRUE(a2);
+    }
+    {
+        optional<int> a1 = 1;
+        optional<int> a2 = 2;
+        a1.swap(a2);
+        EXPECT_EQ(*a1, 2);
+        EXPECT_EQ(*a2, 1);
+    }
+}
+
 /********************************************************/
 /************************math****************************/
 
@@ -50,13 +106,12 @@ TEST(cast_ui2f, values)
     }
 }
 
-TEST(cast_f2i,zero)
+TEST(cast_f2i, zero)
 {
     float f = 0.0f;
     int i = cast_f2i(f);
     EXPECT_EQ(i, 0);
 }
-
 
 TEST(constant, one_minus_epsion_eq_one)
 {
@@ -175,15 +230,15 @@ TEST(rsqrt_quake, zero)
 TEST(Spectrum, assign)
 {
     float wavelengh_values[SPD_SAMPLE_COUNT];
-    for(int i=0;i<SPD_SAMPLE_COUNT;++i)
+    for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
     {
         wavelengh_values[i] = float(i);
     }
 
     Spectrum spd(wavelengh_values);
-    for(int i=0;i<SPD_SAMPLE_COUNT;++i)
+    for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
     {
-       EXPECT_FLOAT_EQ(spd[i],float(i));
+        EXPECT_FLOAT_EQ(spd[i], float(i));
     }
 }
 
