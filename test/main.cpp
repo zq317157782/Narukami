@@ -242,6 +242,18 @@ TEST(Spectrum, assign)
     }
 }
 
+TEST(Spectrum,average)
+{
+    Spectrum a0(0.0f);
+    EXPECT_FLOAT_EQ(average(a0),0.0f);
+    Spectrum a1(1.0f);
+    EXPECT_FLOAT_EQ(average(a1),1.0f);
+    Spectrum a2(-1.0f);
+    EXPECT_FLOAT_EQ(average(a2),-1.0f);
+    Spectrum a3(100000000.0f);
+    EXPECT_FLOAT_EQ(average(a3),100000000.0f);
+}
+
 // TEST(Spectrum, to_xyz)
 // {
 //     Spectrum::init();

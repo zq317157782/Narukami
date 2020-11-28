@@ -30,7 +30,7 @@ SOFTWARE.
 NARUKAMI_BEGIN
 
 struct Spectrum;
-struct RGB; 
+struct RGB;
 
 struct XYZ
 {
@@ -65,7 +65,7 @@ struct RGB
         assert(!isnan(b));
     }
     //explicit RGB(const XYZ&);
-    explicit RGB(const Spectrum&);
+    explicit RGB(const Spectrum &);
     inline float operator[](const int idx) const
     {
         assert(idx >= 0 && idx < 3);
@@ -118,7 +118,7 @@ inline RGB operator*(const RGB &L1, const RGB &L2)
 inline RGB operator*(const RGB &L1, const float f)
 {
     assert(!isnan(f));
-    assert(f!=0.0f);
+    assert(f != 0.0f);
     RGB L;
     L.r = L1.r * f;
     L.g = L1.g * f;
@@ -129,7 +129,7 @@ inline RGB operator*(const float f, const RGB &L1) { return L1 * f; }
 inline RGB operator/(const RGB &L1, const float f)
 {
     assert(!isnan(f));
-    assert(f!=0.0f);
+    assert(f != 0.0f);
     RGB L;
     L.r = L1.r / f;
     L.g = L1.g / f;
@@ -147,7 +147,7 @@ extern const float CIE_X[WAVELENGTH_COUNT];
 extern const float CIE_Y[WAVELENGTH_COUNT];
 extern const float CIE_Z[WAVELENGTH_COUNT];
 extern const float CIE_lambda[WAVELENGTH_COUNT];
-static const float CIE_Y_integral = 106.856895f;//Y曲线的积分，用来标准化xyz
+static const float CIE_Y_integral = 106.856895f; //Y曲线的积分，用来标准化xyz
 
 constexpr int WAVELENGTH_SAMPLE_RATE = 5;
 constexpr int SPD_SAMPLE_COUNT = (WAVELENGTH_MAX - WAVELENGTH_MIN) / WAVELENGTH_SAMPLE_RATE + 1;
@@ -172,14 +172,14 @@ struct Spectrum
             samples[i] = float4(v);
         }
         //最后一个空间是无效样本,因此设置成0.0f
-        samples[SPD_SSE_SAMPLE_COUNT][3] = 0.0f;
+        samples[SPD_SSE_SAMPLE_COUNT-1][3] = 0.0f;
     }
 
     Spectrum(float *input)
     {
         memcpy(samples, input, SPD_SAMPLE_COUNT * sizeof(float));
         //最后一个空间是无效样本,因此设置成0.0f
-        samples[SPD_SSE_SAMPLE_COUNT][3] = 0.0f;
+        samples[SPD_SSE_SAMPLE_COUNT-1][3] = 0.0f;
     }
 
     float operator[](int idx) const
@@ -205,7 +205,7 @@ inline bool isnan(const Spectrum &spd)
 {
     for (int i = 0; i < SPD_SAMPLE_COUNT; ++i)
     {
-        if(isnan(spd[i]))
+        if (isnan(spd[i]))
         {
             return true;
         }
@@ -246,7 +246,7 @@ inline Spectrum operator+(const Spectrum &lhs, const Spectrum &rhs)
     return spd;
 }
 
-inline Spectrum operator+=(Spectrum &lhs,const Spectrum &rhs)
+inline Spectrum operator+=(Spectrum &lhs, const Spectrum &rhs)
 {
     lhs = lhs + rhs;
     return lhs;
@@ -262,7 +262,7 @@ inline Spectrum operator-(const Spectrum &lhs, const Spectrum &rhs)
     return spd;
 }
 
-inline Spectrum operator-=(Spectrum &lhs,const Spectrum &rhs)
+inline Spectrum operator-=(Spectrum &lhs, const Spectrum &rhs)
 {
     lhs = lhs - rhs;
     return lhs;
@@ -278,7 +278,7 @@ inline Spectrum operator*(const Spectrum &lhs, const Spectrum &rhs)
     return spd;
 }
 
-inline Spectrum operator*=(Spectrum &lhs,const Spectrum &rhs)
+inline Spectrum operator*=(Spectrum &lhs, const Spectrum &rhs)
 {
     lhs = lhs * rhs;
     return lhs;
@@ -313,6 +313,16 @@ inline Spectrum operator/(const Spectrum &lhs, float rhs)
         spd.samples[i] = lhs.samples[i] / rhs;
     }
     return spd;
+}
+
+inline float average(const Spectrum &spd)
+{
+    float4 sum4;
+    for (int i = 0; i < SPD_SSE_SAMPLE_COUNT; ++i)
+    {
+        sum4 += spd.samples[i];
+    }
+    return vreduce_add(sum4).x/SPD_SAMPLE_COUNT;
 }
 
 Spectrum from_sample_data(const float *lambda, float *sample, int n);
