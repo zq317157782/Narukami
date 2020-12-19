@@ -174,5 +174,6 @@ int main()
     report_thread_statistics();
     print_statistics(std::cout);
 
-    film->write_to_file("demo_mesh.png");
+    auto image = film->get_image();
+    image->write_to_png("mesh.png",PixelFormat::sRGBA8);
 }

@@ -15,7 +15,8 @@ int main()
                 film.add_sample(Point2f(w, h), Spectrum::X, 1);
             }
         }
-        film.write_to_file("CIE_X_to_RGB.png");
+        auto image = film.get_image();
+        image->write_to_png("CIE_X_to_RGB.png");
     }
 
     {
@@ -27,7 +28,8 @@ int main()
                 film.add_sample(Point2f(w, h), Spectrum::Y, 1);
             }
         }
-        film.write_to_file("CIE_Y_to_RGB.png");
+        auto image = film.get_image();
+        image->write_to_png("CIE_Y_to_RGB.png");
     }
 
     {
@@ -39,7 +41,11 @@ int main()
                 film.add_sample(Point2f(w, h), Spectrum::Z, 1);
             }
         }
-        film.write_to_file("CIE_Z_to_RGB.png");
+        auto image = film.get_image();
+        image->write_to_png("CIE_Z_to_RGB.png");
+
+        Image a("mesh.png", PixelFormat::sRGBA8);
+        a.write_to_png("CIE_Z_to_RGB2.png");
     }
     //narukami::write_image_to_file("texture_space.png",data,128,128);
 }

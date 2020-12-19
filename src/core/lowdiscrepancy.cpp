@@ -104,7 +104,7 @@ inline void gray_code_sample(const uint32_t *C, uint32_t n, uint32_t scramble, f
     uint32_t v = scramble;
     for (uint32_t i = 0; i < n; ++i) {
         p[i] = min(v * 0x1p-32f, ONE_MINUS_EPSILON);  /* 1/2^32 */
-        v ^= C[count_trailing_zero(i + 1)];
+        v ^= C[ctz(i + 1)];
     }
 }
 
@@ -115,8 +115,8 @@ inline void gray_code_sample(const uint32_t *C0, const uint32_t *C1, uint32_t n,
         p[i][0] = min(v[0] * 0x1p-32f, ONE_MINUS_EPSILON);
         p[i][1] = min(v[1] * 0x1p-32f, ONE_MINUS_EPSILON);
 
-        v[0] ^= C0[count_trailing_zero(i + 1)];
-        v[1] ^= C1[count_trailing_zero(i + 1)];
+        v[0] ^= C0[ctz(i + 1)];
+        v[1] ^= C1[ctz(i + 1)];
     }
 }
 

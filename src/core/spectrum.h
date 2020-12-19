@@ -138,6 +138,30 @@ inline RGB operator/(const RGB &L1, const float f)
 }
 
 inline bool is_black(const RGB &L) { return L.r == 0 && L.g == 0 && L.b == 0; }
+
+struct RGBA
+{
+    float r, g, b, a;
+    inline RGBA() : r(0.0f), g(0.0f), b(0.0f), a(0.0f) {}
+    inline RGBA(const float r, const float g, const float b, const float a) : r(r), g(g), b(b), a(a)
+    {
+        assert(!isnan(r));
+        assert(!isnan(g));
+        assert(!isnan(b));
+        assert(!isnan(a));
+    }
+    inline float operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 4);
+        return (&r)[idx];
+    }
+    inline float &operator[](const int idx)
+    {
+        assert(idx >= 0 && idx < 4);
+        return (&r)[idx];
+    }
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------
 constexpr int WAVELENGTH_MIN = 360;
 constexpr int WAVELENGTH_MAX = 830;
@@ -172,14 +196,14 @@ struct Spectrum
             samples[i] = float4(v);
         }
         //最后一个空间是无效样本,因此设置成0.0f
-        samples[SPD_SSE_SAMPLE_COUNT-1][3] = 0.0f;
+        samples[SPD_SSE_SAMPLE_COUNT - 1][3] = 0.0f;
     }
 
     Spectrum(float *input)
     {
         memcpy(samples, input, SPD_SAMPLE_COUNT * sizeof(float));
         //最后一个空间是无效样本,因此设置成0.0f
-        samples[SPD_SSE_SAMPLE_COUNT-1][3] = 0.0f;
+        samples[SPD_SSE_SAMPLE_COUNT - 1][3] = 0.0f;
     }
 
     float operator[](int idx) const
@@ -322,7 +346,7 @@ inline float average(const Spectrum &spd)
     {
         sum4 += spd.samples[i];
     }
-    return vreduce_add(sum4).x/SPD_SAMPLE_COUNT;
+    return vreduce_add(sum4).x / SPD_SAMPLE_COUNT;
 }
 
 Spectrum from_sample_data(const float *lambda, float *sample, int n);

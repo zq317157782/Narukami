@@ -30,7 +30,7 @@ SOFTWARE.
 #include <cmath>
 NARUKAMI_BEGIN
 
-//constants 
+//constants
 static MAYBE_UNUSED constexpr float MIN_RCP_INPUT = 1E-18f;
 static MAYBE_UNUSED constexpr float EPSION = std::numeric_limits<float>::epsilon(); //大于1的最小可表示浮点数
 static MAYBE_UNUSED constexpr float INFINITE = std::numeric_limits<float>::infinity();
@@ -44,6 +44,31 @@ static MAYBE_UNUSED constexpr float PI_OVER_TWO = 1.57079632679489661923f;
 static MAYBE_UNUSED constexpr float PI_OVER_FOUR = 0.78539816339744830961f;
 static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON = 1.0f - EPSION;
 
+inline int ctz(uint32_t x)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_ctz(x);
+#else
+    unsigned long tz;
+    if (_BitScanForward(&tz, x))
+        return tz;
+    return 32;
+
+#endif
+}
+
+inline int clz(uint32_t x)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_clz(v);
+#else
+    unsigned long lz = 0;
+    if (_BitScanReverse(&lz, x))
+        return 31 - lz;
+    return 31;
+#endif
+}
+
 //IEEE 754 float
 //[31][30 : 23][22 : 0]
 //[sign][exp][ma]
@@ -51,7 +76,7 @@ static MAYBE_UNUSED constexpr float ONE_MINUS_EPSILON = 1.0f - EPSION;
 /**IEEE 754 标准下的单精度浮点数类型**/
 union IEEE_754_32bit
 {
-    IEEE_754_32bit():f(0.0f){}
+    IEEE_754_32bit() : f(0.0f) {}
     IEEE_754_32bit(const float x) : f(x){};
     IEEE_754_32bit(const int x) : i(x){};
     IEEE_754_32bit(const unsigned int x) : ui(x){};
@@ -65,6 +90,7 @@ union IEEE_754_32bit
         uint32_t sign : 1;
     };
 };
+
 inline float cast_i2f(const int x)
 {
     IEEE_754_32bit v = x;
@@ -232,6 +258,18 @@ inline float pow(const float x, const float exp)
 {
     return std::powf(x, exp);
 }
+
+inline float log2(const float x)
+{
+    return std::log2f(x);
+}
+
+//floor log2
+inline int log2(const int x)
+{
+    return 31 - clz(x);
+}
+
 inline float sin(const float x)
 {
     return std::sinf(x);
@@ -307,21 +345,4 @@ inline uint32_t round_up_pow2(uint32_t v)
     v |= v >> 16;
     return v + 1;
 }
-inline int count_trailing_zero(uint32_t v)
-{
-#if defined(__GNUC__) || defined(__clang__)
-    return __builtin_ctz(v);
-#else
-    unsigned long index;
-    if (_BitScanForward(&index, v))
-    {
-        return index;
-    }
-    else
-    {
-        return 32;
-    }
-#endif
-}
-
 NARUKAMI_END

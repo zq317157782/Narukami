@@ -90,4 +90,7 @@ inline shared<T> make_shared(const T &t)
     T *ptr = new T(t);
     return shared<T>(ptr);
 }
+
+template<typename T>
+using unique = std::unique_ptr<T>;
 NARUKAMI_END

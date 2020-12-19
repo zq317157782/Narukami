@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/narukami.h"
 #include "core/spectrum.h"
 #include "core/geometry.h"
-#include "core/geometry.h"
+#include "core/image.h"
 #include <mutex>
 NARUKAMI_BEGIN
 
@@ -104,7 +104,8 @@ class Film{
             Point2f max_point = ceil(Point2f(_cropped_pixel_bounds.max_point)-Vector2f(0.5f,0.5f)+_filter_radius);
             return Bounds2i(Bounds2f(min_point,max_point));
         }
-        void write_to_file(const char* file_name) const;
+
+        shared<narukami::Image> get_image() const;
         void add_sample(const Point2f& pos,const Spectrum& l,const float weight) const;
 
         std::unique_ptr<FilmTile> get_film_tile(const Bounds2i& sample_bounds) const;

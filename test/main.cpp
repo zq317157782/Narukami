@@ -2,6 +2,8 @@
 #include "core/geometry.h"
 #include "core/spectrum.h"
 #include "core/optional.h"
+#include "textures/constant.h"
+#include "core/image.h"
 
 using namespace narukami;
 
@@ -224,6 +226,41 @@ TEST(rsqrt_quake, zero)
     //EXPECT_FLOAT_EQ(rsqrt_quake(0.0f),INFINITE);
 }
 
+TEST(log2, values)
+{
+    EXPECT_FLOAT_EQ(narukami::log2(4.0f), 2.0f);
+    EXPECT_FLOAT_EQ(narukami::log2(16.0f), 4.0f);
+    EXPECT_FLOAT_EQ(narukami::log2(64.0f), 6.0f);
+
+    EXPECT_EQ(narukami::log2(4), 2);
+    EXPECT_EQ(narukami::log2(16), 4);
+    EXPECT_EQ(narukami::log2(64), 6);
+}
+
+TEST(ctz, values)
+{
+    EXPECT_EQ(ctz(1), 0);
+    EXPECT_EQ(ctz(2), 1);
+    EXPECT_EQ(ctz(3), 0);
+    EXPECT_EQ(ctz(4), 2);
+    EXPECT_EQ(ctz(5), 0);
+    EXPECT_EQ(ctz(6), 1);
+    EXPECT_EQ(ctz(7), 0);
+    EXPECT_EQ(ctz(8), 3);
+}
+
+TEST(clz, values)
+{
+    EXPECT_EQ(clz(1), 31);
+    EXPECT_EQ(clz(2), 30);
+    EXPECT_EQ(clz(3), 30);
+    EXPECT_EQ(clz(4), 29);
+    EXPECT_EQ(clz(5), 29);
+    EXPECT_EQ(clz(6), 29);
+    EXPECT_EQ(clz(7), 29);
+    EXPECT_EQ(clz(8), 28);
+}
+
 /********************************************************/
 /************************spectrum************************/
 
@@ -242,18 +279,42 @@ TEST(Spectrum, assign)
     }
 }
 
-TEST(Spectrum,average)
+TEST(Spectrum, average)
 {
     Spectrum a0(0.0f);
-    EXPECT_FLOAT_EQ(average(a0),0.0f);
+    EXPECT_FLOAT_EQ(average(a0), 0.0f);
     Spectrum a1(1.0f);
-    EXPECT_FLOAT_EQ(average(a1),1.0f);
+    EXPECT_FLOAT_EQ(average(a1), 1.0f);
     Spectrum a2(-1.0f);
-    EXPECT_FLOAT_EQ(average(a2),-1.0f);
+    EXPECT_FLOAT_EQ(average(a2), -1.0f);
     Spectrum a3(100000000.0f);
-    EXPECT_FLOAT_EQ(average(a3),100000000.0f);
+    EXPECT_FLOAT_EQ(average(a3), 100000000.0f);
 }
 
+/********************************************************/
+/************************texture************************/
+
+TEST(ConstantTexture, sample)
+{
+    FloatConstantTexture a0(0.0f);
+    EXPECT_FLOAT_EQ(a0.sample(Point2f()), 0.0f);
+
+    SpectrumConstantTexture a1(Spectrum(0.0f));
+    EXPECT_FLOAT_EQ(average(a1.sample(Point2f())), 0.0f);
+}
+
+/********************************************************/
+/************************image************************/
+TEST(Image, get_texel)
+{
+    uint8_t data[4] = {0, 127, 255, 255};
+    Image image(data, Point2i(1, 1), PixelFormat::RGBA8);
+    auto texel = image.texel(Point2i(0, 0));
+    EXPECT_FLOAT_EQ(texel[0], 0.0f);
+    EXPECT_FLOAT_EQ(texel[1], 127/255.f);
+    EXPECT_FLOAT_EQ(texel[2], 1.0f);
+    EXPECT_FLOAT_EQ(texel[3], 1.0f);
+}
 // TEST(Spectrum, to_xyz)
 // {
 //     Spectrum::init();
@@ -1380,9 +1441,9 @@ TEST(Spectrum,average)
 // //     EXPECT_EQ(sample_scrambled_gray_code_van_der_corput(1,&s),0.75f);
 // // }
 
-// TEST(narukami,count_trailing_zero){
-//     EXPECT_EQ(count_trailing_zero(1),0);
-//     EXPECT_EQ(count_trailing_zero(2),1);
+// TEST(narukami,ctz){
+//     EXPECT_EQ(ctz(1),0);
+//     EXPECT_EQ(ctz(2),1);
 // }
 
 // #include "core/sampler.h"
