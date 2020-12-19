@@ -124,9 +124,13 @@ private:
     Point2i _resolution;
     PixelFormat _pixel_format;
     PixelState _pixel_state;
-    float get_float_data(const uint8_t* address) const;
-    void get_linear_data(float*,const uint8_t* address) const;
-    const uint8_t* address(const Point2i &idx) const;
+    float get_float_data(const uint8_t *address) const;
+    void set_float_data(uint8_t *address, float value);
+    void get_linear_data(const uint8_t *address,float *) const;
+    void set_linear_data(uint8_t *address,const float *);
+    uint8_t *address(const Point2i &idx);
+    const uint8_t *address(const Point2i &idx) const;
+
 public:
     Image(uint8_t *data, const Point2i &resolution, const PixelFormat &pf);
     Image(const char *file_name, const PixelFormat &pf = PixelFormat::sRGBA8);
@@ -134,7 +138,8 @@ public:
     int total_bytes() const;
     int total_pixels() const;
     const Point2i &resolution() const { return _resolution; }
-    RGBA texel(const Point2i &uv) const;
+    RGBA get_texel(const Point2i &p) const;
+    void set_texel(const Point2i &p,const RGBA& rgba);
     //static std::vector<shared<Image>> generate_mipmap(const shared<Image> &image);
 };
 NARUKAMI_END

@@ -345,4 +345,9 @@ inline uint32_t round_up_pow2(uint32_t v)
     v |= v >> 16;
     return v + 1;
 }
+
+inline bool is_pow2(uint32_t v)
+{
+    return v != 0 && (v & (v - 1)) == 0;
+}
 NARUKAMI_END

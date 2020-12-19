@@ -37,7 +37,7 @@ inline float to_area_measure_pdf(const float solid_angle_pdf, const float distan
     return solid_angle_pdf * costheta * rcp(distance_sqr);
 }
 
-inline Point2f polar_to_cartesian(const float radius,const float theta)
+inline Point2f polar_to_cartesian(const float radius, const float theta)
 {
     return Point2f(radius * cos(theta), radius * sin(theta));
 }
@@ -50,51 +50,56 @@ inline Point2f uniform_sample_disk(const Point2f &u)
 {
     float radius = sqrt(u.x);
     float theta = 2.0f * PI * u.y;
-    return polar_to_cartesian(radius,theta);
+    return polar_to_cartesian(radius, theta);
 }
 
 //"A low distortion map between disk and square"
 inline Point2f concentric_sample_disk(const Point2f &u)
 {
     auto u_offset = u * 2.0f - 1.0f;
-    if(u_offset.x == 0 && u_offset.y == 0)
+    if (u_offset.x == 0 && u_offset.y == 0)
     {
-        return Point2f(0.0f,0.0f);
+        return Point2f(0.0f, 0.0f);
     }
 
-    float radius,theta;
-    if(abs(u_offset.x) > abs(u_offset.y))
+    float radius, theta;
+    if (abs(u_offset.x) > abs(u_offset.y))
     {
         radius = u_offset.x;
-        theta = (u_offset.y/u_offset.x) * PI_OVER_FOUR;
+        theta = (u_offset.y / u_offset.x) * PI_OVER_FOUR;
     }
     else
     {
         radius = u_offset.y;
-        theta = PI_OVER_TWO - (u_offset.x/u_offset.y) * PI_OVER_FOUR;
+        theta = PI_OVER_TWO - (u_offset.x / u_offset.y) * PI_OVER_FOUR;
     }
-    return polar_to_cartesian(radius,theta);
+    return polar_to_cartesian(radius, theta);
 }
 
-//Malley’s Method. 
+//Malley’s Method.
 inline Vector3f cosine_sample_hemisphere(const Point2f &u)
 {
     Point2f d = concentric_sample_disk(u);
-    float z = sqrt(max(0.0f,1.0f - d.x *d.x - d.y * d.y));
-    return Vector3f(d.x,d.y,z);
+    float z = sqrt(max(0.0f, 1.0f - d.x * d.x - d.y * d.y));
+    return Vector3f(d.x, d.y, z);
 }
 
 //from PBRT
 // pdf(u,v) is constant for triangle barycentric
 inline Point2f uniform_sample_triangle_barycentric(const Point2f &u)
 {
-    float  su0 = sqrt(u[0]);
+    float su0 = sqrt(u[0]);
     return Point2f(1 - su0, u[1] * su0);
-} 
+}
 
-inline Point3f uniform_sample_triangle(const Triangle& tri, const Point2f &u)
+inline Point3f uniform_sample_triangle(const Triangle &tri, const Point2f &u)
 {
-    return get_vertex(tri,uniform_sample_triangle_barycentric(u));
+    return get_vertex(tri, uniform_sample_triangle_barycentric(u));
+}
+
+inline float gaussian(float x, float alpha, float e)
+{
+    return max(0.0f, exp(-alpha * x * x) - e);
 }
 
 NARUKAMI_END

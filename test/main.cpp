@@ -261,6 +261,18 @@ TEST(clz, values)
     EXPECT_EQ(clz(8), 28);
 }
 
+TEST(is_pow2,values)
+{
+    EXPECT_TRUE(is_pow2(1));
+    EXPECT_TRUE(is_pow2(2));
+    EXPECT_TRUE(!is_pow2(3));
+    EXPECT_TRUE(is_pow2(4));
+    EXPECT_TRUE(!is_pow2(5));
+    EXPECT_TRUE(!is_pow2(6));
+    EXPECT_TRUE(!is_pow2(7));
+    EXPECT_TRUE(is_pow2(8));
+}
+
 /********************************************************/
 /************************spectrum************************/
 
@@ -309,9 +321,21 @@ TEST(Image, get_texel)
 {
     uint8_t data[4] = {0, 127, 255, 255};
     Image image(data, Point2i(1, 1), PixelFormat::RGBA8);
-    auto texel = image.texel(Point2i(0, 0));
+    auto texel = image.get_texel(Point2i(0, 0));
     EXPECT_FLOAT_EQ(texel[0], 0.0f);
     EXPECT_FLOAT_EQ(texel[1], 127/255.f);
+    EXPECT_FLOAT_EQ(texel[2], 1.0f);
+    EXPECT_FLOAT_EQ(texel[3], 1.0f);
+}
+
+TEST(Image,set_texel)
+{
+    uint8_t data[4] = {0, 0, 0, 0};
+    Image image(data, Point2i(1, 1), PixelFormat::RGBA8);
+    image.set_texel(Point2i(0, 0),RGBA(1.0f,1.0f,1.0f,1.0f));
+    auto texel = image.get_texel(Point2i(0, 0));
+    EXPECT_FLOAT_EQ(texel[0], 1.0f);
+    EXPECT_FLOAT_EQ(texel[1], 1.0f);
     EXPECT_FLOAT_EQ(texel[2], 1.0f);
     EXPECT_FLOAT_EQ(texel[3], 1.0f);
 }
@@ -1320,8 +1344,8 @@ TEST(Image, get_texel)
 // //      std::vector<Normal3f> normals;
 // //      std::vector<Point2f> uvs;
 // //      std::vector<uint32_t> indices={0,1,2,1,2,3};
-// //      auto transform = make_shared(translate(Vector3f(1,0,0)));
-// //      auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
+// //      auto transform = narukami_shared(translate(Vector3f(1,0,0)));
+// //      auto transform2 = narukami_shared(translate(Vector3f(-1,0,0)));
 // //      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
 // //      EXPECT_EQ(meshs.size(),2);
 // //      auto triange = meshs[0];
@@ -1334,8 +1358,8 @@ TEST(Image, get_texel)
 // //      std::vector<Normal3f> normals;
 // //      std::vector<Point2f> uvs;
 // //      std::vector<uint32_t> indices={0,1,2,1,2,3};
-// //      auto transform = make_shared(translate(Vector3f(1,0,0)));
-// //      auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
+// //      auto transform = narukami_shared(translate(Vector3f(1,0,0)));
+// //      auto transform2 = narukami_shared(translate(Vector3f(-1,0,0)));
 // //      auto meshs=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
 
 // //      auto triangle_bounds=meshs[0]->bounds();
@@ -1349,8 +1373,8 @@ TEST(Image, get_texel)
 // //      std::vector<Normal3f> normals;
 // //      std::vector<Point2f> uvs;
 // //      std::vector<uint32_t> indices={0,1,2,1,2,3};
-// //      auto transform = make_shared(translate(Vector3f(1,0,0)));
-// //      auto transform2 = make_shared(translate(Vector3f(-1,0,0)));
+// //      auto transform = narukami_shared(translate(Vector3f(1,0,0)));
+// //      auto transform2 = narukami_shared(translate(Vector3f(-1,0,0)));
 // //      auto triangles=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
 // //      auto primitives=create_mesh_primitives(triangles);
 // //      EXPECT_EQ(primitives.size(),2);
@@ -1512,12 +1536,12 @@ TEST(Image, get_texel)
 // }
 
 // // TEST(integrator,integrator){
-// //     auto film = std::make_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
+// //     auto film = std::narukami_shared<Film>(Point2i(128,128),Bounds2f(Point2f(0,0),Point2f(1,1)));
 // //     Transform t;
 // //     Bounds2f b={{0,0},{1,1}};
-// //     auto a = std::make_shared<Transform>();
+// //     auto a = std::narukami_shared<Transform>();
 // //     auto camera = std::shared_ptr<const Camera>( new OrthographicCamera(t,b,film));
-// //     auto sampler = std::make_shared<Sampler>(1024);
+// //     auto sampler = std::narukami_shared<Sampler>(1024);
 // //     Integrator integrator(camera,sampler);
 // // }
 
@@ -1527,7 +1551,7 @@ TEST(Image, get_texel)
 // }
 
 // TEST(transform,new){
-//     //auto a=std::make_shared<Transform>();
+//     //auto a=std::narukami_shared<Transform>();
 //     //EXPECT_EQ(*a,Transform());
 //     auto a=new Transform();
 //     EXPECT_TRUE(((uint64_t)a%16)==0);
