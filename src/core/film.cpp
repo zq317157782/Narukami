@@ -111,10 +111,10 @@ shared<narukami::Image> Film::get_image() const
             }
 
             RGB rgb(pixel.intensity * inv_w);
-            data.push_back(rgb[0]);
-            data.push_back(rgb[1]);
-            data.push_back(rgb[2]);
-            data.push_back(1.0f);
+            data.emplace_back(rgb[0]);
+            data.emplace_back(rgb[1]);
+            data.emplace_back(rgb[2]);
+            data.emplace_back(1.0f);
         }
     }
     narukami::Image image(reinterpret_cast<uint8_t *>(&data[0]), resolution, PixelFormat::RGBA32);

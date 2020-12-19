@@ -126,7 +126,7 @@ class MemoryArena{
 
 			if(_current_block_pos+sz > _current_alloc_size){
 				if(_current_block){
-					_used.push_back({_current_alloc_size,_current_block});
+					_used.emplace_back(_current_alloc_size,_current_block);
 					_current_block = nullptr;
 				}
 
@@ -208,7 +208,7 @@ class MemoryPool
 		{
 			//no free node
 			T* chunck = alloc_aligned<T,LINE_SIZE>(_chunck_element_num);
-			_chuncks.push_back(chunck);
+			_chuncks.emplace_back(chunck);
 
 			//insert from tail to head
 			for(int32_t i= (_chunck_element_num - 1);i >= 0; --i)
