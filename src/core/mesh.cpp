@@ -39,7 +39,7 @@ shared<Mesh> create_plane(const shared<Transform> &object2world, const shared<Tr
     MeshSegment segment(faces);
     segments.push_back(segment);
 
-    return make_shared<Mesh>(object2world,world2object,vertices,normals,uvs,segments);
+    return std::make_shared<Mesh>(object2world,world2object,vertices,normals,uvs,segments);
 
 }
 

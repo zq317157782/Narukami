@@ -75,32 +75,9 @@ target_link_libraries(narukami_benchmark benchmark)
  
 
 #samples
-#add_executable(sample_render_a_soatriangle sample/render_a_soatriangle.cpp ${SRC_ALL})
 add_executable(sample_render_a_mesh sample/render_a_mesh.cpp ${SRC_ALL})
 target_link_libraries(sample_render_a_mesh tinyobjloader tinyply)
 add_executable(sample_render_xyz_to_rgb sample/render_xyz_to_rgb.cpp ${SRC_ALL})
-#add_executable(sample_render_a_texture_space sample/render_a_texture_space.cpp ${SRC_ALL})
-#add_executable(sample_render_a_bounds sample/render_a_bounds.cpp ${SRC_ALL})
-#add_executable(sample_output_2d_random_number sample/output_2d_random_number.cpp ${SRC_ALL})
-#add_executable(sample_output_sampler_data sample/output_sampler_data.cpp ${SRC_ALL})
-#add_executable(sample_render_a_sample_distribution sample/render_a_sample_distribution.cpp ${SRC_ALL})
-#add_executable(sample_accelerator_test sample/accelerator_test.cpp ${SRC_ALL})
-#target_link_libraries(sample_accelerator_test tinyobjloader tinyply)
-#add_executable(sample_test_parallel_for sample/test_parallel_for.cpp ${SRC_ALL})
-#add_executable(sample_test_animatedtransform sample/test_animatedtrasform.cpp ${SRC_ALL})
-
-
- 
-if(MSVC)
-  if(${MSVC_VERSION} GREATER_EQUAL 1915)
-    # You must acknowledge that you understand MSVC resolved a byte alignment issue in this compiler
-    # We get this due to using Eigen objects and allocating those objects with make_shared
-    target_compile_definitions( narukami_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-    target_compile_definitions( sample_render_a_mesh PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-    #target_compile_definitions( sample_accelerator_test PRIVATE _ENABLE_EXTENDED_ALIGNED_STORAGE )
-  endif()
-endif()
-
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

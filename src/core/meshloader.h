@@ -115,7 +115,7 @@ shared<Mesh> load_mesh<MeshFileFormat::OBJ>(const shared<Transform> &object2worl
         MeshSegment segment(faces);
         segments.push_back(segment);
     }
-    shared<Mesh> mesh = make_shared<Mesh>(object2world, world2object, positions, normals, uvs, segments);
+    shared<Mesh> mesh = std::make_shared<Mesh>(object2world, world2object, positions, normals, uvs, segments);
     return mesh;
 }
 
@@ -194,7 +194,7 @@ shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2worl
     std::vector<MeshSegment> segments;
     MeshSegment segment(faces);
     segments.push_back(segment);
-    shared<Mesh> mesh = make_shared<Mesh>(object2world, world2object, positions, normals, texcoords, segments);
+    shared<Mesh> mesh = std::make_shared<Mesh>(object2world, world2object, positions, normals, texcoords, segments);
     return mesh;
 }
 NARUKAMI_END

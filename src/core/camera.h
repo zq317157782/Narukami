@@ -52,9 +52,9 @@ NARUKAMI_BEGIN
             shared<Transform> _raster_to_camera;
          public:
             ProjectiveCamera(const shared<AnimatedTransform>&  camera_to_world,float shutter_open,float shutter_end,const shared<Transform>&  _camera_to_screen,const Bounds2f& screen_windows,shared<Film> film):Camera(camera_to_world,shutter_open,shutter_end,film),_camera_to_screen(_camera_to_screen){ 
-                _screen_to_raster = make_shared(scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f)));
-                _raster_to_screen = make_shared(inverse(*_screen_to_raster));
-                _raster_to_camera=make_shared(inverse(*_camera_to_screen)/*screen2camera*/*(*_raster_to_screen));
+                _screen_to_raster = std::make_shared<Transform>(scale(static_cast<float>(film->resolution.x),static_cast<float>(film->resolution.y),1.0f)*scale(1.0f/(screen_windows.max_point.x-screen_windows.min_point.x),1.0f/(screen_windows.min_point.y-screen_windows.max_point.y),1.0f)*translate(Vector3f(-screen_windows.min_point.x,-screen_windows.max_point.y,0.0f)));
+                _raster_to_screen = std::make_shared<Transform>(inverse(*_screen_to_raster));
+                _raster_to_camera= std::make_shared<Transform>(inverse(*_camera_to_screen)/*screen2camera*/*(*_raster_to_screen));
             }
     };
 NARUKAMI_END

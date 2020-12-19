@@ -26,7 +26,6 @@ SOFTWARE.
 /*
 narukami.h
 */
-
 //marco for namespace
 #define NARUKAMI_BEGIN \
     namespace narukami \
@@ -64,6 +63,11 @@ fprintf(stderr,"\n"); \
 
 #endif
 
+//这个宏是为了处理Transform使用了std::shared_ptr后引起的报错
+#if defined(_MSC_VER)
+#define _ENABLE_EXTENDED_ALIGNED_STORAGE
+#endif
+
 #include <assert.h>
 #include <ostream>
 #include <iostream>
@@ -83,14 +87,6 @@ class MemoryArena;
 
 template <typename T>
 using shared = std::shared_ptr<T>;
-
-template <typename T>
-inline shared<T> make_shared(const T &t)
-{
-    T *ptr = new T(t);
-    return shared<T>(ptr);
-}
-
 template<typename T>
 using unique = std::unique_ptr<T>;
 NARUKAMI_END

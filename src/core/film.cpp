@@ -118,7 +118,7 @@ shared<narukami::Image> Film::get_image() const
         }
     }
     narukami::Image image(reinterpret_cast<uint8_t *>(&data[0]), resolution, PixelFormat::RGBA32);
-    return make_shared<narukami::Image>(image);
+    return std::make_shared<narukami::Image>(image);
 }
 
 // void Film::write_to_file(const char *file_name) const

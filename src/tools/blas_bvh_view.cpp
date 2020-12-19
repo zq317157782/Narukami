@@ -16,7 +16,7 @@ shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_mesh_blas()
 {
     std::shared_ptr<Mesh> mesh;
     {
-        auto transform = make_shared(identity());
+        auto transform = std::make_shared<Transform>(identity());
         auto inv_transform = transform;
         mesh = load_mesh<MeshFileFormat::OBJ>(transform, inv_transform, "bunny.obj");
     }
@@ -28,7 +28,7 @@ shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>> get_hair_b
 {
     std::shared_ptr<HairStrands> hair;
     {
-        auto transform = make_shared(identity());
+        auto transform = std::make_shared<Transform>(identity());
         auto inv_transform = transform;
         hair = load_hairstrands<HairStrandsFileFormat::HAIR>(transform, inv_transform, "wCurly.hair",1.0f);
     }
