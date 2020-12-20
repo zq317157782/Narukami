@@ -226,68 +226,6 @@ void convert_float_to_float(std::vector<uint8_t> &out, int out_channel_num, cons
     }
 }
 
-// void convert_byte_to_byte(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, int count, const std::function<float(float)> &encode,const std::function<bool(int)>& is_alpha_channel)
-// {
-//     out.resize(count);
-//     const uint8_t *input = &in[0];
-//     for (int i = 0; i < count; ++i)
-//     {
-//         float v = clamp(input[i] / 255.f, 0.0f, 1.0f);
-//         if (!is_alpha_channel(i))
-//         {
-//             v = encode(v);
-//         }
-//         out[i] = static_cast<uint8_t>(clamp(v, 0.0f, 1.0f) * 255);
-//     }
-// }
-
-// void convert_byte_to_float(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, int count, const std::function<float(float)> &encode,const std::function<bool(int)>& is_alpha_channel)
-// {
-//     out.resize(count * 4);
-//     const uint8_t *input = &in[0];
-//     float *output = reinterpret_cast<float *>(&out[0]);
-//     for (int i = 0; i < count; ++i)
-//     {
-//         float v = clamp(input[i] / 255.f, 0.0f, 1.0f);
-//         if (!is_alpha_channel(i))
-//         {
-//             v = encode(v);
-//         }
-//         output[i] = v;
-//     }
-// }
-
-// void convert_float_to_byte(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, int count, const std::function<float(float)> &encode,const std::function<bool(int)>& is_alpha_channel)
-// {
-//     out.resize(count);
-//     const float *input = reinterpret_cast<const float *>(&in[0]);
-//     for (int i = 0; i < count; ++i)
-//     {
-//         float v = input[i];
-//         if (!is_alpha_channel(i))
-//         {
-//             v = encode(v);
-//         }
-//         out[i] = static_cast<uint8_t>(clamp(v, 0.0f, 1.0f) * 255);
-//     }
-// }
-
-// void convert_float_to_float(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, int count, const std::function<float(float)> &encode,const std::function<bool(int)>& is_alpha_channel)
-// {
-//     out.resize(count * 4);
-//     const float *input = reinterpret_cast<const float *>(&in[0]);
-//     float *output = reinterpret_cast<float *>(&out[0]);
-//     for (int i = 0; i < count; ++i)
-//     {
-//         float v = input[i];
-//         if (!is_alpha_channel(i))
-//         {
-//             v = encode(v);
-//         }
-//         output[i] = v;
-//     }
-// }
-
 void convert(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, const PixelFormat &out_format, const PixelFormat &in_format, int pixel_num)
 {
     std::vector<uint8_t> data;
