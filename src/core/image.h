@@ -28,6 +28,9 @@ SOFTWARE.
 NARUKAMI_BEGIN
 enum class PixelFormat
 {
+    R8,
+    RGB8,
+    sRGB8,
     RGBA8,
     sRGBA8,
     RGBA32
@@ -37,6 +40,15 @@ inline const char *pixel_format_name(const PixelFormat &pf)
 {
     switch (pf)
     {
+    case PixelFormat::R8:
+        return "R8";
+        break;
+    case PixelFormat::sRGB8:
+        return "sRGB8";
+        break;
+    case PixelFormat::RGB8:
+        return "RGB8";
+        break;
     case PixelFormat::RGBA8:
         return "RGBA8";
         break;
@@ -47,40 +59,40 @@ inline const char *pixel_format_name(const PixelFormat &pf)
         return "RGBA32";
         break;
     }
-}
-inline std::ostream &operator<<(std::ostream &out, const PixelFormat &pf)
-{
-    switch (pf)
-    {
-    case PixelFormat::RGBA8:
-        out << "RGBA8";
-        break;
-    case PixelFormat::sRGBA8:
-        out << "sRGBA8";
-        break;
-    case PixelFormat::RGBA32:
-        out << "RGB32";
-        break;
-    }
-    return out;
+    return "unknown";
 }
 
 inline int num_channel(const PixelFormat &pf)
 {
     switch (pf)
     {
+    case PixelFormat::R8:
+        return 1;
+        break;
+    case PixelFormat::RGB8:
+    case PixelFormat::sRGB8:
+        return 3;
+        break;
     case PixelFormat::RGBA8:
     case PixelFormat::sRGBA8:
     case PixelFormat::RGBA32:
         return 4;
         break;
     }
+    return 4;
 }
 
 inline int num_byte(const PixelFormat &pf)
 {
     switch (pf)
     {
+    case PixelFormat::R8:
+        return 1;
+        break;
+    case PixelFormat::RGB8:
+    case PixelFormat::sRGB8:
+        return 3;
+        break;
     case PixelFormat::RGBA8:
     case PixelFormat::sRGBA8:
         return 4;
@@ -89,13 +101,28 @@ inline int num_byte(const PixelFormat &pf)
         return 16;
         break;
     }
+    return 4;
 }
 
 inline bool is_srgb_space(const PixelFormat &pf)
 {
     switch (pf)
     {
+    case PixelFormat::sRGB8:
     case PixelFormat::sRGBA8:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool has_alpha(const PixelFormat &pf)
+{
+    switch (pf)
+    {
+    case PixelFormat::RGBA8:
+    case PixelFormat::sRGBA8:
+    case PixelFormat::RGBA32:
         return true;
     default:
         return false;
@@ -124,10 +151,10 @@ private:
     Point2i _resolution;
     PixelFormat _pixel_format;
     PixelState _pixel_state;
-    float get_float_data(const uint8_t *address) const;
-    void set_float_data(uint8_t *address, float value);
-    void get_linear_data(const uint8_t *address,float *) const;
-    void set_linear_data(uint8_t *address,const float *);
+    float get_data(const uint8_t *address) const;
+    void set_data(uint8_t *address, float value);
+    void get_linear_data(const uint8_t *address, float *) const;
+    void set_linear_data(uint8_t *address, const float *);
     uint8_t *address(const Point2i &idx);
     const uint8_t *address(const Point2i &idx) const;
 
@@ -136,10 +163,11 @@ public:
     Image(const char *file_name, const PixelFormat &pf = PixelFormat::sRGBA8);
     void write_to_png(const char *file_name, const PixelFormat &output_format = PixelFormat::sRGBA8);
     int total_bytes() const;
+    int total_channels() const;
     int total_pixels() const;
     const Point2i &resolution() const { return _resolution; }
     RGBA get_texel(const Point2i &p) const;
-    void set_texel(const Point2i &p,const RGBA& rgba);
+    void set_texel(const Point2i &p, const RGBA &rgba);
     //static std::vector<shared<Image>> generate_mipmap(const shared<Image> &image);
 };
 NARUKAMI_END
