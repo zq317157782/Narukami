@@ -640,9 +640,6 @@ public:
         return has_hit;
     }
     Bounds3f bounds() const override { return _bounds; }
-
-    void *operator new(size_t size);
-    void operator delete(void *ptr);
 };
 
 struct BLASInstanceInfo
@@ -677,9 +674,6 @@ public:
     bool intersect(const Ray &ray, SurfaceInteraction *interaction) const;
     bool intersect(const Ray &ray) const;
     Bounds3f bounds() const { return _bounds; }
-
-    void *operator new(size_t size);
-    void operator delete(void *ptr);
 };
 
 NARUKAMI_END

@@ -198,9 +198,6 @@ public:
         out << "[ vertex num:" << mesh._positions.size() << " normal num:" << mesh._normals.size() << " texcoord num:" << mesh._texcoords.size() << " segment num:" << mesh._segments.size() << " ]";
         return out;
     }
-
-    void *operator new(size_t size);
-    void operator delete(void *ptr);
 };
 
 shared<Mesh> create_plane(const shared<Transform> &object2world, const shared<Transform> &world2object, const float width, const float height);

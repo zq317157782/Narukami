@@ -3,20 +3,6 @@
 #include <vector>
 
 NARUKAMI_BEGIN
-
- MemoryPool<Mesh>   g_mesh_pool(256);
-// MemoryPool<TriangleMesh> g_triangle_mesh_pool(4095);
-
-void *Mesh::operator new(size_t size)
-{
-    return g_mesh_pool.alloc();
-}
-
-void Mesh::operator delete(void *ptr)
-{
-    g_mesh_pool.dealloc(reinterpret_cast<Mesh *>(ptr));
-}
-
 shared<Mesh> create_plane(const shared<Transform> &object2world, const shared<Transform> &world2object, const float width, const float height)
 {
     float hw = width * 0.5f;
