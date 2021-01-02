@@ -137,7 +137,7 @@ shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2worl
     }
     catch (const std::exception &e)
     {
-        std::cerr << "tinyply exception: " << e.what() << std::endl;
+        NARUKAMI_WARNING("tinyply exception %s", e.what())
     }
     try
     {
@@ -145,7 +145,7 @@ shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2worl
     }
     catch (const std::exception &e)
     {
-        std::cerr << "tinyply exception: " << e.what() << std::endl;
+        NARUKAMI_WARNING("tinyply exception %s", e.what())
     }
     try
     {
@@ -153,7 +153,7 @@ shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2worl
     }
     catch (const std::exception &e)
     {
-        std::cerr << "tinyply exception: " << e.what() << std::endl;
+        NARUKAMI_WARNING("tinyply exception %s", e.what())
     }
     try
     {
@@ -161,7 +161,7 @@ shared<Mesh> load_mesh<MeshFileFormat::PLY>(const shared<Transform> &object2worl
     }
     catch (const std::exception &e)
     {
-        std::cerr << "tinyply exception: " << e.what() << std::endl;
+        NARUKAMI_WARNING("tinyply exception %s", e.what())
     }
     file.read(*file_stream);
 
