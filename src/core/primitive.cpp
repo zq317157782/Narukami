@@ -26,45 +26,45 @@ SOFTWARE.
 #include "core/interaction.h"
 NARUKAMI_BEGIN
 
-MemoryPool<MeshPrimitive> g_mesh_primitive_pool(4096);
+MemoryPool<MeshTrianglePrimitive> g_mesh_triangle_primitive_pool(4096);
 
-void *MeshPrimitive::operator new(size_t size)
+void *MeshTrianglePrimitive::operator new(size_t size)
 {
-    return g_mesh_primitive_pool.alloc();
+    return g_mesh_triangle_primitive_pool.alloc();
 }
 
-void MeshPrimitive::operator delete(void *ptr)
+void MeshTrianglePrimitive::operator delete(void *ptr)
 {
-    g_mesh_primitive_pool.dealloc(reinterpret_cast<MeshPrimitive *>(ptr));
+    g_mesh_triangle_primitive_pool.dealloc(reinterpret_cast<MeshTrianglePrimitive *>(ptr));
 }
 
-std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &mesh)
+std::vector<shared<MeshTrianglePrimitive>> create_mesh_triangle_primitives(const shared<Mesh> &mesh)
 {
 
-    std::vector<shared<MeshPrimitive>> primitives;
+    std::vector<shared<MeshTrianglePrimitive>> primitives;
 
     for (uint32_t s = 0; s < mesh->get_segment_count(); ++s)
     {
         for (int f = 0; f < mesh->get_face_count(s); ++f)
         {
-            primitives.push_back(shared<MeshPrimitive>(new MeshPrimitive(mesh, s, f)));
+            primitives.push_back(shared<MeshTrianglePrimitive>(new MeshTrianglePrimitive(mesh, s, f)));
         }
     }
 
     return primitives;
 }
 
-bool intersect(RayPack &soa_ray, const CompactMeshPrimitive &compact_primitive, PrimitiveHitPoint *hit_point)
+bool intersect(RayPack &soa_ray, const CompactMeshTrianglePrimitive &compact_primitive, PrimitiveHitPoint *hit_point)
 {
     return intersect(soa_ray, compact_primitive.triangle, &hit_point->hit_t, &hit_point->param_uv, &hit_point->compact_offset);
 }
 
-bool intersect(RayPack &soa_ray, const CompactMeshPrimitive &compact_primitive)
+bool intersect(RayPack &soa_ray, const CompactMeshTrianglePrimitive &compact_primitive)
 {
     return intersect(soa_ray, compact_primitive.triangle);
 }
 
-void setup_interaction(const CompactMeshPrimitive &compact_primitive, const shared<MeshPrimitive> &primitive, const Ray &ray, const PrimitiveHitPoint &hit_point, SurfaceInteraction *interaction)
+void setup_interaction(const CompactMeshTrianglePrimitive &compact_primitive, const shared<MeshTrianglePrimitive> &primitive, const Ray &ray, const PrimitiveHitPoint &hit_point, SurfaceInteraction *interaction)
 {
     auto triangle = compact_primitive.triangle[hit_point.compact_offset];
     //交点和法线
@@ -106,7 +106,7 @@ void setup_interaction(const CompactMeshPrimitive &compact_primitive, const shar
     interaction->uv = primitive->get_texcoord(hit_point.param_uv);
 }
 
-std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count, std::vector<uint32_t> *offsets)
+std::vector<CompactMeshTrianglePrimitive> pack_compact_primitives(const std::vector<shared<MeshTrianglePrimitive>> &triangles, uint32_t start, uint32_t count, std::vector<uint32_t> *offsets)
 {
     assert(count > 0);
     assert((start + count) <= triangles.size());
@@ -137,11 +137,11 @@ std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shar
             e2_array.push_back(Vector3f());
         }
     }
-    std::vector<CompactMeshPrimitive> soa_primitives;
+    std::vector<CompactMeshTrianglePrimitive> soa_primitives;
 
     for (uint32_t i = 0; i < soa_count; ++i)
     {
-        CompactMeshPrimitive primitive;
+        CompactMeshTrianglePrimitive primitive;
         primitive.triangle.v0 = load(&v0_array[i * SSE_WIDTH]);
         primitive.triangle.e1 = load(&e1_array[i * SSE_WIDTH]);
         primitive.triangle.e2 = load(&e2_array[i * SSE_WIDTH]);
@@ -159,6 +159,19 @@ std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, c
     c.insert(c.end(), b.begin(), b.end());
     return c;
 }
+
+MemoryPool<HairSegmentPrimitive> g_hair_segment_primitive_pool(4096);
+
+void *HairSegmentPrimitive::operator new(size_t size)
+{
+    return g_hair_segment_primitive_pool.alloc();
+}
+
+void HairSegmentPrimitive::operator delete(void *ptr)
+{
+    g_hair_segment_primitive_pool.dealloc(reinterpret_cast<HairSegmentPrimitive *>(ptr));
+}
+
 
 std::vector<shared<HairSegmentPrimitive>> create_hair_segment_primitives(const shared<HairStrands> &hairstrands)
 {

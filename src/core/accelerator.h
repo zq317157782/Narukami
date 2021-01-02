@@ -62,7 +62,7 @@ struct BVHMeshPrimitiveState
     Bounds3f bounds;
     Point3f centroid;
     BVHMeshPrimitiveState() = default;
-    BVHMeshPrimitiveState(const shared<MeshPrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
+    BVHMeshPrimitiveState(const shared<MeshTrianglePrimitive> &p, uint32_t index) : prim_index(index), bounds(p->bounds()), centroid((p->bounds().min_point + p->bounds().max_point) * 0.5f) {}
 };
 
 /**

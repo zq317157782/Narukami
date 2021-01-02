@@ -12,7 +12,7 @@ using namespace narukami;
 
 
 
-shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_mesh_blas()
+shared<CompactBLAS<MeshTrianglePrimitive,CompactMeshTrianglePrimitive>> get_mesh_blas()
 {
     std::shared_ptr<Mesh> mesh;
     {
@@ -20,8 +20,8 @@ shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>> get_mesh_blas()
         auto inv_transform = transform;
         mesh = load_mesh<MeshFileFormat::OBJ>(transform, inv_transform, "bunny.obj");
     }
-    auto primitives = create_mesh_primitives(mesh);
-    return shared<CompactBLAS<MeshPrimitive,CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive,CompactMeshPrimitive>(primitives));
+    auto primitives = create_mesh_triangle_primitives(mesh);
+    return shared<CompactBLAS<MeshTrianglePrimitive,CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive,CompactMeshTrianglePrimitive>(primitives));
 }
 
 shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>> get_hair_blas()
@@ -36,7 +36,7 @@ shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>> get_hair_b
     return shared<CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>>(new CompactBLAS<HairSegmentPrimitive,CompactHairSegmentPrimitive>(primitives));
 }
 
-void draw_mesh(const shared<MeshPrimitive> &p)
+void draw_mesh(const shared<MeshTrianglePrimitive> &p)
 {
     auto v0 = p->get_vertex(0);
     auto v1 = p->get_vertex(1);

@@ -1368,7 +1368,7 @@ TEST(Image,set_texel)
 // // }
 
 // #include "core/primitive.h"
-// // TEST(primitive,create_mesh_primitives){
+// // TEST(primitive,create_mesh_triangle_primitives){
 // //      std::vector<Point3f> vertices={Point3f(0,1,0),Point3f(0,0,0),Point3f(1,0,0),Point3f(1,1,0)};
 // //      std::vector<Normal3f> normals;
 // //      std::vector<Point2f> uvs;
@@ -1376,7 +1376,7 @@ TEST(Image,set_texel)
 // //      auto transform = narukami_shared(translate(Vector3f(1,0,0)));
 // //      auto transform2 = narukami_shared(translate(Vector3f(-1,0,0)));
 // //      auto triangles=create_mesh_triangles(transform,transform2,indices,vertices,normals,uvs);
-// //      auto primitives=create_mesh_primitives(triangles);
+// //      auto primitives=create_mesh_triangle_primitives(triangles);
 // //      EXPECT_EQ(primitives.size(),2);
 
 // //     Bounds3f b0{{1,0,0},{2,1,0}};

@@ -46,7 +46,7 @@ class Primitive
 
 std::vector<shared<Primitive>> concat(const std::vector<shared<Primitive>> &a, const std::vector<shared<Primitive>> &b);
 
-class MeshPrimitive : public Primitive
+class MeshTrianglePrimitive : public Primitive
 {
 private:
     shared<Mesh> _mesh;
@@ -54,7 +54,7 @@ private:
     uint32_t _face;
 
 public:
-    MeshPrimitive(const shared<Mesh> &mesh, uint32_t segment, uint32_t face) : Primitive(), _mesh(mesh), _segment(segment), _face(face) {}
+    MeshTrianglePrimitive(const shared<Mesh> &mesh, uint32_t segment, uint32_t face) : Primitive(), _mesh(mesh), _segment(segment), _face(face) {}
     Bounds3f bounds() const override { return _mesh->get_face_bounds(_segment, _face); }
     const Transform &object_to_world() const { return _mesh->object_to_world(); }
     const Transform &world_to_object() const { return _mesh->world_to_object(); }
@@ -66,17 +66,17 @@ public:
     void operator delete(void *ptr);
 };
 
-std::vector<shared<MeshPrimitive>> create_mesh_primitives(const shared<Mesh> &mesh);
+std::vector<shared<MeshTrianglePrimitive>> create_mesh_triangle_primitives(const shared<Mesh> &mesh);
 
-struct CompactMeshPrimitive
+struct CompactMeshTrianglePrimitive
 {
     TrianglePack triangle; //128 byte
 };
 
-bool intersect(RayPack &soa_ray, const CompactMeshPrimitive &compact_primitive, PrimitiveHitPoint* hit_point);
-bool intersect(RayPack &soa_ray, const CompactMeshPrimitive &compact_primitive);
-void setup_interaction(const CompactMeshPrimitive &, const shared<MeshPrimitive> &, const Ray &, const PrimitiveHitPoint &, SurfaceInteraction *);
-std::vector<CompactMeshPrimitive> pack_compact_primitives(const std::vector<shared<MeshPrimitive>> &triangles, uint32_t start, uint32_t count, std::vector<uint32_t> *offsets);
+bool intersect(RayPack &soa_ray, const CompactMeshTrianglePrimitive &compact_primitive, PrimitiveHitPoint* hit_point);
+bool intersect(RayPack &soa_ray, const CompactMeshTrianglePrimitive &compact_primitive);
+void setup_interaction(const CompactMeshTrianglePrimitive &, const shared<MeshTrianglePrimitive> &, const Ray &, const PrimitiveHitPoint &, SurfaceInteraction *);
+std::vector<CompactMeshTrianglePrimitive> pack_compact_primitives(const std::vector<shared<MeshTrianglePrimitive>> &triangles, uint32_t start, uint32_t count, std::vector<uint32_t> *offsets);
 
 class HairSegmentPrimitive : public Primitive
 {
@@ -95,6 +95,9 @@ public:
     Point3f get_end_vertex() const { return _hairstrands->get_end_vertex(_strand, _segment); }
     float get_start_thickness() const { return _hairstrands->get_start_thickness(_strand, _segment); }
     float get_end_thickness() const { return _hairstrands->get_end_thickness(_strand, _segment); }
+
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 };
 
 std::vector<shared<HairSegmentPrimitive>> create_hair_segment_primitives(const shared<HairStrands> &hairstrands);

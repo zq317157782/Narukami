@@ -51,8 +51,8 @@ int main()
             //append(meshs, load_mesh_triangles_from_obj(transform, inv_transform, "bunny.obj", "."));
             mesh = load_mesh<MeshFileFormat::PLY>(transform, inv_transform, "xyzrgb_dragon.ply");
         }
-        auto primitives = create_mesh_primitives(mesh);
-        auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+        auto primitives = create_mesh_triangle_primitives(mesh);
+        auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
 
         {
 
@@ -94,8 +94,8 @@ int main()
             auto transform = std::make_shared<Transform>(translate(0, -1, 0) * rotate(90, 1, 0, 0));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
             shared<Mesh> mesh = create_plane(transform, inv_transform, 5, 5);
-            std::vector<shared<MeshPrimitive>> primitives = create_mesh_primitives(mesh);
-            auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+            std::vector<shared<MeshTrianglePrimitive>> primitives = create_mesh_triangle_primitives(mesh);
+            auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
             auto instance = std::make_shared<BLASInstance>(std::make_shared<AnimatedTransform>(std::make_shared<Transform>(t)), blas);
             instance_list.push_back(instance);
         }
@@ -103,8 +103,8 @@ int main()
             auto transform = std::make_shared<Transform>(translate(0, 1, 0) * rotate(90, 1, 0, 0));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
             shared<Mesh> mesh = create_plane(transform, inv_transform, 5, 5);
-            std::vector<shared<MeshPrimitive>> primitives = create_mesh_primitives(mesh);
-            auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+            std::vector<shared<MeshTrianglePrimitive>> primitives = create_mesh_triangle_primitives(mesh);
+            auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
             auto instance = std::make_shared<BLASInstance>(std::make_shared<AnimatedTransform>(std::make_shared<Transform>(t)), blas);
             instance_list.push_back(instance);
         }
@@ -113,8 +113,8 @@ int main()
             auto transform = std::make_shared<Transform>(translate(0, 0, 2.5f));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
             shared<Mesh> mesh = create_plane(transform, inv_transform, 5, 5);
-            std::vector<shared<MeshPrimitive>> primitives = create_mesh_primitives(mesh);
-            auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+            std::vector<shared<MeshTrianglePrimitive>> primitives = create_mesh_triangle_primitives(mesh);
+            auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
             auto instance = std::make_shared<BLASInstance>(std::make_shared<AnimatedTransform>(std::make_shared<Transform>(t)), blas);
             instance_list.push_back(instance);
         }
@@ -123,8 +123,8 @@ int main()
             auto transform = std::make_shared<Transform>(translate(2.5f, 0, 0) * rotate(90, 0, 1, 0));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
             shared<Mesh> mesh = create_plane(transform, inv_transform, 5, 5);
-            std::vector<shared<MeshPrimitive>> primitives = create_mesh_primitives(mesh);
-            auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+            std::vector<shared<MeshTrianglePrimitive>> primitives = create_mesh_triangle_primitives(mesh);
+            auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
             auto instance = std::make_shared<BLASInstance>(std::make_shared<AnimatedTransform>(std::make_shared<Transform>(t)), blas);
             instance_list.push_back(instance);
         }
@@ -133,8 +133,8 @@ int main()
             auto transform = std::make_shared<Transform>(translate(-2.5f, 0, 0) * rotate(90, 0, 1, 0));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
             shared<Mesh> mesh = create_plane(transform, inv_transform, 5, 5);
-            std::vector<shared<MeshPrimitive>> primitives = create_mesh_primitives(mesh);
-            auto blas = shared<CompactBLAS<MeshPrimitive, CompactMeshPrimitive>>(new CompactBLAS<MeshPrimitive, CompactMeshPrimitive>(primitives));
+            std::vector<shared<MeshTrianglePrimitive>> primitives = create_mesh_triangle_primitives(mesh);
+            auto blas = shared<CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>>(new CompactBLAS<MeshTrianglePrimitive, CompactMeshTrianglePrimitive>(primitives));
             auto instance = std::make_shared<BLASInstance>(std::make_shared<AnimatedTransform>(std::make_shared<Transform>(t)), blas);
             instance_list.push_back(instance);
         }
