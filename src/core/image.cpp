@@ -24,7 +24,7 @@ SOFTWARE.
 */
 #include "core/image.h"
 #include "core/sampling.h"
-#include "lodepng.h"
+#include "third/lodepng/lodepng.h"
 #include <functional>
 NARUKAMI_BEGIN
 Image::Image(uint8_t *data, const Point2i &resolution, const PixelFormat &pf) : _resolution(resolution), _pixel_format(pf), _pixel_state(pf)

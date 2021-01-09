@@ -15,19 +15,18 @@ endif()
 include_directories(src)
 include_directories(external)
 include_directories(external/benchmark/include/benchmark)
-include_directories(external/lodepng)
 include_directories(external/lua/src)
 include_directories(external/tinyobjloader)
 include_directories(external/glfw/include)
 include_directories(external/tinyply/source)
 include_directories(external/cyCodeBase)
 #####################################################################################################################
-#所有的CPP的路径
+#所有的CPP的路径 
 aux_source_directory(src/core SRC_CORE)
 aux_source_directory(src/cameras SRC_CAMERAS)
 aux_source_directory(src/materials SRC_MATERIALS)
-aux_source_directory(external/lodepng EXT_LODEPNG)
-set(SRC_ALL ${SRC_CORE} ${SRC_MATERIALS} ${SRC_CAMERAS}  ${EXT_LODEPNG})
+aux_source_directory(src/third/lodepng THIRD_LODEPNG)
+set(SRC_ALL ${SRC_CORE} ${SRC_MATERIALS} ${SRC_CAMERAS}  ${THIRD_LODEPNG})
 #####################################################################################################################
 #add gtest
 set(gtest_force_shared_crt ON)
