@@ -23,7 +23,6 @@ SOFTWARE.
 */
 #include "core/film.h"
 #include "core/memory.h"
-#include "core/imageio.h"
 NARUKAMI_BEGIN
 
 FilmTile::FilmTile(const Bounds2i &pixel_bounds, const float *filter_lut, const float filter_radius) : _pixel_bounds(pixel_bounds), _filter_lut(filter_lut), _filter_radius(filter_radius), _inv_filter_radius(1.0f / filter_radius)

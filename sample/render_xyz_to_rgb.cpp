@@ -1,5 +1,4 @@
 #include "core/narukami.h"
-#include "core/imageio.h"
 #include "core/film.h"
 #include "core/spectrum.h"
 using namespace narukami;
@@ -44,8 +43,8 @@ int main()
         auto image = film.get_image();
         image->write_to_png("CIE_Z_to_RGB.png");
 
-        Image a("mesh.png", PixelFormat::sRGBA8);
-        a.write_to_png("CIE_Z_to_RGB2.png");
+        Image a("mesh.png", PixelFormat::sRGB8);
+        a.write_to_png("CIE_Z_to_RGB2.png",PixelFormat::R8);
     }
     //narukami::write_image_to_file("texture_space.png",data,128,128);
 }

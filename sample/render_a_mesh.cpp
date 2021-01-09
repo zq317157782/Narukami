@@ -2,7 +2,6 @@
 #include "core/geometry.h"
 #include "core/mesh.h"
 #include "core/hairstrands.h"
-#include "core/imageio.h"
 #include "core/film.h"
 #include "core/spectrum.h"
 #include "core/sampler.h"

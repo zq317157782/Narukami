@@ -1,3 +1,4 @@
+[空间示意]
 screen space：
                                                                     
           +-------------------------------+----------------------------+(w1,h1,z1)
@@ -15,7 +16,7 @@ screen space：
 (w0,h0,z0)+------------------------------------------------------------+
         
 
-raster space
+raster space:
                                                                     
   (0,0) +-----------------------------------------------------------+
         |                                                           |
@@ -45,6 +46,11 @@ texture space:
 
 handeness: left-hand
 
+[采样器]
 sampler is sequeue, so No Sample Number Bound Limit!
         1D => van der Corput sequeue
         2D => Sobol (0,2)-sequeue
+
+[纹理]
+纹理支持缓存(texcache)
+
