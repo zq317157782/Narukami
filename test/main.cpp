@@ -332,7 +332,7 @@ TEST(Image,set_texel)
 {
     uint8_t data[4] = {0, 0, 0, 0};
     Image image(data, Point2i(1, 1), PixelFormat::RGBA8);
-    image.set_texel(Point2i(0, 0),RGBA(1.0f,1.0f,1.0f,1.0f));
+    image.set_texel(Point2i(0, 0),FLinearColor(1.0f,1.0f,1.0f,1.0f));
     auto texel = image.get_texel(Point2i(0, 0));
     EXPECT_FLOAT_EQ(texel[0], 1.0f);
     EXPECT_FLOAT_EQ(texel[1], 1.0f);

@@ -150,7 +150,7 @@ int main()
         } {
             auto transform = std::make_shared<Transform>(translate(Vector3f(0.0f, 1.0f, 0.5f)) * rotate(-90, 1, 0, 0));
             auto inv_transform = std::make_shared<Transform>(inverse(*transform));
-            auto rect_light = new RectLight(transform, inv_transform, tungsten_lamp_3000k(50), false, 1, 1);
+            auto rect_light = new RectLight(transform, inv_transform, tungsten_lamp_3000k(5), false, 1, 1);
             lights.push_back(rect_light);
         }
     }

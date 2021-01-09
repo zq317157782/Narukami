@@ -20,6 +20,7 @@ include_directories(external/tinyobjloader)
 include_directories(external/glfw/include)
 include_directories(external/tinyply/source)
 include_directories(external/cyCodeBase)
+include_directories(external/rgb2spec)
 #####################################################################################################################
 #所有的CPP的路径 
 aux_source_directory(src/core SRC_CORE)
@@ -44,39 +45,39 @@ add_subdirectory(external/tinyobjloader)
 # add_subdirectory(external/sdl2)
 add_subdirectory(external/glfw)
 add_subdirectory(external/tinyply)
-#add embree3
-# set(EMBREE_ISPC_SUPPORT OFF)
-# set(EMBREE_TUTORIALS OFF)
-# set(EMBREE_TASKING_SYSTEM "NO") #TODO change to TBB
-# add_subdirectory(external/embree)
+add_subdirectory(external/rgb2spec)
 #add benchmark
 SET(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 add_subdirectory(external/benchmark)
 #openGL
 find_package(OPENGL REQUIRED)
+
+set(LINK_TARGET_ALL rgb2spec tinyobjloader tinyply)
+
 #narukami
 add_executable(narukami src/main.cpp ${SRC_ALL})
-target_link_libraries(narukami tinyobjloader)
+target_link_libraries(narukami ${LINK_TARGET_ALL})
 # target_link_libraries(narukami embree)
 #####################################################################################################################
 #tools
 add_executable(blas_bvh_view src/tools/blas_bvh_view.cpp ${SRC_ALL})
-target_link_libraries(blas_bvh_view glfw tinyobjloader tinyply ${OPENGL_LIBRARIES}) 
+target_link_libraries(blas_bvh_view glfw ${LINK_TARGET_ALL} ${OPENGL_LIBRARIES}) 
 
 #narukami_test
 add_executable(narukami_test test/main.cpp ${SRC_ALL})
-target_link_libraries(narukami_test gtest lua5.3.4)
+target_link_libraries(narukami_test gtest ${LINK_TARGET_ALL})
 
 #benchmark 
 add_executable(narukami_benchmark benchmark/main.cpp ${SRC_ALL})
-target_link_libraries(narukami_benchmark benchmark)
-
- 
+target_link_libraries(narukami_benchmark benchmark ${LINK_TARGET_ALL})
 
 #samples
 add_executable(sample_render_a_mesh sample/render_a_mesh.cpp ${SRC_ALL})
-target_link_libraries(sample_render_a_mesh tinyobjloader tinyply)
-add_executable(sample_render_xyz_to_rgb sample/render_xyz_to_rgb.cpp ${SRC_ALL})
+target_link_libraries(sample_render_a_mesh ${LINK_TARGET_ALL})
+add_custom_command(TARGET sample_render_a_mesh POST_BUILD        # Adds a post-build event to sample_render_a_mesh
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${PROJECT_SOURCE_DIR}/src/core/srgb.coeff"      # <--this is in-file
+        $<TARGET_FILE_DIR:sample_render_a_mesh>)                 # <--this is out-file path
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

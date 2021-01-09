@@ -316,6 +316,11 @@ inline float between(const float x0, const float x1, const float x)
     assert((x1 - x0) != 0);
     return (x - x0) / (x1 - x0);
 }
+
+inline float smoothstep(float x) {
+    return x * x * (3.0f - 2.0f * x);
+}
+
 //质心坐标插值
 template <typename T>
 T bycerp(const T &x0, const T &x1, const T &x2, float t, float s)

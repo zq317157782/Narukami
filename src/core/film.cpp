@@ -109,39 +109,20 @@ shared<narukami::Image> Film::get_image() const
                 inv_w = 1.0f;
             }
 
-            RGB rgb(pixel.intensity * inv_w);
-            data.emplace_back(rgb[0]);
-            data.emplace_back(rgb[1]);
-            data.emplace_back(rgb[2]);
+            float xyz[3];
+            from_spd_to_xyz(pixel.intensity * inv_w,xyz);
+            float srgb[3];
+            from_xyz_to_srgb(xyz,srgb);
+            
+            data.emplace_back(srgb[0]);
+            data.emplace_back(srgb[1]);
+            data.emplace_back(srgb[2]);
             data.emplace_back(1.0f);
         }
     }
-    narukami::Image image(reinterpret_cast<uint8_t *>(&data[0]), resolution, PixelFormat::RGBA32);
+    narukami::Image image(reinterpret_cast<uint8_t *>(&data[0]), resolution, PixelFormat::sRGBA32);
     return std::make_shared<narukami::Image>(image);
 }
-
-// void Film::write_to_file(const char *file_name) const
-// {
-//     std::vector<float> data;
-//     for (int y = _cropped_pixel_bounds[0].y; y < _cropped_pixel_bounds[1].y; ++y)
-//     {
-//         for (int x = _cropped_pixel_bounds[0].x; x < _cropped_pixel_bounds[1].x; ++x)
-//         {
-//             const Pixel &pixel = get_pixel(Point2i(x, y));
-//             float inv_w = rcp(pixel.weight);
-//             if (EXPECT_NOT_TAKEN(pixel.weight == 0.0f))
-//             {
-//                 inv_w = 1.0f;
-//             }
-
-//             RGB rgb(pixel.intensity * inv_w);
-//             data.push_back(rgb[0]);
-//             data.push_back(rgb[1]);
-//             data.push_back(rgb[2]);
-//         }
-//     }
-//     write_image_to_file(file_name, &data[0], resolution.x, resolution.y);
-// }
 
 void Film::add_sample(const Point2f &pos, const Spectrum &l, const float weight) const
 {

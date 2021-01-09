@@ -61,6 +61,7 @@ namespace png
         case PixelFormat::RGBA8:
         case PixelFormat::sRGBA8:
         case PixelFormat::RGBA32:
+        case PixelFormat::sRGBA32:
             return LCT_RGBA;
             break;
         }
@@ -77,6 +78,7 @@ namespace png
         case PixelFormat::RGBA8:
         case PixelFormat::sRGBA8:
         case PixelFormat::RGBA32: //TODO 16bit is better
+        case PixelFormat::sRGBA32: //TODO 16bit is better
             return 8;
             break;
         }
@@ -89,6 +91,9 @@ namespace png
         {
         case PixelFormat::RGBA32:
             return PixelFormat::RGBA8;
+            break;
+        case PixelFormat::sRGBA32:
+            return PixelFormat::sRGBA8;
             break;
         default:
             return pf;
@@ -395,19 +400,19 @@ const uint8_t *Image::address(const Point2i &idx) const
     return &_data[0] + (width * idx.y + idx.x) * _pixel_state.byte_num;
 }
 
-RGBA Image::get_texel(const Point2i &idx) const
+FLinearColor Image::get_texel(const Point2i &idx) const
 {
     assert(idx.x >= 0 && idx.x < _resolution.x);
     assert(idx.y >= 0 && idx.y < _resolution.y);
     float data[4];
     get_linear_data(address(idx), data);
-    return RGBA(data[0], data[1], data[2], data[3]);
+    return FLinearColor(data[0], data[1], data[2], data[3]);
 }
 
-void Image::set_texel(const Point2i &p, const RGBA &rgba)
+void Image::set_texel(const Point2i &p, const FLinearColor &rgba)
 {
-    assert(idx.x >= 0 && idx.x < _resolution.x);
-    assert(idx.y >= 0 && idx.y < _resolution.y);
+    assert(p.x >= 0 && p.x < _resolution.x);
+    assert(p.y >= 0 && p.y < _resolution.y);
     float data[4] = {rgba[0], rgba[1], rgba[2], rgba[3]};
     set_linear_data(address(p), data);
 }

@@ -33,7 +33,8 @@ enum class PixelFormat
     sRGB8,
     RGBA8,
     sRGBA8,
-    RGBA32
+    RGBA32,
+    sRGBA32
 };
 
 inline const char *pixel_format_name(const PixelFormat &pf)
@@ -58,6 +59,9 @@ inline const char *pixel_format_name(const PixelFormat &pf)
     case PixelFormat::RGBA32:
         return "RGBA32";
         break;
+    case PixelFormat::sRGBA32:
+        return "sRGBA32";
+        break;
     }
     return "unknown";
 }
@@ -76,6 +80,7 @@ inline int num_channel(const PixelFormat &pf)
     case PixelFormat::RGBA8:
     case PixelFormat::sRGBA8:
     case PixelFormat::RGBA32:
+    case PixelFormat::sRGBA32:
         return 4;
         break;
     }
@@ -98,6 +103,7 @@ inline int num_byte(const PixelFormat &pf)
         return 4;
         break;
     case PixelFormat::RGBA32:
+    case PixelFormat::sRGBA32:
         return 16;
         break;
     }
@@ -110,6 +116,7 @@ inline bool is_srgb_space(const PixelFormat &pf)
     {
     case PixelFormat::sRGB8:
     case PixelFormat::sRGBA8:
+    case PixelFormat::sRGBA32:
         return true;
     default:
         return false;
@@ -123,6 +130,7 @@ inline bool has_alpha(const PixelFormat &pf)
     case PixelFormat::RGBA8:
     case PixelFormat::sRGBA8:
     case PixelFormat::RGBA32:
+    case PixelFormat::sRGBA32:
         return true;
     default:
         return false;
@@ -142,6 +150,22 @@ struct PixelState
     int byte_num;
     int byte_per_channel;
     bool is_srgb;
+};
+
+struct FLinearColor
+{
+    float r, g, b, a;
+    FLinearColor(float rr, float gg, float bb, float aa) : r(rr), g(gg), b(bb), a(aa) {}
+    inline float operator[](const int idx) const
+    {
+        assert(idx >= 0 && idx < 4);
+        return (&r)[idx];
+    }
+    inline float &operator[](const int idx)
+    {
+        assert(idx >= 0 && idx < 4);
+        return (&r)[idx];
+    }
 };
 
 class Image
@@ -166,8 +190,8 @@ public:
     int total_channels() const;
     int total_pixels() const;
     const Point2i &resolution() const { return _resolution; }
-    RGBA get_texel(const Point2i &p) const;
-    void set_texel(const Point2i &p, const RGBA &rgba);
+    FLinearColor get_texel(const Point2i &p) const;
+    void set_texel(const Point2i &p, const FLinearColor &rgba);
     //static std::vector<shared<Image>> generate_mipmap(const shared<Image> &image);
 };
 NARUKAMI_END
