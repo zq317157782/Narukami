@@ -23,13 +23,13 @@ include_directories(external/cyCodeBase)
 include_directories(external/rgb2spec)
 include_directories(external/imgui)
 include_directories(external/imgui/backends)
+#include_directories(external/imgui/GL)
 #####################################################################################################################
 #所有的CPP的路径 
 aux_source_directory(src/core SRC_CORE)
 aux_source_directory(src/core/lodepng SRC_CORE_LODEPNG)
 aux_source_directory(src/cameras SRC_CAMERAS)
 aux_source_directory(src/materials SRC_MATERIALS)
-aux_source_directory(src/third/GL THIRD_GL3W)
 set(SRC_ALL ${SRC_CORE} ${SRC_MATERIALS} ${SRC_CAMERAS}  ${SRC_CORE_LODEPNG})
 #####################################################################################################################
 #add gtest
@@ -70,7 +70,7 @@ target_link_libraries(narukami ${LINK_TARGET_ALL})
 # target_link_libraries(blas_bvh_view glfw ${LINK_TARGET_ALL} ${OPENGL_LIBRARIES}) 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GL3W")
-add_executable(rgb2spd src/tools/rgb2spd/rgb2spd.cpp ${SRC_ALL} ${THIRD_GL3W})
+add_executable(rgb2spd src/tools/rgb2spd/rgb2spd.cpp ${SRC_ALL})
 target_link_libraries(rgb2spd glfw ${LINK_TARGET_ALL} ${OPENGL_LIBRARIES} imgui) 
 add_custom_command(TARGET rgb2spd POST_BUILD        
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  
