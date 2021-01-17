@@ -26,11 +26,11 @@ include_directories(external/imgui/backends)
 #####################################################################################################################
 #所有的CPP的路径 
 aux_source_directory(src/core SRC_CORE)
+aux_source_directory(src/core/lodepng SRC_CORE_LODEPNG)
 aux_source_directory(src/cameras SRC_CAMERAS)
 aux_source_directory(src/materials SRC_MATERIALS)
-aux_source_directory(src/third/lodepng THIRD_LODEPNG)
 aux_source_directory(src/third/GL THIRD_GL3W)
-set(SRC_ALL ${SRC_CORE} ${SRC_MATERIALS} ${SRC_CAMERAS}  ${THIRD_LODEPNG})
+set(SRC_ALL ${SRC_CORE} ${SRC_MATERIALS} ${SRC_CAMERAS}  ${SRC_CORE_LODEPNG})
 #####################################################################################################################
 #add gtest
 set(gtest_force_shared_crt ON)
